@@ -1,19 +1,20 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
-import { DashboardMockup } from "./dashboard-mockup"
+import { DashboardPreview } from "./dashboard-preview"
 import { Navbar } from "./navbar"
-import { LogoCloud } from "./logo-cloud"
+import { CustomerStory } from "./customer-story"
 import { FeatureCardsSection } from "./feature-cards-section"
 import { AISection } from "./ai-section"
-import { ProductDirectionSection } from "./product-direction-section"
-import { WorkflowsSection } from "./workflows-section"
-import { CTASection } from "./cta-section"
-// import { Footer } from "./footer"
+import { PipelineSection } from "./pipeline-section"
+import { WaitlistSection } from "./waitlist-section"
 import { WaitlistFooter } from "./waitlist-footer"
+import { CookieConsent } from "./cookie-consent"
 
-export function Hero3DStage() {
+export function LandingPage() {
+  const t = useTranslations("hero")
   const [yOffset, setYOffset] = useState(0)
 
   useEffect(() => {
@@ -40,7 +41,6 @@ export function Hero3DStage() {
       <section id="hero" className="relative min-h-screen overflow-hidden" style={{ backgroundColor: "#09090B" }}>
         <Navbar />
 
-        {/* Subtle glow */}
         <div
           className="absolute pointer-events-none"
           style={{
@@ -53,9 +53,7 @@ export function Hero3DStage() {
           }}
         />
 
-        {/* Main content */}
         <div className="relative z-10 pt-28 flex flex-col">
-          {/* Hero text - contained and centered */}
           <div className="w-full flex justify-center px-6 mt-16">
             <div className="w-full max-w-4xl">
               <motion.h1
@@ -64,7 +62,7 @@ export function Hero3DStage() {
                 transition={{ duration: 0.6 }}
                 className="text-4xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance"
               >
-                Discover, score, and convert your next best customers
+                {t("heading")}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -72,9 +70,7 @@ export function Hero3DStage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="mt-6 text-lg text-zinc-400"
               >
-                ScoreLead uses AI to find and qualify businesses, enrich them with detailed data,
-                <br />
-                score their potential, and generate personalized outreach automatically.
+                {t("subtitle")}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -82,18 +78,17 @@ export function Hero3DStage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mt-8 flex items-center gap-6 relative z-20"
               >
-                <a href="#waitlist" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
-                  Join the waitlist
-                </a>
-                <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
-                  See how it works
+                <button onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })} className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
+                  {t("cta")}
+                </button>
+                <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
+                  {t("secondary")}
                   <span aria-hidden="true">→</span>
-                </a>
+                </button>
               </motion.div>
             </div>
           </div>
 
-          {/* 3D Stage - full bleed */}
           <div
             className="relative mt-16"
             style={{
@@ -114,7 +109,6 @@ export function Hero3DStage() {
               }}
             />
 
-            {/* Perspective container */}
             <div
               style={{
                 transform: `translateY(${yOffset}px)`,
@@ -128,7 +122,6 @@ export function Hero3DStage() {
                 position: "relative",
               }}
             >
-              {/* Transformed base */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -157,21 +150,20 @@ export function Hero3DStage() {
                   overflow: "hidden",
                 }}
               >
-                <DashboardMockup />
+                <DashboardPreview />
               </motion.div>
             </div>
           </div>
 
-          <LogoCloud />
+          <CustomerStory />
           <FeatureCardsSection />
           <AISection />
-          <ProductDirectionSection />
-          {/* <WorkflowsSection /> */}
-          <CTASection />
-          {/* <Footer /> */}
+          <PipelineSection />
+          <WaitlistSection />
           <WaitlistFooter />
         </div>
       </section>
+      <CookieConsent />
     </>
   )
 }

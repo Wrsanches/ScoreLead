@@ -1,6 +1,11 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { ScoreLeadLogo } from "./scorelead-logo"
 
 export function WaitlistFooter() {
+  const t = useTranslations("footer")
+
   return (
     <footer className="border-t border-zinc-800/50 py-8 px-6" style={{ backgroundColor: "#09090B" }}>
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -9,7 +14,7 @@ export function WaitlistFooter() {
           <span className="text-zinc-500 text-sm">ScoreLead</span>
         </div>
         <p className="text-zinc-600 text-xs">
-          &copy; {new Date().getFullYear()} ScoreLead. All rights reserved.
+          &copy; {new Date().getFullYear()} ScoreLead. {t("rights")}
         </p>
       </div>
     </footer>

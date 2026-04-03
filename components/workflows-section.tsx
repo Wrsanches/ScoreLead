@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight, ArrowRight, MapPin, Search, Globe, Sparkles, FileDown, Mail, Code } from "lucide-react"
 
 const carouselCards = [
@@ -56,11 +57,12 @@ const carouselCards = [
 ]
 
 function MapDiscoveryMockup() {
+  const t = useTranslations("capabilities")
   return (
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center gap-2 text-xs text-zinc-400">
         <MapPin className="w-3.5 h-3.5" />
-        <span>Business Discovery</span>
+        <span>{t("mockupDiscovery")}</span>
       </div>
       {[
         { name: "Sunset Yoga Studio", rating: "4.7", reviews: "128" },
@@ -81,15 +83,16 @@ function MapDiscoveryMockup() {
 }
 
 function WebSearchMockup() {
+  const t = useTranslations("capabilities")
   return (
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center gap-2 text-xs text-zinc-400">
         <Search className="w-3.5 h-3.5" />
-        <span>Web Intelligence</span>
+        <span>{t("mockupWebIntelligence")}</span>
       </div>
       <div className="bg-zinc-800/30 rounded-lg px-3 py-2">
-        <span className="text-xs text-zinc-500">Query:</span>
-        <span className="text-xs text-zinc-300 ml-1">yoga studios San Francisco</span>
+        <span className="text-xs text-zinc-500">{t("mockupQuery")}</span>
+        <span className="text-xs text-zinc-300 ml-1">{t("mockupQueryValue")}</span>
       </div>
       {["sunsetyoga.com", "peakfitness.co", "bloomwellness.com"].map((url) => (
         <div key={url} className="flex items-center gap-2 px-3 py-1.5">
@@ -97,47 +100,49 @@ function WebSearchMockup() {
           <span className="text-xs text-blue-400">{url}</span>
         </div>
       ))}
-      <span className="text-[10px] text-zinc-600 px-3">Aggregator sites filtered automatically</span>
+      <span className="text-[10px] text-zinc-600 px-3">{t("mockupAggregatorFiltered")}</span>
     </div>
   )
 }
 
 function DataExtractionMockup() {
+  const t = useTranslations("capabilities")
   return (
     <div className="flex flex-col gap-2 p-4">
       <div className="flex items-center gap-2 text-xs text-zinc-400">
         <Globe className="w-3.5 h-3.5" />
-        <span>Data Extraction</span>
+        <span>{t("mockupDataExtraction")}</span>
         <span className="text-zinc-600">·</span>
         <span className="text-blue-400/70">sunsetyoga.com</span>
       </div>
       <div className="mt-2 bg-zinc-800/30 rounded-lg px-3 py-2 font-mono text-[10px] text-zinc-500 space-y-1">
-        <p><span className="text-zinc-400">email:</span> hello@sunsetyoga.com</p>
-        <p><span className="text-zinc-400">phone:</span> (415) 555-0142</p>
-        <p><span className="text-zinc-400">services:</span> yoga, pilates, meditation</p>
-        <p className="text-zinc-600">  Extracting content...</p>
+        <p><span className="text-zinc-400">{t("mockupEmail")}</span> hello@sunsetyoga.com</p>
+        <p><span className="text-zinc-400">{t("mockupPhone")}</span> (415) 555-0142</p>
+        <p><span className="text-zinc-400">{t("mockupServices")}</span> {t("mockupServicesValue")}</p>
+        <p className="text-zinc-600">  {t("mockupExtractingContent")}</p>
       </div>
       <div className="flex items-center gap-1 mt-1">
         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-[10px] text-zinc-500">Crawling 3 pages...</span>
+        <span className="text-[10px] text-zinc-500">{t("mockupCrawling")}</span>
       </div>
     </div>
   )
 }
 
 function AIEnrichmentMockup() {
+  const t = useTranslations("capabilities")
   return (
     <div className="flex flex-col gap-2 p-4">
       <div className="flex items-center gap-2 text-xs text-zinc-400 mb-1">
         <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-        <span>AI Enrichment</span>
-        <span className="ml-auto text-[10px] text-emerald-400">12 fields extracted</span>
+        <span>{t("mockupAIEnrichment")}</span>
+        <span className="ml-auto text-[10px] text-emerald-400">{t("mockupFieldsExtracted")}</span>
       </div>
       {[
         { field: "email", value: "hello@sunset...", done: true },
         { field: "phone", value: "(415) 555-01...", done: true },
         { field: "services", value: "yoga, pilates, med...", done: true },
-        { field: "team_size", value: "8 members", done: true },
+        { field: "team_size", value: t("mockupMembers"), done: true },
         { field: "pricing", value: "$25–$40/class", done: false },
       ].map((item) => (
         <div key={item.field} className="flex items-center gap-2 bg-zinc-800/30 rounded-md px-3 py-1.5">
@@ -151,6 +156,7 @@ function AIEnrichmentMockup() {
 }
 
 function CSVExportMockup() {
+  const t = useTranslations("capabilities")
   return (
     <div className="flex items-center justify-center h-full">
       <div className="flex flex-col items-center gap-3">
@@ -160,12 +166,12 @@ function CSVExportMockup() {
             <span className="text-xs font-mono text-zinc-400">leads_export.csv</span>
           </div>
           <div className="text-[9px] font-mono text-zinc-600 space-y-0.5">
-            <p>name,email,score,status</p>
-            <p>Sunset Yoga,hello@...,4.5,new</p>
-            <p>Peak Fitness,info@...,4.0,con</p>
+            <p>{t("mockupCsvName")}</p>
+            <p>{t("mockupCsvRow1")}</p>
+            <p>{t("mockupCsvRow2")}</p>
           </div>
         </div>
-        <span className="text-[10px] text-zinc-500">1,240 leads · 28 columns</span>
+        <span className="text-[10px] text-zinc-500">{t("mockupLeads")}</span>
       </div>
     </div>
   )
@@ -231,7 +237,14 @@ function CardMockup({ type }: { type: string }) {
 }
 
 export function WorkflowsSection() {
+  const t = useTranslations("capabilities")
   const [scrollPosition, setScrollPosition] = useState(0)
+
+  const translatedCards = carouselCards.map((card, i) => ({
+    ...card,
+    category: t(`card${i + 1}Category`),
+    title: t(`card${i + 1}Title`),
+  }))
 
   const scrollLeft = () => {
     setScrollPosition(Math.max(0, scrollPosition - 1))
@@ -243,7 +256,6 @@ export function WorkflowsSection() {
 
   return (
     <section id="integrations" className="relative py-24" style={{ backgroundColor: "#09090B" }}>
-      {/* Top gradient */}
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -253,44 +265,34 @@ export function WorkflowsSection() {
       />
 
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mb-16">
           <div className="lg:max-w-xl">
-            {/* Orange indicator */}
             <div className="flex items-center gap-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-orange-500" />
-              <span className="text-sm text-zinc-400">Capabilities</span>
+              <span className="text-sm text-zinc-400">{t("label")}</span>
               <ChevronRight className="w-4 h-4 text-zinc-600" />
             </div>
 
-            {/* Heading */}
             <h2 className="text-4xl md:text-5xl font-medium text-white leading-[1.1]">
-              Everything you need
-              <br />
-              in one platform
+              {t("heading")}
             </h2>
           </div>
 
-          {/* Description */}
           <p className="text-zinc-400 lg:max-w-sm lg:pt-12">
-            ScoreLead combines AI-powered discovery, enrichment, scoring, outreach, and export into a single platform
-            - so your team can focus on closing deals.
+            {t("description")}
           </p>
         </div>
 
-        {/* Carousel */}
         <div className="relative overflow-hidden">
           <div
             className="flex gap-4 transition-transform duration-300 ease-out"
             style={{ transform: `translateX(-${scrollPosition * (100 / 4)}%)` }}
           >
-            {carouselCards.map((card) => (
+            {translatedCards.map((card) => (
               <div key={card.id} className="shrink-0 w-[calc(25%-12px)] min-w-[280px]">
                 <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl overflow-hidden h-[340px] flex flex-col">
-                  {/* Mockup area */}
                   <div className="flex-1 relative overflow-hidden">
                     <CardMockup type={card.mockup} />
-                    {/* Fade overlay */}
                     <div
                       className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
                       style={{
@@ -299,7 +301,6 @@ export function WorkflowsSection() {
                     />
                   </div>
 
-                  {/* Card footer */}
                   <div className="p-4 border-t border-zinc-800/30">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -317,7 +318,6 @@ export function WorkflowsSection() {
           </div>
         </div>
 
-        {/* Navigation arrows */}
         <div className="flex items-center justify-center gap-2 mt-8">
           <button
             onClick={scrollLeft}

@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { ChevronRight, Radar, BarChart3, FileDown, Languages } from "lucide-react"
 
-export function ProductDirectionSection() {
+export function PipelineSection() {
+  const t = useTranslations("pipeline")
+
   return (
     <section id="pipeline" className="relative py-40 px-6 md:px-12 lg:px-24">
-      {/* Gradient overlay at top */}
       <div
         className="absolute inset-x-0 top-0 pointer-events-none"
         style={{
@@ -15,14 +17,12 @@ export function ProductDirectionSection() {
       />
 
       <div className="max-w-6xl mx-auto">
-        {/* Section label */}
         <div className="flex items-center gap-2 mb-6">
           <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-zinc-400 text-sm">Workflow and pipeline</span>
+          <span className="text-zinc-400 text-sm">{t("label")}</span>
           <ChevronRight className="w-4 h-4 text-zinc-500" />
         </div>
 
-        {/* Section heading */}
         <h2
           className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-medium text-white mb-8 max-w-3xl"
           style={{
@@ -32,18 +32,15 @@ export function ProductDirectionSection() {
             lineHeight: 1.1,
           }}
         >
-          From discovery to conversion
+          {t("heading")}
         </h2>
 
-        {/* Description */}
         <p className="text-zinc-400 text-lg max-w-md mb-16">
-          <span className="text-white font-medium">Visualize your entire pipeline.</span> Track every lead from first
-          discovery through enrichment, scoring, outreach, and conversion - all in one place.
+          {t("description")}
         </p>
 
-        {/* 3D Pipeline Visualization */}
         <div
-          className="relative w-full mb-16"
+          className="relative w-full mb-16 overflow-hidden"
           style={{
             perspective: "1200px",
           }}
@@ -57,9 +54,8 @@ export function ProductDirectionSection() {
             }}
           >
             <div className="relative h-[400px]">
-              {/* Diagonal dashed line */}
               <div
-                className="absolute w-[1px] bg-zinc-600/50"
+                className="absolute w-px bg-zinc-600/50"
                 style={{
                   height: "600px",
                   left: "55%",
@@ -69,7 +65,6 @@ export function ProductDirectionSection() {
                 }}
               />
 
-              {/* Timeline header with tick marks */}
               <div className="absolute top-0 left-0 right-0 flex items-end">
                 <div className="flex items-end gap-[3px] absolute bottom-0 left-[5%] right-0">
                   {Array.from({ length: 60 }).map((_, i) => (
@@ -85,28 +80,25 @@ export function ProductDirectionSection() {
                 </div>
               </div>
 
-              {/* Stage labels */}
               <div className="absolute text-zinc-500 text-sm" style={{ left: "5%", top: "55px" }}>
-                Discovery
+                {t("stageDiscovery")}
               </div>
               <div className="absolute text-zinc-500 text-sm" style={{ left: "20%", top: "35px" }}>
-                Enrichment
+                {t("stageEnrichment")}
               </div>
               <div
                 className="absolute px-3 py-1 rounded-md bg-zinc-700/80 text-zinc-300 text-sm font-medium"
                 style={{ left: "42%", top: "15px" }}
               >
-                Scored
+                {t("stageScored")}
               </div>
               <div className="absolute text-zinc-500 text-sm" style={{ left: "62%", top: "-5px" }}>
-                Outreach
+                {t("stageOutreach")}
               </div>
               <div className="absolute text-zinc-500/50 text-sm" style={{ left: "82%", top: "-25px" }}>
-                Converted
+                {t("stageConverted")}
               </div>
 
-              {/* Pipeline stage bars */}
-              {/* Discovery bar */}
               <div
                 className="absolute rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-4 py-3 flex items-center justify-between"
                 style={{
@@ -116,11 +108,10 @@ export function ProductDirectionSection() {
                   height: "48px",
                 }}
               >
-                <span className="text-emerald-400 text-sm font-medium">Discovered</span>
+                <span className="text-emerald-400 text-sm font-medium">{t("discovered")}</span>
                 <span className="text-emerald-400/70 text-sm font-mono">2,450</span>
               </div>
 
-              {/* Enriched bar */}
               <div
                 className="absolute rounded-lg bg-blue-500/15 border border-blue-500/30 px-4 py-3 flex items-center justify-between"
                 style={{
@@ -130,11 +121,10 @@ export function ProductDirectionSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-blue-400 text-sm">Enriched</span>
+                <span className="text-blue-400 text-sm">{t("enriched")}</span>
                 <span className="text-blue-400/70 text-sm font-mono">1,830</span>
               </div>
 
-              {/* Scored bar */}
               <div
                 className="absolute rounded-lg bg-amber-500/15 border border-amber-500/30 px-4 py-3 flex items-center justify-between"
                 style={{
@@ -144,11 +134,10 @@ export function ProductDirectionSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-amber-400 text-sm">Scored 3+</span>
+                <span className="text-amber-400 text-sm">{t("scored3plus")}</span>
                 <span className="text-amber-400/70 text-sm font-mono">1,240</span>
               </div>
 
-              {/* Outreach bar */}
               <div
                 className="absolute rounded-lg bg-purple-500/15 border border-purple-500/30 px-4 py-3 flex items-center justify-between"
                 style={{
@@ -158,11 +147,10 @@ export function ProductDirectionSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-purple-400 text-sm">Outreach Sent</span>
+                <span className="text-purple-400 text-sm">{t("outreachSent")}</span>
                 <span className="text-purple-400/70 text-sm font-mono">680</span>
               </div>
 
-              {/* Converted bar */}
               <div
                 className="absolute rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-4 py-3 flex items-center justify-between"
                 style={{
@@ -172,63 +160,55 @@ export function ProductDirectionSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-emerald-300 text-sm font-medium">Customers</span>
+                <span className="text-emerald-300 text-sm font-medium">{t("customers")}</span>
                 <span className="text-emerald-300/70 text-sm font-mono">180</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom two-column section */}
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Left column - Discovery Jobs */}
-          <div className="border-t border-r border-b border-zinc-800 pt-10 pr-10 pb-16">
-            <h3 className="text-xl font-medium text-zinc-200 mb-3">Discovery Jobs</h3>
+          <div className="border-t border-b md:border-r border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
+            <h3 className="text-xl font-medium text-zinc-200 mb-3">{t("discoveryTitle")}</h3>
             <p className="text-zinc-500 text-base leading-relaxed mb-8">
-              Launch async discovery jobs by country, state, or city. Track progress in real time as ScoreLead scans
-              multiple data sources across the web.
+              {t("discoveryDesc")}
             </p>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-medium text-zinc-200">San Francisco, CA - Yoga Studios</h4>
-                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">In Progress</span>
+                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{t("inProgress")}</span>
               </div>
 
-              {/* Progress bar */}
               <div className="w-full h-2 bg-zinc-800 rounded-full mb-3 overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: "73%" }} />
               </div>
-              <span className="text-zinc-500 text-xs">73% complete</span>
+              <span className="text-zinc-500 text-xs">{t("complete")}</span>
 
-              {/* Stats */}
               <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-800/50">
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">142</p>
-                  <p className="text-zinc-500 text-[10px]">Found</p>
+                  <p className="text-zinc-500 text-[10px]">{t("found")}</p>
                 </div>
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">104</p>
-                  <p className="text-zinc-500 text-[10px]">Enriched</p>
+                  <p className="text-zinc-500 text-[10px]">{t("enrichedStat")}</p>
                 </div>
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">98</p>
-                  <p className="text-zinc-500 text-[10px]">Scored</p>
+                  <p className="text-zinc-500 text-[10px]">{t("scored")}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right column - Deduplication */}
-          <div className="border-t border-b border-zinc-800 pt-10 pl-10 pb-16">
-            <h3 className="text-xl font-medium text-zinc-200 mb-3">Deduplication & Data Quality</h3>
+          <div className="border-b md:border-t border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
+            <h3 className="text-xl font-medium text-zinc-200 mb-3">{t("deduplicationTitle")}</h3>
             <p className="text-zinc-500 text-base leading-relaxed mb-8">
-              Smart identity matching ensures no duplicate leads. Our AI cross-references multiple data points to
-              merge duplicates automatically.
+              {t("deduplicationDesc")}
             </p>
 
             <div className="relative h-48">
-              {/* Duplicate card (back) */}
               <div
                 className="absolute rounded-lg bg-zinc-800/40 border border-red-500/20 px-4 py-3"
                 style={{ top: 0, left: "10%", width: "80%" }}
@@ -240,7 +220,6 @@ export function ProductDirectionSection() {
                 </div>
               </div>
 
-              {/* Duplicate card (middle) */}
               <div
                 className="absolute rounded-lg bg-zinc-800/60 border border-amber-500/20 px-4 py-3"
                 style={{ top: "35px", left: "5%", width: "85%" }}
@@ -252,7 +231,6 @@ export function ProductDirectionSection() {
                 </div>
               </div>
 
-              {/* Merged card (front) */}
               <div
                 className="absolute rounded-xl bg-zinc-800/90 border border-emerald-500/30 px-5 py-4"
                 style={{ top: "75px", left: 0, width: "95%" }}
@@ -263,51 +241,50 @@ export function ProductDirectionSection() {
                       <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
                     </svg>
                   </span>
-                  <span className="text-emerald-400 font-medium text-sm">Merged</span>
+                  <span className="text-emerald-400 font-medium text-sm">{t("merged")}</span>
                 </div>
                 <p className="text-zinc-300 text-sm mb-2">Sunset Yoga Studio</p>
                 <div className="flex items-center gap-2 text-[10px]">
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">Same website</span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">Similar name</span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">Same location</span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("sameWebsite")}</span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("similarName")}</span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("sameLocation")}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom feature grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-16">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Radar className="w-5 h-5 text-zinc-400" />
-              <span className="text-zinc-200 font-medium">Discovery Jobs</span>
+              <span className="text-zinc-200 font-medium">{t("feature1")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">Async discovery by geography with progress tracking.</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature1Desc")}</p>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-3">
               <BarChart3 className="w-5 h-5 text-zinc-400" />
-              <span className="text-zinc-200 font-medium">AI Scoring</span>
+              <span className="text-zinc-200 font-medium">{t("feature2")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">Intelligent scoring across multiple dimensions to prioritize the best leads.</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature2Desc")}</p>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-3">
               <FileDown className="w-5 h-5 text-zinc-400" />
-              <span className="text-zinc-200 font-medium">CSV Export</span>
+              <span className="text-zinc-200 font-medium">{t("feature3")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">Export filtered leads with all enriched data.</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature3Desc")}</p>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Languages className="w-5 h-5 text-zinc-400" />
-              <span className="text-zinc-200 font-medium">Multi-language</span>
+              <span className="text-zinc-200 font-medium">{t("feature4")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">AI outreach in multiple languages to reach leads anywhere in the world.</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature4Desc")}</p>
           </div>
         </div>
       </div>

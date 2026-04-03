@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
 
@@ -8,18 +9,33 @@ type WaitlistForm = {
   email: string
 }
 
-export function CTASection() {
+export function WaitlistSection() {
+  const t = useTranslations("waitlist")
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const { register, handleSubmit, formState: { errors } } = useForm<WaitlistForm>()
 
-  const onSubmit = (data: WaitlistForm) => {
-    console.log("Waitlist signup:", data.email)
-    setSubmitted(true)
+  const onSubmit = async (data: WaitlistForm) => {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email }),
+      })
+      if (!res.ok) throw new Error("Failed to join waitlist")
+      setSubmitted(true)
+    } catch {
+      setError(t("error"))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <section id="waitlist" className="relative py-32 px-6 overflow-hidden" style={{ backgroundColor: "#09090B" }}>
-      {/* Background glow */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -32,7 +48,6 @@ export function CTASection() {
         }}
       />
 
-      {/* Top border */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
 
       <div className="relative max-w-2xl mx-auto text-center">
@@ -44,7 +59,7 @@ export function CTASection() {
         >
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Coming soon
+            {t("badge")}
           </span>
         </motion.div>
 
@@ -61,7 +76,7 @@ export function CTASection() {
             lineHeight: 1.1,
           }}
         >
-          Be the first to try ScoreLead
+          {t("heading")}
         </motion.h2>
 
         <motion.p
@@ -71,7 +86,7 @@ export function CTASection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-zinc-400 text-lg mb-12 max-w-md mx-auto"
         >
-          Join the waitlist and get early access when we launch.
+          {t("description")}
         </motion.p>
 
         <motion.div
@@ -87,32 +102,36 @@ export function CTASection() {
                   <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
                 </svg>
               </div>
-              <span className="text-zinc-200 text-sm">You're on the list. We'll be in touch.</span>
+              <span className="text-zinc-200 text-sm">{t("success")}</span>
             </div>
           ) : (
             <div className="max-w-md mx-auto">
-              <form onSubmit={handleSubmit(onSubmit)} className="flex items-center gap-2 p-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50">
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("placeholder")}
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("emailRequired"),
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: t("emailInvalid"),
                     },
                   })}
                   className="flex-1 px-4 py-3 bg-transparent text-white text-sm placeholder:text-zinc-500 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm shrink-0"
+                  disabled={loading}
+                  className="px-6 py-3 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm shrink-0 disabled:opacity-50"
                 >
-                  Join waitlist
+                  {loading ? t("joining") : t("cta")}
                 </button>
               </form>
               {errors.email && (
                 <p className="text-red-400 text-xs mt-2">{errors.email.message}</p>
+              )}
+              {error && (
+                <p className="text-red-400 text-xs mt-2">{error}</p>
               )}
             </div>
           )}

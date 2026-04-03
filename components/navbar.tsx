@@ -1,40 +1,94 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
+import { Menu, X } from "lucide-react"
 import { ScoreLeadLogo } from "./scorelead-logo"
+import { LanguageSwitcher } from "./language-switcher"
+
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
+}
 
 export function Navbar() {
+  const t = useTranslations("nav")
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    const handleScroll = () => setOpen(false)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [open])
+
+  const links = [
+    { id: "customers", label: t("results") },
+    { id: "features", label: t("features") },
+    { id: "ai", label: t("ai") },
+    { id: "pipeline", label: t("pipeline") },
+  ]
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-[#09090B]/80 backdrop-blur-md">
       <div className="w-full flex justify-center px-6 py-4">
         <div className="w-full max-w-4xl flex items-center justify-between">
-          <a href="#hero" className="flex items-center gap-2">
+          <button onClick={() => scrollTo("hero")} className="flex items-center gap-2">
             <ScoreLeadLogo className="w-5 h-5 text-white" />
             <span className="text-white font-semibold">ScoreLead</span>
-          </a>
+          </button>
+
           <div className="hidden md:flex items-center gap-8">
-            <a href="#customers" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Results
-            </a>
-            <a href="#features" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#ai" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              AI
-            </a>
-            <a href="#pipeline" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Pipeline
-            </a>
+            {links.map((link) => (
+              <button key={link.id} onClick={() => scrollTo(link.id)} className="text-sm text-zinc-400 hover:text-white transition-colors">
+                {link.label}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="#waitlist"
+
+          <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
+            <button
+              onClick={() => scrollTo("waitlist")}
               className="text-sm text-white bg-zinc-800 hover:bg-zinc-700 px-3.5 py-1.5 rounded-md border border-zinc-700 transition-colors"
             >
-              Join Waitlist
-            </a>
+              {t("joinWaitlist")}
+            </button>
           </div>
+
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden text-zinc-400 hover:text-white transition-colors"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {open && (
+        <div className="md:hidden border-t border-zinc-800 bg-[#09090B]/95 backdrop-blur-md px-6 pb-6 pt-4">
+          <div className="flex flex-col gap-4">
+            {links.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => { scrollTo(link.id); setOpen(false) }}
+                className="text-sm text-zinc-400 hover:text-white transition-colors text-left"
+              >
+                {link.label}
+              </button>
+            ))}
+            <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
+              <LanguageSwitcher />
+              <button
+                onClick={() => { scrollTo("waitlist"); setOpen(false) }}
+                className="text-sm text-white bg-zinc-800 hover:bg-zinc-700 px-3.5 py-1.5 rounded-md border border-zinc-700 transition-colors"
+              >
+                {t("joinWaitlist")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
