@@ -69,100 +69,100 @@ const localeMetadata: Record<string, LocaleMetadata> = {
     ],
   },
   pt: {
-    title: "ScoreLead - Descoberta e Pontuacao de Leads com IA",
+    title: "ScoreLead - Descoberta e Pontuação de Leads com IA",
     description:
-      "Descubra, pontue e converta leads B2B com IA. Descoberta automatizada de negocios, pontuacao inteligente em multiplas dimensoes e outreach personalizado em escala.",
+      "Descubra, pontue e converta leads B2B com IA. Descoberta automatizada de negócios, pontuação inteligente em múltiplas dimensões e outreach personalizado em escala.",
     keywords: [
       "descoberta de leads",
-      "pontuacao de leads",
-      "geracao de leads com IA",
-      "geracao de leads B2B",
+      "pontuação de leads",
+      "geração de leads com IA",
+      "geração de leads B2B",
       "pipeline de vendas",
       "enriquecimento de leads",
       "outreach automatizado",
-      "descoberta de negocios",
-      "qualificacao de leads",
-      "automacao de vendas",
+      "descoberta de negócios",
+      "qualificação de leads",
+      "automação de vendas",
       "ferramentas de vendas com IA",
-      "pontuacao de prospects",
-      "gestao de leads",
-      "inteligencia de vendas",
-      "automacao de outreach",
+      "pontuação de prospects",
+      "gestão de leads",
+      "inteligência de vendas",
+      "automação de outreach",
     ],
     ogTitle: "ScoreLead - Descubra, Pontue e Converta Leads com IA",
     ogDescription:
-      "Plataforma de descoberta e pontuacao de leads com IA. Encontre negocios, enriqueca com dados, pontue seu potencial e gere outreach personalizado automaticamente.",
+      "Plataforma de descoberta e pontuação de leads com IA. Encontre negócios, enriqueça com dados, pontue seu potencial e gere outreach personalizado automaticamente.",
     jsonLdDescription:
-      "Plataforma de descoberta e pontuacao de leads com IA para equipes de vendas B2B. Descoberta automatizada, pontuacao inteligente, enriquecimento de dados e outreach personalizado.",
+      "Plataforma de descoberta e pontuação de leads com IA para equipes de vendas B2B. Descoberta automatizada, pontuação inteligente, enriquecimento de dados e outreach personalizado.",
     faq: [
       {
-        question: "O que e o ScoreLead?",
+        question: "O que é o ScoreLead?",
         answer:
-          "ScoreLead e uma plataforma com IA que descobre, pontua e qualifica leads B2B automaticamente. Encontra empresas em qualquer cidade ou industria, enriquece com dados detalhados e gera sequencias de outreach personalizadas.",
+          "ScoreLead é uma plataforma com IA que descobre, pontua e qualifica leads B2B automaticamente. Encontra empresas em qualquer cidade ou indústria, enriquece com dados detalhados e gera sequências de outreach personalizadas.",
       },
       {
-        question: "Como funciona a pontuacao de leads com IA?",
+        question: "Como funciona a pontuação de leads com IA?",
         answer:
-          "A IA do ScoreLead analisa leads em multiplas dimensoes, incluindo presenca online, reputacao, adequacao ao mercado, potencial de engajamento e prontidao para compra, atribuindo uma pontuacao clara de 1 a 5.",
+          "A IA do ScoreLead analisa leads em múltiplas dimensões, incluindo presença online, reputação, adequação ao mercado, potencial de engajamento e prontidão para compra, atribuindo uma pontuação clara de 1 a 5.",
       },
       {
         question: "Quais idiomas o ScoreLead suporta?",
         answer:
-          "O ScoreLead suporta multiplos idiomas tanto na interface da plataforma quanto no outreach gerado por IA, incluindo ingles, portugues e espanhol.",
+          "O ScoreLead suporta múltiplos idiomas tanto na interface da plataforma quanto no outreach gerado por IA, incluindo inglês, português e espanhol.",
       },
       {
         question: "Como posso acessar o ScoreLead?",
         answer:
-          "O ScoreLead esta em acesso antecipado. Voce pode entrar na lista de espera em nosso site para ser notificado quando lancarmos.",
+          "O ScoreLead está em acesso antecipado. Você pode entrar na lista de espera em nosso site para ser notificado quando lançarmos.",
       },
     ],
   },
   es: {
-    title: "ScoreLead - Descubrimiento y Puntuacion de Leads con IA",
+    title: "ScoreLead - Descubrimiento y Puntuación de Leads con IA",
     description:
-      "Descubre, puntua y convierte leads B2B con IA. Descubrimiento automatizado de negocios, puntuacion inteligente en multiples dimensiones y outreach personalizado a escala.",
+      "Descubre, puntúa y convierte leads B2B con IA. Descubrimiento automatizado de negocios, puntuación inteligente en múltiples dimensiones y outreach personalizado a escala.",
     keywords: [
       "descubrimiento de leads",
-      "puntuacion de leads",
-      "generacion de leads con IA",
-      "generacion de leads B2B",
+      "puntuación de leads",
+      "generación de leads con IA",
+      "generación de leads B2B",
       "pipeline de ventas",
       "enriquecimiento de leads",
       "outreach automatizado",
       "descubrimiento de negocios",
-      "calificacion de leads",
-      "automatizacion de ventas",
+      "calificación de leads",
+      "automatización de ventas",
       "herramientas de ventas con IA",
-      "puntuacion de prospectos",
-      "gestion de leads",
+      "puntuación de prospectos",
+      "gestión de leads",
       "inteligencia de ventas",
-      "automatizacion de outreach",
+      "automatización de outreach",
     ],
-    ogTitle: "ScoreLead - Descubre, Puntua y Convierte Leads con IA",
+    ogTitle: "ScoreLead - Descubre, Puntúa y Convierte Leads con IA",
     ogDescription:
-      "Plataforma de descubrimiento y puntuacion de leads con IA. Encuentra negocios, enriquece con datos, puntua su potencial y genera outreach personalizado automaticamente.",
+      "Plataforma de descubrimiento y puntuación de leads con IA. Encuentra negocios, enriquece con datos, puntúa su potencial y genera outreach personalizado automáticamente.",
     jsonLdDescription:
-      "Plataforma de descubrimiento y puntuacion de leads con IA para equipos de ventas B2B. Descubrimiento automatizado, puntuacion inteligente, enriquecimiento de datos y outreach personalizado.",
+      "Plataforma de descubrimiento y puntuación de leads con IA para equipos de ventas B2B. Descubrimiento automatizado, puntuación inteligente, enriquecimiento de datos y outreach personalizado.",
     faq: [
       {
-        question: "Que es ScoreLead?",
+        question: "¿Qué es ScoreLead?",
         answer:
-          "ScoreLead es una plataforma con IA que descubre, puntua y califica leads B2B automaticamente. Encuentra negocios en cualquier ciudad o industria, los enriquece con datos detallados y genera secuencias de outreach personalizadas.",
+          "ScoreLead es una plataforma con IA que descubre, puntúa y califica leads B2B automáticamente. Encuentra negocios en cualquier ciudad o industria, los enriquece con datos detallados y genera secuencias de outreach personalizadas.",
       },
       {
-        question: "Como funciona la puntuacion de leads con IA?",
+        question: "¿Cómo funciona la puntuación de leads con IA?",
         answer:
-          "La IA de ScoreLead analiza leads en multiples dimensiones, incluyendo presencia online, reputacion, ajuste al mercado, potencial de engagement y disposicion a comprar, asignando una puntuacion clara de 1 a 5.",
+          "La IA de ScoreLead analiza leads en múltiples dimensiones, incluyendo presencia online, reputación, ajuste al mercado, potencial de engagement y disposición a comprar, asignando una puntuación clara de 1 a 5.",
       },
       {
-        question: "Que idiomas soporta ScoreLead?",
+        question: "¿Qué idiomas soporta ScoreLead?",
         answer:
-          "ScoreLead soporta multiples idiomas tanto en la interfaz de la plataforma como en el outreach generado por IA, incluyendo ingles, portugues y espanol.",
+          "ScoreLead soporta múltiples idiomas tanto en la interfaz de la plataforma como en el outreach generado por IA, incluyendo inglés, portugués y español.",
       },
       {
-        question: "Como puedo acceder a ScoreLead?",
+        question: "¿Cómo puedo acceder a ScoreLead?",
         answer:
-          "ScoreLead esta en acceso anticipado. Puedes unirte a la lista de espera en nuestro sitio web para ser notificado cuando lancemos.",
+          "ScoreLead está en acceso anticipado. Puedes unirte a la lista de espera en nuestro sitio web para ser notificado cuando lancemos.",
       },
     ],
   },
