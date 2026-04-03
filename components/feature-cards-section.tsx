@@ -6,7 +6,6 @@ import { ChevronRight } from "lucide-react"
 
 const featureCards = [
   {
-    title: "AI-Powered Discovery",
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
         <img src="/images/radar-discovery.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
@@ -14,7 +13,6 @@ const featureCards = [
     ),
   },
   {
-    title: "Smart Lead Scoring",
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
         <img src="/images/lead-scoring.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
@@ -22,7 +20,6 @@ const featureCards = [
     ),
   },
   {
-    title: "Outreach Automation",
     illustration: null,
   },
 ]
