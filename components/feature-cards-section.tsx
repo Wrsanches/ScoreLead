@@ -5,76 +5,150 @@ import { ChevronRight, Plus } from "lucide-react"
 
 const featureCards = [
   {
-    title: "Project planning for scrum",
+    title: "AI-Powered Discovery",
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
         <svg
           width="100%"
           height="100%"
-          viewBox="0 0 791 669"
+          viewBox="0 0 400 360"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="max-w-full max-h-full"
         >
-          <path
-            opacity="0.25"
-            d="M377.449 24.2664L22.1248 192.099C9.24419 198.183 1.16249 211.29 1.51081 225.531L10.925 610.428C11.5763 637.054 39.9132 653.778 63.5378 641.48L409.448 461.403C421.355 455.204 428.824 442.895 428.824 429.471V56.8179C428.824 30.407 401.33 12.9865 377.449 24.2664Z"
-            fill="#2C2C2C"
-            fillOpacity="0.8"
-            stroke="#424242"
-            strokeWidth="3"
-          />
-          <path
-            opacity="0.25"
-            d="M497.594 24.2664L142.269 192.099C129.389 198.183 121.307 211.29 121.655 225.531L131.07 610.428C131.721 637.054 160.058 653.778 183.682 641.48L529.592 461.403C541.5 455.204 548.969 442.895 548.969 429.471V56.8179C548.969 30.407 521.475 12.9865 497.594 24.2664Z"
-            fill="#2C2C2C"
-            fillOpacity="0.8"
-            stroke="#424242"
-            strokeWidth="3"
-          />
-          <path
-            opacity="0.25"
-            d="M617.738 24.2664L262.414 192.099C249.533 198.183 241.451 211.29 241.8 225.531L251.214 610.428C251.865 637.054 280.202 653.778 303.827 641.48L649.737 461.403C661.644 455.204 669.113 442.895 669.113 429.471V56.8179C669.113 30.407 641.619 12.9865 617.738 24.2664Z"
-            fill="#2C2C2C"
-            fillOpacity="0.8"
-            stroke="#424242"
-            strokeWidth="3"
-          />
-          <path
-            opacity="0.25"
-            d="M737.883 24.2664L382.558 192.099C369.678 198.183 361.596 211.29 361.944 225.531L371.358 610.428C372.01 637.054 400.347 653.778 423.971 641.48L769.881 461.403C781.789 455.204 789.258 442.895 789.258 429.471V56.8179C789.258 30.407 761.764 12.9865 737.883 24.2664Z"
-            fill="#2C2C2C"
-            fillOpacity="0.8"
-            stroke="#424242"
-            strokeWidth="3"
-          />
+          {/* Radar concentric circles */}
+          <circle cx="200" cy="180" r="140" stroke="#424242" strokeWidth="1.5" opacity="0.3" />
+          <circle cx="200" cy="180" r="100" stroke="#424242" strokeWidth="1.5" opacity="0.4" />
+          <circle cx="200" cy="180" r="60" stroke="#424242" strokeWidth="1.5" opacity="0.5" />
+          <circle cx="200" cy="180" r="20" stroke="#424242" strokeWidth="1.5" opacity="0.6" />
+          {/* Cross lines */}
+          <line x1="200" y1="40" x2="200" y2="320" stroke="#424242" strokeWidth="1" opacity="0.2" />
+          <line x1="60" y1="180" x2="340" y2="180" stroke="#424242" strokeWidth="1" opacity="0.2" />
+          {/* Radar sweep */}
+          <path d="M200 180 L200 40 A140 140 0 0 1 320 110 Z" fill="url(#radarGrad)" opacity="0.4" />
+          {/* Detected points */}
+          <circle cx="170" cy="130" r="4" fill="#10b981" opacity="0.9" />
+          <circle cx="250" cy="160" r="4" fill="#10b981" opacity="0.9" />
+          <circle cx="230" cy="220" r="4" fill="#10b981" opacity="0.7" />
+          <circle cx="150" cy="200" r="4" fill="#f59e0b" opacity="0.7" />
+          <circle cx="280" cy="130" r="4" fill="#10b981" opacity="0.6" />
+          <circle cx="140" cy="160" r="3" fill="#f59e0b" opacity="0.5" />
+          <circle cx="260" cy="250" r="3" fill="#6366f1" opacity="0.5" />
+          {/* Center dot */}
+          <circle cx="200" cy="180" r="5" fill="#10b981" />
+          <defs>
+            <radialGradient id="radarGrad" cx="200" cy="180" r="140" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+            </radialGradient>
+          </defs>
         </svg>
       </div>
     ),
   },
   {
-    title: "Iteration management for scaling",
+    title: "Smart Lead Scoring",
     illustration: (
-      <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <img
-          src="/images/speed-lines.png"
-          alt="Speed lines illustration"
-          className="w-full h-full object-cover"
-          style={{ filter: "invert(1)" }}
-        />
+      <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
+        <svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 400 360"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="max-w-full max-h-full"
+        >
+          {/* Score bars */}
+          {[
+            { x: 80, h: 180, label: "Web", color: "#10b981" },
+            { x: 140, h: 140, label: "Social", color: "#6366f1" },
+            { x: 200, h: 200, label: "Rating", color: "#10b981" },
+            { x: 260, h: 100, label: "Tech", color: "#f59e0b" },
+            { x: 320, h: 160, label: "Fit", color: "#10b981" },
+          ].map((bar) => (
+            <g key={bar.label}>
+              <rect
+                x={bar.x - 16}
+                y={280 - bar.h}
+                width="32"
+                height={bar.h}
+                rx="4"
+                fill={bar.color}
+                opacity="0.7"
+              />
+              <text x={bar.x} y={300} textAnchor="middle" fill="#71717a" fontSize="11" fontFamily="system-ui">
+                {bar.label}
+              </text>
+            </g>
+          ))}
+          {/* Score label */}
+          <text x="200" y="40" textAnchor="middle" fill="white" fontSize="36" fontWeight="600" fontFamily="system-ui">
+            4.2
+          </text>
+          <text x="200" y="58" textAnchor="middle" fill="#71717a" fontSize="12" fontFamily="system-ui">
+            / 5.0
+          </text>
+        </svg>
       </div>
     ),
   },
   {
-    title: "When precision matters",
+    title: "Outreach Automation",
     illustration: (
-      <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <img
-          src="/images/precision-workflow.png"
-          alt="Precision workflow illustration"
-          className="w-full h-full object-cover"
-          style={{ filter: "invert(1)" }}
-        />
+      <div className="relative w-full h-full flex items-start justify-center overflow-hidden rounded-lg px-5 pt-6">
+        <div className="w-full flex flex-col gap-0">
+          {/* Step 1 */}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-[10px] text-blue-400 font-bold shrink-0">
+                1
+              </div>
+              <div className="w-px flex-1 bg-zinc-700/50" />
+            </div>
+            <div className="pb-3 flex-1 min-w-0">
+              <p className="text-[11px] text-zinc-300 font-medium mb-0.5">Introduction</p>
+              <p className="text-[10px] text-zinc-600 leading-snug">Hi, I noticed your studio offers yoga and pilates...</p>
+              <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 1</span>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0">
+                2
+              </div>
+              <div className="w-px flex-1 bg-zinc-700/50" />
+            </div>
+            <div className="pb-3 flex-1 min-w-0">
+              <p className="text-[11px] text-zinc-300 font-medium mb-0.5">Follow-up</p>
+              <p className="text-[10px] text-zinc-600 leading-snug">Studios like yours are saving 10+ hours a week...</p>
+              <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 3</span>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-[10px] text-emerald-400 font-bold shrink-0">
+                3
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-zinc-300 font-medium mb-0.5">Value prop</p>
+              <p className="text-[10px] text-zinc-600 leading-snug">With your 4.7 rating and growing demand...</p>
+              <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 7</span>
+            </div>
+          </div>
+
+          {/* Language tags */}
+          <div className="flex gap-1.5 mt-3 ml-10">
+            <span className="text-[9px] bg-blue-500/15 text-blue-400/80 px-1.5 py-0.5 rounded">EN</span>
+            <span className="text-[9px] bg-zinc-800/80 text-zinc-600 px-1.5 py-0.5 rounded">ES</span>
+            <span className="text-[9px] bg-zinc-800/80 text-zinc-600 px-1.5 py-0.5 rounded">PT</span>
+            <span className="text-[9px] bg-zinc-800/80 text-zinc-600 px-1.5 py-0.5 rounded">FR</span>
+          </div>
+        </div>
       </div>
     ),
   },
@@ -82,7 +156,7 @@ const featureCards = [
 
 export function FeatureCardsSection() {
   return (
-    <div className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+    <div id="features" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -107,7 +181,7 @@ export function FeatureCardsSection() {
                 lineHeight: 1.1,
               }}
             >
-              Made for modern product teams
+              Built for teams that need more pipeline
             </motion.h2>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -117,10 +191,10 @@ export function FeatureCardsSection() {
               className="max-w-md"
             >
               <p className="text-zinc-400 leading-relaxed">
-                Sprint is shaped by the practices and principles that distinguish world-class product teams from the
-                rest: relentless focus, fast execution, and a commitment to the quality of craft.{" "}
+                ScoreLead combines discovery, enrichment, and outreach into one system. Stop juggling spreadsheets and
+                manual research - let AI handle the grunt work.{" "}
                 <a href="#" className="text-white inline-flex items-center gap-1 hover:underline">
-                  Make the switch <ChevronRight className="w-4 h-4" />
+                  See all features <ChevronRight className="w-4 h-4" />
                 </a>
               </p>
             </motion.div>

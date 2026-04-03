@@ -4,25 +4,27 @@ import type React from "react"
 import { motion } from "framer-motion"
 import {
   Inbox,
-  CircleUser,
-  Layers,
-  FolderKanban,
-  LayoutGrid,
   Users,
-  Smartphone,
-  Map,
-  FileText,
+  Radar,
+  Bookmark,
+  CircleDot,
+  Send,
+  ThumbsUp,
+  Trophy,
+  Mail,
+  Download,
   ChevronDown,
   ChevronRight,
-  CirclePower,
   Search,
-  Plus,
-  Link2,
   MoreHorizontal,
   Sparkles,
   Settings,
-  HelpCircle,
+  Globe,
+  Phone,
+  Star,
+  AtSign,
 } from "lucide-react"
+import { ScoreLeadLogo } from "./scorelead-logo"
 
 export function DashboardMockup() {
   const containerVariants = {
@@ -67,8 +69,8 @@ export function DashboardMockup() {
         {/* Logo */}
         <div className="p-3 border-b border-zinc-800/50">
           <div className="flex items-center gap-2 px-2 py-1.5">
-            <CirclePower className="w-5 h-5 text-white" />
-            <span className="text-white font-semibold text-sm">Sprint</span>
+            <ScoreLeadLogo className="w-5 h-5 text-white" />
+            <span className="text-white font-semibold text-sm">ScoreLead</span>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500 ml-auto" />
           </div>
         </div>
@@ -77,137 +79,127 @@ export function DashboardMockup() {
         <div className="p-3">
           <div className="flex items-center gap-2 px-2.5 py-1.5 bg-zinc-800/50 rounded-md text-zinc-500 text-xs">
             <Search className="w-3.5 h-3.5" />
-            <span>Search...</span>
+            <span>Search leads...</span>
             <span className="ml-auto text-[10px] bg-zinc-700/50 px-1.5 py-0.5 rounded">⌘K</span>
           </div>
         </div>
 
         {/* Main nav */}
         <div className="px-3 space-y-0.5">
-          <NavItem icon={Inbox} label="Inbox" badge={3} active />
-          <NavItem icon={CircleUser} label="My Issues" />
+          <NavItem icon={Inbox} label="Inbox" badge={5} />
+          <NavItem icon={Users} label="All Leads" active />
         </div>
 
-        {/* Workspace section */}
+        {/* Discovery section */}
         <div className="mt-5 px-3">
-          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider flex items-center gap-1">
-            Workspace
+          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
+            Discovery
           </div>
           <div className="space-y-0.5 mt-1">
-            <NavItem icon={Layers} label="Initiatives" hasSubmenu />
-            <NavItem icon={FolderKanban} label="Projects" hasSubmenu />
-            <NavItem icon={LayoutGrid} label="Views" hasSubmenu />
-            <NavItem icon={Users} label="Teams" hasSubmenu />
+            <NavItem icon={Radar} label="Discovery Jobs" hasSubmenu />
+            <NavItem icon={Bookmark} label="Saved Searches" hasSubmenu />
           </div>
         </div>
 
-        {/* Favorites section */}
+        {/* Pipeline section */}
         <div className="mt-5 px-3">
-          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider flex items-center gap-1">
-            Favorites
+          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
+            Pipeline
           </div>
           <div className="space-y-0.5 mt-1">
-            <NavItem icon={Smartphone} label="Mobile App" color="text-blue-400" />
-            <NavItem icon={Map} label="Q1 Roadmap" color="text-orange-400" />
-            <NavItem icon={FileText} label="API Docs" color="text-emerald-400" />
+            <NavItem icon={CircleDot} label="New" color="text-emerald-400" badge={142} />
+            <NavItem icon={Send} label="Contacted" color="text-blue-400" />
+            <NavItem icon={ThumbsUp} label="Interested" color="text-amber-400" />
+            <NavItem icon={Trophy} label="Customers" color="text-emerald-400" />
           </div>
         </div>
 
-        {/* Teams section */}
+        {/* Tools section */}
         <div className="mt-5 px-3 flex-1">
-          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider flex items-center gap-1">
-            Your Teams
+          <div className="px-2 py-1 text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
+            Tools
           </div>
           <div className="space-y-0.5 mt-1">
-            <NavItem icon={Sparkles} label="Product" hasSubmenu />
-            <NavItem icon={Settings} label="Engineering" hasSubmenu />
+            <NavItem icon={Mail} label="Outreach" hasSubmenu />
+            <NavItem icon={Download} label="Export" />
           </div>
         </div>
 
         {/* Bottom */}
         <div className="p-3 border-t border-zinc-800/50">
-          <NavItem icon={HelpCircle} label="Help & Support" />
+          <NavItem icon={Settings} label="Settings" />
         </div>
       </motion.div>
 
-      {/* Inbox List */}
+      {/* Lead List */}
       <motion.div
         className="w-[320px] h-full bg-zinc-900/40 border-r border-zinc-800/50 flex flex-col shrink-0"
         variants={panelVariants}
       >
         <div className="px-4 py-3 border-b border-zinc-800/50 flex items-center justify-between">
-          <h3 className="text-white font-semibold text-sm">Inbox</h3>
-          <div className="flex items-center gap-2">
-            <button className="text-zinc-500 hover:text-white transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
+          <h3 className="text-white font-semibold text-sm">Leads</h3>
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <span>Score ↓</span>
           </div>
         </div>
 
         <div className="flex-1 overflow-auto scrollbar-hide">
-          <InboxItem
-            id="ENG-135"
-            title="Refactor sonic crawler"
-            subtitle="nan assigned you"
+          <LeadItem
+            name="Sunset Yoga Studio"
+            location="San Francisco, CA"
+            score={4.5}
+            status="new"
             time="2h"
-            avatar="https://i.pravatar.cc/32?img=1"
-            status="in-progress"
             active
           />
-          <InboxItem
-            id="LLM"
-            title="LLM Chatbot"
-            subtitle="New project update by raissa"
+          <LeadItem
+            name="Peak Fitness Co"
+            location="Austin, TX"
+            score={4.0}
+            status="contacted"
             time="1d"
-            avatar="https://i.pravatar.cc/32?img=2"
-            status="todo"
-            isProject
           />
-          <InboxItem
-            id="ENG-159"
-            title="Error uploading images via API"
-            subtitle="SLA breached"
-            time="2d"
-            avatar="https://i.pravatar.cc/32?img=3"
-            status="bug"
+          <LeadItem
+            name="Bloom Wellness Spa"
+            location="New York, NY"
+            score={3.5}
+            status="new"
+            time="1d"
           />
-          <InboxItem
-            id="DES-498"
-            title="Redesign users settings..."
-            subtitle="karri mentioned you"
-            time="4h"
-            avatar="https://i.pravatar.cc/32?img=4"
-            status="todo"
+          <LeadItem
+            name="Iron Temple Gym"
+            location="Chicago, IL"
+            score={4.5}
+            status="interested"
+            time="3d"
           />
-          <InboxItem
-            id="ENG-160"
-            title="Holtzmann engine is broken"
-            subtitle="You asked to be reminded"
+          <LeadItem
+            name="Mindful Movement"
+            location="Portland, OR"
+            score={3.0}
+            status="new"
+            time="3d"
+          />
+          <LeadItem
+            name="Urban Dance Academy"
+            location="Miami, FL"
+            score={2.5}
+            status="contacted"
+            time="5d"
+          />
+          <LeadItem
+            name="Zen Garden Studio"
+            location="Seattle, WA"
+            score={4.0}
+            status="new"
             time="1w"
-            avatar="https://i.pravatar.cc/32?img=5"
-            status="bug"
           />
-          <InboxItem
-            title="Sign up flow experiments"
-            subtitle="Added as project member"
-            avatar="https://i.pravatar.cc/32?img=6"
-            status="done"
-            isProject
-          />
-          <InboxItem
-            id="MKT-122"
-            title="Design assets for marketing"
-            subtitle="erin marked as Duplicate"
+          <LeadItem
+            name="CrossFit Downtown"
+            location="Denver, CO"
+            score={3.5}
+            status="contacted"
             time="1w"
-            avatar="https://i.pravatar.cc/32?img=7"
-            status="done"
-          />
-          <InboxItem
-            title="Homepage v3"
-            subtitle="New project update by paco"
-            avatar="https://i.pravatar.cc/32?img=8"
-            status="todo"
-            isProject
           />
         </div>
       </motion.div>
@@ -217,79 +209,91 @@ export function DashboardMockup() {
         {/* Header breadcrumb */}
         <div className="px-5 py-3 border-b border-zinc-800/50 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-zinc-500">Engineering</span>
+            <span className="text-zinc-500">Discovery</span>
             <span className="text-zinc-600">›</span>
-            <span className="text-emerald-400">Spice harvester</span>
+            <span className="text-emerald-400">San Francisco</span>
             <span className="text-zinc-600">›</span>
-            <span className="text-zinc-300">ENG-135</span>
+            <span className="text-zinc-300">Sunset Yoga Studio</span>
           </div>
           <MoreHorizontal className="w-4 h-4 text-zinc-500" />
         </div>
 
         {/* Content */}
         <div className="flex-1 p-5 overflow-auto scrollbar-hide">
-          <h2 className="text-white text-xl font-semibold mb-5">Refactor sonic crawler</h2>
-
-          {/* Code block */}
-          <div className="bg-zinc-900/80 rounded-lg p-4 text-[11px] font-mono mb-5 border border-zinc-800/50">
-            <div className="space-y-2">
-              <div>
-                <span className="text-zinc-500">Comment.</span>
-                <span className="text-amber-300">documentContent</span>
-                <span className="text-zinc-400"> is defined wrongly. It should be a </span>
-                <span className="text-cyan-300">LazyManyToOne</span>
-                <span className="text-zinc-400"> relation.</span>
-              </div>
-              <div className="mt-3 text-zinc-600">
-                {/* The document content that this comment is associated with. */}
-              </div>
-              <div>
-                <span className="text-purple-400">@ManyToOne</span>
-                <span className="text-zinc-400">(</span>
-                <span className="text-cyan-300">DocumentContent</span>
-                <span className="text-zinc-400">,</span>
-                <span className="text-amber-300">comments</span>
-                <span className="text-zinc-400">,</span>
-                <span className="text-amber-300">cascade</span>
-                <span className="text-zinc-400">:</span>
-                <span className="text-orange-300">true</span>
-                <span className="text-zinc-400">,</span>
-                <span className="text-amber-300">nullable</span>
-                <span className="text-zinc-400">:</span>
-                <span className="text-orange-300">false</span>
-                <span className="text-zinc-400">)</span>
-              </div>
-              <div>
-                <span className="text-blue-400">public </span>
-                <span className="text-amber-300">documentContent</span>
-                <span className="text-zinc-400">?: </span>
-                <span className="text-cyan-300">DocumentContent</span>
-                <span className="text-zinc-400">;</span>
-              </div>
-              <div className="mt-3 text-zinc-400">
-                We would be accessing
-                <span className="text-emerald-400">CachedPromise&lt;DocumentContent&gt;</span>
-                then, and document content would be hydrated.
+          <div className="flex items-start justify-between mb-5">
+            <h2 className="text-white text-xl font-semibold">Sunset Yoga Studio</h2>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-500">Score</span>
+              <div className="flex items-center gap-1 bg-emerald-500/20 px-2.5 py-1 rounded-md">
+                <span className="text-emerald-400 font-semibold text-lg">4.5</span>
+                <span className="text-emerald-400/60 text-xs">/5</span>
               </div>
             </div>
           </div>
 
-          {/* Meta actions */}
-          <div className="space-y-2 text-sm mb-5">
-            <div className="flex items-center gap-2 text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors">
-              <Plus className="w-4 h-4" />
-              <span>Add sub-issues</span>
-            </div>
-            <div className="flex items-center gap-2 text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors">
-              <Link2 className="w-4 h-4" />
-              <span>Links</span>
-            </div>
+          {/* Score breakdown */}
+          <div className="flex items-end gap-2 mb-6">
+            {[
+              { label: "Reach", value: 5, color: "bg-emerald-500" },
+              { label: "Trust", value: 4, color: "bg-emerald-500" },
+              { label: "Engage", value: 4, color: "bg-blue-500" },
+              { label: "Match", value: 5, color: "bg-emerald-500" },
+              { label: "Ready", value: 3, color: "bg-amber-500" },
+            ].map((signal) => (
+              <div key={signal.label} className="flex flex-col items-center gap-1">
+                <div className="flex flex-col-reverse gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-5 h-1.5 rounded-sm ${i < signal.value ? signal.color : "bg-zinc-800"}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-[9px] text-zinc-500">{signal.label}</span>
+              </div>
+            ))}
           </div>
 
-          {/* PR reference */}
-          <div className="text-xs text-zinc-500 mb-5">
-            <span className="text-zinc-600">#20319</span>
-            <span> igor/eng-135 add source to insights slice and segment</span>
+          {/* Enriched data */}
+          <div className="bg-zinc-900/80 rounded-lg p-4 text-sm mb-5 border border-zinc-800/50 space-y-3">
+            <div className="flex items-center gap-2">
+              <Globe className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-blue-400 text-xs">sunsetyoga.com</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-zinc-300 text-xs">hello@sunsetyoga.com</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-zinc-300 text-xs">(415) 555-0142</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-zinc-300 text-xs">4.7</span>
+              <span className="text-zinc-500 text-xs">(128 reviews)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <AtSign className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-zinc-300 text-xs">@sunsetyogasf</span>
+              <span className="text-zinc-500 text-xs">· 2.4k followers</span>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[10px] text-zinc-500">Services:</span>
+              <div className="flex gap-1">
+                {["Yoga", "Pilates", "Meditation"].map((s) => (
+                  <span key={s} className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-zinc-500">Booking:</span>
+              <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
+                High opportunity
+              </span>
+            </div>
           </div>
 
           {/* Activity */}
@@ -297,19 +301,22 @@ export function DashboardMockup() {
             <div className="text-xs text-zinc-500 font-medium mb-3 uppercase tracking-wider">Activity</div>
             <div className="space-y-3">
               <ActivityItem
-                avatar="https://i.pravatar.cc/24?img=1"
-                name="nan"
-                action="moved from"
-                from="Backlog"
-                to="In Progress"
-                time="5 months ago"
+                icon={Sparkles}
+                text="AI enrichment completed - 14 data points extracted"
+                time="2 hours ago"
+                color="text-purple-400"
               />
               <ActivityItem
-                avatar="https://i.pravatar.cc/24?img=2"
-                name="alex"
-                action="commented on"
-                from="this issue"
-                time="5 months ago"
+                icon={Mail}
+                text="Outreach sequence generated - 3 steps, English"
+                time="2 hours ago"
+                color="text-blue-400"
+              />
+              <ActivityItem
+                icon={Radar}
+                text="Discovered via AI search - San Francisco, CA"
+                time="2 hours ago"
+                color="text-emerald-400"
               />
             </div>
           </div>
@@ -343,7 +350,7 @@ function NavItem({
       <Icon className={`w-4 h-4 ${color || ""}`} />
       <span className="flex-1 text-xs">{label}</span>
       {badge && (
-        <span className="bg-indigo-500/80 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-medium px-1">
+        <span className="bg-zinc-700/80 text-zinc-300 text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-medium px-1">
           {badge}
         </span>
       )}
@@ -352,30 +359,31 @@ function NavItem({
   )
 }
 
-function InboxItem({
-  id,
-  title,
-  subtitle,
-  time,
-  avatar,
+function LeadItem({
+  name,
+  location,
+  score,
   status,
-  isProject,
+  time,
   active,
 }: {
-  id?: string
-  title: string
-  subtitle?: string
-  time?: string
-  avatar: string
+  name: string
+  location: string
+  score: number
   status: string
-  isProject?: boolean
+  time: string
   active?: boolean
 }) {
+  const scoreColor =
+    score >= 4 ? "text-emerald-400 bg-emerald-500/20" :
+    score >= 3 ? "text-amber-400 bg-amber-500/20" :
+    "text-red-400 bg-red-500/20"
+
   const statusColors: Record<string, string> = {
-    "in-progress": "bg-yellow-500",
-    todo: "bg-zinc-600",
-    bug: "bg-red-500",
-    done: "bg-emerald-500",
+    new: "bg-emerald-500",
+    contacted: "bg-blue-500",
+    interested: "bg-amber-500",
+    customer: "bg-emerald-400",
   }
 
   return (
@@ -385,52 +393,40 @@ function InboxItem({
       }`}
     >
       <div className="flex items-start gap-3">
-        <img src={avatar || "/placeholder.svg"} alt="" className="w-8 h-8 rounded-full shrink-0 mt-0.5" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            {id && <span className="text-zinc-500 text-[10px]">{id}</span>}
-            {isProject && <span className="text-violet-400 text-[10px]">Project</span>}
-            <div className={`w-2 h-2 rounded-full ${statusColors[status] || "bg-zinc-500"}`} />
-          </div>
-          <p className="text-white text-xs truncate leading-tight">{title}</p>
-          {subtitle && <p className="text-zinc-500 text-[10px] mt-0.5 truncate">{subtitle}</p>}
+        <div className="flex flex-col items-center gap-1 mt-0.5">
+          <div className={`w-2 h-2 rounded-full ${statusColors[status] || "bg-zinc-500"}`} />
         </div>
-        {time && <span className="text-zinc-600 text-[10px] shrink-0">{time}</span>}
+        <div className="flex-1 min-w-0">
+          <p className="text-white text-xs truncate leading-tight">{name}</p>
+          <p className="text-zinc-500 text-[10px] mt-0.5 truncate">{location}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${scoreColor}`}>
+            {score.toFixed(1)}
+          </span>
+          <span className="text-zinc-600 text-[10px] shrink-0">{time}</span>
+        </div>
       </div>
     </div>
   )
 }
 
 function ActivityItem({
-  avatar,
-  name,
-  action,
-  from,
-  to,
+  icon: Icon,
+  text,
   time,
+  color,
 }: {
-  avatar: string
-  name: string
-  action: string
-  from: string
-  to?: string
+  icon: React.ElementType
+  text: string
   time: string
+  color: string
 }) {
   return (
     <div className="flex items-start gap-2">
-      <img src={avatar || "/placeholder.svg"} alt="" className="w-5 h-5 rounded-full" />
+      <Icon className={`w-4 h-4 ${color} mt-0.5`} />
       <div className="flex-1">
-        <p className="text-zinc-400 text-xs">
-          <span className="text-white">{name}</span>
-          <span className="text-zinc-500"> {action} </span>
-          <span className="text-zinc-300">{from}</span>
-          {to && (
-            <>
-              <span className="text-zinc-500"> to </span>
-              <span className="text-zinc-300">{to}</span>
-            </>
-          )}
-        </p>
+        <p className="text-zinc-400 text-xs">{text}</p>
         <p className="text-zinc-600 text-[10px] mt-0.5">{time}</p>
       </div>
     </div>

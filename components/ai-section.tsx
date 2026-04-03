@@ -1,20 +1,21 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ChevronRight, Check, Paperclip, Globe, Lightbulb } from "lucide-react"
+import { ChevronRight, Globe, Mail, Phone, Users, Star, AtSign, MapPin } from "lucide-react"
 
-const agents = [
-  { name: "Cursor", isAgent: true, selected: true, icon: "◇" },
-  { name: "GitHub Copilot", isAgent: true, selected: false, icon: "◉" },
-  { name: "Sentry", isAgent: true, selected: false, icon: "◈" },
-  { name: "Leela", isAgent: false, selected: false, icon: "○" },
-  { name: "Codex", isAgent: true, selected: false, icon: "◎" },
-  { name: "Conor", isAgent: false, selected: false, icon: "○" },
+const enrichmentFields = [
+  { icon: Globe, label: "Website", value: "sunsetyoga.com", color: "text-blue-400" },
+  { icon: Mail, label: "Email", value: "hello@sunsetyoga.com", color: "text-zinc-300" },
+  { icon: Phone, label: "Phone", value: "(415) 555-0142", color: "text-zinc-300" },
+  { icon: Users, label: "Team Size", value: "8 members", color: "text-zinc-300" },
+  { icon: Star, label: "Rating", value: "4.7 (128 reviews)", color: "text-amber-400" },
+  { icon: AtSign, label: "Social", value: "@sunsetyogasf · 2.4k", color: "text-zinc-300" },
+  { icon: MapPin, label: "Location", value: "San Francisco, CA", color: "text-zinc-300" },
 ]
 
 export function AISection() {
   return (
-    <div className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+    <div id="ai" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -51,7 +52,7 @@ export function AISection() {
               lineHeight: 1.1,
             }}
           >
-            AI-assisted product development
+            AI that does the research for you
           </motion.h2>
 
           {/* Description */}
@@ -60,10 +61,11 @@ export function AISection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-zinc-400 max-w-md mb-8"
+            className="text-zinc-400 max-w-lg mb-8"
           >
-            <span className="text-white font-medium">Sprint for Agents.</span> Choose from a variety of AI agents and
-            start delegating work, from code generation to other technical tasks.
+            <span className="text-white font-medium">ScoreLead AI.</span> Point it at any city or industry, and it
+            discovers businesses, visits their websites, extracts structured data - emails, pricing, services, team
+            members, social profiles - and scores every lead automatically.
           </motion.p>
 
           {/* Learn more button */}
@@ -74,11 +76,11 @@ export function AISection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="px-5 py-2.5 bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-colors text-sm flex items-center gap-2 mb-16"
           >
-            Learn more
+            See AI enrichment in action
             <ChevronRight className="w-4 h-4" />
           </motion.button>
 
-          {/* Agent dropdown mockup */}
+          {/* AI Enrichment Result Card */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -135,63 +137,53 @@ export function AISection() {
                   }}
                 />
 
-                {/* Input field */}
-                <div className="bg-zinc-800/50 border border-zinc-700 rounded-t-xl px-5 py-4">
-                  <span className="text-zinc-500 italic">Assign to...</span>
+                {/* Card header */}
+                <div className="bg-zinc-800/50 border border-zinc-700 rounded-t-xl px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-zinc-300 font-medium text-sm">AI Enrichment Results</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {["Maps", "Web", "AI"].map((source) => (
+                      <span
+                        key={source}
+                        className="text-[10px] bg-zinc-700/50 text-zinc-400 px-2 py-0.5 rounded"
+                      >
+                        {source}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Dropdown options */}
-                <div className="bg-zinc-900/80 border border-t-0 border-zinc-700 rounded-b-xl py-1">
-                  {agents.map((agent, index) => (
+                {/* Enrichment fields */}
+                <div className="bg-zinc-900/80 border border-t-0 border-zinc-700 rounded-b-xl py-2">
+                  {enrichmentFields.map((field) => (
                     <div
-                      key={agent.name}
-                      style={
-                        agent.selected
-                          ? {
-                              transform: "scale(1.04) rotateX(17deg)",
-                              background: "linear-gradient(#343434 0%, #2d2d2d 100%)",
-                              borderRadius: "6px",
-                              height: "48px",
-                              position: "relative",
-                              boxShadow:
-                                "inset 0 -2.75px 4.75px rgba(255, 255, 255, 0.14), inset 0 -0.752px 0.752px rgba(255, 255, 255, 0.1), 0 54px 73px 3px rgba(0, 0, 0, 0.5)",
-                              zIndex: 20,
-                              marginLeft: "-12px",
-                              marginRight: "-12px",
-                            }
-                          : {
-                              opacity: 1 - index * 0.15,
-                              height: "42px",
-                            }
-                      }
+                      key={field.label}
+                      className="flex items-center gap-3 px-5 py-2.5 hover:bg-zinc-800/30 transition-colors"
                     >
-                      <div
-                        className="flex items-center justify-between h-full"
-                        style={{
-                          paddingLeft: "24px",
-                          paddingRight: "24px",
-                          gap: "12px",
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-zinc-400 text-lg">{agent.icon}</span>
-                          <span className={agent.selected ? "text-white font-medium" : "text-zinc-300"}>
-                            {agent.name}
-                          </span>
-                          {agent.isAgent && (
-                            <span className="text-xs bg-zinc-700 text-zinc-400 px-2 py-0.5 rounded">Agent</span>
-                          )}
-                        </div>
-                        {agent.selected && <Check className="w-4 h-4 text-zinc-400" />}
-                      </div>
+                      <field.icon className="w-4 h-4 text-zinc-500" />
+                      <span className="text-zinc-500 text-sm w-20">{field.label}</span>
+                      <span className={`text-sm ${field.color}`}>{field.value}</span>
                     </div>
                   ))}
+                  <div className="flex items-center justify-between px-5 py-3 mt-1 border-t border-zinc-800/50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-zinc-500">Services detected:</span>
+                      {["Yoga", "Pilates", "Meditation", "Workshops"].map((s) => (
+                        <span key={s} className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="text-xs text-emerald-400 font-medium">Confidence: 94%</span>
+                  </div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Bottom divider with two columns */}
+          {/* Bottom two columns */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -200,136 +192,124 @@ export function AISection() {
             className="mt-16"
           >
             <div className="grid grid-cols-1 md:grid-cols-2">
-              {/* Left column */}
+              {/* Left column - Smart Scoring */}
               <div className="border-t border-r border-b border-zinc-800/60 pt-12 pr-12 pb-16">
-                <h3 className="text-zinc-200 font-medium text-xl mb-3">Self-driving product operations</h3>
+                <h3 className="text-zinc-200 font-medium text-xl mb-3">Smart Scoring Engine</h3>
                 <p className="text-zinc-500 text-base mb-8">
-                  Streamline your product development workflows with AI assistance for routine, manual tasks.
+                  Our AI analyzes every lead across multiple dimensions - online presence, reputation, market fit,
+                  engagement potential, and readiness to buy - then distills it into one clear score.
                 </p>
 
-                {/* Triage Intelligence Card */}
+                {/* Scoring breakdown card */}
                 <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-5">
-                    <svg className="w-4 h-4 text-zinc-500" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M8 0L9.5 5.5L15 7L9.5 8.5L8 14L6.5 8.5L1 7L6.5 5.5L8 0Z" />
-                    </svg>
-                    <span className="text-zinc-500 text-sm">
-                      Triage <span className="text-zinc-300">Intelligence</span>
-                    </span>
-                  </div>
-
-                  {/* Suggestions Row */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-zinc-600 text-sm w-20">Suggestions</span>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm"
-                        style={{ background: "#7170ff" }}
-                      >
-                        <span className="w-4 h-4 bg-white/30 rounded-full" />
-                        <span className="text-white">nan</span>
-                      </span>
-                      <span className="flex items-center gap-1.5 bg-zinc-800/30 rounded-md px-2 py-1 text-sm text-zinc-600">
-                        <span className="w-3 h-3 border border-zinc-700 rounded" />
-                        Mobile App Refactor
-                      </span>
-                      <span className="flex items-center gap-1.5 text-sm text-zinc-700">
-                        <span className="w-2 h-2 bg-zinc-600 rounded-full" />
-                        Slack
-                      </span>
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="text-zinc-300 text-sm font-medium">Sunset Yoga Studio</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-emerald-400 font-bold text-xl">4.5</span>
+                      <span className="text-zinc-500 text-xs">/5</span>
                     </div>
                   </div>
 
-                  {/* Duplicate Row */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-zinc-600 text-sm w-20">Duplicate of</span>
+                  <div className="space-y-3">
+                    {[
+                      { label: "Online Reach", value: 5, color: "bg-emerald-500" },
+                      { label: "Trustworthiness", value: 4, color: "bg-emerald-500" },
+                      { label: "Market Fit", value: 5, color: "bg-emerald-500" },
+                      { label: "Engagement", value: 4, color: "bg-blue-500" },
+                      { label: "Readiness", value: 3, color: "bg-amber-500" },
+                    ].map((signal) => (
+                      <div key={signal.label} className="flex items-center gap-3">
+                        <span className="text-zinc-500 text-xs w-28">{signal.label}</span>
+                        <div className="flex-1 flex gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className={`h-2 flex-1 rounded-sm ${i < signal.value ? signal.color : "bg-zinc-800"}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-zinc-400 text-xs w-6 text-right">{signal.value}/5</span>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Related Row */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-zinc-600 text-sm w-20">Related to</span>
-                  </div>
-
-                  {/* Expanded Suggestion Card */}
-                  <div className="bg-zinc-800/40 rounded-lg p-4 ml-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-5 h-5 bg-zinc-600 rounded-full" />
-                      <span className="text-zinc-300 text-sm font-medium">nan</span>
-                    </div>
-
-                    <p className="text-zinc-500 text-xs mb-2">Why this assignee was suggested</p>
-                    <p className="text-zinc-500 text-sm mb-4">
-                      This person was the assignee on previous issues related to performance problems in the mobile app
-                      launch flow
-                    </p>
-
-                    <p className="text-zinc-500 text-xs mb-2">Alternatives</p>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="flex items-center gap-1.5 bg-zinc-700/50 rounded-md px-2 py-1 text-sm">
-                        <span className="w-4 h-4 bg-zinc-500 rounded-full" />
-                        <span className="text-zinc-400">yann</span>
-                      </span>
-                      <span className="flex items-center gap-1.5 bg-zinc-700/50 rounded-md px-2 py-1 text-sm">
-                        <span className="w-4 h-4 bg-zinc-500 rounded-full" />
-                        <span className="text-zinc-400">erin</span>
-                      </span>
-                    </div>
-
-                    <button className="w-full flex items-center justify-center gap-2 bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-300 text-sm py-2.5 rounded-md transition-colors">
-                      <Check className="w-4 h-4" />
-                      Accept suggestion
-                    </button>
+                  <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center gap-2">
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">High opportunity</span>
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Open market</span>
+                    <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">Growing demand</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right column */}
+              {/* Right column - Automated Outreach */}
               <div className="border-t border-b border-zinc-800/60 pt-12 pl-12 pb-16">
-                <h3 className="text-zinc-200 font-medium text-xl mb-3">Sprint MCP</h3>
+                <h3 className="text-zinc-200 font-medium text-xl mb-3">Automated Outreach</h3>
                 <p className="text-zinc-500 text-base mb-8">
-                  Connect Sprint to your favorite tools including Cursor, Claude, ChatGPT, and more.
+                  AI generates personalized multi-step outreach sequences in multiple languages. Each message references
+                  the lead&#39;s specific business details.
                 </p>
 
-                {/* MCP Code Snippet */}
+                {/* Email sequence preview */}
                 <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-xl p-5 font-mono text-sm">
-                  <p className="text-zinc-700 mb-3">//mcp.sprint.app/sse</p>
-                  <div className="space-y-1 mb-6">
-                    <p>
-                      <span className="text-orange-400/70">"mcpServers"</span>
-                      <span className="text-zinc-500">: {"{"}</span>
-                    </p>
-                    <p className="pl-4">
-                      <span className="text-orange-400/70">"sprint"</span>
-                      <span className="text-zinc-500">: {"{"}</span>
-                    </p>
-                    <p className="pl-8">
-                      <span className="text-orange-400/70">"command"</span>
-                      <span className="text-zinc-500">: </span>
-                      <span className="text-green-400/70">"npx"</span>
-                    </p>
+                  <div className="space-y-4">
+                    {/* Step 1 */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px] text-blue-400 font-bold">1</div>
+                        <span className="text-zinc-400 text-xs">Introduction · Day 1</span>
+                      </div>
+                      <div className="bg-zinc-800/40 rounded-lg p-3">
+                        <p className="text-zinc-500 text-xs mb-1">Subject: <span className="text-zinc-300">Loved what I saw at Sunset Yoga Studio</span></p>
+                        <p className="text-zinc-600 text-xs">Hi, I noticed your studio offers yoga, pilates, and meditation classes in SF...</p>
+                      </div>
+                    </div>
+
+                    {/* Connector */}
+                    <div className="flex items-center gap-2 pl-2.5">
+                      <div className="w-px h-4 bg-zinc-700" />
+                    </div>
+
+                    {/* Step 2 */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] text-amber-400 font-bold">2</div>
+                        <span className="text-zinc-400 text-xs">Follow-up · Day 3</span>
+                      </div>
+                      <div className="bg-zinc-800/40 rounded-lg p-3">
+                        <p className="text-zinc-500 text-xs mb-1">Subject: <span className="text-zinc-300">Quick follow-up</span></p>
+                        <p className="text-zinc-600 text-xs">Just wanted to share how studios like yours are saving 10+ hours/week...</p>
+                      </div>
+                    </div>
+
+                    {/* Connector */}
+                    <div className="flex items-center gap-2 pl-2.5">
+                      <div className="w-px h-4 bg-zinc-700" />
+                    </div>
+
+                    {/* Step 3 */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px] text-emerald-400 font-bold">3</div>
+                        <span className="text-zinc-400 text-xs">Value prop · Day 7</span>
+                      </div>
+                      <div className="bg-zinc-800/40 rounded-lg p-3">
+                        <p className="text-zinc-500 text-xs mb-1">Subject: <span className="text-zinc-300">Your 128 five-star reviews say it all</span></p>
+                        <p className="text-zinc-600 text-xs">With your 4.7 rating and growing waitlist, here&#39;s how we can help scale...</p>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Ask Anything Input */}
-                  <div className="bg-zinc-800/40 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="w-0.5 h-5 bg-zinc-600" />
-                      <span className="text-zinc-600">Ask anything</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button className="flex items-center gap-1.5 border border-zinc-700/60 text-zinc-500 text-sm px-3 py-1.5 rounded-full hover:bg-zinc-700/30 transition-colors">
-                        <Paperclip className="w-3.5 h-3.5" />
-                        Attach
-                      </button>
-                      <button className="flex items-center gap-1.5 border border-zinc-700/60 text-zinc-500 text-sm px-3 py-1.5 rounded-full hover:bg-zinc-700/30 transition-colors">
-                        <Globe className="w-3.5 h-3.5" />
-                        Search
-                      </button>
-                      <button className="flex items-center gap-1.5 border border-zinc-700/60 text-zinc-500 text-sm px-3 py-1.5 rounded-full hover:bg-zinc-700/30 transition-colors">
-                        <Lightbulb className="w-3.5 h-3.5" />
-                        Reason
-                      </button>
-                    </div>
+                  <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center gap-3">
+                    {["EN", "ES", "PT", "FR", "DE", "+12"].map((lang) => (
+                      <span
+                        key={lang}
+                        className={`text-[10px] px-2 py-0.5 rounded ${
+                          lang === "EN" ? "bg-blue-500/20 text-blue-400" : "bg-zinc-800 text-zinc-500"
+                        }`}
+                      >
+                        {lang}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -7,9 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'ScoreLead - AI-Powered Lead Discovery & Scoring',
+  description: 'Discover, score, and convert B2B leads with AI. Automated discovery, intelligent scoring across 20+ signals, and personalized outreach at scale.',
   icons: {
     icon: [
       {
@@ -36,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-[#09090B]">
         {children}
         <Analytics />
       </body>

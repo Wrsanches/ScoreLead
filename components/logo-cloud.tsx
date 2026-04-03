@@ -1,54 +1,111 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Triangle } from "lucide-react"
+import { ChevronRight, Quote, ArrowUpRight } from "lucide-react"
+import Image from "next/image"
 
 export function LogoCloud() {
   return (
-    <div className="relative z-20 pb-24 pt-8" style={{ backgroundColor: "#09090B" }}>
+    <div id="customers" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: "20%",
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 100%)",
+        }}
+      />
       <div className="w-full flex justify-center px-6">
-        <div className="w-full max-w-4xl text-center">
-          <motion.p
+        <div className="w-full max-w-5xl">
+          {/* Section label */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-lg text-zinc-300 mb-2"
+            className="flex items-center gap-2 mb-6"
           >
-            Powering the world's best product teams.
-          </motion.p>
-          <motion.p
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-zinc-400 text-sm">Customer story</span>
+            <ChevronRight className="w-4 h-4 text-zinc-500" />
+          </motion.div>
+
+          {/* Heading */}
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg text-zinc-500 mb-16"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] text-white max-w-3xl mb-16"
+            style={{
+              letterSpacing: "-0.0325em",
+              fontVariationSettings: '"opsz" 28',
+              fontWeight: 538,
+              lineHeight: 1.1,
+            }}
           >
-            From next-gen startups to established enterprises.
-          </motion.p>
+            See how Ceramik grew their pipeline 10x
+          </motion.h2>
 
+          {/* Testimonial card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative group cursor-pointer"
           >
-            {/* Logo grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-16 gap-y-10 items-center justify-items-center transition-all duration-300 group-hover:blur-[2.5px] group-hover:opacity-50">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="text-white font-semibold text-xl flex items-center gap-2">
-                  <Triangle className="w-5 h-5 fill-white" />
-                  Vercel
-                </div>
-              ))}
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              {/* Left - quote */}
+              <div className="border-t border-r border-b border-zinc-800/60 pt-12 pr-12 pb-16">
+                <Quote className="w-8 h-8 text-emerald-500/30 mb-6" />
+                <p className="text-lg md:text-xl text-zinc-200 leading-relaxed mb-8">
+                  ScoreLead transformed how we find and reach pottery studios. We went from manually searching for leads
+                  to discovering hundreds of qualified prospects in minutes. Our pipeline grew 10x in the first month.
+                </p>
 
-            {/* Hover overlay button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="px-5 py-2.5 bg-zinc-800/80 backdrop-blur-sm border border-zinc-700 rounded-full text-sm text-zinc-300 flex items-center gap-2">
-                Meet our customers
-                <span aria-hidden="true">›</span>
+                <div className="flex items-center gap-4">
+                  <Image
+                    src="/images/ceramik-logo.png"
+                    alt="Ceramik"
+                    width={40}
+                    height={40}
+                    className="rounded-lg"
+                  />
+                  <div>
+                    <p className="text-white font-medium">Ceramik</p>
+                    <p className="text-zinc-500 text-sm">All-in-one app for pottery teachers to manage their studios</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right - stats */}
+              <div className="border-t border-b border-zinc-800/60 pt-12 pl-12 pb-16">
+                <p className="text-zinc-500 text-sm mb-8">Results after 30 days with ScoreLead</p>
+
+                <div className="space-y-8">
+                  <div>
+                    <p className="text-4xl md:text-5xl font-semibold text-white mb-1" style={{ letterSpacing: "-0.02em" }}>
+                      2,450
+                    </p>
+                    <p className="text-zinc-500 text-sm">Leads discovered automatically</p>
+                  </div>
+                  <div>
+                    <p className="text-4xl md:text-5xl font-semibold text-white mb-1" style={{ letterSpacing: "-0.02em" }}>
+                      10x
+                    </p>
+                    <p className="text-zinc-500 text-sm">Pipeline growth in the first month</p>
+                  </div>
+                  <div>
+                    <p className="text-4xl md:text-5xl font-semibold text-white mb-1" style={{ letterSpacing: "-0.02em" }}>
+                      85%
+                    </p>
+                    <p className="text-zinc-500 text-sm">Less time spent on manual research</p>
+                  </div>
+                </div>
+
+                <button className="mt-10 flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
+                  Read the full story
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </motion.div>

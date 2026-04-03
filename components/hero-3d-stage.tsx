@@ -10,7 +10,8 @@ import { AISection } from "./ai-section"
 import { ProductDirectionSection } from "./product-direction-section"
 import { WorkflowsSection } from "./workflows-section"
 import { CTASection } from "./cta-section"
-import { Footer } from "./footer"
+// import { Footer } from "./footer"
+import { WaitlistFooter } from "./waitlist-footer"
 
 export function Hero3DStage() {
   const [yOffset, setYOffset] = useState(0)
@@ -36,7 +37,7 @@ export function Hero3DStage() {
 
   return (
     <>
-      <section className="relative min-h-screen overflow-hidden" style={{ backgroundColor: "#09090B" }}>
+      <section id="hero" className="relative min-h-screen overflow-hidden" style={{ backgroundColor: "#09090B" }}>
         <Navbar />
 
         {/* Subtle glow */}
@@ -48,7 +49,7 @@ export function Hero3DStage() {
             transform: "translate(-50%, -30%)",
             width: "1200px",
             height: "800px",
-            background: "radial-gradient(ellipse at center, rgba(99, 102, 241, 0.08) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)",
           }}
         />
 
@@ -63,7 +64,7 @@ export function Hero3DStage() {
                 transition={{ duration: 0.6 }}
                 className="text-4xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance"
               >
-                Sprint is a purpose-built tool for planning and building products
+                Discover, score, and convert your next best customers
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -71,23 +72,23 @@ export function Hero3DStage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="mt-6 text-lg text-zinc-400"
               >
-                Meet the system for modern software development.
+                ScoreLead uses AI to find and qualify businesses, enrich them with detailed data,
                 <br />
-                Streamline issues, projects, and product roadmaps.
+                score their potential, and generate personalized outreach automatically.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mt-8 flex items-center gap-6"
+                className="mt-8 flex items-center gap-6 relative z-20"
               >
-                <button className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
-                  Start building
-                </button>
-                <button className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
-                  <span className="text-zinc-500">New:</span> Sprint agent for Slack
+                <a href="#waitlist" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
+                  Join the waitlist
+                </a>
+                <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
+                  See how it works
                   <span aria-hidden="true">→</span>
-                </button>
+                </a>
               </motion.div>
             </div>
           </div>
@@ -165,9 +166,10 @@ export function Hero3DStage() {
           <FeatureCardsSection />
           <AISection />
           <ProductDirectionSection />
-          <WorkflowsSection />
+          {/* <WorkflowsSection /> */}
           <CTASection />
-          <Footer />
+          {/* <Footer /> */}
+          <WaitlistFooter />
         </div>
       </section>
     </>
