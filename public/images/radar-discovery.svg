@@ -1,0 +1,23 @@
+<svg width="400" height="360" viewBox="0 0 400 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="200" cy="180" r="140" stroke="#424242" stroke-width="1.5" opacity="0.3" />
+  <circle cx="200" cy="180" r="100" stroke="#424242" stroke-width="1.5" opacity="0.4" />
+  <circle cx="200" cy="180" r="60" stroke="#424242" stroke-width="1.5" opacity="0.5" />
+  <circle cx="200" cy="180" r="20" stroke="#424242" stroke-width="1.5" opacity="0.6" />
+  <line x1="200" y1="40" x2="200" y2="320" stroke="#424242" stroke-width="1" opacity="0.2" />
+  <line x1="60" y1="180" x2="340" y2="180" stroke="#424242" stroke-width="1" opacity="0.2" />
+  <path d="M200 180 L200 40 A140 140 0 0 1 320 110 Z" fill="url(#radarGrad)" opacity="0.4" />
+  <circle cx="170" cy="130" r="4" fill="#10b981" opacity="0.9" />
+  <circle cx="250" cy="160" r="4" fill="#10b981" opacity="0.9" />
+  <circle cx="230" cy="220" r="4" fill="#10b981" opacity="0.7" />
+  <circle cx="150" cy="200" r="4" fill="#f59e0b" opacity="0.7" />
+  <circle cx="280" cy="130" r="4" fill="#10b981" opacity="0.6" />
+  <circle cx="140" cy="160" r="3" fill="#f59e0b" opacity="0.5" />
+  <circle cx="260" cy="250" r="3" fill="#6366f1" opacity="0.5" />
+  <circle cx="200" cy="180" r="5" fill="#10b981" />
+  <defs>
+    <radialGradient id="radarGrad" cx="200" cy="180" r="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+</svg>

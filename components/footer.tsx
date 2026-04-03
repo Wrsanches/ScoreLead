@@ -31,9 +31,9 @@ export function Footer() {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm">
+                    <span className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm cursor-default">
                       {link}
-                    </a>
+                    </span>
                   </li>
                 ))}
               </ul>

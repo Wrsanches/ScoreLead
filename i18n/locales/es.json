@@ -256,9 +256,14 @@
     "mockupCsvRow1": "Sunset Yoga,hello@...,4.5,nuevo",
     "mockupCsvRow2": "Peak Fitness,info@...,4.0,con"
   },
+  "error": {
+    "title": "Algo salió mal",
+    "description": "Ocurrió un error inesperado. Intenta de nuevo o vuelve a la página de inicio.",
+    "retry": "Intentar de nuevo"
+  },
   "notFound": {
-    "title": "Esta pagina no fue encontrada",
-    "description": "La pagina que buscas no existe, fue eliminada o la URL podria ser incorrecta.",
+    "title": "Esta página no fue encontrada",
+    "description": "La página que buscas no existe, fue eliminada o la URL podría ser incorrecta.",
     "backHome": "Volver al inicio"
   },
   "cookies": {

@@ -2,43 +2,14 @@
 
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
-import { ChevronRight, Plus } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
 const featureCards = [
   {
     title: "AI-Powered Discovery",
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 400 360"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="max-w-full max-h-full"
-        >
-          <circle cx="200" cy="180" r="140" stroke="#424242" strokeWidth="1.5" opacity="0.3" />
-          <circle cx="200" cy="180" r="100" stroke="#424242" strokeWidth="1.5" opacity="0.4" />
-          <circle cx="200" cy="180" r="60" stroke="#424242" strokeWidth="1.5" opacity="0.5" />
-          <circle cx="200" cy="180" r="20" stroke="#424242" strokeWidth="1.5" opacity="0.6" />
-          <line x1="200" y1="40" x2="200" y2="320" stroke="#424242" strokeWidth="1" opacity="0.2" />
-          <line x1="60" y1="180" x2="340" y2="180" stroke="#424242" strokeWidth="1" opacity="0.2" />
-          <path d="M200 180 L200 40 A140 140 0 0 1 320 110 Z" fill="url(#radarGrad)" opacity="0.4" />
-          <circle cx="170" cy="130" r="4" fill="#10b981" opacity="0.9" />
-          <circle cx="250" cy="160" r="4" fill="#10b981" opacity="0.9" />
-          <circle cx="230" cy="220" r="4" fill="#10b981" opacity="0.7" />
-          <circle cx="150" cy="200" r="4" fill="#f59e0b" opacity="0.7" />
-          <circle cx="280" cy="130" r="4" fill="#10b981" opacity="0.6" />
-          <circle cx="140" cy="160" r="3" fill="#f59e0b" opacity="0.5" />
-          <circle cx="260" cy="250" r="3" fill="#6366f1" opacity="0.5" />
-          <circle cx="200" cy="180" r="5" fill="#10b981" />
-          <defs>
-            <radialGradient id="radarGrad" cx="200" cy="180" r="140" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-        </svg>
+        <img src="/images/radar-discovery.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
       </div>
     ),
   },
@@ -46,43 +17,7 @@ const featureCards = [
     title: "Smart Lead Scoring",
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 400 360"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="max-w-full max-h-full"
-        >
-          {[
-            { x: 80, h: 180, label: "Web", color: "#10b981" },
-            { x: 140, h: 140, label: "Social", color: "#6366f1" },
-            { x: 200, h: 200, label: "Rating", color: "#10b981" },
-            { x: 260, h: 100, label: "Tech", color: "#f59e0b" },
-            { x: 320, h: 160, label: "Fit", color: "#10b981" },
-          ].map((bar) => (
-            <g key={bar.label}>
-              <rect
-                x={bar.x - 16}
-                y={280 - bar.h}
-                width="32"
-                height={bar.h}
-                rx="4"
-                fill={bar.color}
-                opacity="0.7"
-              />
-              <text x={bar.x} y={300} textAnchor="middle" fill="#71717a" fontSize="11" fontFamily="system-ui">
-                {bar.label}
-              </text>
-            </g>
-          ))}
-          <text x="200" y="40" textAnchor="middle" fill="white" fontSize="36" fontWeight="600" fontFamily="system-ui">
-            4.2
-          </text>
-          <text x="200" y="58" textAnchor="middle" fill="#71717a" fontSize="12" fontFamily="system-ui">
-            / 5.0
-          </text>
-        </svg>
+        <img src="/images/lead-scoring.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
       </div>
     ),
   },
@@ -146,7 +81,7 @@ export function FeatureCardsSection() {
   const t = useTranslations("features")
 
   return (
-    <div id="features" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+    <section id="features" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -180,10 +115,7 @@ export function FeatureCardsSection() {
               className="max-w-md"
             >
               <p className="text-zinc-400 leading-relaxed">
-                {t("description")}{" "}
-                <a href="#" className="text-white inline-flex items-center gap-1 hover:underline">
-                  {t("seeAll")} <ChevronRight className="w-4 h-4" />
-                </a>
+                {t("description")}
               </p>
             </motion.div>
           </div>
@@ -196,7 +128,7 @@ export function FeatureCardsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                className="bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer group overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-[320px] lg:min-h-[360px]"
+                className="bg-zinc-900/50 border border-zinc-800 overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-[320px] lg:min-h-[360px]"
               >
                 <div
                   className="absolute top-0 left-0 w-full flex"
@@ -218,15 +150,13 @@ export function FeatureCardsSection() {
                   style={{ padding: "0 24px 28px", gap: "16px" }}
                 >
                   <h3 className="text-white font-medium text-base md:text-lg leading-tight">{t(cardKeys[index])}</h3>
-                  <div className="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-500 group-hover:border-zinc-500 group-hover:text-zinc-300 transition-colors shrink-0">
-                    <Plus className="w-4 h-4" />
-                  </div>
+                  <ChevronRight className="w-5 h-5 text-zinc-600 shrink-0" />
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

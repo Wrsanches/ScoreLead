@@ -1,0 +1,21 @@
+{
+  "name": "ScoreLead",
+  "short_name": "ScoreLead",
+  "description": "AI-Powered Lead Discovery & Scoring",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090B",
+  "theme_color": "#09090B",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ]
+}

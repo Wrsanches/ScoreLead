@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 
 const siteConfig = {
   name: "ScoreLead",
@@ -14,6 +14,8 @@ type LocaleMetadata = {
   keywords: string[]
   ogTitle: string
   ogDescription: string
+  jsonLdDescription: string
+  faq: { question: string; answer: string }[]
 }
 
 const localeMetadata: Record<string, LocaleMetadata> = {
@@ -41,6 +43,30 @@ const localeMetadata: Record<string, LocaleMetadata> = {
     ogTitle: "ScoreLead - Discover, Score, and Convert Leads with AI",
     ogDescription:
       "AI-powered lead discovery and scoring platform. Find businesses, enrich with data, score their potential, and generate personalized outreach automatically.",
+    jsonLdDescription:
+      "AI-powered lead discovery and scoring platform for B2B sales teams. Automated business discovery, intelligent scoring, data enrichment, and personalized outreach.",
+    faq: [
+      {
+        question: "What is ScoreLead?",
+        answer:
+          "ScoreLead is an AI-powered platform that discovers, scores, and qualifies B2B leads automatically. It finds businesses across any city or industry, enriches them with detailed data, and generates personalized outreach sequences.",
+      },
+      {
+        question: "How does AI lead scoring work?",
+        answer:
+          "ScoreLead AI analyzes leads across multiple dimensions including online presence, reputation, market fit, engagement potential, and readiness to buy, then assigns a clear score from 1 to 5.",
+      },
+      {
+        question: "What languages does ScoreLead support?",
+        answer:
+          "ScoreLead supports multiple languages for both the platform interface and AI-generated outreach, including English, Portuguese, and Spanish.",
+      },
+      {
+        question: "How do I get access to ScoreLead?",
+        answer:
+          "ScoreLead is currently in early access. You can join the waitlist on our website to be notified when we launch.",
+      },
+    ],
   },
   pt: {
     title: "ScoreLead - Descoberta e Pontuacao de Leads com IA",
@@ -66,6 +92,30 @@ const localeMetadata: Record<string, LocaleMetadata> = {
     ogTitle: "ScoreLead - Descubra, Pontue e Converta Leads com IA",
     ogDescription:
       "Plataforma de descoberta e pontuacao de leads com IA. Encontre negocios, enriqueca com dados, pontue seu potencial e gere outreach personalizado automaticamente.",
+    jsonLdDescription:
+      "Plataforma de descoberta e pontuacao de leads com IA para equipes de vendas B2B. Descoberta automatizada, pontuacao inteligente, enriquecimento de dados e outreach personalizado.",
+    faq: [
+      {
+        question: "O que e o ScoreLead?",
+        answer:
+          "ScoreLead e uma plataforma com IA que descobre, pontua e qualifica leads B2B automaticamente. Encontra empresas em qualquer cidade ou industria, enriquece com dados detalhados e gera sequencias de outreach personalizadas.",
+      },
+      {
+        question: "Como funciona a pontuacao de leads com IA?",
+        answer:
+          "A IA do ScoreLead analisa leads em multiplas dimensoes, incluindo presenca online, reputacao, adequacao ao mercado, potencial de engajamento e prontidao para compra, atribuindo uma pontuacao clara de 1 a 5.",
+      },
+      {
+        question: "Quais idiomas o ScoreLead suporta?",
+        answer:
+          "O ScoreLead suporta multiplos idiomas tanto na interface da plataforma quanto no outreach gerado por IA, incluindo ingles, portugues e espanhol.",
+      },
+      {
+        question: "Como posso acessar o ScoreLead?",
+        answer:
+          "O ScoreLead esta em acesso antecipado. Voce pode entrar na lista de espera em nosso site para ser notificado quando lancarmos.",
+      },
+    ],
   },
   es: {
     title: "ScoreLead - Descubrimiento y Puntuacion de Leads con IA",
@@ -91,7 +141,38 @@ const localeMetadata: Record<string, LocaleMetadata> = {
     ogTitle: "ScoreLead - Descubre, Puntua y Convierte Leads con IA",
     ogDescription:
       "Plataforma de descubrimiento y puntuacion de leads con IA. Encuentra negocios, enriquece con datos, puntua su potencial y genera outreach personalizado automaticamente.",
+    jsonLdDescription:
+      "Plataforma de descubrimiento y puntuacion de leads con IA para equipos de ventas B2B. Descubrimiento automatizado, puntuacion inteligente, enriquecimiento de datos y outreach personalizado.",
+    faq: [
+      {
+        question: "Que es ScoreLead?",
+        answer:
+          "ScoreLead es una plataforma con IA que descubre, puntua y califica leads B2B automaticamente. Encuentra negocios en cualquier ciudad o industria, los enriquece con datos detallados y genera secuencias de outreach personalizadas.",
+      },
+      {
+        question: "Como funciona la puntuacion de leads con IA?",
+        answer:
+          "La IA de ScoreLead analiza leads en multiples dimensiones, incluyendo presencia online, reputacion, ajuste al mercado, potencial de engagement y disposicion a comprar, asignando una puntuacion clara de 1 a 5.",
+      },
+      {
+        question: "Que idiomas soporta ScoreLead?",
+        answer:
+          "ScoreLead soporta multiples idiomas tanto en la interfaz de la plataforma como en el outreach generado por IA, incluyendo ingles, portugues y espanol.",
+      },
+      {
+        question: "Como puedo acceder a ScoreLead?",
+        answer:
+          "ScoreLead esta en acceso anticipado. Puedes unirte a la lista de espera en nuestro sitio web para ser notificado cuando lancemos.",
+      },
+    ],
   },
+}
+
+export const siteViewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#09090B",
 }
 
 export function generateSiteMetadata(locale: string): Metadata {
@@ -114,6 +195,7 @@ export function generateSiteMetadata(locale: string): Metadata {
       address: false,
       telephone: false,
     },
+    manifest: "/manifest.json",
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -165,48 +247,72 @@ export function generateSiteMetadata(locale: string): Metadata {
   }
 }
 
-export const jsonLdOrganization = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "ScoreLead",
-  url: siteConfig.url,
-  logo: `${siteConfig.url}/images/scorelead-logo-512.png`,
-  email: siteConfig.email,
-  contactPoint: {
-    "@type": "ContactPoint",
+export function generateJsonLd(locale: string) {
+  const meta = localeMetadata[locale] || localeMetadata.en
+  const canonicalUrl = locale === "en" ? siteConfig.url : `${siteConfig.url}/${locale}`
+
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "ScoreLead",
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/images/scorelead-logo-512.png`,
     email: siteConfig.email,
-    contactType: "customer support",
-    availableLanguage: ["English", "Portuguese", "Spanish"],
-  },
-}
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: siteConfig.email,
+      contactType: "customer support",
+      availableLanguage: ["English", "Portuguese", "Spanish"],
+    },
+  }
 
-export const jsonLdWebSite = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "ScoreLead",
-  url: siteConfig.url,
-}
+  const webSite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ScoreLead",
+    url: siteConfig.url,
+    inLanguage: locale === "pt" ? "pt-BR" : locale === "es" ? "es" : "en",
+    description: meta.jsonLdDescription,
+  }
 
-export const jsonLdSoftwareApplication = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "ScoreLead",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  description: "AI-powered lead discovery and scoring platform for B2B sales teams",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-    description: "Waitlist - launching soon",
-  },
-  featureList: [
-    "AI-powered business discovery",
-    "Intelligent lead scoring",
-    "Automated data enrichment",
-    "Multi-language outreach generation",
-    "Pipeline management",
-    "CSV export",
-    "Deduplication",
-  ],
+  const softwareApplication = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "ScoreLead",
+    url: canonicalUrl,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: meta.jsonLdDescription,
+    inLanguage: locale === "pt" ? "pt-BR" : locale === "es" ? "es" : "en",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Waitlist - launching soon",
+    },
+    featureList: [
+      "AI-powered business discovery",
+      "Intelligent lead scoring",
+      "Automated data enrichment",
+      "Multi-language outreach generation",
+      "Pipeline management",
+      "CSV export",
+      "Deduplication",
+    ],
+  }
+
+  const faqPage = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: meta.faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  }
+
+  return { organization, webSite, softwareApplication, faqPage }
 }

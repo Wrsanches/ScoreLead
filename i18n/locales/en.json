@@ -33,7 +33,7 @@
   },
   "features": {
     "heading": "Built for teams that need more pipeline",
-    "description": "ScoreLead combines discovery, enrichment, and outreach into one system. Stop juggling spreadsheets and manual research - let AI handle the grunt work.",
+    "description": "ScoreLead combines discovery, enrichment, and outreach into one system. Stop juggling spreadsheets and manual research - let AI handle the heavy lifting.",
     "seeAll": "See all features",
     "card1": "AI-Powered Discovery",
     "card2": "Smart Lead Scoring",
@@ -255,6 +255,11 @@
     "mockupCsvName": "name,email,score,status",
     "mockupCsvRow1": "Sunset Yoga,hello@...,4.5,new",
     "mockupCsvRow2": "Peak Fitness,info@...,4.0,con"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again or return to the home page.",
+    "retry": "Try again"
   },
   "notFound": {
     "title": "This page could not be found",

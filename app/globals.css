@@ -5,6 +5,36 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: #27272a #09090B;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
 
 a, button, [role="button"] {
@@ -131,6 +161,78 @@ a, button, [role="button"] {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@keyframes not-found-glitch {
+  0%, 100% { text-shadow: 2px 0 #10b981, -2px 0 #ef4444; }
+  25% { text-shadow: -2px -2px #10b981, 2px 2px #ef4444; }
+  50% { text-shadow: 2px 2px #10b981, -2px -2px #ef4444; clip-path: inset(20% 0 40% 0); }
+  75% { text-shadow: -2px 2px #10b981, 2px -2px #ef4444; clip-path: inset(60% 0 10% 0); }
+}
+
+@keyframes not-found-glitch-base {
+  0%, 100% { clip-path: inset(0 0 0 0); }
+  50% { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes not-found-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes not-found-scanline {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes not-found-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes not-found-particle1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  25% { transform: translate(30px, -40px) scale(0.6); opacity: 0.6; }
+  50% { transform: translate(-20px, -70px) scale(0.3); opacity: 0; }
+  75% { transform: translate(10px, 20px) scale(0.8); opacity: 0.1; }
+}
+
+@keyframes not-found-particle2 {
+  0%, 100% { transform: translate(0, 0) scale(0.5); opacity: 0.2; }
+  33% { transform: translate(-40px, -30px) scale(1); opacity: 0.5; }
+  66% { transform: translate(25px, -60px) scale(0.2); opacity: 0; }
+}
+
+@keyframes not-found-particle3 {
+  0%, 100% { transform: translate(0, 0) scale(0.8); opacity: 0.4; }
+  20% { transform: translate(50px, -20px) scale(0.4); opacity: 0.6; }
+  60% { transform: translate(-30px, -50px) scale(0.1); opacity: 0; }
+  80% { transform: translate(-10px, 10px) scale(0.6); opacity: 0.2; }
+}
+
+.glitch-404 {
+  animation: not-found-glitch-base 3s ease-in-out infinite;
+}
+
+.glitch-404::before,
+.glitch-404::after {
+  content: "404";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.glitch-404::before {
+  animation: not-found-glitch 3s ease-in-out infinite;
+  color: transparent;
+}
+
+.glitch-404::after {
+  animation: not-found-glitch 3s ease-in-out infinite reverse;
+  color: transparent;
 }
 
 @layer base {

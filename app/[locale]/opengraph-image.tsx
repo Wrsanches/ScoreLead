@@ -8,7 +8,7 @@ export const size = {
 
 export const contentType = "image/png"
 
-export default async function OGImage({ params }: { params: { locale: string } }) {
+export default async function OGImage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const file = locale === "pt" ? "og-image-pt.png" : locale === "es" ? "og-image-es.png" : "og-image-en.png"
   const imageBuffer = await readFile(join(process.cwd(), `public/images/${file}`))

@@ -9,7 +9,7 @@ export function CustomerStory() {
   const t = useTranslations("customerStory")
 
   return (
-    <div id="customers" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+    <section id="customers" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -108,6 +108,6 @@ export function CustomerStory() {
           </motion.div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

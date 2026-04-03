@@ -51,7 +51,7 @@ export function DashboardPreview() {
       y: 0,
       transition: {
         duration: 1.2,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       },
     },
   }
@@ -330,8 +330,9 @@ function NavItem({
 }) {
   return (
     <div
-      className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
-        active ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
+      role="presentation"
+      className={`flex items-center gap-2 px-2 py-1.5 rounded-md ${
+        active ? "bg-zinc-800 text-white" : "text-zinc-400"
       }`}
     >
       <Icon className={`w-4 h-4 ${color || ""}`} />
@@ -375,8 +376,9 @@ function LeadItem({
 
   return (
     <div
-      className={`px-4 py-3 border-b border-zinc-800/30 cursor-pointer transition-colors ${
-        active ? "bg-zinc-800/50" : "hover:bg-zinc-800/30"
+      role="presentation"
+      className={`px-4 py-3 border-b border-zinc-800/30 ${
+        active ? "bg-zinc-800/50" : ""
       }`}
     >
       <div className="flex items-start gap-3">

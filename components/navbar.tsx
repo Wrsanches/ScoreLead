@@ -6,10 +6,6 @@ import { Menu, X } from "lucide-react"
 import { ScoreLeadLogo } from "./scorelead-logo"
 import { LanguageSwitcher } from "./language-switcher"
 
-function scrollTo(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
-}
-
 export function Navbar() {
   const t = useTranslations("nav")
   const [open, setOpen] = useState(false)
@@ -32,30 +28,31 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-[#09090B]/80 backdrop-blur-md">
       <div className="w-full flex justify-center px-6 py-4">
         <div className="w-full max-w-4xl flex items-center justify-between">
-          <button onClick={() => scrollTo("hero")} className="flex items-center gap-2">
+          <a href="#hero" className="flex items-center gap-2">
             <ScoreLeadLogo className="w-5 h-5 text-white" />
             <span className="text-white font-semibold">ScoreLead</span>
-          </button>
+          </a>
 
           <div className="hidden md:flex items-center gap-8">
             {links.map((link) => (
-              <button key={link.id} onClick={() => scrollTo(link.id)} className="text-sm text-zinc-400 hover:text-white transition-colors">
+              <a key={link.id} href={`#${link.id}`} className="text-sm text-zinc-400 hover:text-white transition-colors">
                 {link.label}
-              </button>
+              </a>
             ))}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            <button
-              onClick={() => scrollTo("waitlist")}
+            <a
+              href="#waitlist"
               className="text-sm text-white bg-zinc-800 hover:bg-zinc-700 px-3.5 py-1.5 rounded-md border border-zinc-700 transition-colors"
             >
               {t("joinWaitlist")}
-            </button>
+            </a>
           </div>
 
           <button
+            type="button"
             onClick={() => setOpen(!open)}
             className="md:hidden text-zinc-400 hover:text-white transition-colors"
             aria-label="Toggle menu"
@@ -69,22 +66,24 @@ export function Navbar() {
         <div className="md:hidden border-t border-zinc-800 bg-[#09090B]/95 backdrop-blur-md px-6 pb-6 pt-4">
           <div className="flex flex-col gap-4">
             {links.map((link) => (
-              <button
+              <a
                 key={link.id}
-                onClick={() => { scrollTo(link.id); setOpen(false) }}
-                className="text-sm text-zinc-400 hover:text-white transition-colors text-left"
+                href={`#${link.id}`}
+                onClick={() => setOpen(false)}
+                className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
                 {link.label}
-              </button>
+              </a>
             ))}
             <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
               <LanguageSwitcher />
-              <button
-                onClick={() => { scrollTo("waitlist"); setOpen(false) }}
+              <a
+                href="#waitlist"
+                onClick={() => setOpen(false)}
                 className="text-sm text-white bg-zinc-800 hover:bg-zinc-700 px-3.5 py-1.5 rounded-md border border-zinc-700 transition-colors"
               >
                 {t("joinWaitlist")}
-              </button>
+              </a>
             </div>
           </div>
         </div>

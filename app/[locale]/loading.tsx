@@ -1,26 +1,41 @@
+import { Skeleton } from "@/components/ui/skeleton"
+
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-[#09090B] flex items-center justify-center">
-      <div className="animate-pulse">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-10 h-10"
-        >
-          <defs>
-            <linearGradient id="sGradLoading" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="white" />
-              <stop offset="100%" stopColor="#10b981" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M7 6.5C7 4.567 8.567 3 10.5 3H14C16.209 3 18 4.791 18 7C18 9.209 16.209 11 14 11H10C7.791 11 6 12.791 6 15C6 17.209 7.791 19 10 19H13.5C15.433 19 17 20.567 17 22.5"
-            stroke="url(#sGradLoading)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </svg>
+    <div className="min-h-screen bg-[#09090B] overflow-hidden">
+
+      <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+        <Skeleton className="h-6 w-6 bg-zinc-800" />
+        <div className="hidden md:flex items-center gap-8">
+          <Skeleton className="h-4 w-16 bg-zinc-800" />
+          <Skeleton className="h-4 w-16 bg-zinc-800" />
+          <Skeleton className="h-4 w-16 bg-zinc-800" />
+          <Skeleton className="h-4 w-16 bg-zinc-800" />
+        </div>
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-16 bg-zinc-800" />
+          <Skeleton className="h-9 w-24 rounded-lg bg-zinc-800" />
+        </div>
+      </div>
+
+
+      <div className="pt-28 flex flex-col items-center px-6 mt-16">
+        <div className="w-full max-w-4xl space-y-6">
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-3/4 bg-zinc-800/60" />
+            <Skeleton className="h-12 w-1/2 bg-zinc-800/60" />
+          </div>
+          <Skeleton className="h-5 w-2/3 bg-zinc-800/40" />
+          <div className="flex items-center gap-6 mt-8">
+            <Skeleton className="h-10 w-32 rounded-lg bg-zinc-800/60" />
+            <Skeleton className="h-5 w-28 bg-zinc-800/40" />
+          </div>
+        </div>
+      </div>
+
+
+      <div className="flex justify-center mt-20 px-6">
+        <Skeleton className="w-full max-w-5xl h-80 rounded-xl bg-zinc-800/30 border border-zinc-800/50" />
       </div>
     </div>
   )

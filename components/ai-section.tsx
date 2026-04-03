@@ -18,7 +18,7 @@ export function AISection() {
   ]
 
   return (
-    <div id="ai" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
+    <section id="ai" className="relative z-20 py-40" style={{ backgroundColor: "#09090B" }}>
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
@@ -67,6 +67,7 @@ export function AISection() {
           </motion.p>
 
           <motion.button
+            type="button"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -298,6 +299,6 @@ export function AISection() {
           </motion.div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

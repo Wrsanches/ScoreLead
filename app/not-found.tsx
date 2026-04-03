@@ -147,7 +147,7 @@ export default function NotFound() {
 
           {/* Ambient glow behind 404 */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] pointer-events-none -z-0"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] pointer-events-none z-0"
             style={{
               background: "radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, transparent 70%)",
               animation: "pulse 5s ease-in-out infinite",

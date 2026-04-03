@@ -1,9 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useTranslations } from "next-intl"
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
-import { DashboardPreview } from "./dashboard-preview"
+
+const DashboardPreview = dynamic(
+  () => import("./dashboard-preview").then((m) => ({ default: m.DashboardPreview })),
+  { ssr: true }
+)
 import { Navbar } from "./navbar"
 import { CustomerStory } from "./customer-story"
 import { FeatureCardsSection } from "./feature-cards-section"
@@ -16,17 +21,23 @@ import { CookieConsent } from "./cookie-consent"
 export function LandingPage() {
   const t = useTranslations("hero")
   const [yOffset, setYOffset] = useState(0)
+  const rafRef = useRef(0)
+
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(() => {
+      const offset = Math.min(window.scrollY / 300, 1) * -20
+      setYOffset(offset)
+    })
+  }, [])
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const offset = Math.min(scrollY / 300, 1) * -20
-      setYOffset(offset)
-    }
-
     window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [handleScroll])
 
   const baseTransform = {
     translateX: 2,
@@ -78,13 +89,13 @@ export function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mt-8 flex items-center gap-6 relative z-20"
               >
-                <button onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })} className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
+                <a href="#waitlist" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
                   {t("cta")}
-                </button>
-                <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
+                </a>
+                <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
                   {t("secondary")}
                   <span aria-hidden="true">→</span>
-                </button>
+                </a>
               </motion.div>
             </div>
           </div>
