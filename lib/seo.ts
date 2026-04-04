@@ -171,7 +171,6 @@ const localeMetadata: Record<string, LocaleMetadata> = {
 export const siteViewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
   themeColor: "#09090B",
 }
 

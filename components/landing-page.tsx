@@ -64,14 +64,14 @@ export function LandingPage() {
           }}
         />
 
-        <div className="relative z-10 pt-28 flex flex-col">
-          <div className="w-full flex justify-center px-6 mt-16">
+        <div className="relative z-10 pt-20 sm:pt-28 flex flex-col">
+          <div className="w-full flex justify-center px-6 mt-6 sm:mt-16">
             <div className="w-full max-w-4xl">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="text-4xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance"
+                className="text-3xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance"
               >
                 {t("heading")}
               </motion.h1>
@@ -79,7 +79,7 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="mt-6 text-lg text-zinc-400"
+                className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-400"
               >
                 {t("subtitle")}
               </motion.p>
@@ -87,7 +87,7 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mt-8 flex items-center gap-6 relative z-20"
+                className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20"
               >
                 <a href="#waitlist" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
                   {t("cta")}
@@ -101,7 +101,7 @@ export function LandingPage() {
           </div>
 
           <div
-            className="relative mt-16"
+            className="relative"
             style={{
               width: "100vw",
               marginLeft: "-50vw",
@@ -141,6 +141,7 @@ export function LandingPage() {
                   duration: 1,
                   ease: [0.22, 1, 0.36, 1],
                 }}
+                className="max-sm:[margin-top:180px] sm:[margin-top:280px]"
                 style={{
                   backgroundColor: "#09090B",
                   transformOrigin: "0 0",
@@ -150,7 +151,7 @@ export function LandingPage() {
                   borderRadius: "10px",
                   width: "1600px",
                   height: "900px",
-                  margin: "280px auto auto",
+                  marginInline: "auto",
                   position: "absolute",
                   top: 0,
                   bottom: 0,

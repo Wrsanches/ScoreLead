@@ -124,7 +124,7 @@ export function WaitlistSection() {
                       },
                       onChange: () => { if (error) setError("") },
                     })}
-                    className="flex-1 px-4 py-3 bg-transparent text-white text-sm placeholder:text-zinc-500 focus:outline-none"
+                    className="flex-1 px-4 py-3 bg-transparent text-white text-base sm:text-sm placeholder:text-zinc-500 focus:outline-none"
                   />
                   <button
                     type="submit"

@@ -80,27 +80,27 @@ export function PipelineSection() {
                 </div>
               </div>
 
-              <div className="absolute text-zinc-500 text-sm" style={{ left: "5%", top: "55px" }}>
+              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "5%", top: "55px" }}>
                 {t("stageDiscovery")}
               </div>
-              <div className="absolute text-zinc-500 text-sm" style={{ left: "20%", top: "35px" }}>
+              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "20%", top: "35px" }}>
                 {t("stageEnrichment")}
               </div>
               <div
-                className="absolute px-3 py-1 rounded-md bg-zinc-700/80 text-zinc-300 text-sm font-medium"
+                className="absolute px-2 sm:px-3 py-1 rounded-md bg-zinc-700/80 text-zinc-300 text-[10px] sm:text-sm font-medium"
                 style={{ left: "42%", top: "15px" }}
               >
                 {t("stageScored")}
               </div>
-              <div className="absolute text-zinc-500 text-sm" style={{ left: "62%", top: "-5px" }}>
+              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "62%", top: "-5px" }}>
                 {t("stageOutreach")}
               </div>
-              <div className="absolute text-zinc-500/50 text-sm" style={{ left: "82%", top: "-25px" }}>
+              <div className="absolute text-zinc-500/50 text-[10px] sm:text-sm" style={{ left: "82%", top: "-25px" }}>
                 {t("stageConverted")}
               </div>
 
               <div
-                className="absolute rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-4 py-3 flex items-center justify-between"
+                className="absolute rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between overflow-hidden"
                 style={{
                   left: "5%",
                   top: "100px",
@@ -108,12 +108,12 @@ export function PipelineSection() {
                   height: "48px",
                 }}
               >
-                <span className="text-emerald-400 text-sm font-medium">{t("discovered")}</span>
-                <span className="text-emerald-400/70 text-sm font-mono">2,450</span>
+                <span className="text-emerald-400 text-[11px] sm:text-sm font-medium truncate">{t("discovered")}</span>
+                <span className="text-emerald-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">2,450</span>
               </div>
 
               <div
-                className="absolute rounded-lg bg-blue-500/15 border border-blue-500/30 px-4 py-3 flex items-center justify-between"
+                className="absolute rounded-lg bg-blue-500/15 border border-blue-500/30 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between overflow-hidden"
                 style={{
                   left: "15%",
                   top: "155px",
@@ -121,12 +121,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-blue-400 text-sm">{t("enriched")}</span>
-                <span className="text-blue-400/70 text-sm font-mono">1,830</span>
+                <span className="text-blue-400 text-[11px] sm:text-sm truncate">{t("enriched")}</span>
+                <span className="text-blue-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">1,830</span>
               </div>
 
               <div
-                className="absolute rounded-lg bg-amber-500/15 border border-amber-500/30 px-4 py-3 flex items-center justify-between"
+                className="absolute rounded-lg bg-amber-500/15 border border-amber-500/30 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between overflow-hidden"
                 style={{
                   left: "30%",
                   top: "210px",
@@ -134,12 +134,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-amber-400 text-sm">{t("scored3plus")}</span>
-                <span className="text-amber-400/70 text-sm font-mono">1,240</span>
+                <span className="text-amber-400 text-[11px] sm:text-sm truncate">{t("scored3plus")}</span>
+                <span className="text-amber-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">1,240</span>
               </div>
 
               <div
-                className="absolute rounded-lg bg-purple-500/15 border border-purple-500/30 px-4 py-3 flex items-center justify-between"
+                className="absolute rounded-lg bg-purple-500/15 border border-purple-500/30 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between overflow-hidden"
                 style={{
                   left: "45%",
                   top: "265px",
@@ -147,12 +147,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-purple-400 text-sm">{t("outreachSent")}</span>
-                <span className="text-purple-400/70 text-sm font-mono">680</span>
+                <span className="text-purple-400 text-[11px] sm:text-sm truncate">{t("outreachSent")}</span>
+                <span className="text-purple-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">680</span>
               </div>
 
               <div
-                className="absolute rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-4 py-3 flex items-center justify-between"
+                className="absolute rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between overflow-hidden"
                 style={{
                   left: "58%",
                   top: "320px",
@@ -160,8 +160,8 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-emerald-300 text-sm font-medium">{t("customers")}</span>
-                <span className="text-emerald-300/70 text-sm font-mono">180</span>
+                <span className="text-emerald-300 text-[11px] sm:text-sm font-medium truncate">{t("customers")}</span>
+                <span className="text-emerald-300/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">180</span>
               </div>
             </div>
           </div>
@@ -254,7 +254,7 @@ export function PipelineSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-16">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Radar className="w-5 h-5 text-zinc-400" />
