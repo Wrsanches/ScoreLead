@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server"
+import { requireAuth } from "@/lib/auth-guard"
 
 export default async function AdminLayout({
   children,
@@ -9,6 +10,7 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
+  await requireAuth(locale)
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-zinc-950">
