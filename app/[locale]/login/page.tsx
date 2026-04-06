@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react"
-import { Link, useRouter } from "@/i18n/routing"
+import { Link } from "@/i18n/routing"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -13,7 +13,6 @@ import { loginSchema, type LoginValues } from "@/lib/validations/auth"
 
 export default function LoginPage() {
   const t = useTranslations("auth")
-  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState("")
 
@@ -38,7 +37,7 @@ export default function LoginPage() {
       return
     }
 
-    router.push("/admin")
+    window.location.href = "/admin"
   }
 
   function handleGoogleSignIn() {

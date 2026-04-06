@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/routing"
 
 export default function Error({ reset }: { error: Error; reset: () => void }) {
   const t = useTranslations("error")
@@ -33,7 +34,7 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
 
       <div className="relative mb-6 select-none">
         <h1
-          className="glitch-404 relative text-[10rem] sm:text-[14rem] font-black leading-none tracking-tighter bg-clip-text text-transparent"
+          className="glitch-500 relative text-[10rem] sm:text-[14rem] font-black leading-none tracking-tighter bg-clip-text text-transparent"
           style={{
             backgroundImage: "linear-gradient(135deg, #ffffff 0%, #10b981 50%, #a1a1aa 100%)",
             backgroundSize: "200% 200%",
@@ -60,18 +61,26 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
         {t("description")}
       </p>
 
-      <button
-        onClick={reset}
-        className="group relative px-6 py-3 text-sm font-medium text-white rounded-lg bg-zinc-800/80 border border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800 transition-all duration-300"
-      >
-        <span
-          className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{
-            background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, transparent 70%)",
-          }}
-        />
-        <span className="relative">{t("retry")}</span>
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={reset}
+          className="group relative px-6 py-3 text-sm font-medium text-white rounded-lg bg-zinc-800/80 border border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800 transition-all duration-300"
+        >
+          <span
+            className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            style={{
+              background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, transparent 70%)",
+            }}
+          />
+          <span className="relative">{t("retry")}</span>
+        </button>
+        <Link
+          href="/"
+          className="px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-300"
+        >
+          {t("goHome")}
+        </Link>
+      </div>
 
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] pointer-events-none z-0"

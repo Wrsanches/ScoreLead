@@ -27,8 +27,19 @@ import {
   X,
   ArrowLeft,
   User,
+  LogOut,
 } from "lucide-react"
 import { ScoreLeadLogo } from "@/components/scorelead-logo"
+import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const leads = [
   { nameKey: "lead1", locationKey: "lead1Location", score: 4.5, status: "new", time: "2h" },
@@ -43,6 +54,7 @@ const leads = [
 
 export default function AdminPage() {
   const t = useTranslations("dashboard")
+  const router = useRouter()
   const [selectedLead, setSelectedLead] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -155,16 +167,54 @@ export default function AdminPage() {
         </div>
 
         <div className="p-3 border-t border-zinc-800">
-          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200 transition-all duration-150">
-            <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center shrink-0">
-              <User className="w-3.5 h-3.5 text-zinc-300" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-200 truncate">Demo User</p>
-              <p className="text-xs text-zinc-500 truncate">demo@scorelead.io</p>
-            </div>
-            <Settings className="w-4 h-4 text-zinc-600" />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600">
+                <div className="w-7 h-7 rounded-full bg-linear-to-br from-zinc-600 to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-600/50 group-hover:ring-zinc-500/50 transition-all duration-200">
+                  <User className="w-3.5 h-3.5 text-zinc-300" />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm text-zinc-200 truncate">Demo User</p>
+                  <p className="text-xs text-zinc-500 truncate">demo@scorelead.io</p>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              className="w-[216px] bg-zinc-900 border-zinc-700/60 shadow-xl shadow-black/40"
+            >
+              <DropdownMenuLabel className="px-3 py-2.5 font-normal">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-zinc-600 to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-600/50">
+                    <User className="w-4 h-4 text-zinc-300" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-zinc-200 truncate">Demo User</p>
+                    <p className="text-xs text-zinc-500 truncate">demo@scorelead.io</p>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem className="px-3 py-2 text-zinc-400 focus:text-zinc-200 focus:bg-zinc-800/60 cursor-pointer">
+                <Settings className="w-4 h-4" />
+                {t("settings")}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem
+                onClick={async () => {
+                  await authClient.signOut()
+                  router.push("/login")
+                }}
+                className="px-3 py-2 text-red-400/80 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                {t("signOut")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 

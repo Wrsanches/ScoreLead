@@ -4,7 +4,7 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['192.168.15.5'],
+  allowedDevOrigins: ['192.168.15.5', '192.168.15.12'],
   async headers() {
     return [
       {

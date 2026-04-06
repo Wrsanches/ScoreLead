@@ -17,6 +17,7 @@ import { PipelineSection } from "./pipeline-section"
 import { WaitlistSection } from "./waitlist-section"
 import { WaitlistFooter } from "./waitlist-footer"
 import { CookieConsent } from "./cookie-consent"
+import { Link } from "@/i18n/routing"
 
 export function LandingPage() {
   const t = useTranslations("hero")
@@ -89,9 +90,9 @@ export function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20"
               >
-                <a href="#waitlist" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
+                <Link href="/signup" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
                   {t("cta")}
-                </a>
+                </Link>
                 <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
                   {t("secondary")}
                   <span aria-hidden="true">→</span>

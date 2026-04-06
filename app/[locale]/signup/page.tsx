@@ -82,13 +82,13 @@ export default function SignUpPage() {
       return
     }
 
-    router.push("/admin")
+    router.push("/onboarding")
   }
 
   function handleGoogleSignIn() {
     authClient.signIn.social({
       provider: "google",
-      callbackURL: "/admin",
+      callbackURL: "/onboarding",
     })
   }
 

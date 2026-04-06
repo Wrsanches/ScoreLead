@@ -4,8 +4,9 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
+import { Mail, Send } from "lucide-react"
 
-type WaitlistForm = {
+type ContactForm = {
   email: string
 }
 
@@ -14,9 +15,9 @@ export function WaitlistSection() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const { register, handleSubmit, formState: { errors } } = useForm<WaitlistForm>()
+  const { register, handleSubmit, formState: { errors } } = useForm<ContactForm>()
 
-  const onSubmit = async (data: WaitlistForm) => {
+  const onSubmit = async (data: ContactForm) => {
     setLoading(true)
     setError("")
     try {
@@ -25,7 +26,7 @@ export function WaitlistSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email }),
       })
-      if (!res.ok) throw new Error("Failed to join waitlist")
+      if (!res.ok) throw new Error("Failed")
       setSubmitted(true)
     } catch {
       setError(t("error"))
@@ -95,52 +96,58 @@ export function WaitlistSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div role="status" aria-live="polite">
-            {submitted ? (
-              <div className="flex items-center justify-center gap-3 py-5 px-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 max-w-md mx-auto">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                    <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-                  </svg>
+          <div className="max-w-md mx-auto">
+            <div role="status" aria-live="polite">
+              {submitted ? (
+                <div className="flex items-center justify-center gap-3 py-5 px-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                      <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-zinc-200 text-sm">{t("success")}</span>
                 </div>
-                <span className="text-zinc-200 text-sm">{t("success")}</span>
-              </div>
-            ) : (
-              <div className="max-w-md mx-auto">
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50">
-                  <label htmlFor="waitlist-email" className="sr-only">{t("placeholder")}</label>
-                  <input
-                    id="waitlist-email"
-                    type="email"
-                    autoComplete="email"
-                    spellCheck={false}
-                    placeholder={t("placeholder")}
-                    aria-describedby={errors.email || error ? "waitlist-error" : undefined}
-                    {...register("email", {
-                      required: t("emailRequired"),
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: t("emailInvalid"),
-                      },
-                      onChange: () => { if (error) setError("") },
-                    })}
-                    className="flex-1 px-4 py-3 bg-transparent text-white text-base sm:text-sm placeholder:text-zinc-500 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-6 py-3 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm shrink-0 disabled:opacity-50"
-                  >
-                    {loading ? t("joining") : t("cta")}
-                  </button>
-                </form>
-                {(errors.email || error) && (
-                  <p id="waitlist-error" role="alert" className="text-red-400 text-xs mt-2">
-                    {errors.email?.message || error}
-                  </p>
-                )}
-              </div>
-            )}
+              ) : (
+                <>
+                  <form onSubmit={handleSubmit(onSubmit)} className="flex items-stretch gap-2 p-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50">
+                    <label htmlFor="contact-email" className="sr-only">{t("placeholder")}</label>
+                    <div className="relative flex-1">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                      <input
+                        id="contact-email"
+                        type="email"
+                        autoComplete="email"
+                        spellCheck={false}
+                        placeholder={t("placeholder")}
+                        aria-describedby={errors.email || error ? "contact-error" : undefined}
+                        {...register("email", {
+                          required: t("emailRequired"),
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: t("emailInvalid"),
+                          },
+                          onChange: () => { if (error) setError("") },
+                        })}
+                        className="w-full pl-10 pr-4 py-3 bg-transparent text-white text-sm placeholder:text-zinc-500 focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-5 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-medium rounded-lg transition-colors text-sm shrink-0 disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {loading ? t("sending") : t("ctaSales")}
+                      {!loading && <Send className="w-3.5 h-3.5" />}
+                    </button>
+                  </form>
+                  {(errors.email || error) && (
+                    <p id="contact-error" role="alert" className="text-red-400 text-xs mt-2">
+                      {errors.email?.message || error}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

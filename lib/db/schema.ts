@@ -41,6 +41,37 @@ export const account = pgTable("account", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
 
+export const business = pgTable("business", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  website: text("website"),
+  instagram: text("instagram"),
+  facebook: text("facebook"),
+  linkedin: text("linkedin"),
+  other: text("other"),
+  location: text("location"),
+  name: text("name"),
+  description: text("description"),
+  persona: text("persona"),
+  clientPersona: text("clientPersona"),
+  field: text("field"),
+  category: text("category"),
+  tags: text("tags"),
+  logo: text("logo"),
+  language: text("language"),
+  businessModel: text("businessModel"),
+  services: text("services"),
+  serviceArea: text("serviceArea"),
+  competitors: text("competitors"),
+  onboardingCompleted: boolean("onboardingCompleted").notNull().default(false),
+  onboardingStep: text("onboardingStep").notNull().default("links"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+})
+
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),

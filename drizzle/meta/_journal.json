@@ -8,6 +8,41 @@
       "when": 1775480778252,
       "tag": "0000_typical_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775483146721,
+      "tag": "0001_violet_silk_fever",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775486919166,
+      "tag": "0002_wet_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775487233807,
+      "tag": "0003_jittery_giant_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775487778977,
+      "tag": "0004_charming_wolfpack",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775493474860,
+      "tag": "0005_absurd_sabretooth",
+      "breakpoints": true
     }
   ]
 }

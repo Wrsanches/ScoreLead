@@ -235,6 +235,30 @@ a, button, [role="button"] {
   color: transparent;
 }
 
+.glitch-500 {
+  animation: not-found-glitch-base 3s ease-in-out infinite;
+}
+
+.glitch-500::before,
+.glitch-500::after {
+  content: "500";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.glitch-500::before {
+  animation: not-found-glitch 3s ease-in-out infinite;
+  color: transparent;
+}
+
+.glitch-500::after {
+  animation: not-found-glitch 3s ease-in-out infinite reverse;
+  color: transparent;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
