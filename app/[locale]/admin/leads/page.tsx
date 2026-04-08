@@ -19,7 +19,8 @@ import {
   Tag,
 } from "lucide-react"
 import { MobileMenuButton } from "@/components/admin-shell"
-import { formatDistanceToNow } from "date-fns"
+import { ScoreBadge, SectionCard } from "@/components/admin"
+import { formatRelativeDate, getInitials, scoreColor, scoreBadgeClasses } from "@/lib/admin-utils"
 
 interface Lead {
   id: string
@@ -131,28 +132,6 @@ export default function LeadsPage() {
     }
   }, [leads.length])
 
-  function scoreColor(score: number) {
-    if (score >= 4) return "text-emerald-400"
-    if (score >= 3) return "text-amber-400"
-    return "text-red-400"
-  }
-
-  function scoreBadgeColor(score: number) {
-    if (score >= 4) return "text-emerald-400 bg-emerald-500/10"
-    if (score >= 3) return "text-amber-400 bg-amber-500/10"
-    return "text-red-400 bg-red-500/10"
-  }
-
-  function getInitials(name: string | null): string {
-    if (!name) return "?"
-    return name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
   const statusColors: Record<string, string> = {
     new: "bg-emerald-500",
     contacted: "bg-blue-500",
@@ -161,13 +140,7 @@ export default function LeadsPage() {
     customer: "bg-emerald-400",
   }
 
-  function formatDate(dateStr: string) {
-    try {
-      return formatDistanceToNow(new Date(dateStr), { addSuffix: true })
-    } catch {
-      return dateStr
-    }
-  }
+  const formatDate = formatRelativeDate
 
   return (
     <div className="flex h-full w-full overflow-hidden">
@@ -259,7 +232,7 @@ export default function LeadsPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums ${scoreBadgeColor(l.score)}`}>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums ${scoreBadgeClasses(l.score)}`}>
                         {l.score.toFixed(1)}
                       </span>
                       <span className="text-zinc-600 text-xs shrink-0 tabular-nums">{formatDate(l.createdAt)}</span>
@@ -369,7 +342,7 @@ export default function LeadsPage() {
 
                 {/* Score breakdown - 5 categories */}
                 {lead.scoreBreakdown?.categories && (
-                  <div className="bg-zinc-900/60 rounded-xl p-5 mb-6 border border-zinc-800">
+                  <div className="border border-zinc-800/60 rounded-xl p-5 mb-6">
                     <div className="flex items-end gap-4">
                       {([
                         { key: "reach", label: t("reach"), color: "bg-emerald-500" },
@@ -403,8 +376,7 @@ export default function LeadsPage() {
 
                 {/* Contact + Discovery cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 space-y-3">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">Contact</p>
+                  <SectionCard title="Contact" className="space-y-3">
                     {lead.website && (
                       <div className="flex items-center gap-2.5">
                         <Globe className="w-4 h-4 text-zinc-500 shrink-0" />
@@ -434,10 +406,9 @@ export default function LeadsPage() {
                     {!lead.website && !lead.email && !lead.phone && (
                       <p className="text-zinc-600 text-sm">No contact info found</p>
                     )}
-                  </div>
+                  </SectionCard>
 
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 space-y-3">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">{t("discovery")}</p>
+                  <SectionCard title={t("discovery")} className="space-y-3">
                     {lead.googleRating != null && (
                       <div className="flex items-center gap-2.5">
                         <Star className="w-4 h-4 text-amber-400 shrink-0" />
@@ -479,13 +450,12 @@ export default function LeadsPage() {
                     {!lead.googleRating && !lead.instagramHandle && !lead.services?.length && (
                       <p className="text-zinc-600 text-sm">No discovery data</p>
                     )}
-                  </div>
+                  </SectionCard>
                 </div>
 
                 {/* Social media */}
                 {lead.socialMedia && Object.keys(lead.socialMedia).length > 0 && (
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 mb-6">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">Social</p>
+                  <SectionCard title="Social" className="mb-6">
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(lead.socialMedia).map(([platform, url]) => (
                         <a
@@ -500,31 +470,26 @@ export default function LeadsPage() {
                         </a>
                       ))}
                     </div>
-                  </div>
+                  </SectionCard>
                 )}
 
                 {/* AI Summary */}
                 {lead.aiSummary && (
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 mb-6">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">AI Summary</p>
+                  <SectionCard title="AI Summary" className="mb-6">
                     <p className="text-zinc-300 text-sm leading-relaxed">{lead.aiSummary}</p>
-                  </div>
+                  </SectionCard>
                 )}
 
                 {/* Description */}
                 {lead.description && !lead.aiSummary && (
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 mb-6">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">Description</p>
+                  <SectionCard title="Description" className="mb-6">
                     <p className="text-zinc-300 text-sm leading-relaxed">{lead.description}</p>
-                  </div>
+                  </SectionCard>
                 )}
 
                 {/* Google Reviews */}
                 {lead.googleReviews && lead.googleReviews.length > 0 && (
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 mb-6">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">
-                      Reviews ({lead.googleReviews.length})
-                    </p>
+                  <SectionCard title={`Reviews (${lead.googleReviews.length})`} className="mb-6">
                     <div className="space-y-3">
                       {lead.googleReviews.map((review, i) => (
                         <div key={i} className="py-2.5 px-3 bg-zinc-800/30 rounded-lg">
@@ -548,13 +513,12 @@ export default function LeadsPage() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </SectionCard>
                 )}
 
                 {/* Pricing */}
                 {lead.pricingInfo && (
-                  <div className="bg-zinc-900/60 rounded-xl p-4 border border-zinc-800 mb-6">
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-3">Pricing</p>
+                  <SectionCard title="Pricing" className="mb-6">
                     <div className="space-y-2.5">
                       {lead.pricingInfo
                         .split(/[|;\n]/)
@@ -567,12 +531,12 @@ export default function LeadsPage() {
                           </div>
                         ))}
                     </div>
-                  </div>
+                  </SectionCard>
                 )}
 
                 {/* Metadata */}
                 <div className="pt-5 border-t border-zinc-800">
-                  <div className="text-sm text-zinc-500 font-semibold mb-4 uppercase tracking-widest">Details</div>
+                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Details</p>
                   <div className="space-y-px">
                     <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg">
                       <span className="flex-1 text-sm text-zinc-500">Source</span>

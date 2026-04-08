@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
-  ArrowLeft,
   MapPin,
   Search,
   Radar,
@@ -17,8 +16,8 @@ import {
 } from "lucide-react"
 import { Country, State, City } from "country-state-city"
 import type { ICountry, IState, ICity } from "country-state-city"
-import { MobileMenuButton } from "@/components/admin-shell"
 import { SearchableSelect, type SelectOption } from "@/components/searchable-select"
+import { PageHeader, ContentWrapper } from "@/components/admin"
 import { toast } from "sonner"
 
 export default function NewDiscoveryJobPage() {
@@ -271,29 +270,18 @@ export default function NewDiscoveryJobPage() {
 
   return (
     <>
-      {/* Top bar */}
-      <div className="px-6 h-14 flex items-center justify-between border-b border-zinc-800/70 shrink-0">
-        <div className="flex items-center gap-3">
-          <MobileMenuButton />
-          <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("discoveryJobsTitle")}</span>
-            </button>
-            <span className="text-zinc-700">/</span>
-            <span className="text-white text-sm font-medium">{t("createJob")}</span>
-          </div>
-        </div>
+      <PageHeader
+        title={t("createJob")}
+        backHref="/admin/discovery-jobs"
+        breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
+      />
 
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-2xl mx-auto px-6 py-10">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-white text-2xl font-semibold tracking-tight mb-2">{t("createJob")}</h1>
-              <p className="text-zinc-500 text-sm">Configure your discovery parameters. Our AI will scan the web, find matching businesses, and score them as leads.</p>
-            </div>
+      <div className="flex-1 overflow-auto">
+        <ContentWrapper narrow>
+          <div className="mb-8">
+            <h1 className="text-white text-2xl font-semibold tracking-tight mb-2">{t("createJob")}</h1>
+            <p className="text-zinc-500 text-sm">Configure your discovery parameters. Our AI will scan the web, find matching businesses, and score them as leads.</p>
+          </div>
 
             {/* Form */}
             <div className="space-y-8">
@@ -507,8 +495,8 @@ export default function NewDiscoveryJobPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+        </ContentWrapper>
+      </div>
     </>
   )
 }
