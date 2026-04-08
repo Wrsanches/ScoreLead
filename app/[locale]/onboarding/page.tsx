@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useTranslations } from "next-intl"
 import { useRouter } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation"
 import { ScoreLeadLogo } from "@/components/scorelead-logo"
 import { Link } from "@/i18n/routing"
 import { AnimatePresence, motion } from "framer-motion"
@@ -54,11 +54,12 @@ const EASE = [0.25, 0.46, 0.45, 0.94] as const
 const STEP_ORDER: Step[] = ["welcome", "primaryLinks", "moreLinks", "location", "targeting", "processing", "review"]
 
 export default function OnboardingPage() {
-  const t = useTranslations("onboarding")
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isAddingNew = searchParams.get("new") === "true"
   const { data: session } = authClient.useSession()
 
-  const [step, setStep] = useState<Step>("welcome")
+  const [step, setStep] = useState<Step>(isAddingNew ? "primaryLinks" : "welcome")
   const [direction, setDirection] = useState<1 | -1>(1)
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("scraping")
   const [profile, setProfile] = useState<BusinessProfile | null>(null)
@@ -88,12 +89,24 @@ export default function OnboardingPage() {
   const userName = session?.user?.name || ""
 
   useEffect(() => {
+    if (isAddingNew) {
+      setIsHydrating(false)
+      return
+    }
+
     async function hydrate() {
       try {
         const res = await fetch("/api/onboarding/state")
         if (!res.ok) return
 
-        const { business: biz } = await res.json()
+        const { business: biz, hasCompleted } = await res.json()
+
+        // If user already has a completed business and no in-progress one, redirect to admin
+        if (hasCompleted && !biz) {
+          router.push("/admin")
+          return
+        }
+
         if (!biz || biz.onboardingStep === "links") return
 
         setPrimaryLinks({ website: biz.website, instagram: biz.instagram })
@@ -122,7 +135,7 @@ export default function OnboardingPage() {
     }
 
     hydrate()
-  }, [])
+  }, [isAddingNew, router])
 
   // Map step to orb state
   function getOrbState(): OrbState {
@@ -280,46 +293,6 @@ export default function OnboardingPage() {
     }),
   }
 
-  if (isHydrating) {
-    return (
-      <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
-        <NeuralBackground />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
-        <div className="w-full max-w-xl relative z-10">
-          <div className="flex flex-col items-center mb-10">
-            <div className="flex items-center gap-2.5 mb-6">
-              <ScoreLeadLogo className="w-8 h-8 text-white" />
-              <span className="text-white font-semibold text-xl tracking-tight">ScoreLead</span>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/30 backdrop-blur-sm p-6 sm:p-10 shadow-2xl shadow-black/20">
-            <div className="flex justify-center mb-6">
-              <AiOrb state="processing" size="sm" />
-            </div>
-            <div className="flex flex-col items-center mb-8 space-y-2">
-              <div className="h-7 w-56 rounded-lg bg-zinc-800/60 animate-pulse" />
-              <div className="h-4 w-72 rounded-md bg-zinc-800/40 animate-pulse" />
-            </div>
-            <div className="space-y-5">
-              <div className="space-y-1.5">
-                <div className="h-4 w-20 rounded-md bg-zinc-800/40 animate-pulse" />
-                <div className="h-11 w-full rounded-xl bg-zinc-800/30 animate-pulse" />
-              </div>
-              <div className="space-y-1.5">
-                <div className="h-4 w-24 rounded-md bg-zinc-800/40 animate-pulse" />
-                <div className="h-11 w-full rounded-xl bg-zinc-800/30 animate-pulse" />
-              </div>
-            </div>
-            <div className="flex items-center justify-between mt-8">
-              <div className="h-10 w-20 rounded-lg bg-zinc-800/30 animate-pulse" />
-              <div className="h-10 w-28 rounded-lg bg-zinc-800/50 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
       {/* Neural network background */}
@@ -328,7 +301,12 @@ export default function OnboardingPage() {
       {/* Ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
 
-      <div className="w-full max-w-xl relative z-10">
+      <motion.div
+        className="w-full max-w-xl relative z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isHydrating ? 0 : 1 }}
+        transition={{ duration: 0.4, ease: EASE }}
+      >
         {/* Header */}
         <div className="flex flex-col items-center mb-10">
           <Link href="/" className="flex items-center gap-2.5 mb-6">
@@ -337,7 +315,6 @@ export default function OnboardingPage() {
               ScoreLead
             </span>
           </Link>
-
         </div>
 
         {/* Error banner */}
@@ -359,25 +336,29 @@ export default function OnboardingPage() {
 
         {/* Step content */}
         <div className="relative">
-          {step !== "welcome" && (
-            <>
-              {/* Top edge highlight */}
-              <div className="absolute top-0 left-4 right-4 h-px bg-linear-to-r from-transparent via-zinc-700/50 to-transparent" />
-            </>
-          )}
+          {/* Top edge highlight */}
+          <motion.div
+            className="absolute top-0 left-4 right-4 h-px bg-linear-to-r from-transparent via-zinc-700/50 to-transparent"
+            initial={false}
+            animate={{ opacity: step !== "welcome" ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+          />
 
-          <div
-            className={
+          <motion.div
+            initial={false}
+            animate={
               step === "welcome"
-                ? ""
-                : "rounded-2xl border border-zinc-800/60 bg-zinc-900/30 backdrop-blur-sm p-6 sm:p-10 shadow-2xl shadow-black/20"
+                ? { backgroundColor: "rgba(24,24,27,0)", borderColor: "rgba(39,39,42,0)", boxShadow: "0 0 0 0 rgba(0,0,0,0)", padding: 0 }
+                : { backgroundColor: "rgba(24,24,27,0.3)", borderColor: "rgba(39,39,42,0.6)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.2)", padding: "clamp(1.5rem, 4vw, 2.5rem)" }
             }
+            transition={{ duration: 0.5, ease: EASE }}
+            className="rounded-2xl border backdrop-blur-sm"
           >
             {/* AI Orb inside card */}
             <div className="flex justify-center mb-6">
               <motion.div
                 layout
-                transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{ duration: 0.5, ease: EASE }}
               >
                 <AiOrb state={getOrbState()} size={getOrbSize()} />
               </motion.div>
@@ -404,7 +385,7 @@ export default function OnboardingPage() {
                   <StepPrimaryLinks
                     defaultValues={primaryLinks}
                     onSubmit={handlePrimaryLinksSubmit}
-                    onBack={() => goTo("welcome")}
+                    onBack={() => isAddingNew ? router.push("/admin") : goTo("welcome")}
                   />
                 )}
 
@@ -464,9 +445,9 @@ export default function OnboardingPage() {
                 )}
               </motion.div>
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -41,6 +41,11 @@ a, button, [role="button"] {
   cursor: pointer;
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Add scrollbar-hide utility */
 @utility scrollbar-hide {
   -ms-overflow-style: none;

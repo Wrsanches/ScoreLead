@@ -50,9 +50,10 @@ export async function POST(request: Request) {
     .select()
     .from(business)
     .where(eq(business.userId, session.user.id))
-    .limit(1)
 
-  if (existing.length > 0) {
+  const inProgress = existing.find(b => !b.onboardingCompleted)
+
+  if (inProgress) {
     await db
       .update(business)
       .set({
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         onboardingStep: "completed",
         updatedAt: new Date(),
       })
-      .where(eq(business.userId, session.user.id))
+      .where(eq(business.id, inProgress.id))
   } else {
     await db.insert(business).values({
       id: crypto.randomUUID(),

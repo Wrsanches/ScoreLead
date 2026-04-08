@@ -18,15 +18,16 @@ export async function GET() {
     .select()
     .from(business)
     .where(eq(business.userId, session.user.id))
-    .limit(1)
 
-  const biz = result[0]
+  const hasCompleted = result.some(b => b.onboardingCompleted)
+  const biz = result.find(b => !b.onboardingCompleted) || null
 
   if (!biz) {
-    return NextResponse.json({ business: null })
+    return NextResponse.json({ business: null, hasCompleted })
   }
 
   return NextResponse.json({
+    hasCompleted,
     business: {
       website: biz.website || "",
       instagram: biz.instagram || "",

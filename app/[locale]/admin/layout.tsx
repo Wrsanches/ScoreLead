@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server"
 import { requireAuth } from "@/lib/auth-guard"
+import { AdminShell } from "@/components/admin-shell"
 
 export default async function AdminLayout({
   children,
@@ -14,7 +15,7 @@ export default async function AdminLayout({
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-zinc-950">
-      {children}
+      <AdminShell>{children}</AdminShell>
     </div>
   )
 }

@@ -46,7 +46,7 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-[#09090B]/80 backdrop-blur-md">
-      <div className="w-full flex justify-center px-6 py-4">
+      <div className="w-full flex justify-center px-6 h-16">
         <div className="w-full max-w-4xl flex items-center justify-between">
           <a href="#hero" className="flex items-center gap-2">
             <ScoreLeadLogo className="w-5 h-5 text-white" />
@@ -63,12 +63,7 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            {isPending ? (
-              <div className="flex items-center gap-3 animate-pulse">
-                <div className="h-4 w-14 rounded bg-zinc-800" />
-                <div className="h-8 w-24 rounded-md bg-zinc-800" />
-              </div>
-            ) : isLoggedIn ? (
+            {isLoggedIn ? (
               <Link
                 href="/admin"
                 className="flex items-center gap-2.5 text-sm text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800/50"
@@ -120,12 +115,7 @@ export function Navbar() {
             ))}
             <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
               <LanguageSwitcher />
-              {isPending ? (
-                <div className="flex items-center gap-3 animate-pulse">
-                  <div className="h-4 w-14 rounded bg-zinc-800" />
-                  <div className="h-8 w-20 rounded-md bg-zinc-800" />
-                </div>
-              ) : isLoggedIn ? (
+              {isLoggedIn ? (
                 <Link
                   href="/admin"
                   onClick={() => setOpen(false)}

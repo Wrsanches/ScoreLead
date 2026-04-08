@@ -1,0 +1,1 @@
+ALTER TABLE "business" DROP CONSTRAINT "business_userId_unique";

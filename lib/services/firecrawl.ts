@@ -6,17 +6,22 @@ const firecrawl = new Firecrawl({
 
 export interface ScrapeResult {
   markdown: string
+  html?: string
   language?: string
 }
 
-export async function scrapeUrl(url: string): Promise<ScrapeResult> {
+export async function scrapeUrl(url: string, options?: { includeHtml?: boolean }): Promise<ScrapeResult> {
+  const formats: ("markdown" | "html")[] = ["markdown"]
+  if (options?.includeHtml) formats.push("html")
+
   const result = await firecrawl.scrape(url, {
-    formats: ["markdown"],
-    onlyMainContent: true,
+    formats,
+    onlyMainContent: !options?.includeHtml,
   })
 
   return {
     markdown: result.markdown || "",
+    html: result.html || undefined,
     language: result.metadata?.language || undefined,
   }
 }

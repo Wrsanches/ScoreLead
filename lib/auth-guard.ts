@@ -11,13 +11,12 @@ async function getSession() {
   })
 }
 
-async function getUserBusiness(userId: string) {
-  const result = await db
-    .select()
+async function hasCompletedBusiness(userId: string) {
+  const rows = await db
+    .select({ onboardingCompleted: business.onboardingCompleted })
     .from(business)
     .where(eq(business.userId, userId))
-    .limit(1)
-  return result[0] || null
+  return rows.some(r => r.onboardingCompleted)
 }
 
 /** Auth only - no onboarding check. Used by onboarding layout. */
@@ -37,9 +36,9 @@ export async function requireAuth(locale: string) {
   const session = await requireAuthOnly(locale)
   const prefix = locale === "en" ? "" : `/${locale}`
 
-  const biz = await getUserBusiness(session.user.id)
+  const completed = await hasCompletedBusiness(session.user.id)
 
-  if (!biz || !biz.onboardingCompleted) {
+  if (!completed) {
     redirect(`${prefix}/onboarding`)
   }
 
@@ -52,9 +51,9 @@ export async function redirectIfAuthenticated(locale: string) {
   if (!session) return
 
   const prefix = locale === "en" ? "" : `/${locale}`
-  const biz = await getUserBusiness(session.user.id)
+  const completed = await hasCompletedBusiness(session.user.id)
 
-  if (biz?.onboardingCompleted) {
+  if (completed) {
     redirect(`${prefix}/admin`)
   } else {
     redirect(`${prefix}/onboarding`)

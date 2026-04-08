@@ -20,14 +20,19 @@ export async function runOnboardingPipeline(links: OnboardingLinks): Promise<Bus
   if (links.linkedin) urlsToScrape.push({ label: "LinkedIn", url: links.linkedin })
   if (links.other) urlsToScrape.push({ label: "Other", url: links.other })
 
-  // Scrape all URLs in parallel
+  // Scrape all URLs in parallel (include HTML for website to extract brand design)
   let detectedLanguage: string | undefined
+  let websiteHtml: string | undefined
   const scrapeResults = await Promise.allSettled(
     urlsToScrape.map(async ({ label, url }) => {
-      const result = await scrapeUrl(url)
+      const isWebsite = label === "Website"
+      const result = await scrapeUrl(url, { includeHtml: isWebsite })
       // Capture language from the first successful scrape (prioritize website)
       if (result.language && !detectedLanguage) {
         detectedLanguage = result.language
+      }
+      if (isWebsite && result.html) {
+        websiteHtml = result.html
       }
       return `--- ${label} (${url}) ---\n${result.markdown}`
     })
@@ -54,9 +59,23 @@ export async function runOnboardingPipeline(links: OnboardingLinks): Promise<Bus
     }
   }
 
+  // Truncate HTML to just the <head> and first portion of <body> for design extraction
+  let designHtml = ""
+  if (websiteHtml) {
+    const headMatch = websiteHtml.match(/<head[\s\S]*?<\/head>/i)
+    const styleMatches = websiteHtml.match(/<style[\s\S]*?<\/style>/gi)
+    const bodyStart = websiteHtml.match(/<body[\s\S]{0,3000}/i)
+    designHtml = [
+      headMatch?.[0] || "",
+      ...(styleMatches || []),
+      bodyStart?.[0] || "",
+    ].filter(Boolean).join("\n").slice(0, 15000)
+  }
+
   // Combine all content
   const allContent = [
     ...scrapedContent,
+    designHtml ? `--- Website HTML (for brand design extraction) ---\n${designHtml}` : "",
     searchContent ? `--- Brave Search Results ---\n${searchContent}` : "",
     links.location ? `--- Location ---\n${links.location}` : "",
   ]

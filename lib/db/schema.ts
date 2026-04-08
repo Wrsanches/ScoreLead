@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, boolean, integer, real, jsonb } from "drizzle-orm/pg-core"
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -45,7 +45,6 @@ export const business = pgTable("business", {
   id: text("id").primaryKey(),
   userId: text("userId")
     .notNull()
-    .unique()
     .references(() => user.id, { onDelete: "cascade" }),
   website: text("website"),
   instagram: text("instagram"),
@@ -62,14 +61,126 @@ export const business = pgTable("business", {
   tags: text("tags"),
   logo: text("logo"),
   language: text("language"),
+  brandColors: jsonb("brandColors").$type<string[]>(),
+  brandFonts: jsonb("brandFonts").$type<string[]>(),
+  brandStyle: text("brandStyle"),
   businessModel: text("businessModel"),
   services: text("services"),
   serviceArea: text("serviceArea"),
   competitors: text("competitors"),
+  suggestedKeywords: jsonb("suggestedKeywords").$type<string[]>(),
+  lastDiscoveryKeywords: jsonb("lastDiscoveryKeywords").$type<string[]>(),
   onboardingCompleted: boolean("onboardingCompleted").notNull().default(false),
   onboardingStep: text("onboardingStep").notNull().default("links"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+})
+
+export const savedSearch = pgTable("saved_search", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  state: text("state"),
+  city: text("city"),
+  location: text("location").notNull(),
+  keywords: jsonb("keywords").$type<string[]>().notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const discoveryJob = pgTable("discovery_job", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  state: text("state"),
+  city: text("city"),
+  location: text("location").notNull(),
+  keywords: text("keywords").notNull(),
+  maxResults: integer("maxResults").notNull(),
+  serviceArea: text("serviceArea").notNull(),
+  status: text("status").notNull().default("queued"),
+  totalFound: integer("totalFound").notNull().default(0),
+  insertedLeads: integer("insertedLeads").notNull().default(0),
+  duplicateLeads: integer("duplicateLeads").notNull().default(0),
+  completedQueries: integer("completedQueries").notNull().default(0),
+  currentQuery: text("currentQuery"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  startedAt: timestamp("startedAt"),
+  completedAt: timestamp("completedAt"),
+})
+
+export const lead = pgTable("lead", {
+  id: text("id").primaryKey(),
+  jobId: text("jobId")
+    .notNull()
+    .references(() => discoveryJob.id, { onDelete: "cascade" }),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  // Core identity
+  name: text("name"),
+  website: text("website"),
+  websiteDomain: text("websiteDomain"),
+  email: text("email"),
+  phone: text("phone"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  country: text("country"),
+  description: text("description"),
+  // Google Places data
+  googlePlaceId: text("googlePlaceId"),
+  googleMapsUrl: text("googleMapsUrl"),
+  googleRating: real("googleRating"),
+  googleReviewCount: integer("googleReviewCount"),
+  lat: real("lat"),
+  lng: real("lng"),
+  priceRange: text("priceRange"),
+  photoUrl: text("photoUrl"),
+  googleReviews: jsonb("googleReviews").$type<{ author: string; rating: number; text: string; date: string }[]>(),
+  // Contact & social
+  emails: jsonb("emails").$type<string[]>(),
+  phones: jsonb("phones").$type<string[]>(),
+  socialMedia: jsonb("socialMedia").$type<Record<string, string>>(),
+  instagramHandle: text("instagramHandle"),
+  facebookUrl: text("facebookUrl"),
+  // Enrichment data
+  services: jsonb("services").$type<string[]>(),
+  ownerName: text("ownerName"),
+  teamMembers: jsonb("teamMembers").$type<{ name: string; role?: string }[]>(),
+  operatingHours: text("operatingHours"),
+  yearEstablished: text("yearEstablished"),
+  pricingInfo: text("pricingInfo"),
+  amenities: jsonb("amenities").$type<string[]>(),
+  aiSummary: text("aiSummary"),
+  websiteContent: text("websiteContent"),
+  enrichmentSources: jsonb("enrichmentSources").$type<string[]>(),
+  // Scoring
+  score: real("score").notNull().default(1),
+  scoreBreakdown: jsonb("scoreBreakdown").$type<{
+    positives: { label: string; value: number; category: string }[]
+    risks: { label: string; value: number; category: string }[]
+    categories: Record<string, number>
+  }>(),
+  // Discovery metadata
+  source: text("source").notNull(),
+  firecrawlEnriched: boolean("firecrawlEnriched").notNull().default(false),
+  discoveryQuery: text("discoveryQuery"),
+  discoveryQueries: jsonb("discoveryQueries").$type<string[]>(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
 })
 
 export const verification = pgTable("verification", {

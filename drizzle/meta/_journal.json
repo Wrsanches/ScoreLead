@@ -43,6 +43,34 @@
       "when": 1775493474860,
       "tag": "0005_absurd_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775522186636,
+      "tag": "0006_productive_invaders",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1775564237064,
+      "tag": "0007_flat_wolf_cub",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775653709756,
+      "tag": "0008_aspiring_katie_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1775677988902,
+      "tag": "0009_fresh_sebastian_shaw",
+      "breakpoints": true
     }
   ]
 }

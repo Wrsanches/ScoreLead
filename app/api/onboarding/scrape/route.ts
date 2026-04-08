@@ -59,46 +59,41 @@ export async function POST(request: Request) {
       }
     }
 
-    // Upsert business record
+    // Find an in-progress business or create a new one
     const existing = await db
       .select()
       .from(business)
       .where(eq(business.userId, session.user.id))
-      .limit(1)
 
-    if (existing.length > 0) {
+    const inProgress = existing.find(b => !b.onboardingCompleted)
+
+    const businessData = {
+      ...links,
+      name: profile.name,
+      description: profile.description,
+      persona: profile.persona,
+      clientPersona: profile.clientPersona,
+      field: profile.field,
+      category: profile.category,
+      tags: JSON.stringify(profile.tags),
+      logo,
+      language: profile.language || null,
+      brandColors: profile.brandColors?.length ? profile.brandColors : null,
+      brandFonts: profile.brandFonts?.length ? profile.brandFonts : null,
+      brandStyle: profile.brandStyle || null,
+      onboardingStep: "review",
+    }
+
+    if (inProgress) {
       await db
         .update(business)
-        .set({
-          ...links,
-          name: profile.name,
-          description: profile.description,
-          persona: profile.persona,
-          clientPersona: profile.clientPersona,
-          field: profile.field,
-          category: profile.category,
-          tags: JSON.stringify(profile.tags),
-          logo,
-          language: profile.language || null,
-          onboardingStep: "review",
-          updatedAt: new Date(),
-        })
-        .where(eq(business.userId, session.user.id))
+        .set({ ...businessData, updatedAt: new Date() })
+        .where(eq(business.id, inProgress.id))
     } else {
       await db.insert(business).values({
         id: crypto.randomUUID(),
         userId: session.user.id,
-        ...links,
-        name: profile.name,
-        description: profile.description,
-        persona: profile.persona,
-        clientPersona: profile.clientPersona,
-        field: profile.field,
-        category: profile.category,
-        tags: JSON.stringify(profile.tags),
-        logo,
-        language: profile.language || null,
-        onboardingStep: "review",
+        ...businessData,
       })
     }
 

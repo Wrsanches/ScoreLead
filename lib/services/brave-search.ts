@@ -28,3 +28,20 @@ export async function searchBusiness(query: string): Promise<BraveSearchResult[]
     url: r.url,
   }))
 }
+
+const USEFUL_DOMAINS = [
+  "yelp.com", "facebook.com", "instagram.com",
+  "tripadvisor.com", "linkedin.com",
+]
+
+/** Filter Brave results to only social/directory sites useful for secondary enrichment */
+export function filterUsefulResults(results: BraveSearchResult[]): BraveSearchResult[] {
+  return results.filter((r) => {
+    try {
+      const hostname = new URL(r.url).hostname.replace("www.", "")
+      return USEFUL_DOMAINS.some((d) => hostname.includes(d))
+    } catch {
+      return false
+    }
+  }).slice(0, 3)
+}

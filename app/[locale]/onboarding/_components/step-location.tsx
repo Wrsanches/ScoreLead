@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { MapPin, ArrowRight, ArrowLeft } from "lucide-react"
 import { Country, State, City } from "country-state-city"
 import type { ICountry, IState, ICity } from "country-state-city"
-import { SearchableSelect, type SelectOption } from "./searchable-select"
+import { SearchableSelect, type SelectOption } from "@/components/searchable-select"
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
