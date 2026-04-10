@@ -1,4 +1,5 @@
 import OpenAI from "openai"
+import { buildKeywordSuggestionPrompt, buildSearchQueriesPrompt } from "@/lib/prompts"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -41,14 +42,7 @@ export async function suggestKeywords(
     messages: [
       {
         role: "system",
-        content: `You are a lead generation expert. Given a business profile, suggest 8-15 search keywords that would help find potential leads (clients/customers) for this business.
-
-${business.businessModel === "b2b" || business.businessModel === "both" ? "For B2B: suggest keywords describing types of businesses that would be clients (e.g., 'dental clinics', 'law firms', 'real estate agencies')." : ""}
-${business.businessModel === "b2c" || business.businessModel === "both" ? "For B2C: suggest keywords describing types of individuals or communities that would be customers (e.g., 'fitness enthusiasts', 'pet owners', 'home buyers')." : ""}
-
-Return JSON: { "keywords": ["keyword1", "keyword2", ...] }
-
-Each keyword should be 1-4 words, specific enough to produce relevant search results. Write keywords in the same language as the business profile.`,
+        content: buildKeywordSuggestionPrompt(business.businessModel),
       },
       {
         role: "user",
@@ -91,18 +85,7 @@ export async function generateSearchQueries(
     messages: [
       {
         role: "system",
-        content: `You are a lead generation expert. Generate 8-12 web search queries to find potential leads for a business.
-
-${business.businessModel === "b2b" || business.businessModel === "both" ? "For B2B leads: generate queries to find businesses that would be clients. Include queries like '{keyword} {location}', '{keyword} companies near {location}', '{keyword} directory {location}'." : ""}
-${business.businessModel === "b2c" || business.businessModel === "both" ? "For B2C leads: generate queries to find directories, communities, and listings of potential individual customers. Include queries like '{keyword} groups {location}', 'best {keyword} directory {location}'." : ""}
-
-IMPORTANT: Always include the full location "${location}" in every query. All results must be local to this specific area.
-
-Also include 1-2 competitor-adjacent queries if competitors are provided (e.g., "{competitor} alternatives {location}").
-
-Return JSON: { "queries": ["query1", "query2", ...] }
-
-Generate diverse queries. Maximum 15 queries.`,
+        content: buildSearchQueriesPrompt(business.businessModel, location),
       },
       {
         role: "user",

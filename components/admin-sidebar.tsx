@@ -3,13 +3,13 @@
 import type React from "react"
 import { useEffect, useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
-import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Users,
   Radar,
   Bookmark,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Search,
   X,
@@ -19,12 +19,12 @@ import {
   Building2,
   Check,
   Plus,
+  Columns3,
 } from "lucide-react"
 import Image from "next/image"
 import { ScoreLeadLogo } from "@/components/scorelead-logo"
 import { authClient } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
-import { Link } from "@/i18n/routing"
+import { Link, useRouter, usePathname } from "@/i18n/routing"
 import { useSearch } from "./search-overlay"
 import {
   DropdownMenu,
@@ -60,9 +60,15 @@ function getBusinessLogo(b: Business | undefined): string | null {
 export function AdminSidebar({
   open,
   onClose,
+  collapsed,
+  onCollapsedChange,
+  animateLayout,
 }: {
   open: boolean
   onClose: () => void
+  collapsed: boolean
+  onCollapsedChange: (collapsed: boolean) => void
+  animateLayout: boolean
 }) {
   const t = useTranslations("dashboard")
   const router = useRouter()
@@ -95,31 +101,67 @@ export function AdminSidebar({
       .catch(() => {})
   }, [])
 
+  // Keep selection in sync with /admin/business/[id] route
+  useEffect(() => {
+    const match = pathname.match(/\/admin\/business\/([^/]+)/)
+    if (match) {
+      setSelectedBusinessId(match[1])
+    }
+  }, [pathname])
+
   const selectedBusiness = useMemo(
     () => businesses.find((b) => b.id === selectedBusinessId) || businesses[0],
     [businesses, selectedBusinessId],
   )
 
-  // Determine active nav item from pathname
+  // Determine active nav item from pathname.
+  // Special case for /admin/leads: don't match when we're on the nested kanban page.
   const isActive = (path: string) => {
     if (path === "/admin") return pathname.endsWith("/admin")
+    if (path === "/admin/leads") {
+      return pathname.includes("/admin/leads") && !pathname.includes("/admin/leads/kanban")
+    }
     return pathname.includes(path)
   }
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-[240px] bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-800 flex flex-col shrink-0 transition-transform duration-200 ease-out lg:relative lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 w-[240px] bg-zinc-950/95 backdrop-blur-xl flex flex-col shrink-0 duration-200 ease-out lg:relative lg:bg-transparent lg:backdrop-blur-none lg:translate-x-0 ${
+        animateLayout ? "transition-[transform,width]" : "transition-transform"
+      } ${
         open ? "translate-x-0" : "-translate-x-full"
+      } ${collapsed ? "lg:w-[72px]" : "lg:w-[240px]"
       }`}
     >
-      <div className="p-3 border-b border-zinc-800 flex items-center justify-center relative">
-        <div className="flex items-center gap-2.5 py-1.5">
+      <div className={`px-4 pt-4 pb-3 flex items-center justify-between ${collapsed ? "lg:px-3 lg:justify-center" : ""}`}>
+        <button
+          type="button"
+          onClick={() => onCollapsedChange(false)}
+          className={`hidden h-9 w-9 items-center justify-center rounded-lg text-white hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:flex" : ""}`}
+          title="Expand sidebar"
+          aria-label="Expand sidebar"
+        >
+          <ScoreLeadLogo className="w-6 h-6" />
+        </button>
+        <div className={`flex items-center gap-2.5 min-w-0 ${collapsed ? "lg:hidden" : ""}`}>
           <ScoreLeadLogo className="w-6 h-6 text-white" />
-          <span className="text-white font-semibold text-[15px] tracking-tight">ScoreLead</span>
+          <span className="text-white font-semibold text-[15px] tracking-tight truncate">
+            ScoreLead
+          </span>
         </div>
         <button
+          type="button"
+          onClick={() => onCollapsedChange(!collapsed)}
+          className={`hidden h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:hidden" : "lg:flex"}`}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-pressed={collapsed}
+        >
+          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        </button>
+        <button
           onClick={onClose}
-          className="lg:hidden absolute right-3 p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600"
+          className="lg:hidden p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600"
         >
           <X className="w-4 h-4" />
         </button>
@@ -128,7 +170,10 @@ export function AdminSidebar({
       <div className="p-3 space-y-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 border border-zinc-800 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600">
+            <button
+              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 border border-zinc-800 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+              title={selectedBusiness?.name || t("noBusiness")}
+            >
               {getBusinessLogo(selectedBusiness) ? (
                 <Image src={getBusinessLogo(selectedBusiness)!} alt="" width={24} height={24} className="w-6 h-6 rounded-md object-cover shrink-0" unoptimized />
               ) : (
@@ -136,10 +181,10 @@ export function AdminSidebar({
                   <Building2 className="w-3.5 h-3.5 text-zinc-500" />
                 </div>
               )}
-              <span className="flex-1 text-sm text-zinc-200 text-left truncate">
+              <span className={`flex-1 text-sm text-zinc-200 text-left truncate ${collapsed ? "lg:hidden" : ""}`}>
                 {selectedBusiness?.name || t("noBusiness")}
               </span>
-              <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200 shrink-0" />
+              <ChevronDown className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200 shrink-0 ${collapsed ? "lg:hidden" : ""}`} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -154,7 +199,12 @@ export function AdminSidebar({
             {businesses.map((b) => (
               <DropdownMenuItem
                 key={b.id}
-                onClick={() => setSelectedBusinessId(b.id)}
+                onClick={() => {
+                  setSelectedBusinessId(b.id)
+                  if (pathname.includes("/admin/business/")) {
+                    router.push(`/admin/business/${b.id}`)
+                  }
+                }}
                 className="px-3 py-2 text-zinc-400 focus:text-zinc-200 focus:bg-zinc-800/60 cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 w-full">
@@ -188,33 +238,53 @@ export function AdminSidebar({
 
         <button
           onClick={openSearch}
-          className="w-full flex items-center gap-2.5 px-3 py-2 bg-zinc-800/40 rounded-lg text-zinc-500 text-sm cursor-pointer hover:bg-zinc-800/70 border border-zinc-800 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-700 transition-all duration-150"
+          className={`w-full flex items-center gap-2.5 px-3 py-2 bg-zinc-800/40 rounded-lg text-zinc-500 text-sm cursor-pointer hover:bg-zinc-800/70 border border-zinc-800 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-700 transition-all duration-150 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+          title={t("searchLeads")}
         >
           <Search className="w-4 h-4" />
-          <span>{t("searchLeads")}</span>
-          <span className="ml-auto text-xs bg-zinc-700/60 text-zinc-400 px-1.5 py-0.5 rounded-md font-medium">&#8984;K</span>
+          <span className={collapsed ? "lg:hidden" : ""}>{t("searchLeads")}</span>
+          <span className={`ml-auto text-xs bg-zinc-700/60 text-zinc-400 px-1.5 py-0.5 rounded-md font-medium ${collapsed ? "lg:hidden" : ""}`}>&#8984;K</span>
         </button>
       </div>
 
       <div className="px-3 space-y-0.5">
-        <NavItem icon={LayoutDashboard} label={t("dashboard")} href="/admin" active={isActive("/admin")} />
-        <NavItem icon={Users} label={t("allLeads")} href="/admin/leads" active={isActive("/admin/leads")} />
+        <NavItem icon={LayoutDashboard} label={t("dashboard")} href="/admin" active={isActive("/admin")} collapsed={collapsed} />
+        <NavItem icon={Users} label={t("allLeads")} href="/admin/leads" active={isActive("/admin/leads")} collapsed={collapsed} />
+        <NavItem
+          icon={Columns3}
+          label={t("pipeline")}
+          href="/admin/leads/kanban"
+          active={isActive("/admin/leads/kanban")}
+          collapsed={collapsed}
+        />
+        {selectedBusinessId && (
+          <NavItem
+            icon={Building2}
+            label={t("businessPage")}
+            href={`/admin/business/${selectedBusinessId}`}
+            active={isActive("/admin/business")}
+            collapsed={collapsed}
+          />
+        )}
       </div>
 
       <div className="mt-8 px-3">
-        <div className="px-2.5 py-1 mb-2 text-xs text-zinc-500 font-semibold uppercase tracking-widest">
+        <div className={`px-2.5 py-1 mb-2 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest ${collapsed ? "lg:hidden" : ""}`}>
           {t("discovery")}
         </div>
         <div className="space-y-0.5">
-          <NavItem icon={Radar} label={t("discoveryJobs")} href="/admin/discovery-jobs" active={isActive("/admin/discovery-jobs")} />
-          <NavItem icon={Bookmark} label={t("savedSearches")} href="/admin/saved-searches" active={isActive("/admin/saved-searches")} />
+          <NavItem icon={Radar} label={t("discoveryJobs")} href="/admin/discovery-jobs" active={isActive("/admin/discovery-jobs")} collapsed={collapsed} />
+          <NavItem icon={Bookmark} label={t("savedSearches")} href="/admin/saved-searches" active={isActive("/admin/saved-searches")} collapsed={collapsed} />
         </div>
       </div>
 
-      <div className="mt-auto p-3 border-t border-zinc-800">
+      <div className="mt-auto p-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600">
+            <button
+              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+              title={userName || userEmail || "Account"}
+            >
               {userImage ? (
                 <Image src={userImage} alt="" width={28} height={28} className="w-7 h-7 rounded-full shrink-0 ring-1 ring-zinc-600/50 group-hover:ring-zinc-500/50 transition-all duration-200 object-cover" unoptimized />
               ) : (
@@ -226,11 +296,11 @@ export function AdminSidebar({
                   )}
                 </div>
               )}
-              <div className="flex-1 min-w-0 text-left">
+              <div className={`flex-1 min-w-0 text-left ${collapsed ? "lg:hidden" : ""}`}>
                 <p className="text-sm text-zinc-200 truncate">{userName}</p>
                 <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200" />
+              <ChevronDown className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200 ${collapsed ? "lg:hidden" : ""}`} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -287,43 +357,49 @@ function NavItem({
   badge,
   active,
   href,
-  color,
+  collapsed,
 }: {
   icon: React.ElementType
   label: string
   badge?: number
   active?: boolean
   href?: string
-  color?: string
+  collapsed?: boolean
 }) {
   const content = (
     <>
-      <Icon className={`w-4 h-4 shrink-0 ${color || ""}`} />
-      <span className="flex-1 text-sm">{label}</span>
+      <Icon
+        className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+          active
+            ? "text-emerald-400"
+            : "text-zinc-500 group-hover:text-emerald-300"
+        }`}
+      />
+      <span className={`flex-1 text-sm ${collapsed ? "lg:hidden" : ""}`}>{label}</span>
       {badge !== undefined && (
-        <span className="text-zinc-500 text-xs tabular-nums">
+        <span className={`text-zinc-500 text-xs tabular-nums ${collapsed ? "lg:hidden" : ""}`}>
           {badge}
         </span>
       )}
     </>
   )
 
-  const className = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${
+  const className = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 group ${
     active
-      ? "bg-zinc-800/80 text-white"
+      ? "bg-emerald-500/[0.08] text-white"
       : "text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200"
-  }`
+  } ${collapsed ? "lg:justify-center lg:px-0" : ""}`
 
   if (href) {
     return (
-      <Link href={href} className={className}>
+      <Link href={href} className={className} title={label}>
         {content}
       </Link>
     )
   }
 
   return (
-    <div tabIndex={0} className={className}>
+    <div tabIndex={0} className={className} title={label}>
       {content}
     </div>
   )

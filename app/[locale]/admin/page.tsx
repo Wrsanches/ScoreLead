@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
+import { motion } from "framer-motion"
 import { Link } from "@/i18n/routing"
 import {
   Users,
@@ -12,6 +13,7 @@ import {
   Phone,
   Star,
   ArrowRight,
+  AlertTriangle,
 } from "lucide-react"
 import {
   Bar,
@@ -37,10 +39,12 @@ import {
   SectionCard,
   StatCard,
   ScoreBadge,
-  StatusIcon,
+  StatusBadge,
   LoadingState,
   EmptyState,
+  StatNumber,
 } from "@/components/admin"
+import { AiOrb } from "@/components/ai-orb"
 import { formatRelativeDate, getInitials } from "@/lib/admin-utils"
 
 interface DashboardStats {
@@ -69,7 +73,9 @@ const chartConfig = {
   count: { label: "Leads", color: "var(--color-emerald-500)" },
 } satisfies ChartConfig
 
-const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"]
+// Unified ramp: emerald → teal → cyan → sky → indigo.
+// All feel related to the brand without being monotone.
+const PIE_COLORS = ["#10b981", "#14b8a6", "#06b6d4", "#0ea5e9", "#6366f1"]
 
 export default function AdminPage() {
   const t = useTranslations("dashboard")
@@ -84,15 +90,64 @@ export default function AdminPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <PageHeader title={t("dashboard")} />
+  const hasRunningJobs = (stats?.jobs.running ?? 0) > 0
 
+  return (
+    <div className="flex-1 overflow-y-auto overflow-x-hidden">
       <ContentWrapper>
+        {/* Hero row with cascaded entrance */}
+        <div className="relative mb-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="text-[11px] text-emerald-400/80 font-semibold uppercase tracking-widest mb-2"
+              >
+                {t("dashboard")}
+              </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="text-2xl md:text-3xl text-white font-semibold tracking-tight leading-tight"
+              >
+                {hasRunningJobs ? "Your AI is working" : "Welcome back"}
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed"
+              >
+                {hasRunningJobs
+                  ? `${stats?.jobs.running} discovery job${(stats?.jobs.running ?? 0) > 1 ? "s" : ""} running in the background.`
+                  : "Overview of your leads, discovery jobs, and pipeline activity."}
+              </motion.p>
+            </div>
+            {/* Hero AI orb — matches onboarding pattern. No fixed-size wrapper
+                and no overflow-hidden so the orb's ambient glow (~80px beyond
+                its core) stays visible on all sides. */}
+            <motion.div
+              layout
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="hidden sm:block shrink-0 mr-4 mt-2"
+            >
+              <AiOrb
+                size="sm"
+                state={hasRunningJobs ? "processing" : "idle"}
+              />
+            </motion.div>
+          </div>
+        </div>
+
         {loading ? (
           <LoadingState />
         ) : !stats ? (
-          <EmptyState title="Failed to load dashboard data." />
+          <EmptyState icon={AlertTriangle} title="Failed to load dashboard data." />
         ) : (
           <div className="space-y-6">
             {/* KPI row */}
@@ -103,12 +158,14 @@ export default function AdminPage() {
                 icon={Users}
                 sub={`${stats.leads.highScore} high score`}
                 href="/admin/leads"
+                accent="emerald"
               />
               <StatCard
                 label={t("score")}
                 value={stats.leads.avgScore.toFixed(1)}
                 icon={Star}
                 sub="avg across all leads"
+                accent="amber"
               />
               <StatCard
                 label={t("discoveryJobs")}
@@ -116,12 +173,14 @@ export default function AdminPage() {
                 icon={Radar}
                 sub={`${stats.jobs.completed} completed`}
                 href="/admin/discovery-jobs"
+                accent="sky"
               />
               <StatCard
                 label="Enriched"
                 value={stats.leads.enriched}
                 icon={TrendingUp}
                 sub={stats.leads.total > 0 ? `${Math.round((stats.leads.enriched / stats.leads.total) * 100)}% of leads` : "0%"}
+                accent="violet"
               />
             </div>
 
@@ -248,16 +307,22 @@ export default function AdminPage() {
                       <Link
                         key={job.id}
                         href={`/admin/discovery-jobs/${job.id}`}
-                        className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800/40 transition-colors"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/40 transition-colors group"
                       >
-                        <StatusIcon status={job.status} />
-                        <span className="flex-1 text-sm text-zinc-300 truncate">{job.name}</span>
-                        <span className="text-xs text-zinc-600 shrink-0 tabular-nums">{job.insertedLeads} leads</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-zinc-200 truncate group-hover:text-white transition-colors">
+                            {job.name}
+                          </p>
+                          <p className="text-xs text-zinc-600 mt-0.5">
+                            <StatNumber value={job.insertedLeads} /> leads
+                          </p>
+                        </div>
+                        <StatusBadge status={job.status} />
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-zinc-600 text-sm">No jobs yet</div>
+                  <EmptyState icon={Radar} title="No jobs yet" />
                 )}
               </SectionCard>
             </div>
@@ -274,29 +339,45 @@ export default function AdminPage() {
               {stats.recentLeads.length > 0 ? (
                 <div className="space-y-1">
                   {stats.recentLeads.map((lead) => (
-                    <div key={lead.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/30 transition-colors">
+                    <div
+                      key={lead.id}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/40 transition-colors group"
+                    >
                       {lead.photoUrl ? (
-                        <img src={lead.photoUrl} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
+                        <img
+                          src={lead.photoUrl}
+                          alt=""
+                          className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-zinc-800"
+                        />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-medium text-zinc-500">{getInitials(lead.name)}</span>
+                        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-700/50">
+                          <span className="text-[10px] font-medium text-zinc-400">
+                            {getInitials(lead.name)}
+                          </span>
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-zinc-200 truncate">{lead.name || "Unknown"}</p>
+                        <p className="text-sm text-zinc-200 truncate group-hover:text-white transition-colors">
+                          {lead.name || "Unknown"}
+                        </p>
                         <p className="text-xs text-zinc-600 truncate">
                           {[lead.city, lead.country].filter(Boolean).join(", ") || "No location"}
                         </p>
                       </div>
                       <ScoreBadge score={lead.score} />
-                      <span className="text-xs text-zinc-600 shrink-0">{formatRelativeDate(lead.createdAt)}</span>
+                      <StatNumber
+                        value={formatRelativeDate(lead.createdAt)}
+                        className="text-xs text-zinc-600 shrink-0"
+                      />
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center text-zinc-600 text-sm">
-                  No leads yet. Run a discovery job to get started.
-                </div>
+                <EmptyState
+                  icon={Users}
+                  title="No leads yet"
+                  description="Run a discovery job to get started."
+                />
               )}
             </SectionCard>
           </div>

@@ -1,6 +1,7 @@
-import { scrapeUrl } from "./firecrawl"
+import { scrapeUrl, type ScrapeResult } from "./firecrawl"
 import { searchBusiness } from "./brave-search"
 import { extractBusinessProfile, type BusinessProfile } from "./openai"
+import { extractBrandFromScrape, type BrandProfile } from "./brand-extractor"
 
 interface OnboardingLinks {
   website?: string
@@ -11,7 +12,9 @@ interface OnboardingLinks {
   location?: string
 }
 
-export async function runOnboardingPipeline(links: OnboardingLinks): Promise<BusinessProfile> {
+export type OnboardingProfile = BusinessProfile & BrandProfile
+
+export async function runOnboardingPipeline(links: OnboardingLinks): Promise<OnboardingProfile> {
   const urlsToScrape: { label: string; url: string }[] = []
 
   if (links.website) urlsToScrape.push({ label: "Website", url: links.website })
@@ -20,22 +23,26 @@ export async function runOnboardingPipeline(links: OnboardingLinks): Promise<Bus
   if (links.linkedin) urlsToScrape.push({ label: "LinkedIn", url: links.linkedin })
   if (links.other) urlsToScrape.push({ label: "Other", url: links.other })
 
-  // Scrape all URLs in parallel (include HTML for website to extract brand design)
+  // Scrape all URLs in parallel. For the website we also request rawHtml +
+  // branding so we can run brand extraction against it later.
   let detectedLanguage: string | undefined
-  let websiteHtml: string | undefined
+  let websiteScrape: ScrapeResult | null = null
+
   const scrapeResults = await Promise.allSettled(
     urlsToScrape.map(async ({ label, url }) => {
       const isWebsite = label === "Website"
-      const result = await scrapeUrl(url, { includeHtml: isWebsite })
-      // Capture language from the first successful scrape (prioritize website)
+      const result = await scrapeUrl(url, {
+        includeRawHtml: isWebsite,
+        includeBranding: isWebsite,
+      })
       if (result.language && !detectedLanguage) {
         detectedLanguage = result.language
       }
-      if (isWebsite && result.html) {
-        websiteHtml = result.html
+      if (isWebsite) {
+        websiteScrape = result
       }
       return `--- ${label} (${url}) ---\n${result.markdown}`
-    })
+    }),
   )
 
   const scrapedContent = scrapeResults
@@ -59,23 +66,8 @@ export async function runOnboardingPipeline(links: OnboardingLinks): Promise<Bus
     }
   }
 
-  // Truncate HTML to just the <head> and first portion of <body> for design extraction
-  let designHtml = ""
-  if (websiteHtml) {
-    const headMatch = websiteHtml.match(/<head[\s\S]*?<\/head>/i)
-    const styleMatches = websiteHtml.match(/<style[\s\S]*?<\/style>/gi)
-    const bodyStart = websiteHtml.match(/<body[\s\S]{0,3000}/i)
-    designHtml = [
-      headMatch?.[0] || "",
-      ...(styleMatches || []),
-      bodyStart?.[0] || "",
-    ].filter(Boolean).join("\n").slice(0, 15000)
-  }
-
-  // Combine all content
   const allContent = [
     ...scrapedContent,
-    designHtml ? `--- Website HTML (for brand design extraction) ---\n${designHtml}` : "",
     searchContent ? `--- Brave Search Results ---\n${searchContent}` : "",
     links.location ? `--- Location ---\n${links.location}` : "",
   ]
@@ -86,5 +78,18 @@ export async function runOnboardingPipeline(links: OnboardingLinks): Promise<Bus
     throw new Error("No content could be extracted from the provided links")
   }
 
-  return extractBusinessProfile(allContent, detectedLanguage, links.location)
+  // Run business profile extraction and brand extraction in parallel -
+  // they depend on different parts of the scraped content and don't share state.
+  const [profile, brand] = await Promise.all([
+    extractBusinessProfile(allContent, detectedLanguage, links.location),
+    websiteScrape
+      ? extractBrandFromScrape(websiteScrape)
+      : Promise.resolve<BrandProfile>({
+          brandColors: null,
+          brandFonts: null,
+          brandStyle: null,
+        }),
+  ])
+
+  return { ...profile, ...brand }
 }

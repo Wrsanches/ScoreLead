@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, createContext, useContext } f
 import { Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
+import { AiOrb } from "@/components/ai-orb"
 
 interface SearchResult {
   id: string
@@ -178,6 +179,14 @@ function SearchOverlay({
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
+          {/* Ambient orb glow behind the dialog — Raycast/Linear vibe */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-[10vh] -translate-x-1/2 opacity-40 blur-3xl"
+          >
+            <AiOrb size="lg" state="idle" />
+          </div>
+
           {/* Dialog */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: -8 }}
@@ -185,7 +194,7 @@ function SearchOverlay({
             exit={{ opacity: 0, scale: 0.98, y: -8 }}
             transition={{ duration: 0.15 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg bg-zinc-900 border border-zinc-700/60 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
+            className="relative w-full max-w-lg bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/60 rounded-xl shadow-2xl shadow-black/50 overflow-hidden ring-1 ring-emerald-500/10"
           >
             {/* Input */}
             <div className="flex items-center gap-3 px-4 h-14 border-b border-zinc-800">

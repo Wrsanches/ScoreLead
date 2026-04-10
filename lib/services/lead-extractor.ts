@@ -1,5 +1,6 @@
 import Firecrawl from "@mendable/firecrawl-js"
 import OpenAI from "openai"
+import { buildLeadExtractorPrompt } from "@/lib/prompts"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
 
@@ -228,13 +229,6 @@ async function extractWithAI(
 ): Promise<EnrichmentResult> {
   const trimmed = markdown.slice(0, 15000)
 
-  const relevanceInstruction = businessContext
-    ? `\nIMPORTANT - Relevance check:
-We are looking for leads that are potential competitors or similar businesses to: "${businessContext.description || businessContext.field || ""}" (category: ${businessContext.category || "unknown"}, keywords: ${businessContext.keywords?.join(", ") || "none"}).
-- "businessCategory": The primary industry/category of THIS business (e.g. "pottery studio", "brick factory", "restaurant", "yoga studio")
-- "relevant": true if this business operates in the SAME field/industry as the search context above. A brick factory is NOT the same as a pottery studio even if both work with ceramics. A construction supply store is NOT the same as an architecture firm. Be strict - only mark as relevant if they truly serve the same market and offer similar services.`
-    : ""
-
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-5.4",
@@ -242,34 +236,7 @@ We are looking for leads that are potential competitors or similar businesses to
       messages: [
         {
           role: "system",
-          content: `You are an expert at extracting structured business data from website content.
-
-Extract the following from the provided content. Return ONLY valid JSON:
-
-{
-  "businessName": "The official business name",
-  "businessCategory": "The primary industry/category of this business",
-  "relevant": true,
-  "description": "2-3 sentence factual description",
-  "aiSummary": "A detailed paragraph analyzing: what makes this business unique, their main offerings, target audience, and overall digital presence quality.",
-  "emails": ["all email addresses found"],
-  "phones": ["all phone numbers found"],
-  "ownerName": "owner or founder name if mentioned",
-  "teamMembers": [{"name": "...", "role": "..."}],
-  "services": ["list of services they offer"],
-  "pricingInfo": "A clean, concise summary of pricing. Format as a short list of offerings with prices, e.g. 'Monthly classes: R$320/month (4 sessions of 2h30) | Free modeling workshop: R$250/person | Glazing workshop: R$200/person'. Strip verbose discount policies and fine print - just the core offering name and price.",
-  "operatingHours": "business hours if found",
-  "yearEstablished": "year if mentioned",
-  "socialMedia": {"instagram": "full URL", "facebook": "full URL", "tiktok": "full URL", "youtube": "full URL", "linkedin": "full URL", "twitter": "full URL", "whatsapp": "wa.me link"},
-  "amenities": ["any amenities: parking, wifi, wheelchair accessible, etc"]
-}
-
-Rules:
-- Only include fields where you found actual data. Use null for missing fields.
-- Filter out fake emails (tracking pixels, schema.org, example.com, etc.)
-- Look carefully for ALL social links in footers, headers, and contact pages.
-- The "description" and "aiSummary" should be in the same language as the website content.
-- Be thorough but accurate - don't hallucinate data.${country ? ` The business is located in ${country}.` : ""}${relevanceInstruction}`,
+          content: buildLeadExtractorPrompt({ country, businessContext }),
         },
         {
           role: "user",

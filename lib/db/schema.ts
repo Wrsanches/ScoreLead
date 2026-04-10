@@ -167,6 +167,7 @@ export const lead = pgTable("lead", {
   aiSummary: text("aiSummary"),
   websiteContent: text("websiteContent"),
   enrichmentSources: jsonb("enrichmentSources").$type<string[]>(),
+  outreachMessages: jsonb("outreachMessages").$type<{ step: number; label: string; subject?: string; body: string }[]>(),
   // Scoring
   score: real("score").notNull().default(1),
   scoreBreakdown: jsonb("scoreBreakdown").$type<{
