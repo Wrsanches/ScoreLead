@@ -22,6 +22,7 @@ import {
   Radar,
   Building2,
   ChevronDown,
+  Users,
 } from "lucide-react"
 import { MobileMenuButton } from "@/components/admin-shell"
 import { SectionCard, StatNumber, SocialIcon, getSocialConfig } from "@/components/admin"
@@ -160,7 +161,7 @@ export default function LeadsPage() {
 
       {/* Lead list */}
       <div className="w-full sm:w-[340px] h-full bg-zinc-900/30 border-r border-zinc-800 flex flex-col shrink-0">
-        <div className="px-4 p-3 border-b border-zinc-800 flex items-center justify-between">
+        <div className="px-4 h-[72px] border-b border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileMenuButton />
             <div>
@@ -278,12 +279,20 @@ export default function LeadsPage() {
         }`}
       >
         {!lead ? (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-zinc-600 text-sm">Select a lead to view details</p>
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="max-w-sm rounded-2xl border border-zinc-800/70 bg-zinc-950/40 px-8 py-10 text-center shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900/70 ring-1 ring-zinc-800">
+                <Users className="h-5 w-5 text-zinc-500" />
+              </div>
+              <p className="text-sm font-medium text-zinc-300">Select a lead</p>
+              <p className="mt-1 text-sm text-zinc-600">
+                Open a record from the list to review contact details, scoring, and outreach.
+              </p>
+            </div>
           </div>
         ) : (
           <>
-            <div className="px-5 h-14 border-b border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-900/30 backdrop-blur-sm">
+            <div className="px-4 sm:px-5 h-[72px] border-b border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-950/50 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setDetailOpen(false)}
@@ -346,24 +355,34 @@ export default function LeadsPage() {
               </div>
             </div>
 
-            <div className="flex-1 p-6 overflow-auto scrollbar-hide">
-              <div className="w-full 2xl:max-w-3xl 2xl:mx-auto">
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto scrollbar-hide">
+              <div className="w-full max-w-5xl mx-auto">
                 {(() => {
                   const statusCfg = getStatus(lead.status)
                   return (
-                    <div className="flex items-start justify-between gap-5 mb-7">
-                      <div className="flex items-start gap-4 min-w-0">
+                    <div className="relative overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-950/45 p-5 sm:p-6 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                          backgroundImage: `
+                            radial-gradient(ellipse 55% 70% at top left, rgba(16,185,129,0.045), transparent 55%),
+                            linear-gradient(135deg, rgba(39,39,42,0.45), transparent 48%)
+                          `,
+                        }}
+                      />
+                      <div className="relative flex items-start gap-4 min-w-0">
                         {/* Avatar */}
                         <div className="relative shrink-0">
                           {lead.photoUrl ? (
                             <img
                               src={lead.photoUrl}
                               alt=""
-                              className="w-16 h-16 rounded-2xl object-cover ring-1 ring-zinc-800"
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-1 ring-zinc-700/80 shadow-lg shadow-black/30"
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded-2xl bg-zinc-800/80 flex items-center justify-center ring-1 ring-zinc-700/60">
-                              <span className="text-xl font-semibold text-zinc-400">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-800/80 flex items-center justify-center ring-1 ring-zinc-700/60 shadow-lg shadow-black/25">
+                              <span className="text-xl sm:text-2xl font-semibold text-zinc-400">
                                 {getInitials(lead.name)}
                               </span>
                             </div>
@@ -371,14 +390,14 @@ export default function LeadsPage() {
                           <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-zinc-950 ${statusCfg.dot}`} />
                         </div>
 
-                        <div className="min-w-0">
+                        <div className="min-w-0 pt-0.5">
                           {/* Status pill (clickable) + enriched hint */}
-                          <div className="flex items-center gap-2 mb-1.5">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
                                   type="button"
-                                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ring-1 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.ring}`}
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ring-1 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.ring}`}
                                   aria-label="Change lead status"
                                 >
                                   <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
@@ -419,24 +438,26 @@ export default function LeadsPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                             {lead.firecrawlEnriched && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/25">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-800/60 text-zinc-300 ring-1 ring-zinc-700/60">
                                 Enriched
                               </span>
                             )}
                           </div>
 
-                          <h2 className="text-white text-2xl font-semibold tracking-tight line-clamp-2">
+                          <h2 className="text-white text-2xl sm:text-3xl font-semibold tracking-tight line-clamp-2">
                             {lead.name || "Unknown"}
                           </h2>
-                          <p className="text-zinc-500 text-sm mt-1 flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-zinc-600" />
-                            {[lead.city, lead.state, lead.country].filter(Boolean).join(", ") || lead.address || "No location"}
+                          <p className="text-zinc-400 text-sm mt-2 flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                            <span className="truncate">
+                              {[lead.city, lead.state, lead.country].filter(Boolean).join(", ") || lead.address || "No location"}
+                            </span>
                           </p>
 
                           {/* Quick facts row */}
-                          <div className="flex items-center gap-4 mt-3 text-xs">
+                          <div className="flex flex-wrap items-center gap-2 mt-4 text-xs">
                             {lead.googleRating != null && (
-                              <div className="flex items-center gap-1 text-zinc-400">
+                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
                                 <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                                 <StatNumber value={lead.googleRating.toFixed(1)} className="text-zinc-200 font-medium" />
                                 {lead.googleReviewCount != null && (
@@ -445,14 +466,14 @@ export default function LeadsPage() {
                               </div>
                             )}
                             {lead.services && lead.services.length > 0 && (
-                              <div className="flex items-center gap-1 text-zinc-400">
-                                <Tag className="w-3.5 h-3.5 text-zinc-600" />
+                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
+                                  <Tag className="w-3.5 h-3.5 text-emerald-400" />
                                 <StatNumber value={lead.services.length} className="text-zinc-200 font-medium" />
                                 <span className="text-zinc-600">services</span>
                               </div>
                             )}
-                            <div className="flex items-center gap-1 text-zinc-400">
-                              <Radar className="w-3.5 h-3.5 text-zinc-600" />
+                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
+                              <Radar className="w-3.5 h-3.5 text-emerald-400" />
                               <span className="text-zinc-500 capitalize">{lead.source.replace("_", " ")}</span>
                             </div>
                           </div>
@@ -460,12 +481,12 @@ export default function LeadsPage() {
                       </div>
 
                       {/* Score card */}
-                      <div className="shrink-0 flex flex-col items-end gap-1.5">
+                      <div className="relative shrink-0 rounded-2xl border border-zinc-800/70 bg-zinc-900/50 px-4 py-3 ring-1 ring-zinc-800/80 sm:text-right">
                         <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">
                           {t("score")}
                         </span>
-                        <div className="flex items-baseline gap-1 bg-gradient-to-br from-zinc-800/70 to-zinc-900/70 border border-zinc-800 px-3.5 py-2 rounded-xl ring-1 ring-emerald-500/[0.08]">
-                          <span className={`text-3xl font-semibold tabular-nums tracking-tight ${scoreColor(lead.score)}`}>
+                        <div className="flex items-baseline gap-1 sm:justify-end">
+                          <span className={`text-4xl font-semibold tabular-nums tracking-tight ${scoreColor(lead.score)}`}>
                             {lead.score.toFixed(1)}
                           </span>
                           <span className="text-sm text-zinc-600 tabular-nums">/5</span>
@@ -477,21 +498,32 @@ export default function LeadsPage() {
 
                 {/* Score breakdown - 5 categories */}
                 {lead.scoreBreakdown?.categories && (
-                  <div className="border border-zinc-800/60 rounded-xl p-5 mb-6">
-                    <div className="flex items-end gap-4">
+                  <div className="border border-zinc-800/70 bg-zinc-950/35 rounded-2xl p-5 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+                    <div className="flex items-center justify-between gap-4 mb-5">
+                      <div>
+                        <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
+                          Score breakdown
+                        </p>
+                        <p className="text-xs text-zinc-600 mt-1">Signals grouped by discovery quality.</p>
+                      </div>
+                      <span className={`text-sm font-semibold tabular-nums ${scoreColor(lead.score)}`}>
+                        {lead.score.toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-5 gap-3 sm:gap-4">
                       {([
                         { key: "reach", label: t("reach"), color: "bg-emerald-500" },
-                        { key: "trust", label: t("trust"), color: "bg-emerald-500" },
-                        { key: "offer", label: t("engage"), color: "bg-blue-500" },
-                        { key: "profile", label: t("match"), color: "bg-emerald-500" },
-                        { key: "social", label: t("ready"), color: "bg-amber-500" },
+                        { key: "trust", label: t("trust"), color: "bg-lime-400" },
+                        { key: "offer", label: t("engage"), color: "bg-sky-400" },
+                        { key: "profile", label: t("match"), color: "bg-emerald-400" },
+                        { key: "social", label: t("ready"), color: "bg-amber-400" },
                       ] as const).map((cat) => {
                         const value = lead.scoreBreakdown?.categories[cat.key] ?? 0
-                        const barColor = value >= 4 ? "bg-emerald-500" : value >= 2.5 ? "bg-blue-500" : value > 0 ? "bg-amber-500" : "bg-zinc-800/80"
+                        const barColor = value > 0 ? cat.color : "bg-zinc-800/80"
                         return (
-                          <div key={cat.key} className="flex-1 flex flex-col items-center gap-2">
-                            <span className="text-xs text-zinc-400 tabular-nums">{value.toFixed(0)}/5</span>
-                            <div className="flex flex-col-reverse gap-[3px] w-full max-w-[36px]">
+                          <div key={cat.key} className="flex flex-col items-center gap-2 min-w-0">
+                            <span className="text-xs text-zinc-300 tabular-nums">{value.toFixed(0)}/5</span>
+                            <div className="flex flex-col-reverse gap-[3px] w-full max-w-[40px]">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <div
                                   key={i}
@@ -501,7 +533,7 @@ export default function LeadsPage() {
                                 />
                               ))}
                             </div>
-                            <span className="text-xs text-zinc-500 font-medium">{cat.label}</span>
+                            <span className="text-xs text-zinc-500 font-medium truncate max-w-full">{cat.label}</span>
                           </div>
                         )
                       })}
@@ -510,7 +542,7 @@ export default function LeadsPage() {
                 )}
 
                 {/* Contact + Business cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                   <SectionCard title="Contact">
                     <div className="space-y-1">
                       {lead.website && (
@@ -587,14 +619,14 @@ export default function LeadsPage() {
                       {lead.services && lead.services.length > 0 && (
                         <div className={lead.ownerName || lead.operatingHours ? "pt-2 border-t border-zinc-800/60" : ""}>
                           <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-2 flex items-center gap-1.5">
-                            <Building2 className="w-3 h-3" />
+                            <Building2 className="w-3 h-3 text-emerald-400" />
                             Services
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {lead.services.map((s) => (
                               <span
                                 key={s}
-                                className="text-[11px] bg-emerald-500/10 text-emerald-300 px-2 py-1 rounded-md ring-1 ring-emerald-500/20"
+                                className="text-[11px] bg-zinc-800/60 text-zinc-300 px-2 py-1 rounded-md ring-1 ring-zinc-700/60"
                               >
                                 {s}
                               </span>
@@ -651,7 +683,7 @@ export default function LeadsPage() {
 
                 {/* AI Summary */}
                 {lead.aiSummary && (
-                  <SectionCard title="AI Summary" className="mb-6" accent="emerald">
+                  <SectionCard title="AI Summary" className="mb-6">
                     <p className="text-zinc-300 text-sm leading-relaxed">{lead.aiSummary}</p>
                   </SectionCard>
                 )}
@@ -743,7 +775,7 @@ export default function LeadsPage() {
                         .filter((item) => item.length > 5)
                         .map((item, i) => (
                           <div key={i} className="flex items-start gap-2.5 py-1.5 px-3 bg-zinc-800/30 rounded-lg">
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50 mt-1.5 shrink-0" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 mt-1.5 shrink-0" />
                             <span className="text-zinc-300 text-sm leading-relaxed">{item}</span>
                           </div>
                         ))}
