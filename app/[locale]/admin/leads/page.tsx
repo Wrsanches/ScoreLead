@@ -1,9 +1,12 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useCallback, useRef, useEffect } from "react"
-import { useTranslations } from "next-intl"
-import { useSearch } from "@/components/search-overlay"
+import type React from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useSearch } from "@/components/search-overlay";
+import { useActiveBusiness } from "@/components/admin/active-business-context";
 import {
   Mail,
   MoreHorizontal,
@@ -23,9 +26,15 @@ import {
   Building2,
   ChevronDown,
   Users,
-} from "lucide-react"
-import { MobileMenuButton } from "@/components/admin-shell"
-import { SectionCard, StatNumber, SocialIcon, getSocialConfig } from "@/components/admin"
+  X,
+} from "lucide-react";
+import { MobileMenuButton } from "@/components/admin-shell";
+import {
+  SectionCard,
+  StatNumber,
+  SocialIcon,
+  getSocialConfig,
+} from "@/components/admin";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,35 +42,71 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { formatRelativeDate, getInitials, scoreColor, scoreBadgeClasses } from "@/lib/admin-utils"
+} from "@/components/ui/dropdown-menu";
+import {
+  formatRelativeDate,
+  getInitials,
+  scoreColor,
+  scoreBadgeClasses,
+} from "@/lib/admin-utils";
 import {
   LEAD_STATUS_KEYS,
   STATUS_CONFIG,
   getStatus,
   type Lead,
   type LeadStatus,
-} from "./_shared"
-import { OutreachMessagesCard } from "./_components/outreach-messages-card"
+} from "./_shared";
+import { OutreachMessagesCard } from "./_components/outreach-messages-card";
 
 export default function LeadsPage() {
-  const t = useTranslations("dashboard")
-  const { selectedLeadId, clearSelectedLead } = useSearch()
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const leadListRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations("dashboard");
+  const { selectedLeadId, setSelectedLead, clearSelectedLead } = useSearch();
+  const { activeBusinessId } = useActiveBusiness();
+  const searchParams = useSearchParams();
+
+  // Hydrate the search context from the ?focus=<id> query param - used when
+  // opening a lead from the kanban "Open full lead" link. Each focus value is
+  // handled exactly once; once the list-level effect consumes the selection
+  // and clears it, we mustn't re-apply the same URL-driven value.
+  const hydratedFocusRef = useRef<string | null>(null);
+  useEffect(() => {
+    const focus = searchParams.get("focus");
+    if (focus && hydratedFocusRef.current !== focus) {
+      hydratedFocusRef.current = focus;
+      setSelectedLead(focus);
+    }
+  }, [searchParams, setSelectedLead]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [sortBy, setSortByState] = useState<"score" | "name" | "createdAt">("score");
+  const [sortOrder, setSortOrderState] = useState<"asc" | "desc">("desc");
+  const [statusFilter, setStatusFilterState] = useState<LeadStatus | "all">("all");
+
+  function setSortBy(v: typeof sortBy) {
+    setPage(1);
+    setSortByState(v);
+  }
+  function setSortOrder(v: typeof sortOrder) {
+    setPage(1);
+    setSortOrderState(v);
+  }
+  function setStatusFilter(v: typeof statusFilter) {
+    setPage(1);
+    setStatusFilterState(v);
+  }
+  const leadListRef = useRef<HTMLDivElement>(null);
 
   async function copyToClipboard(value: string, key: string) {
     try {
-      await navigator.clipboard.writeText(value)
-      setCopiedKey(key)
-      setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1400)
+      await navigator.clipboard.writeText(value);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1400);
     } catch {
       /* noop */
     }
@@ -69,86 +114,104 @@ export default function LeadsPage() {
 
   async function updateLeadStatus(leadId: string, nextStatus: LeadStatus) {
     // Optimistic update
-    const previous = leads
+    const previous = leads;
     setLeads((prev) =>
       prev.map((l) => (l.id === leadId ? { ...l, status: nextStatus } : l)),
-    )
+    );
     try {
       const res = await fetch(`/api/leads/${leadId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
-      })
-      if (!res.ok) throw new Error("Failed")
+      });
+      if (!res.ok) throw new Error("Failed");
     } catch {
       // Revert on failure
-      setLeads(previous)
+      setLeads(previous);
     }
   }
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchLeads() {
+      setIsLoading(true);
       try {
-        const res = await fetch(`/api/leads?page=${page}&limit=50&sortBy=score&sortOrder=desc`)
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: "50",
+          sortBy,
+          sortOrder,
+        });
+        if (statusFilter !== "all") params.set("status", statusFilter);
+        const res = await fetch(`/api/leads?${params.toString()}`, {
+          signal: controller.signal,
+        });
         if (res.ok) {
-          const data = await res.json()
-          setLeads(data.leads)
-          setTotalPages(data.totalPages)
-          setTotal(data.total)
+          const data = await res.json();
+          if (!controller.signal.aborted) {
+            setLeads(data.leads);
+            setTotalPages(data.totalPages);
+            setTotal(data.total);
+          }
         }
-      } catch {
-        // Failed to fetch
+      } catch (err) {
+        // Ignore aborts - they happen when deps change mid-flight.
+        if ((err as Error).name === "AbortError") return;
       }
-      setIsLoading(false)
+      if (!controller.signal.aborted) setIsLoading(false);
     }
-    fetchLeads()
-  }, [page])
+    fetchLeads();
+    return () => controller.abort();
+  }, [page, activeBusinessId, sortBy, sortOrder, statusFilter]);
 
   // Handle search selection
   useEffect(() => {
-    if (!selectedLeadId || leads.length === 0) return
+    if (!selectedLeadId || leads.length === 0) return;
 
-    const idx = leads.findIndex((l) => l.id === selectedLeadId)
+    const idx = leads.findIndex((l) => l.id === selectedLeadId);
     if (idx >= 0) {
-      setSelectedIndex(idx)
-      setDetailOpen(true)
-      clearSelectedLead()
+      setSelectedIndex(idx);
+      setDetailOpen(true);
+      clearSelectedLead();
     } else {
       // Lead not on current page - fetch it directly and prepend
       fetch(`/api/leads/${selectedLeadId}`)
-        .then((res) => res.ok ? res.json() : null)
+        .then((res) => (res.ok ? res.json() : null))
         .then((targetLead) => {
           if (targetLead) {
-            setLeads((prev) => [targetLead, ...prev])
-            setSelectedIndex(0)
-            setDetailOpen(true)
+            setLeads((prev) => [targetLead, ...prev]);
+            setSelectedIndex(0);
+            setDetailOpen(true);
           }
-          clearSelectedLead()
+          clearSelectedLead();
         })
-        .catch(() => clearSelectedLead())
+        .catch(() => clearSelectedLead());
     }
-  }, [selectedLeadId, leads, clearSelectedLead])
+  }, [selectedLeadId, leads, clearSelectedLead]);
 
-  const lead = leads[selectedIndex] || null
+  const lead = leads[selectedIndex] || null;
 
   const handleSelectLead = useCallback((i: number) => {
-    setSelectedIndex(i)
-    setDetailOpen(true)
-  }, [])
+    setSelectedIndex(i);
+    setDetailOpen(true);
+  }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      setSelectedIndex((prev) => Math.min(prev + 1, leads.length - 1))
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      setSelectedIndex((prev) => Math.max(prev - 1, 0))
-    } else if (e.key === "Enter") {
-      setDetailOpen(true)
-    }
-  }, [leads.length])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, leads.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter") {
+        setDetailOpen(true);
+      }
+    },
+    [leads.length],
+  );
 
-  const formatDate = formatRelativeDate
+  const formatDate = formatRelativeDate;
 
   return (
     <div className="flex h-full w-full overflow-hidden">
@@ -160,22 +223,129 @@ export default function LeadsPage() {
       )}
 
       {/* Lead list */}
-      <div className="w-full sm:w-[340px] h-full bg-zinc-900/30 border-r border-zinc-800 flex flex-col shrink-0">
-        <div className="px-4 h-[72px] border-b border-zinc-800 flex items-center justify-between">
+      <div className="w-full sm:w-85 h-full bg-zinc-900/30 border-r border-zinc-800 flex flex-col shrink-0">
+        <div className="px-4 h-18 border-b border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileMenuButton />
             <div>
-              <h3 className="text-white font-bold text-lg tracking-tight">{t("leads")}</h3>
+              <h3 className="text-white font-bold text-lg tracking-tight">
+                {t("leads")}
+              </h3>
               <p className="text-zinc-500 text-xs mt-0.5">
-                <StatNumber value={total} className="text-zinc-400" /> {t("leads").toLowerCase()}
+                <StatNumber value={total} className="text-zinc-400" />{" "}
+                {t("leads").toLowerCase()}
               </p>
             </div>
           </div>
-          <button className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-200 bg-zinc-800/40 hover:bg-zinc-800/70 px-2.5 py-1.5 rounded-lg border border-zinc-800 transition-all duration-150">
-            <span className="text-zinc-200">{t("score")}</span>
-            <span aria-hidden="true" className="text-zinc-500">&darr;</span>
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-200 bg-zinc-800/40 hover:bg-zinc-800/70 px-2.5 py-1.5 rounded-lg border border-zinc-800 transition-all duration-150">
+                <span className="text-zinc-200">
+                  {sortBy === "score"
+                    ? t("score")
+                    : sortBy === "name"
+                      ? t("sortByName")
+                      : t("sortByRecent")}
+                </span>
+                <span aria-hidden="true" className="text-zinc-500">
+                  {sortOrder === "desc" ? "\u2193" : "\u2191"}
+                </span>
+                {statusFilter !== "all" && (
+                  <span
+                    className={`ml-1 w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[statusFilter].dot}`}
+                  />
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel>{t("sortBy")}</DropdownMenuLabel>
+              {(
+                [
+                  { key: "score", label: t("score") },
+                  { key: "name", label: t("sortByName") },
+                  { key: "createdAt", label: t("sortByRecent") },
+                ] as const
+              ).map((opt) => (
+                <DropdownMenuItem
+                  key={opt.key}
+                  onSelect={() => setSortBy(opt.key)}
+                  className="cursor-pointer"
+                >
+                  <span className="flex-1">{opt.label}</span>
+                  {sortBy === opt.key && (
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault()
+                  setSortOrder(sortOrder === "desc" ? "asc" : "desc")
+                }}
+                className="cursor-pointer"
+              >
+                <span className="flex-1">
+                  {sortOrder === "desc"
+                    ? t("sortOrderDesc")
+                    : t("sortOrderAsc")}
+                </span>
+                <span className="text-zinc-500">
+                  {sortOrder === "desc" ? "\u2193" : "\u2191"}
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>{t("filterStatus")}</DropdownMenuLabel>
+              <DropdownMenuItem
+                onSelect={() => setStatusFilter("all")}
+                className="cursor-pointer"
+              >
+                <span className="flex-1">{t("filterAll")}</span>
+                {statusFilter === "all" && (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                )}
+              </DropdownMenuItem>
+              {LEAD_STATUS_KEYS.map((key) => {
+                const cfg = STATUS_CONFIG[key];
+                return (
+                  <DropdownMenuItem
+                    key={key}
+                    onSelect={() => setStatusFilter(key)}
+                    className="cursor-pointer"
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                    <span className="flex-1">{cfg.label}</span>
+                    {statusFilter === key && (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
+        {statusFilter !== "all" && (
+          <div className="px-4 pt-4 pb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+              {t("filterStatus")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setStatusFilter("all")}
+              className={`inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-full text-xs font-medium ${STATUS_CONFIG[statusFilter].bg} ${STATUS_CONFIG[statusFilter].text} ring-1 ${STATUS_CONFIG[statusFilter].ring} hover:brightness-110 transition`}
+              title={t("filterAll")}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[statusFilter].dot}`}
+              />
+              <span>{STATUS_CONFIG[statusFilter].label}</span>
+              <span className="w-4 h-4 rounded-full bg-black/20 flex items-center justify-center">
+                <X className="w-2.5 h-2.5 opacity-80" />
+              </span>
+            </button>
+          </div>
+        )}
 
         <div
           ref={leadListRef}
@@ -200,7 +370,9 @@ export default function LeadsPage() {
           ) : leads.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
               <p className="text-zinc-400 text-sm mb-1">No leads yet</p>
-              <p className="text-zinc-600 text-xs">Run a discovery job to find leads.</p>
+              <p className="text-zinc-600 text-xs">
+                Run a discovery job to find leads.
+              </p>
             </div>
           ) : (
             <>
@@ -219,31 +391,49 @@ export default function LeadsPage() {
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
                       {l.photoUrl ? (
-                        <img
+                        <Image
                           src={l.photoUrl}
                           alt=""
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
-                          <span className="text-[10px] font-medium text-zinc-500">{getInitials(l.name)}</span>
+                          <span className="text-[10px] font-medium text-zinc-500">
+                            {getInitials(l.name)}
+                          </span>
                         </div>
                       )}
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-zinc-900 ${getStatus(l.status).dot}`} />
+                      <div
+                        className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-zinc-900 ${getStatus(l.status).dot}`}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate leading-tight transition-colors ${i === selectedIndex ? "text-white" : "text-zinc-200 group-hover:text-white"}`}>
+                      <p
+                        className={`text-sm font-medium truncate leading-tight transition-colors ${i === selectedIndex ? "text-white" : "text-zinc-200 group-hover:text-white"}`}
+                      >
                         {l.name || "Unknown"}
                       </p>
                       <p className="text-zinc-500 text-xs mt-1 truncate">
-                        {[l.city, l.state, l.country].filter(Boolean).join(", ") || l.address || l.websiteDomain || "No location"}
+                        {[l.city, l.state, l.country]
+                          .filter(Boolean)
+                          .join(", ") ||
+                          l.address ||
+                          l.websiteDomain ||
+                          "No location"}
                       </p>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums ${scoreBadgeClasses(l.score)}`}>
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums ${scoreBadgeClasses(l.score)}`}
+                      >
                         {l.score.toFixed(1)}
                       </span>
-                      <span className="text-zinc-600 text-xs shrink-0 tabular-nums">{formatDate(l.createdAt)}</span>
+                      <span className="text-zinc-600 text-xs shrink-0 tabular-nums">
+                        {formatDate(l.createdAt)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -257,7 +447,9 @@ export default function LeadsPage() {
                   >
                     Prev
                   </button>
-                  <span className="text-xs text-zinc-600 tabular-nums">{page}/{totalPages}</span>
+                  <span className="text-xs text-zinc-600 tabular-nums">
+                    {page}/{totalPages}
+                  </span>
                   <button
                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
@@ -286,13 +478,14 @@ export default function LeadsPage() {
               </div>
               <p className="text-sm font-medium text-zinc-300">Select a lead</p>
               <p className="mt-1 text-sm text-zinc-600">
-                Open a record from the list to review contact details, scoring, and outreach.
+                Open a record from the list to review contact details, scoring,
+                and outreach.
               </p>
             </div>
           </div>
         ) : (
           <>
-            <div className="px-4 sm:px-5 h-[72px] border-b border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-950/50 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+            <div className="px-4 sm:px-5 h-18 border-b border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-950/50 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setDetailOpen(false)}
@@ -305,13 +498,15 @@ export default function LeadsPage() {
                   <span className="text-zinc-700">/</span>
                   {[lead.city, lead.country].filter(Boolean).length > 0 && (
                     <>
-                      <span className="text-emerald-400 truncate max-w-[140px]">
+                      <span className="text-emerald-400 truncate max-w-35">
                         {[lead.city, lead.country].filter(Boolean).join(", ")}
                       </span>
                       <span className="text-zinc-700">/</span>
                     </>
                   )}
-                  <span className="text-white font-semibold truncate max-w-[240px]">{lead.name || "Unknown"}</span>
+                  <span className="text-white font-semibold truncate max-w-60">
+                    {lead.name || "Unknown"}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -358,7 +553,7 @@ export default function LeadsPage() {
             <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto scrollbar-hide">
               <div className="w-full max-w-5xl mx-auto">
                 {(() => {
-                  const statusCfg = getStatus(lead.status)
+                  const statusCfg = getStatus(lead.status);
                   return (
                     <div className="relative overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-950/45 p-5 sm:p-6 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
                       <div
@@ -375,11 +570,16 @@ export default function LeadsPage() {
                         {/* Avatar */}
                         <div className="relative shrink-0">
                           {lead.photoUrl ? (
-                            <img
-                              src={lead.photoUrl}
-                              alt=""
-                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-1 ring-zinc-700/80 shadow-lg shadow-black/30"
-                            />
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden ring-1 ring-zinc-700/80 shadow-lg shadow-black/30">
+                              <Image
+                                src={lead.photoUrl}
+                                alt=""
+                                fill
+                                sizes="(min-width: 640px) 80px, 64px"
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
                           ) : (
                             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-800/80 flex items-center justify-center ring-1 ring-zinc-700/60 shadow-lg shadow-black/25">
                               <span className="text-xl sm:text-2xl font-semibold text-zinc-400">
@@ -387,7 +587,9 @@ export default function LeadsPage() {
                               </span>
                             </div>
                           )}
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-zinc-950 ${statusCfg.dot}`} />
+                          <div
+                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-zinc-950 ${statusCfg.dot}`}
+                          />
                         </div>
 
                         <div className="min-w-0 pt-0.5">
@@ -400,7 +602,9 @@ export default function LeadsPage() {
                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ring-1 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.ring}`}
                                   aria-label="Change lead status"
                                 >
-                                  <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`}
+                                  />
                                   {statusCfg.label}
                                   <ChevronDown className="w-3 h-3 opacity-60" />
                                 </button>
@@ -408,32 +612,37 @@ export default function LeadsPage() {
                               <DropdownMenuContent
                                 align="start"
                                 sideOffset={6}
-                                className="w-[200px] bg-zinc-900 border-zinc-700/60 shadow-xl shadow-black/40"
+                                className="w-50 bg-zinc-900 border-zinc-700/60 shadow-xl shadow-black/40"
                               >
                                 <DropdownMenuLabel className="px-3 py-1.5 text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
                                   Change status
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-zinc-800" />
                                 {LEAD_STATUS_KEYS.map((key) => {
-                                  const cfg = STATUS_CONFIG[key]
-                                  const isCurrent = key === lead.status
+                                  const cfg = STATUS_CONFIG[key];
+                                  const isCurrent = key === lead.status;
                                   return (
                                     <DropdownMenuItem
                                       key={key}
                                       onClick={() => {
-                                        if (!isCurrent) updateLeadStatus(lead.id, key)
+                                        if (!isCurrent)
+                                          updateLeadStatus(lead.id, key);
                                       }}
                                       className="px-3 py-2 text-zinc-300 focus:text-white focus:bg-zinc-800/70 cursor-pointer"
                                     >
                                       <span className="flex items-center gap-2.5 w-full">
-                                        <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                                        <span className="flex-1 text-sm">{cfg.label}</span>
+                                        <span
+                                          className={`w-2 h-2 rounded-full ${cfg.dot}`}
+                                        />
+                                        <span className="flex-1 text-sm">
+                                          {cfg.label}
+                                        </span>
                                         {isCurrent && (
                                           <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                                         )}
                                       </span>
                                     </DropdownMenuItem>
-                                  )
+                                  );
                                 })}
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -450,7 +659,11 @@ export default function LeadsPage() {
                           <p className="text-zinc-400 text-sm mt-2 flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
                             <span className="truncate">
-                              {[lead.city, lead.state, lead.country].filter(Boolean).join(", ") || lead.address || "No location"}
+                              {[lead.city, lead.state, lead.country]
+                                .filter(Boolean)
+                                .join(", ") ||
+                                lead.address ||
+                                "No location"}
                             </span>
                           </p>
 
@@ -459,22 +672,32 @@ export default function LeadsPage() {
                             {lead.googleRating != null && (
                               <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
                                 <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                                <StatNumber value={lead.googleRating.toFixed(1)} className="text-zinc-200 font-medium" />
+                                <StatNumber
+                                  value={lead.googleRating.toFixed(1)}
+                                  className="text-zinc-200 font-medium"
+                                />
                                 {lead.googleReviewCount != null && (
-                                  <span className="text-zinc-600">({lead.googleReviewCount})</span>
+                                  <span className="text-zinc-600">
+                                    ({lead.googleReviewCount})
+                                  </span>
                                 )}
                               </div>
                             )}
                             {lead.services && lead.services.length > 0 && (
                               <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
-                                  <Tag className="w-3.5 h-3.5 text-emerald-400" />
-                                <StatNumber value={lead.services.length} className="text-zinc-200 font-medium" />
+                                <Tag className="w-3.5 h-3.5 text-emerald-400" />
+                                <StatNumber
+                                  value={lead.services.length}
+                                  className="text-zinc-200 font-medium"
+                                />
                                 <span className="text-zinc-600">services</span>
                               </div>
                             )}
                             <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800/70 bg-zinc-900/50 px-2.5 py-1.5 text-zinc-400">
                               <Radar className="w-3.5 h-3.5 text-emerald-400" />
-                              <span className="text-zinc-500 capitalize">{lead.source.replace("_", " ")}</span>
+                              <span className="text-zinc-500 capitalize">
+                                {lead.source.replace("_", " ")}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -486,14 +709,18 @@ export default function LeadsPage() {
                           {t("score")}
                         </span>
                         <div className="flex items-baseline gap-1 sm:justify-end">
-                          <span className={`text-4xl font-semibold tabular-nums tracking-tight ${scoreColor(lead.score)}`}>
+                          <span
+                            className={`text-4xl font-semibold tabular-nums tracking-tight ${scoreColor(lead.score)}`}
+                          >
                             {lead.score.toFixed(1)}
                           </span>
-                          <span className="text-sm text-zinc-600 tabular-nums">/5</span>
+                          <span className="text-sm text-zinc-600 tabular-nums">
+                            /5
+                          </span>
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })()}
 
                 {/* Score breakdown - 5 categories */}
@@ -504,38 +731,94 @@ export default function LeadsPage() {
                         <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
                           Score breakdown
                         </p>
-                        <p className="text-xs text-zinc-600 mt-1">Signals grouped by discovery quality.</p>
+                        <p className="text-xs text-zinc-600 mt-1">
+                          Signals grouped by discovery quality.
+                        </p>
                       </div>
-                      <span className={`text-sm font-semibold tabular-nums ${scoreColor(lead.score)}`}>
+                      <span
+                        className={`text-sm font-semibold tabular-nums ${scoreColor(lead.score)}`}
+                      >
                         {lead.score.toFixed(1)}
                       </span>
                     </div>
                     <div className="grid grid-cols-5 gap-3 sm:gap-4">
-                      {([
-                        { key: "reach", label: t("reach"), color: "bg-emerald-500" },
-                        { key: "trust", label: t("trust"), color: "bg-lime-400" },
-                        { key: "offer", label: t("engage"), color: "bg-sky-400" },
-                        { key: "profile", label: t("match"), color: "bg-emerald-400" },
-                        { key: "social", label: t("ready"), color: "bg-amber-400" },
-                      ] as const).map((cat) => {
-                        const value = lead.scoreBreakdown?.categories[cat.key] ?? 0
-                        const barColor = value > 0 ? cat.color : "bg-zinc-800/80"
+                      {(
+                        [
+                          {
+                            key: "reach",
+                            label: t("reach"),
+                            filled:
+                              "bg-gradient-to-t from-emerald-500 to-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.35)]",
+                            empty: "bg-emerald-500/[0.06]",
+                            valueText: "text-emerald-400",
+                            labelText: "text-emerald-400/70",
+                          },
+                          {
+                            key: "trust",
+                            label: t("trust"),
+                            filled:
+                              "bg-gradient-to-t from-sky-500 to-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.35)]",
+                            empty: "bg-sky-500/[0.06]",
+                            valueText: "text-sky-400",
+                            labelText: "text-sky-400/70",
+                          },
+                          {
+                            key: "offer",
+                            label: t("engage"),
+                            filled:
+                              "bg-gradient-to-t from-violet-500 to-violet-400 shadow-[0_0_6px_rgba(139,92,246,0.35)]",
+                            empty: "bg-violet-500/[0.06]",
+                            valueText: "text-violet-400",
+                            labelText: "text-violet-400/70",
+                          },
+                          {
+                            key: "profile",
+                            label: t("match"),
+                            filled:
+                              "bg-gradient-to-t from-amber-500 to-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.35)]",
+                            empty: "bg-amber-500/[0.06]",
+                            valueText: "text-amber-400",
+                            labelText: "text-amber-400/70",
+                          },
+                          {
+                            key: "social",
+                            label: t("ready"),
+                            filled:
+                              "bg-gradient-to-t from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.35)]",
+                            empty: "bg-rose-500/[0.06]",
+                            valueText: "text-rose-400",
+                            labelText: "text-rose-400/70",
+                          },
+                        ] as const
+                      ).map((cat) => {
+                        const value =
+                          lead.scoreBreakdown?.categories[cat.key] ?? 0;
+                        const hasValue = value > 0;
                         return (
-                          <div key={cat.key} className="flex flex-col items-center gap-2 min-w-0">
-                            <span className="text-xs text-zinc-300 tabular-nums">{value.toFixed(0)}/5</span>
-                            <div className="flex flex-col-reverse gap-[3px] w-full max-w-[40px]">
+                          <div
+                            key={cat.key}
+                            className="flex flex-col items-center gap-2 min-w-0"
+                          >
+                            <span
+                              className={`text-xs font-semibold tabular-nums ${hasValue ? cat.valueText : "text-zinc-500"}`}
+                            >
+                              {value.toFixed(0)}/5
+                            </span>
+                            <div className="flex flex-col-reverse gap-0.75 w-full max-w-10">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <div
                                   key={i}
-                                  className={`w-full h-[8px] rounded-sm ${
-                                    i < value ? barColor : "bg-zinc-800/80"
-                                  }`}
+                                  className={`w-full h-2 rounded-sm ${i < value ? cat.filled : cat.empty}`}
                                 />
                               ))}
                             </div>
-                            <span className="text-xs text-zinc-500 font-medium truncate max-w-full">{cat.label}</span>
+                            <span
+                              className={`text-xs font-medium truncate max-w-full ${hasValue ? cat.labelText : "text-zinc-500"}`}
+                            >
+                              {cat.label}
+                            </span>
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   </div>
@@ -548,7 +831,12 @@ export default function LeadsPage() {
                       {lead.website && (
                         <CopyRow
                           icon={Globe}
-                          label={lead.websiteDomain || lead.website.replace(/^https?:\/\/(www\.)?/, "").slice(0, 32)}
+                          label={
+                            lead.websiteDomain ||
+                            lead.website
+                              .replace(/^https?:\/\/(www\.)?/, "")
+                              .slice(0, 32)
+                          }
                           copyValue={lead.website}
                           linkHref={lead.website}
                           external
@@ -599,25 +887,49 @@ export default function LeadsPage() {
                           onCopy={copyToClipboard}
                         />
                       )}
-                      {!lead.website && !lead.email && !lead.phone && !lead.address && !lead.instagramHandle && (
-                        <p className="text-zinc-600 text-sm py-2">No contact info found.</p>
-                      )}
+                      {!lead.website &&
+                        !lead.email &&
+                        !lead.phone &&
+                        !lead.address &&
+                        !lead.instagramHandle && (
+                          <p className="text-zinc-600 text-sm py-2">
+                            No contact info found.
+                          </p>
+                        )}
                     </div>
                   </SectionCard>
 
                   <SectionCard title="Business">
                     <div className="space-y-2.5">
                       {lead.ownerName && (
-                        <InfoRow icon={User} label="Owner" value={lead.ownerName} />
+                        <InfoRow
+                          icon={User}
+                          label="Owner"
+                          value={lead.ownerName}
+                        />
                       )}
                       {lead.operatingHours && (
-                        <InfoRow icon={Clock} label="Hours" value={lead.operatingHours} />
+                        <InfoRow
+                          icon={Clock}
+                          label="Hours"
+                          value={lead.operatingHours}
+                        />
                       )}
-                      {!lead.ownerName && !lead.operatingHours && !lead.services?.length && (
-                        <p className="text-zinc-600 text-sm py-2">No business data.</p>
-                      )}
+                      {!lead.ownerName &&
+                        !lead.operatingHours &&
+                        !lead.services?.length && (
+                          <p className="text-zinc-600 text-sm py-2">
+                            No business data.
+                          </p>
+                        )}
                       {lead.services && lead.services.length > 0 && (
-                        <div className={lead.ownerName || lead.operatingHours ? "pt-2 border-t border-zinc-800/60" : ""}>
+                        <div
+                          className={
+                            lead.ownerName || lead.operatingHours
+                              ? "pt-2 border-t border-zinc-800/60"
+                              : ""
+                          }
+                        >
                           <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-2 flex items-center gap-1.5">
                             <Building2 className="w-3 h-3 text-emerald-400" />
                             Services
@@ -639,59 +951,74 @@ export default function LeadsPage() {
                 </div>
 
                 {/* Social media */}
-                {lead.socialMedia && Object.keys(lead.socialMedia).length > 0 && (
-                  <SectionCard title="Social" className="mb-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {Object.entries(lead.socialMedia).map(([platform, url]) => {
-                        const cfg = getSocialConfig(platform)
-                        let preview = url
-                        try {
-                          const u = new URL(url)
-                          preview = u.hostname.replace(/^www\./, "") + (u.pathname !== "/" ? u.pathname : "")
-                          if (preview.length > 28) preview = preview.slice(0, 27) + "…"
-                        } catch {
-                          /* keep raw url */
-                        }
-                        return (
-                          <a
-                            key={platform}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-800/70 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-zinc-700 transition-all duration-150 overflow-hidden"
-                            title={url}
-                          >
-                            <div
-                              className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ring-1 transition-all duration-150 ${cfg.bg} ${cfg.ring}`}
-                              style={{ color: cfg.color }}
-                            >
-                              <SocialIcon platform={platform} className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-zinc-200 font-medium truncate group-hover:text-white transition-colors">
-                                {cfg.label}
-                              </p>
-                              <p className="text-[11px] text-zinc-600 truncate">{preview}</p>
-                            </div>
-                            <ExternalLink className="w-3.5 h-3.5 text-zinc-700 group-hover:text-zinc-400 shrink-0 transition-colors" />
-                          </a>
-                        )
-                      })}
-                    </div>
-                  </SectionCard>
-                )}
+                {lead.socialMedia &&
+                  Object.keys(lead.socialMedia).length > 0 && (
+                    <SectionCard title="Social" className="mb-6">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {Object.entries(lead.socialMedia).map(
+                          ([platform, url]) => {
+                            const cfg = getSocialConfig(platform);
+                            let preview = url;
+                            try {
+                              const u = new URL(url);
+                              preview =
+                                u.hostname.replace(/^www\./, "") +
+                                (u.pathname !== "/" ? u.pathname : "");
+                              if (preview.length > 28)
+                                preview = preview.slice(0, 27) + "…";
+                            } catch {
+                              /* keep raw url */
+                            }
+                            return (
+                              <a
+                                key={platform}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-800/70 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-zinc-700 transition-all duration-150 overflow-hidden"
+                                title={url}
+                              >
+                                <div
+                                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ring-1 transition-all duration-150 ${cfg.bg} ${cfg.ring}`}
+                                  style={{ color: cfg.color }}
+                                >
+                                  <SocialIcon
+                                    platform={platform}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm text-zinc-200 font-medium truncate group-hover:text-white transition-colors">
+                                    {cfg.label}
+                                  </p>
+                                  <p className="text-[11px] text-zinc-600 truncate">
+                                    {preview}
+                                  </p>
+                                </div>
+                                <ExternalLink className="w-3.5 h-3.5 text-zinc-700 group-hover:text-zinc-400 shrink-0 transition-colors" />
+                              </a>
+                            );
+                          },
+                        )}
+                      </div>
+                    </SectionCard>
+                  )}
 
                 {/* AI Summary */}
                 {lead.aiSummary && (
                   <SectionCard title="AI Summary" className="mb-6">
-                    <p className="text-zinc-300 text-sm leading-relaxed">{lead.aiSummary}</p>
+                    <p className="text-zinc-300 text-sm leading-relaxed">
+                      {lead.aiSummary}
+                    </p>
                   </SectionCard>
                 )}
 
                 {/* Description */}
                 {lead.description && !lead.aiSummary && (
                   <SectionCard title="Description" className="mb-6">
-                    <p className="text-zinc-300 text-sm leading-relaxed">{lead.description}</p>
+                    <p className="text-zinc-300 text-sm leading-relaxed">
+                      {lead.description}
+                    </p>
                   </SectionCard>
                 )}
 
@@ -703,67 +1030,82 @@ export default function LeadsPage() {
                   contact={{ email: lead.email, phone: lead.phone }}
                   onMessagesChange={(msgs) => {
                     setLeads((prev) =>
-                      prev.map((l) => (l.id === lead.id ? { ...l, outreachMessages: msgs } : l)),
-                    )
+                      prev.map((l) =>
+                        l.id === lead.id ? { ...l, outreachMessages: msgs } : l,
+                      ),
+                    );
                   }}
                 />
 
-
                 {/* Google Reviews */}
-                {lead.googleReviews && lead.googleReviews.length > 0 && (() => {
-                  const reviews = lead.googleReviews
-                  const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-                  return (
-                    <SectionCard title="Reviews" className="mb-6">
-                      {/* Aggregate header */}
-                      <div className="flex items-center gap-4 pb-4 mb-4 border-b border-zinc-800/60">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-3xl text-white font-semibold tabular-nums tracking-tight">
-                            {avg.toFixed(1)}
-                          </span>
-                          <span className="text-sm text-zinc-600">/5</span>
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-0.5 mb-0.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${i < Math.round(avg) ? "text-amber-400 fill-amber-400" : "text-zinc-700"}`}
-                              />
-                            ))}
+                {lead.googleReviews &&
+                  lead.googleReviews.length > 0 &&
+                  (() => {
+                    const reviews = lead.googleReviews;
+                    const avg =
+                      reviews.reduce((sum, r) => sum + r.rating, 0) /
+                      reviews.length;
+                    return (
+                      <SectionCard title="Reviews" className="mb-6">
+                        {/* Aggregate header */}
+                        <div className="flex items-center gap-4 pb-4 mb-4 border-b border-zinc-800/60">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl text-white font-semibold tabular-nums tracking-tight">
+                              {avg.toFixed(1)}
+                            </span>
+                            <span className="text-sm text-zinc-600">/5</span>
                           </div>
-                          <p className="text-[11px] text-zinc-500 tabular-nums">
-                            {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        {reviews.map((review, i) => (
-                          <div key={i} className="py-3 px-3.5 bg-zinc-900/40 rounded-lg border border-zinc-800/60">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-zinc-200 font-medium">{review.author}</span>
-                                <div className="flex items-center gap-0.5">
-                                  {Array.from({ length: 5 }).map((_, si) => (
-                                    <Star
-                                      key={si}
-                                      className={`w-3 h-3 ${si < review.rating ? "text-amber-400 fill-amber-400" : "text-zinc-700"}`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                              {review.date && (
-                                <span className="text-[11px] text-zinc-600 tabular-nums">{review.date}</span>
-                              )}
+                          <div>
+                            <div className="flex items-center gap-0.5 mb-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${i < Math.round(avg) ? "text-amber-400 fill-amber-400" : "text-zinc-700"}`}
+                                />
+                              ))}
                             </div>
-                            <p className="text-zinc-400 text-sm leading-relaxed">{review.text}</p>
+                            <p className="text-[11px] text-zinc-500 tabular-nums">
+                              {reviews.length}{" "}
+                              {reviews.length === 1 ? "review" : "reviews"}
+                            </p>
                           </div>
-                        ))}
-                      </div>
-                    </SectionCard>
-                  )
-                })()}
+                        </div>
+
+                        <div className="space-y-2">
+                          {reviews.map((review, i) => (
+                            <div
+                              key={i}
+                              className="py-3 px-3.5 bg-zinc-900/40 rounded-lg border border-zinc-800/60"
+                            >
+                              <div className="flex items-center justify-between mb-1.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-zinc-200 font-medium">
+                                    {review.author}
+                                  </span>
+                                  <div className="flex items-center gap-0.5">
+                                    {Array.from({ length: 5 }).map((_, si) => (
+                                      <Star
+                                        key={si}
+                                        className={`w-3 h-3 ${si < review.rating ? "text-amber-400 fill-amber-400" : "text-zinc-700"}`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                {review.date && (
+                                  <span className="text-[11px] text-zinc-600 tabular-nums">
+                                    {review.date}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-zinc-400 text-sm leading-relaxed">
+                                {review.text}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </SectionCard>
+                    );
+                  })()}
 
                 {/* Pricing */}
                 {lead.pricingInfo && (
@@ -774,9 +1116,14 @@ export default function LeadsPage() {
                         .map((item) => item.trim())
                         .filter((item) => item.length > 5)
                         .map((item, i) => (
-                          <div key={i} className="flex items-start gap-2.5 py-1.5 px-3 bg-zinc-800/30 rounded-lg">
+                          <div
+                            key={i}
+                            className="flex items-start gap-2.5 py-1.5 px-3 bg-zinc-800/30 rounded-lg"
+                          >
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 mt-1.5 shrink-0" />
-                            <span className="text-zinc-300 text-sm leading-relaxed">{item}</span>
+                            <span className="text-zinc-300 text-sm leading-relaxed">
+                              {item}
+                            </span>
                           </div>
                         ))}
                     </div>
@@ -789,10 +1136,22 @@ export default function LeadsPage() {
                     Details
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                    <MetaCell label="Source" value={lead.source.replace("_", " ")} />
-                    <MetaCell label="Enriched" value={lead.firecrawlEnriched ? "Yes" : "No"} />
-                    <MetaCell label="Found" value={formatDate(lead.createdAt)} />
-                    <MetaCell label="Status" value={getStatus(lead.status).label} />
+                    <MetaCell
+                      label="Source"
+                      value={lead.source.replace("_", " ")}
+                    />
+                    <MetaCell
+                      label="Enriched"
+                      value={lead.firecrawlEnriched ? "Yes" : "No"}
+                    />
+                    <MetaCell
+                      label="Found"
+                      value={formatDate(lead.createdAt)}
+                    />
+                    <MetaCell
+                      label="Status"
+                      value={getStatus(lead.status).label}
+                    />
                     {lead.teamMembers && lead.teamMembers.length > 0 && (
                       <div className="col-span-2">
                         <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-1.5">
@@ -805,7 +1164,11 @@ export default function LeadsPage() {
                               className="text-xs bg-zinc-900/60 text-zinc-300 border border-zinc-800 px-2 py-1 rounded-md"
                             >
                               {m.name}
-                              {m.role && <span className="text-zinc-600 ml-1">· {m.role}</span>}
+                              {m.role && (
+                                <span className="text-zinc-600 ml-1">
+                                  · {m.role}
+                                </span>
+                              )}
                             </span>
                           ))}
                         </div>
@@ -819,20 +1182,20 @@ export default function LeadsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ── Helper row components ──────────────────────────────────────
 
 interface CopyRowProps {
-  icon: React.ElementType
-  label: string
-  copyValue: string
-  copyKey: string
-  copiedKey: string | null
-  onCopy: (value: string, key: string) => void
-  linkHref?: string
-  external?: boolean
+  icon: React.ElementType;
+  label: string;
+  copyValue: string;
+  copyKey: string;
+  copiedKey: string | null;
+  onCopy: (value: string, key: string) => void;
+  linkHref?: string;
+  external?: boolean;
 }
 
 function CopyRow({
@@ -845,8 +1208,9 @@ function CopyRow({
   linkHref,
   external,
 }: CopyRowProps) {
-  const isCopied = copiedKey === copyKey
-  const linkClasses = "flex-1 text-sm text-zinc-300 hover:text-white truncate transition-colors"
+  const isCopied = copiedKey === copyKey;
+  const linkClasses =
+    "flex-1 text-sm text-zinc-300 hover:text-white truncate transition-colors";
 
   return (
     <div className="group flex items-center gap-2.5 -mx-2 px-2 py-1.5 rounded-md hover:bg-zinc-800/40 transition-colors">
@@ -866,9 +1230,9 @@ function CopyRow({
       <button
         type="button"
         onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          onCopy(copyValue, copyKey)
+          e.preventDefault();
+          e.stopPropagation();
+          onCopy(copyValue, copyKey);
         }}
         className={`shrink-0 p-1 rounded-md transition-all duration-150 ${
           isCopied
@@ -878,10 +1242,14 @@ function CopyRow({
         title={isCopied ? "Copied!" : "Copy"}
         aria-label={isCopied ? "Copied" : `Copy ${copyKey}`}
       >
-        {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+        {isCopied ? (
+          <Check className="w-3.5 h-3.5" />
+        ) : (
+          <Copy className="w-3.5 h-3.5" />
+        )}
       </button>
     </div>
-  )
+  );
 }
 
 function InfoRow({
@@ -889,17 +1257,19 @@ function InfoRow({
   label,
   value,
 }: {
-  icon: React.ElementType
-  label: string
-  value: string
+  icon: React.ElementType;
+  label: string;
+  value: string;
 }) {
   return (
     <div className="flex items-center gap-2.5 -mx-2 px-2 py-1.5">
       <Icon className="w-4 h-4 text-zinc-500 shrink-0" />
       <span className="text-xs text-zinc-500 shrink-0">{label}</span>
-      <span className="flex-1 text-sm text-zinc-300 truncate text-right">{value}</span>
+      <span className="flex-1 text-sm text-zinc-300 truncate text-right">
+        {value}
+      </span>
     </div>
-  )
+  );
 }
 
 function MetaCell({ label, value }: { label: string; value: string }) {
@@ -910,5 +1280,5 @@ function MetaCell({ label, value }: { label: string; value: string }) {
       </p>
       <p className="text-sm text-zinc-200 capitalize">{value}</p>
     </div>
-  )
+  );
 }

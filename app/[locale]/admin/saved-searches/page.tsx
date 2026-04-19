@@ -12,6 +12,7 @@ import {
   EmptyState,
 } from "@/components/admin"
 import { formatRelativeDate } from "@/lib/admin-utils"
+import { useActiveBusiness } from "@/components/admin/active-business-context"
 
 interface SavedSearch {
   id: string
@@ -26,17 +27,25 @@ interface SavedSearch {
 
 export default function SavedSearchesPage() {
   const t = useTranslations("dashboard")
+  const { activeBusinessId } = useActiveBusiness()
   const [searches, setSearches] = useState<SavedSearch[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/discovery/saved-searches")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setSearches)
+    setLoading(true)
+    const controller = new AbortController()
+    fetch("/api/discovery/saved-searches", { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (!controller.signal.aborted) setSearches(data)
+      })
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
+    return () => controller.abort()
+  }, [activeBusinessId])
 
   async function handleDelete(id: string) {
     setDeleting(id)

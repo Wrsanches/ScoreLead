@@ -26,6 +26,16 @@ const completeSchema = z.object({
   services: z.string().optional().or(z.literal("")),
   serviceArea: z.string().optional().or(z.literal("")),
   competitors: z.string().optional().or(z.literal("")),
+  brandColorPrimary: z
+    .string()
+    .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/)
+    .nullable()
+    .optional(),
+  brandColorSecondary: z
+    .string()
+    .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/)
+    .nullable()
+    .optional(),
 })
 
 export async function POST(request: Request) {

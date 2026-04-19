@@ -117,7 +117,7 @@ export function PageHeader(props: PageHeaderProps) {
             <span className="text-zinc-700">/</span>
           </>
         )}
-        <h1 className="text-white text-sm font-semibold tracking-tight truncate max-w-[260px]">
+        <h1 className="text-white text-sm font-semibold tracking-tight truncate max-w-65">
           {title}
         </h1>
       </div>

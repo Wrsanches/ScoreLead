@@ -48,7 +48,7 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
           aria-hidden="true"
         >
           <div
-            className="absolute left-0 w-full h-[2px] bg-emerald-500/10"
+            className="absolute left-0 w-full h-0.5 bg-emerald-500/10"
             style={{ animation: "not-found-scanline 4s linear infinite" }}
           />
         </div>
@@ -83,7 +83,7 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
       </div>
 
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] pointer-events-none z-0"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-75 pointer-events-none z-0"
         style={{
           background: "radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, transparent 70%)",
           animation: "not-found-pulse 5s ease-in-out infinite",

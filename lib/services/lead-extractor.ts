@@ -1,6 +1,7 @@
 import Firecrawl from "@mendable/firecrawl-js"
 import OpenAI from "openai"
 import { buildLeadExtractorPrompt } from "@/lib/prompts"
+import { OPENAI_TEXT_MODEL } from "@/lib/models"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
 
@@ -231,7 +232,7 @@ async function extractWithAI(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.4",
+      model: OPENAI_TEXT_MODEL,
       response_format: { type: "json_object" },
       messages: [
         {

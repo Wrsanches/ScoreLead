@@ -62,6 +62,8 @@ export const business = pgTable("business", {
   logo: text("logo"),
   language: text("language"),
   brandColors: jsonb("brandColors").$type<string[]>(),
+  brandColorPrimary: text("brandColorPrimary"),
+  brandColorSecondary: text("brandColorSecondary"),
   brandFonts: jsonb("brandFonts").$type<string[]>(),
   brandStyle: text("brandStyle"),
   businessModel: text("businessModel"),
@@ -182,6 +184,31 @@ export const lead = pgTable("lead", {
   discoveryQueries: jsonb("discoveryQueries").$type<string[]>(),
   status: text("status").notNull().default("new"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const contentPost = pgTable("content_post", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  provider: text("provider").notNull().default("instagram"),
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  postType: text("postType").notNull().default("single"),
+  pillar: text("pillar"),
+  caption: text("caption").notNull().default(""),
+  hashtags: jsonb("hashtags").$type<string[]>().default([]),
+  visualIdea: text("visualIdea"),
+  callToAction: text("callToAction"),
+  images: jsonb("images").$type<
+    { url: string; headline: string; prompt: string }[]
+  >(),
+  status: text("status").notNull().default("draft"),
+  aiGenerated: boolean("aiGenerated").notNull().default(false),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
 
 export const verification = pgTable("verification", {

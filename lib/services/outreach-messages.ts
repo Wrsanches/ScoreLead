@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { buildOutreachPrompt } from "@/lib/prompts";
+import { OPENAI_TEXT_MODEL } from "@/lib/models";
 
 let client: OpenAI | null = null;
 function getOpenAI(): OpenAI | null {
@@ -282,7 +283,7 @@ export async function generateOutreachMessages(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.4",
+      model: OPENAI_TEXT_MODEL,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },

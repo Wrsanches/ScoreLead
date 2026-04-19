@@ -43,6 +43,9 @@ export async function GET() {
       category: biz.category || "",
       tags: biz.tags || "",
       logo: biz.logo || "",
+      brandColors: biz.brandColors || [],
+      brandColorPrimary: biz.brandColorPrimary || null,
+      brandColorSecondary: biz.brandColorSecondary || null,
       onboardingStep: biz.onboardingStep,
     },
   })

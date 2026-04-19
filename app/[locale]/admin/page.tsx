@@ -1,9 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useTranslations } from "next-intl"
-import { motion } from "framer-motion"
-import { Link } from "@/i18n/routing"
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useActiveBusiness } from "@/components/admin/active-business-context";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Link } from "@/i18n/routing";
 import {
   Users,
   Radar,
@@ -14,7 +16,7 @@ import {
   Star,
   ArrowRight,
   AlertTriangle,
-} from "lucide-react"
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -26,15 +28,14 @@ import {
   PieChart,
   Cell,
   CartesianGrid,
-} from "recharts"
+} from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
-  PageHeader,
   ContentWrapper,
   SectionCard,
   StatCard,
@@ -43,54 +44,69 @@ import {
   LoadingState,
   EmptyState,
   StatNumber,
-} from "@/components/admin"
-import { AiOrb } from "@/components/ai-orb"
-import { formatRelativeDate, getInitials } from "@/lib/admin-utils"
+} from "@/components/admin";
+import { AiOrb } from "@/components/ai-orb";
+import { formatRelativeDate, getInitials } from "@/lib/admin-utils";
 
 interface DashboardStats {
-  jobs: { total: number; completed: number; running: number; failed: number }
+  jobs: { total: number; completed: number; running: number; failed: number };
   leads: {
-    total: number; avgScore: number; avgRating: number | null
-    highScore: number; withWebsite: number; withEmail: number; withPhone: number; enriched: number
-  }
+    total: number;
+    avgScore: number;
+    avgRating: number | null;
+    highScore: number;
+    withWebsite: number;
+    withEmail: number;
+    withPhone: number;
+    enriched: number;
+  };
   charts: {
-    scoreDistribution: { bucket: string; count: number }[]
-    sourceBreakdown: { source: string; count: number }[]
-    leadsOverTime: { date: string; count: number }[]
-  }
+    scoreDistribution: { bucket: string; count: number }[];
+    sourceBreakdown: { source: string; count: number }[];
+    leadsOverTime: { date: string; count: number }[];
+  };
   recentLeads: {
-    id: string; name: string | null; score: number
-    city: string | null; country: string | null
-    photoUrl: string | null; createdAt: string
-  }[]
+    id: string;
+    name: string | null;
+    score: number;
+    city: string | null;
+    country: string | null;
+    photoUrl: string | null;
+    createdAt: string;
+  }[];
   recentJobs: {
-    id: string; name: string; status: string
-    insertedLeads: number; createdAt: string
-  }[]
+    id: string;
+    name: string;
+    status: string;
+    insertedLeads: number;
+    createdAt: string;
+  }[];
 }
 
 const chartConfig = {
   count: { label: "Leads", color: "var(--color-emerald-500)" },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 // Unified ramp: emerald → teal → cyan → sky → indigo.
 // All feel related to the brand without being monotone.
-const PIE_COLORS = ["#10b981", "#14b8a6", "#06b6d4", "#0ea5e9", "#6366f1"]
+const PIE_COLORS = ["#10b981", "#14b8a6", "#06b6d4", "#0ea5e9", "#6366f1"];
 
 export default function AdminPage() {
-  const t = useTranslations("dashboard")
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [loading, setLoading] = useState(true)
+  const t = useTranslations("dashboard");
+  const { activeBusinessId } = useActiveBusiness();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch("/api/dashboard/stats")
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then(setStats)
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => setLoading(false));
+  }, [activeBusinessId]);
 
-  const hasRunningJobs = (stats?.jobs.running ?? 0) > 0
+  const hasRunningJobs = (stats?.jobs.running ?? 0) > 0;
 
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden">
@@ -102,7 +118,11 @@ export default function AdminPage() {
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.15,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
                 className="text-[11px] text-emerald-400/80 font-semibold uppercase tracking-widest mb-2"
               >
                 {t("dashboard")}
@@ -110,7 +130,11 @@ export default function AdminPage() {
               <motion.h1
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.3,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
                 className="text-2xl md:text-3xl text-white font-semibold tracking-tight leading-tight"
               >
                 {hasRunningJobs ? "Your AI is working" : "Welcome back"}
@@ -118,7 +142,11 @@ export default function AdminPage() {
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.45,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
                 className="text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed"
               >
                 {hasRunningJobs
@@ -133,13 +161,14 @@ export default function AdminPage() {
               layout
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.5,
+                delay: 0.3,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="hidden sm:block shrink-0 mr-4 mt-2"
             >
-              <AiOrb
-                size="sm"
-                state={hasRunningJobs ? "processing" : "idle"}
-              />
+              <AiOrb size="sm" state={hasRunningJobs ? "processing" : "idle"} />
             </motion.div>
           </div>
         </div>
@@ -147,7 +176,10 @@ export default function AdminPage() {
         {loading ? (
           <LoadingState />
         ) : !stats ? (
-          <EmptyState icon={AlertTriangle} title="Failed to load dashboard data." />
+          <EmptyState
+            icon={AlertTriangle}
+            title="Failed to load dashboard data."
+          />
         ) : (
           <div className="space-y-6">
             {/* KPI row */}
@@ -179,7 +211,11 @@ export default function AdminPage() {
                 label="Enriched"
                 value={stats.leads.enriched}
                 icon={TrendingUp}
-                sub={stats.leads.total > 0 ? `${Math.round((stats.leads.enriched / stats.leads.total) * 100)}% of leads` : "0%"}
+                sub={
+                  stats.leads.total > 0
+                    ? `${Math.round((stats.leads.enriched / stats.leads.total) * 100)}% of leads`
+                    : "0%"
+                }
                 accent="violet"
               />
             </div>
@@ -188,51 +224,116 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <SectionCard title="Leads - Last 7 days">
                 {stats.charts.leadsOverTime.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                    <AreaChart data={stats.charts.leadsOverTime} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                  <ChartContainer config={chartConfig} className="h-50 w-full">
+                    <AreaChart
+                      data={stats.charts.leadsOverTime}
+                      margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
+                    >
                       <defs>
-                        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.2} />
-                          <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                        <linearGradient
+                          id="areaGrad"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#10b981"
+                            stopOpacity={0.2}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#10b981"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid vertical={false} stroke="#27272a" strokeDasharray="3 3" />
+                      <CartesianGrid
+                        vertical={false}
+                        stroke="#27272a"
+                        strokeDasharray="3 3"
+                      />
                       <XAxis
                         dataKey="date"
-                        tickFormatter={(d) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        tickFormatter={(d) =>
+                          new Date(d).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                          })
+                        }
                         tick={{ fill: "#71717a", fontSize: 11 }}
                         axisLine={false}
                         tickLine={false}
                       />
-                      <YAxis tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                      <YAxis
+                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Area type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} fill="url(#areaGrad)" />
+                      <Area
+                        type="monotone"
+                        dataKey="count"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        fill="url(#areaGrad)"
+                      />
                     </AreaChart>
                   </ChartContainer>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center text-zinc-600 text-sm">No data yet</div>
+                  <div className="h-50 flex items-center justify-center text-zinc-600 text-sm">
+                    No data yet
+                  </div>
                 )}
               </SectionCard>
 
               <SectionCard title="Score Distribution">
                 {stats.charts.scoreDistribution.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                    <BarChart data={stats.charts.scoreDistribution} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-                      <CartesianGrid vertical={false} stroke="#27272a" strokeDasharray="3 3" />
-                      <XAxis dataKey="bucket" tick={{ fill: "#71717a", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <ChartContainer config={chartConfig} className="h-50 w-full">
+                    <BarChart
+                      data={stats.charts.scoreDistribution}
+                      margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
+                    >
+                      <CartesianGrid
+                        vertical={false}
+                        stroke="#27272a"
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="bucket"
+                        tick={{ fill: "#71717a", fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                         {stats.charts.scoreDistribution.map((entry, i) => {
-                          const score = parseFloat(entry.bucket)
-                          const color = score >= 4 ? "#10b981" : score >= 3 ? "#f59e0b" : "#ef4444"
-                          return <Cell key={i} fill={color} fillOpacity={0.8} />
+                          const score = parseFloat(entry.bucket);
+                          const color =
+                            score >= 4
+                              ? "#10b981"
+                              : score >= 3
+                                ? "#f59e0b"
+                                : "#ef4444";
+                          return (
+                            <Cell key={i} fill={color} fillOpacity={0.8} />
+                          );
                         })}
                       </Bar>
                     </BarChart>
                   </ChartContainer>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center text-zinc-600 text-sm">No data yet</div>
+                  <div className="h-50 flex items-center justify-center text-zinc-600 text-sm">
+                    No data yet
+                  </div>
                 )}
               </SectionCard>
             </div>
@@ -242,11 +343,25 @@ export default function AdminPage() {
               <SectionCard title="Sources">
                 {stats.charts.sourceBreakdown.length > 0 ? (
                   <div className="flex items-center gap-6">
-                    <ChartContainer config={{ count: { label: "Leads" } }} className="h-[140px] w-[140px] shrink-0">
+                    <ChartContainer
+                      config={{ count: { label: "Leads" } }}
+                      className="h-35 w-35 shrink-0"
+                    >
                       <PieChart>
-                        <Pie data={stats.charts.sourceBreakdown} dataKey="count" nameKey="source" innerRadius={40} outerRadius={65} strokeWidth={0}>
+                        <Pie
+                          data={stats.charts.sourceBreakdown}
+                          dataKey="count"
+                          nameKey="source"
+                          innerRadius={40}
+                          outerRadius={65}
+                          strokeWidth={0}
+                        >
                           {stats.charts.sourceBreakdown.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} fillOpacity={0.85} />
+                            <Cell
+                              key={i}
+                              fill={PIE_COLORS[i % PIE_COLORS.length]}
+                              fillOpacity={0.85}
+                            />
                           ))}
                         </Pie>
                         <ChartTooltip content={<ChartTooltipContent />} />
@@ -254,41 +369,80 @@ export default function AdminPage() {
                     </ChartContainer>
                     <div className="space-y-2.5">
                       {stats.charts.sourceBreakdown.map((s, i) => (
-                        <div key={s.source} className="flex items-center gap-2.5">
-                          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
-                          <span className="text-sm text-zinc-400">{s.source}</span>
-                          <span className="text-sm text-zinc-500 tabular-nums ml-auto">{s.count}</span>
+                        <div
+                          key={s.source}
+                          className="flex items-center gap-2.5"
+                        >
+                          <div
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{
+                              backgroundColor:
+                                PIE_COLORS[i % PIE_COLORS.length],
+                            }}
+                          />
+                          <span className="text-sm text-zinc-400">
+                            {s.source}
+                          </span>
+                          <span className="text-sm text-zinc-500 tabular-nums ml-auto">
+                            {s.count}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="h-[140px] flex items-center justify-center text-zinc-600 text-sm">No data yet</div>
+                  <div className="h-35 flex items-center justify-center text-zinc-600 text-sm">
+                    No data yet
+                  </div>
                 )}
               </SectionCard>
 
               <SectionCard title="Contact Availability">
                 <div className="space-y-4">
-                  {([
-                    { label: "Website", count: stats.leads.withWebsite, icon: Globe },
-                    { label: "Email", count: stats.leads.withEmail, icon: Mail },
-                    { label: "Phone", count: stats.leads.withPhone, icon: Phone },
-                  ] as const).map(({ label, count, icon: Icon }) => {
-                    const pct = stats.leads.total > 0 ? (count / stats.leads.total) * 100 : 0
+                  {(
+                    [
+                      {
+                        label: "Website",
+                        count: stats.leads.withWebsite,
+                        icon: Globe,
+                      },
+                      {
+                        label: "Email",
+                        count: stats.leads.withEmail,
+                        icon: Mail,
+                      },
+                      {
+                        label: "Phone",
+                        count: stats.leads.withPhone,
+                        icon: Phone,
+                      },
+                    ] as const
+                  ).map(({ label, count, icon: Icon }) => {
+                    const pct =
+                      stats.leads.total > 0
+                        ? (count / stats.leads.total) * 100
+                        : 0;
                     return (
                       <div key={label} className="flex items-center gap-3">
                         <Icon className="w-4 h-4 text-zinc-600 shrink-0" />
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-zinc-400">{label}</span>
-                            <span className="text-xs text-zinc-500 tabular-nums">{count} ({pct.toFixed(0)}%)</span>
+                            <span className="text-sm text-zinc-400">
+                              {label}
+                            </span>
+                            <span className="text-xs text-zinc-500 tabular-nums">
+                              {count} ({pct.toFixed(0)}%)
+                            </span>
                           </div>
                           <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-zinc-500 rounded-full" style={{ width: `${pct}%` }} />
+                            <div
+                              className="h-full bg-zinc-500 rounded-full"
+                              style={{ width: `${pct}%` }}
+                            />
                           </div>
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </SectionCard>
@@ -296,7 +450,10 @@ export default function AdminPage() {
               <SectionCard
                 title="Recent Jobs"
                 actions={
-                  <Link href="/admin/discovery-jobs" className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors">
+                  <Link
+                    href="/admin/discovery-jobs"
+                    className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
+                  >
                     View all <ArrowRight className="w-3 h-3" />
                   </Link>
                 }
@@ -331,7 +488,10 @@ export default function AdminPage() {
             <SectionCard
               title="Recent Leads"
               actions={
-                <Link href="/admin/leads" className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors">
+                <Link
+                  href="/admin/leads"
+                  className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
+                >
                   View all <ArrowRight className="w-3 h-3" />
                 </Link>
               }
@@ -344,10 +504,13 @@ export default function AdminPage() {
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/40 transition-colors group"
                     >
                       {lead.photoUrl ? (
-                        <img
+                        <Image
                           src={lead.photoUrl}
                           alt=""
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-zinc-800"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-700/50">
@@ -361,7 +524,9 @@ export default function AdminPage() {
                           {lead.name || "Unknown"}
                         </p>
                         <p className="text-xs text-zinc-600 truncate">
-                          {[lead.city, lead.country].filter(Boolean).join(", ") || "No location"}
+                          {[lead.city, lead.country]
+                            .filter(Boolean)
+                            .join(", ") || "No location"}
                         </p>
                       </div>
                       <ScoreBadge score={lead.score} />
@@ -384,5 +549,5 @@ export default function AdminPage() {
         )}
       </ContentWrapper>
     </div>
-  )
+  );
 }

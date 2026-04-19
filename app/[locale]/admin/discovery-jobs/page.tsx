@@ -15,6 +15,7 @@ import {
   StatNumber,
 } from "@/components/admin"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
+import { useActiveBusiness } from "@/components/admin/active-business-context"
 
 interface DiscoveryJob {
   id: string
@@ -32,6 +33,7 @@ interface DiscoveryJob {
 
 export default function DiscoveryJobsPage() {
   const t = useTranslations("dashboard")
+  const { activeBusinessId } = useActiveBusiness()
   const [jobs, setJobs] = useState<DiscoveryJob[]>([])
   const [loading, setLoading] = useState(true)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -51,8 +53,12 @@ export default function DiscoveryJobsPage() {
   }
 
   useEffect(() => {
+    setLoading(true)
+    setJobs([])
     fetchJobs().then(() => setLoading(false))
-  }, [])
+    // Refetching whenever active business changes keeps this list scoped to
+    // the currently selected business. fetchJobs is stable by definition.
+  }, [activeBusinessId])
 
   useEffect(() => {
     const hasActive = jobs.some((j) => j.status === "running" || j.status === "queued")
@@ -159,7 +165,7 @@ export default function DiscoveryJobsPage() {
                   }`}
                 >
                   {isRunning && (
-                    <div className="h-[2px] bg-zinc-800/50 rounded-t-xl overflow-hidden">
+                    <div className="h-0.5 bg-zinc-800/50 rounded-t-xl overflow-hidden">
                       <div
                         className="h-full w-1/3 bg-gradient-to-r from-transparent via-emerald-400 to-transparent rounded-full"
                         style={{ animation: "shimmer 1.8s ease-in-out infinite" }}

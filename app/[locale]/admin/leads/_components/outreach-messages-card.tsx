@@ -247,7 +247,7 @@ export function OutreachMessagesCard({
         {/* Timeline of messages */}
         {hasMessages && !loading && (
           <div className="relative">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               {messages.map((msg, idx) => {
                 const cfg = STEP_CONFIGS[idx] || STEP_CONFIGS[0]
                 const isEditing = editingIdx === idx
@@ -277,7 +277,7 @@ export function OutreachMessagesCard({
                       </div>
                       {!isLast && (
                         <div
-                          className={`w-px flex-1 min-h-[16px] mt-1.5 bg-gradient-to-b ${cfg.line}`}
+                          className={`w-px flex-1 min-h-4 mt-1.5 bg-gradient-to-b ${cfg.line}`}
                         />
                       )}
                     </div>
@@ -488,7 +488,7 @@ function EmptyState({
           <OrbIcon size={56} />
         </div>
         <p className="text-sm font-semibold text-zinc-100 mb-1">{title}</p>
-        <p className="text-xs text-zinc-500 mb-5 max-w-[320px] leading-relaxed">{description}</p>
+        <p className="text-xs text-zinc-500 mb-5 max-w-80 leading-relaxed">{description}</p>
         <button
           type="button"
           onClick={onGenerate}

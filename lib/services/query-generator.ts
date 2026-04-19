@@ -1,5 +1,6 @@
 import OpenAI from "openai"
 import { buildKeywordSuggestionPrompt, buildSearchQueriesPrompt } from "@/lib/prompts"
+import { OPENAI_TEXT_MODEL } from "@/lib/models"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -37,7 +38,7 @@ export async function suggestKeywords(
   const competitors = safeParseArray(business.competitors)
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.4",
+    model: OPENAI_TEXT_MODEL,
     response_format: { type: "json_object" },
     messages: [
       {
@@ -80,7 +81,7 @@ export async function generateSearchQueries(
   const competitors = safeParseArray(business.competitors)
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.4",
+    model: OPENAI_TEXT_MODEL,
     response_format: { type: "json_object" },
     messages: [
       {

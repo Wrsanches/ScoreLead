@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { discoveryJob, lead } from "@/lib/db/schema"
-import { eq, and, count, avg, gte, lt, desc, sql, inArray } from "drizzle-orm"
+import { eq, and, count, avg, gte, desc, sql, inArray } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
+import { getActiveBusinessIdForUser } from "@/lib/active-business"
 
 export async function GET() {
   const session = await auth.api.getSession({
@@ -15,12 +16,21 @@ export async function GET() {
   }
 
   const userId = session.user.id
+  const activeBusinessId = await getActiveBusinessIdForUser(userId)
+  const businessScope = activeBusinessId
+    ? and(
+        eq(discoveryJob.userId, userId),
+        eq(discoveryJob.businessId, activeBusinessId),
+      )
+    : eq(discoveryJob.userId, userId)
 
-  // Get user's jobs
-  const userJobs = await db
-    .select({ id: discoveryJob.id })
-    .from(discoveryJob)
-    .where(eq(discoveryJob.userId, userId))
+  // Get jobs for the active business
+  const userJobs = activeBusinessId
+    ? await db
+        .select({ id: discoveryJob.id })
+        .from(discoveryJob)
+        .where(businessScope)
+    : []
 
   const jobIds = userJobs.map((j) => j.id)
   const hasJobs = jobIds.length > 0
@@ -49,7 +59,7 @@ export async function GET() {
         failed: count(sql`CASE WHEN ${discoveryJob.status} = 'failed' THEN 1 END`),
       })
       .from(discoveryJob)
-      .where(eq(discoveryJob.userId, userId)),
+      .where(businessScope),
     // Lead totals
     db
       .select({
@@ -135,7 +145,7 @@ export async function GET() {
         createdAt: discoveryJob.createdAt,
       })
       .from(discoveryJob)
-      .where(eq(discoveryJob.userId, userId))
+      .where(businessScope)
       .orderBy(desc(discoveryJob.createdAt))
       .limit(5),
     // Leads over time (last 7 days)

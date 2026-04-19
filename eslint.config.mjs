@@ -23,6 +23,16 @@ export default [
     },
   },
   {
-    ignores: [".next/", "node_modules/"],
+    // Skip build outputs, the bun/git-worktree mirror, generated assets,
+    // and migration SQL/meta. The worktree copy especially was drowning
+    // real warnings in "tsconfigRootDir" parse errors.
+    ignores: [
+      ".next/",
+      "node_modules/",
+      ".claude/",
+      "public/generated/",
+      "drizzle/",
+      "scripts/",
+    ],
   },
 ]

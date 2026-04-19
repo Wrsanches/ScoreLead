@@ -4,7 +4,7 @@ export default function SignUpLoading() {
   return (
     <div className="min-h-screen flex bg-zinc-950 lg:justify-center">
       {/* Branding side */}
-      <div className="hidden lg:flex lg:w-[500px] lg:shrink-0 items-center justify-end">
+      <div className="hidden lg:flex lg:w-125 lg:shrink-0 items-center justify-end">
         <div className="max-w-md px-12 w-full space-y-6">
           <div className="flex items-center gap-3 mb-10">
             <Skeleton className="w-10 h-10 rounded-lg bg-zinc-800" />
@@ -38,8 +38,8 @@ export default function SignUpLoading() {
       </div>
 
       {/* Form side */}
-      <div className="flex-1 lg:w-[500px] lg:flex-none flex items-center justify-center px-6 py-12 lg:justify-start lg:pl-20">
-        <div className="w-full max-w-[400px]">
+      <div className="flex-1 lg:w-125 lg:flex-none flex items-center justify-center px-6 py-12 lg:justify-start lg:pl-20">
+        <div className="w-full max-w-100">
           <div className="lg:hidden flex flex-col items-center mb-8">
             <Skeleton className="w-8 h-8 rounded-lg bg-zinc-800" />
             <Skeleton className="h-5 w-24 mt-2 bg-zinc-800" />

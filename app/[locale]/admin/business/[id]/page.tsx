@@ -15,8 +15,6 @@ import {
   Target,
   Pencil,
   ExternalLink,
-  Copy,
-  Check,
   RefreshCw,
   AlertCircle,
 } from "lucide-react"
@@ -26,7 +24,12 @@ import {
   SectionCard,
   LoadingState,
   EmptyState,
+  BrandColorPicker,
 } from "@/components/admin"
+import {
+  BusinessEditSheet,
+  type BusinessEditValues,
+} from "@/components/admin/business-edit-sheet"
 
 interface Business {
   id: string
@@ -46,6 +49,8 @@ interface Business {
   other: string | null
   location: string | null
   brandColors: string[] | null
+  brandColorPrimary: string | null
+  brandColorSecondary: string | null
   brandFonts: string[] | null
   brandStyle: string | null
   services: string | null
@@ -76,51 +81,6 @@ function parseTags(tags: string | null): string[] {
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean)
-}
-
-function ColorSwatch({ color }: { color: string }) {
-  const [copied, setCopied] = useState(false)
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(color)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
-    } catch {
-      // ignore
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={copy}
-      className="group flex items-center gap-3 p-2 pr-3 rounded-xl border border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900/40 transition-all duration-150 text-left"
-    >
-      <div
-        className="w-11 h-11 rounded-lg border border-zinc-800 shrink-0 shadow-inner"
-        style={{ backgroundColor: color }}
-      />
-      <div className="min-w-0">
-        <p className="text-sm text-zinc-200 font-mono tabular-nums uppercase truncate">
-          {color}
-        </p>
-        <p className="text-xs text-zinc-600 flex items-center gap-1">
-          {copied ? (
-            <>
-              <Check className="w-3 h-3 text-emerald-400" />
-              <span className="text-emerald-400">Copied</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3 h-3" />
-              <span className="group-hover:text-zinc-400 transition-colors">Copy</span>
-            </>
-          )}
-        </p>
-      </div>
-    </button>
-  )
 }
 
 function LinkRow({
@@ -169,6 +129,7 @@ export default function BusinessDetailPage({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshingBrand, setRefreshingBrand] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [brandError, setBrandError] = useState<string | null>(null)
 
   async function refreshBrand() {
@@ -184,20 +145,91 @@ export default function BusinessDetailPage({
       if (!res.ok) {
         throw new Error(body?.error || "Failed to refresh brand")
       }
-      setData((prev) =>
-        prev
-          ? {
-              ...prev,
-              brandColors: body.brandColors ?? null,
-              brandFonts: body.brandFonts ?? null,
-              brandStyle: body.brandStyle ?? null,
-            }
-          : prev,
-      )
+      setData((prev) => {
+        if (!prev) return prev
+        const nextColors: string[] | null = body.brandColors ?? null
+        const nextSet = new Set((nextColors || []).map((c) => c.toLowerCase()))
+        const keepPrimary =
+          prev.brandColorPrimary && nextSet.has(prev.brandColorPrimary.toLowerCase())
+            ? prev.brandColorPrimary
+            : null
+        const keepSecondary =
+          prev.brandColorSecondary && nextSet.has(prev.brandColorSecondary.toLowerCase())
+            ? prev.brandColorSecondary
+            : null
+        return {
+          ...prev,
+          brandColors: nextColors,
+          brandFonts: body.brandFonts ?? null,
+          brandStyle: body.brandStyle ?? null,
+          brandColorPrimary: keepPrimary,
+          brandColorSecondary: keepSecondary,
+        }
+      })
     } catch (e) {
       setBrandError(e instanceof Error ? e.message : "Failed to refresh brand")
     } finally {
       setRefreshingBrand(false)
+    }
+  }
+
+  async function updateBrandColors(update: {
+    brandColorPrimary?: string | null
+    brandColorSecondary?: string | null
+  }) {
+    const previous = data
+    setData((prev) => (prev ? { ...prev, ...update } : prev))
+    try {
+      const res = await fetch(`/api/businesses/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(update),
+      })
+      if (!res.ok) throw new Error("Failed")
+    } catch {
+      setData(previous)
+    }
+  }
+
+  async function handleEditSave(values: BusinessEditValues) {
+    const previous = data
+    // Optimistic merge so the page reflects the edit instantly.
+    setData((prev) =>
+      prev
+        ? {
+            ...prev,
+            name: values.name,
+            description: values.description || null,
+            persona: values.persona || null,
+            clientPersona: values.clientPersona || null,
+            field: values.field || null,
+            category: values.category || null,
+            tags: values.tags || null,
+            location: values.location || null,
+            language: values.language || prev.language,
+            logo: values.logo || null,
+            website: values.website || null,
+            instagram: values.instagram || null,
+            facebook: values.facebook || null,
+            linkedin: values.linkedin || null,
+            other: values.other || null,
+            services: values.services || null,
+            serviceArea: values.serviceArea || null,
+            competitors: values.competitors || null,
+            brandStyle: values.brandStyle || null,
+          }
+        : prev,
+    )
+    try {
+      const res = await fetch(`/api/businesses/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
+      if (!res.ok) throw new Error("Failed")
+    } catch {
+      setData(previous)
+      throw new Error("Save failed")
     }
   }
 
@@ -316,9 +348,8 @@ export default function BusinessDetailPage({
 
                 <button
                   type="button"
-                  disabled
-                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-500 border border-zinc-800 rounded-lg cursor-not-allowed"
-                  title={t("editComingSoon")}
+                  onClick={() => setEditOpen(true)}
+                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-300 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/40 hover:text-white rounded-lg transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   {t("edit")}
@@ -400,11 +431,17 @@ export default function BusinessDetailPage({
                   <div className="space-y-5">
                     {hasBrandColors && (
                       <Field label={t("brandColors")}>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                          {data.brandColors!.map((color) => (
-                            <ColorSwatch key={color} color={color} />
-                          ))}
-                        </div>
+                        <BrandColorPicker
+                          colors={data.brandColors!}
+                          primary={data.brandColorPrimary}
+                          secondary={data.brandColorSecondary}
+                          onPrimaryChange={(color) =>
+                            updateBrandColors({ brandColorPrimary: color })
+                          }
+                          onSecondaryChange={(color) =>
+                            updateBrandColors({ brandColorSecondary: color })
+                          }
+                        />
                       </Field>
                     )}
                     {hasBrandFonts && (
@@ -497,6 +534,35 @@ export default function BusinessDetailPage({
           )}
         </ContentWrapper>
       </div>
+
+      {data && (
+        <BusinessEditSheet
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          defaults={{
+            name: data.name ?? "",
+            description: data.description ?? "",
+            persona: data.persona ?? "",
+            clientPersona: data.clientPersona ?? "",
+            field: data.field ?? "",
+            category: data.category ?? "",
+            tags: data.tags ?? "",
+            location: data.location ?? "",
+            language: data.language ?? "",
+            logo: data.logo ?? "",
+            website: data.website ?? "",
+            instagram: data.instagram ?? "",
+            facebook: data.facebook ?? "",
+            linkedin: data.linkedin ?? "",
+            other: data.other ?? "",
+            services: data.services ?? "",
+            serviceArea: data.serviceArea ?? "",
+            competitors: data.competitors ?? "",
+            brandStyle: data.brandStyle ?? "",
+          }}
+          onSubmit={handleEditSave}
+        />
+      )}
     </>
   )
 }

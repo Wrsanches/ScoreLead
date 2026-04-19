@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useActiveBusiness } from "@/components/admin/active-business-context"
 import {
   MapPin,
   Search,
@@ -25,6 +26,21 @@ export default function NewDiscoveryJobPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const savedSearchId = searchParams.get("savedSearchId")
+  const { activeBusinessId } = useActiveBusiness()
+
+  // If the user switches businesses mid-form, bounce back to the jobs list
+  // for the newly selected business instead of letting them accidentally
+  // create a job under the wrong org.
+  const initialBusinessRef = useRef<string | null | undefined>(undefined)
+  useEffect(() => {
+    if (initialBusinessRef.current === undefined) {
+      initialBusinessRef.current = activeBusinessId
+      return
+    }
+    if (initialBusinessRef.current !== activeBusinessId) {
+      router.replace("/admin/discovery-jobs")
+    }
+  }, [activeBusinessId, router])
 
   // Form state
   const [jobName, setJobName] = useState("")
@@ -394,7 +410,7 @@ export default function NewDiscoveryJobPage() {
                 {/* Custom keywords input */}
                 <div>
                   <label className="block text-sm text-zinc-300 mb-2">{t("keywords")}</label>
-                  <div className="min-h-[44px] flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus-within:border-zinc-700 transition-colors">
+                  <div className="min-h-11 flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus-within:border-zinc-700 transition-colors">
                     {keywords.map((kw) => (
                       <span
                         key={kw}
@@ -422,7 +438,7 @@ export default function NewDiscoveryJobPage() {
                       onBlur={addKeyword}
                       disabled={isSubmitting}
                       placeholder={keywords.length === 0 ? t("keywordsPlaceholder") : "Add more..."}
-                      className="flex-1 min-w-[120px] bg-transparent text-sm text-zinc-200 placeholder:text-zinc-700 focus:outline-none disabled:opacity-50"
+                      className="flex-1 min-w-30 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-700 focus:outline-none disabled:opacity-50"
                     />
                   </div>
                   <p className="text-zinc-600 text-xs mt-1.5">Press Enter to add custom keywords. Click suggestions above to toggle them.</p>

@@ -1,7 +1,7 @@
 export default function OnboardingLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-xl relative z-10">
         <div className="flex flex-col items-center mb-10">

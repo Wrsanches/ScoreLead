@@ -3,41 +3,44 @@
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Users } from "lucide-react"
-import { useRouter } from "@/i18n/routing"
 import {
   PageHeader,
   LoadingState,
   EmptyState,
 } from "@/components/admin"
+import { LeadDetailModal } from "@/components/admin/lead-detail-modal"
+import { useActiveBusiness } from "@/components/admin/active-business-context"
 import { LeadsKanban } from "../_components/leads-kanban"
 import type { Lead, LeadStatus } from "../_shared"
 
 export default function LeadsKanbanPage() {
   const t = useTranslations("dashboard")
-  const router = useRouter()
+  const { activeBusinessId } = useActiveBusiness()
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  const selectedLead = leads.find((l) => l.id === selectedLeadId) ?? null
 
   useEffect(() => {
-    let cancelled = false
+    const controller = new AbortController()
     async function fetchLeads() {
+      setLoading(true)
       try {
-        // Kanban shows every lead up front; no pagination.
-        const res = await fetch("/api/leads?page=1&limit=200&sortBy=score&sortOrder=desc")
+        const res = await fetch(
+          "/api/leads?page=1&limit=200&sortBy=score&sortOrder=desc",
+          { signal: controller.signal },
+        )
         if (!res.ok) throw new Error("Failed")
         const data = await res.json()
-        if (!cancelled) setLeads(data.leads)
-      } catch {
-        /* noop */
-      } finally {
-        if (!cancelled) setLoading(false)
+        if (!controller.signal.aborted) setLeads(data.leads)
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return
       }
+      if (!controller.signal.aborted) setLoading(false)
     }
     fetchLeads()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    return () => controller.abort()
+  }, [activeBusinessId])
 
   async function handleStatusChange(leadId: string, nextStatus: LeadStatus) {
     // Optimistic update with rollback on failure
@@ -58,8 +61,7 @@ export default function LeadsKanbanPage() {
   }
 
   function handleCardClick(leadId: string) {
-    // Jump to the list view with the lead pre-selected via the search context
-    router.push(`/admin/leads?focus=${leadId}`)
+    setSelectedLeadId(leadId)
   }
 
   return (
@@ -88,6 +90,15 @@ export default function LeadsKanbanPage() {
           onCardClick={handleCardClick}
         />
       )}
+
+      <LeadDetailModal
+        lead={selectedLead}
+        open={selectedLeadId !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedLeadId(null)
+        }}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   )
 }

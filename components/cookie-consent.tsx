@@ -34,7 +34,7 @@ export function CookieConsent() {
           : "translate-y-4 opacity-0 pointer-events-none"
       }`}
     >
-      <div className="w-full md:w-[340px] rounded-xl border border-zinc-800 bg-zinc-950/95 backdrop-blur-xl shadow-2xl shadow-black/40 p-5">
+      <div className="w-full md:w-85 rounded-xl border border-zinc-800 bg-zinc-950/95 backdrop-blur-xl shadow-2xl shadow-black/40 p-5">
         <div className="flex items-center gap-2.5 mb-3">
           <div className="w-8 h-8 rounded-lg bg-zinc-800/80 flex items-center justify-center">
             <Cookie className="w-4 h-4 text-zinc-400" />

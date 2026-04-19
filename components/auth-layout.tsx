@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { useTranslations } from "next-intl"
-import { ScoreLeadLogo } from "@/components/scorelead-logo"
-import { Link } from "@/i18n/routing"
-import { motion } from "framer-motion"
-import Image from "next/image"
+import { ReactNode } from "react";
+import { useTranslations } from "next-intl";
+import { ScoreLeadLogo } from "@/components/scorelead-logo";
+import { Link } from "@/i18n/routing";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 const avatars = [
   "/images/avatars/avatar-1.jpg",
@@ -13,7 +13,7 @@ const avatars = [
   "/images/avatars/avatar-3.jpg",
   "/images/avatars/avatar-4.jpg",
   "/images/avatars/avatar-5.jpg",
-]
+];
 
 function AvatarStack({ label }: { label: string }) {
   return (
@@ -32,12 +32,22 @@ function AvatarStack({ label }: { label: string }) {
       </div>
       <span className="text-sm text-zinc-400">{label}</span>
     </div>
-  )
+  );
 }
 
-function BrandingSide({ heading, description, joinLabel, stats }: { heading: string; description: string; joinLabel: string; stats: { value: string; label: string }[] }) {
+function BrandingSide({
+  heading,
+  description,
+  joinLabel,
+  stats,
+}: {
+  heading: string;
+  description: string;
+  joinLabel: string;
+  stats: { value: string; label: string }[];
+}) {
   return (
-    <div className="hidden lg:flex lg:w-[500px] lg:shrink-0 bg-zinc-950 items-center justify-end">
+    <div className="hidden lg:flex lg:w-125 lg:shrink-0 bg-zinc-950 items-center justify-end">
       <div className="max-w-md px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -77,7 +87,7 @@ function BrandingSide({ heading, description, joinLabel, stats }: { heading: str
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
 
 export function GoogleButton({ onClick }: { onClick?: () => void }) {
@@ -109,7 +119,7 @@ export function GoogleButton({ onClick }: { onClick?: () => void }) {
       </svg>
       Google
     </motion.button>
-  )
+  );
 }
 
 export function GitHubButton() {
@@ -124,7 +134,7 @@ export function GitHubButton() {
       </svg>
       GitHub
     </motion.button>
-  )
+  );
 }
 
 export function OrDivider({ label }: { label: string }) {
@@ -139,7 +149,7 @@ export function OrDivider({ label }: { label: string }) {
         </span>
       </div>
     </div>
-  )
+  );
 }
 
 export function AuthLayout({
@@ -147,11 +157,11 @@ export function AuthLayout({
   brandingDescription,
   children,
 }: {
-  brandingHeading: string
-  brandingDescription: string
-  children: ReactNode
+  brandingHeading: string;
+  brandingDescription: string;
+  children: ReactNode;
 }) {
-  const t = useTranslations("auth")
+  const t = useTranslations("auth");
 
   return (
     <div className="min-h-screen flex bg-zinc-950 lg:justify-center">
@@ -166,9 +176,9 @@ export function AuthLayout({
         ]}
       />
 
-      <div className="flex-1 lg:w-[500px] lg:flex-none flex items-center justify-center px-6 py-12 lg:justify-start lg:pl-20">
+      <div className="flex-1 lg:w-125 lg:flex-none flex items-center justify-center px-6 py-12 lg:justify-start lg:pl-20">
         <motion.div
-          className="w-full max-w-[400px] relative z-10"
+          className="w-full max-w-100 relative z-10"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
@@ -186,5 +196,5 @@ export function AuthLayout({
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

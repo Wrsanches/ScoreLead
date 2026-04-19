@@ -289,8 +289,8 @@ export function WorkflowsSection() {
             style={{ transform: `translateX(-${scrollPosition * (100 / 4)}%)` }}
           >
             {translatedCards.map((card) => (
-              <div key={card.id} className="shrink-0 w-[calc(25%-12px)] min-w-[280px]">
-                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl overflow-hidden h-[340px] flex flex-col">
+              <div key={card.id} className="shrink-0 w-[calc(25%-12px)] min-w-70">
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl overflow-hidden h-85 flex flex-col">
                   <div className="flex-1 relative overflow-hidden">
                     <CardMockup type={card.mockup} />
                     <div

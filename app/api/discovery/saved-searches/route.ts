@@ -5,6 +5,7 @@ import { eq, and, desc } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { getActiveBusinessIdForUser } from "@/lib/active-business"
 
 const createSchema = z.object({
   businessId: z.string(),
@@ -25,10 +26,20 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  const activeBusinessId = await getActiveBusinessIdForUser(session.user.id)
+  if (!activeBusinessId) {
+    return NextResponse.json([])
+  }
+
   const searches = await db
     .select()
     .from(savedSearch)
-    .where(eq(savedSearch.userId, session.user.id))
+    .where(
+      and(
+        eq(savedSearch.userId, session.user.id),
+        eq(savedSearch.businessId, activeBusinessId),
+      ),
+    )
     .orderBy(desc(savedSearch.createdAt))
 
   return NextResponse.json(searches)

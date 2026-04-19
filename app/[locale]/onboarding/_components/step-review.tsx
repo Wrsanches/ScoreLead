@@ -1,16 +1,17 @@
 "use client"
 
-import { useState, useCallback } from "react"
 import { useTranslations } from "next-intl"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { CheckCircle, Loader2, ArrowLeft, X, Upload, ImageIcon, Check, CornerDownLeft } from "lucide-react"
+import { CheckCircle, Loader2, ArrowLeft, Upload, ImageIcon, Check } from "lucide-react"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { getTranslatedCategories } from "@/lib/categories"
 import { ChevronDown } from "lucide-react"
 import { useLocale } from "next-intl"
+import { BrandColorPicker } from "@/components/admin/brand-color-picker"
+import { TagsInput } from "@/components/admin/tags-input"
 
 function createReviewSchema(t: (key: string) => string) {
   return z.object({
@@ -31,6 +32,11 @@ interface StepReviewProps {
   defaultValues?: Partial<ReviewValues>
   logo?: string | null
   onLogoChange?: (logo: string | null) => void
+  brandColors?: string[]
+  primaryColor?: string | null
+  secondaryColor?: string | null
+  onPrimaryColorChange?: (color: string | null) => void
+  onSecondaryColorChange?: (color: string | null) => void
   onSubmit: (data: ReviewValues) => void
   onBack?: () => void
   isSubmitting: boolean
@@ -41,109 +47,21 @@ const EASE = [0.25, 0.46, 0.45, 0.94] as const
 const inputClasses =
   "w-full px-4 py-3 bg-zinc-800/20 border border-zinc-800/80 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
 
-function TagsInput({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string
-  onChange: (value: string) => void
-  placeholder: string
-}) {
-  const [inputValue, setInputValue] = useState("")
-
-  const tags = value
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean)
-
-  const addTag = useCallback(
-    (tag: string) => {
-      const trimmed = tag.trim()
-      if (!trimmed || tags.includes(trimmed) || tags.length >= 12) return
-      const next = [...tags, trimmed].join(", ")
-      onChange(next)
-      setInputValue("")
-    },
-    [tags, onChange],
-  )
-
-  const removeTag = useCallback(
-    (index: number) => {
-      const next = tags.filter((_, i) => i !== index).join(", ")
-      onChange(next)
-    },
-    [tags, onChange],
-  )
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault()
-      addTag(inputValue)
-    }
-    if (e.key === "Backspace" && !inputValue && tags.length > 0) {
-      removeTag(tags.length - 1)
-    }
-  }
-
-  return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-2">
-        <AnimatePresence>
-          {tags.map((tag, i) => (
-            <motion.span
-              key={tag}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.15 }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => removeTag(i)}
-                className="text-emerald-400/60 hover:text-emerald-300 transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </motion.span>
-          ))}
-        </AnimatePresence>
-      </div>
-      {tags.length < 12 ? (
-        <div className="relative">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={() => addTag(inputValue)}
-            placeholder={tags.length === 0 ? placeholder : "Add more..."}
-            className={`${inputClasses} pr-20`}
-          />
-          <button
-            type="button"
-            onClick={() => addTag(inputValue)}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-              inputValue.trim()
-                ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
-                : "bg-zinc-800/40 text-zinc-600"
-            }`}
-          >
-            <CornerDownLeft className="w-3 h-3" />
-            Enter
-          </button>
-        </div>
-      ) : (
-        <p className="text-xs text-zinc-500 mt-1">Maximum of 12 tags reached</p>
-      )}
-    </div>
-  )
-}
-
-export function StepReview({ defaultValues, logo, onLogoChange, onSubmit, onBack, isSubmitting }: StepReviewProps) {
+export function StepReview({
+  defaultValues,
+  logo,
+  onLogoChange,
+  brandColors = [],
+  primaryColor = null,
+  secondaryColor = null,
+  onPrimaryColorChange,
+  onSecondaryColorChange,
+  onSubmit,
+  onBack,
+  isSubmitting,
+}: StepReviewProps) {
   const t = useTranslations("onboarding")
+  const tBusiness = useTranslations("business")
   const locale = useLocale()
   const categories = getTranslatedCategories(locale)
   const reviewSchema = createReviewSchema(t)
@@ -253,6 +171,26 @@ export function StepReview({ defaultValues, logo, onLogoChange, onSubmit, onBack
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+        {brandColors.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: EASE }}
+          >
+            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-3 font-medium">
+              {tBusiness("brandColors")}
+            </label>
+            <BrandColorPicker
+              colors={brandColors}
+              primary={primaryColor}
+              secondary={secondaryColor}
+              onPrimaryChange={(c) => onPrimaryColorChange?.(c)}
+              onSecondaryChange={(c) => onSecondaryColorChange?.(c)}
+            />
+            <div className="h-px bg-zinc-800/60 my-6" />
+          </motion.div>
+        )}
+
         {groups.map((group, groupIndex) => (
           <motion.div
             key={group.label}

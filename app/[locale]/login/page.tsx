@@ -106,9 +106,12 @@ export default function LoginPage() {
                 >
                   {t("password")}
                 </label>
-                <a className="text-xs text-zinc-500 hover:text-emerald-400 cursor-pointer transition-colors duration-200">
+                <button
+                  type="button"
+                  className="text-xs text-zinc-500 hover:text-emerald-400 cursor-pointer transition-colors duration-200"
+                >
                   {t("forgotPassword")}
-                </a>
+                </button>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors duration-200 group-focus-within:text-zinc-400" />

@@ -2,20 +2,35 @@
 
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { ChevronRight } from "lucide-react"
 
 const featureCards = [
   {
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-        <img src="/images/radar-discovery.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
+        <Image
+          src="/images/radar-discovery.svg"
+          alt=""
+          fill
+          className="object-contain"
+          aria-hidden="true"
+          unoptimized
+        />
       </div>
     ),
   },
   {
     illustration: (
       <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-        <img src="/images/lead-scoring.svg" alt="" className="max-w-full max-h-full" aria-hidden="true" />
+        <Image
+          src="/images/lead-scoring.svg"
+          alt=""
+          fill
+          className="object-contain"
+          aria-hidden="true"
+          unoptimized
+        />
       </div>
     ),
   },
@@ -125,7 +140,7 @@ export function FeatureCardsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                className="bg-zinc-900/50 border border-zinc-800 overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-[320px] lg:min-h-[360px]"
+                className="bg-zinc-900/50 border border-zinc-800 overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-80 lg:min-h-90"
               >
                 <div
                   className="absolute top-0 left-0 w-full flex"

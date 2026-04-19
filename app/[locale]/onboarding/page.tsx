@@ -37,6 +37,7 @@ interface BusinessProfile {
   field: string
   category: string
   tags: string[]
+  brandColors: string[]
 }
 
 function parseTags(raw: string): string[] {
@@ -64,6 +65,8 @@ export default function OnboardingPage() {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("scraping")
   const [profile, setProfile] = useState<BusinessProfile | null>(null)
   const [logo, setLogo] = useState<string | null>(null)
+  const [primaryColor, setPrimaryColor] = useState<string | null>(null)
+  const [secondaryColor, setSecondaryColor] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isHydrating, setIsHydrating] = useState(true)
@@ -124,7 +127,10 @@ export default function OnboardingPage() {
             field: biz.field,
             category: biz.category,
             tags: biz.tags ? parseTags(biz.tags) : [],
+            brandColors: Array.isArray(biz.brandColors) ? biz.brandColors : [],
           })
+          setPrimaryColor(biz.brandColorPrimary || null)
+          setSecondaryColor(biz.brandColorSecondary || null)
           setStep("review")
         }
       } catch {
@@ -230,8 +236,11 @@ export default function OnboardingPage() {
       }
 
       const { profile: result, logo: fetchedLogo } = await response.json()
-      setProfile(result)
+      const colors: string[] = Array.isArray(result?.brandColors) ? result.brandColors : []
+      setProfile({ ...result, brandColors: colors })
       if (fetchedLogo) setLogo(fetchedLogo)
+      setPrimaryColor((prev) => prev ?? colors[0] ?? null)
+      setSecondaryColor((prev) => prev ?? colors[1] ?? null)
       goTo("review")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -262,6 +271,8 @@ export default function OnboardingPage() {
           services: JSON.stringify(targeting.services),
           serviceArea: targeting.serviceArea,
           competitors: JSON.stringify(targeting.competitors),
+          brandColorPrimary: primaryColor,
+          brandColorSecondary: secondaryColor,
         }),
       })
 
@@ -299,7 +310,7 @@ export default function OnboardingPage() {
       <NeuralBackground />
 
       {/* Ambient glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
 
       <motion.div
         className="w-full max-w-xl relative z-10"
@@ -438,6 +449,11 @@ export default function OnboardingPage() {
                     }
                     logo={logo}
                     onLogoChange={setLogo}
+                    brandColors={profile?.brandColors ?? []}
+                    primaryColor={primaryColor}
+                    secondaryColor={secondaryColor}
+                    onPrimaryColorChange={setPrimaryColor}
+                    onSecondaryColorChange={setSecondaryColor}
                     onSubmit={handleReviewSubmit}
                     onBack={() => goTo("targeting")}
                     isSubmitting={isSubmitting}

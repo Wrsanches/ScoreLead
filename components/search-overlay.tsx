@@ -1,65 +1,78 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useCallback, createContext, useContext } from "react"
-import { Search, X } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { AnimatePresence, motion } from "framer-motion"
-import { AiOrb } from "@/components/ai-orb"
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
+import Image from "next/image";
+import { Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { AiOrb } from "@/components/ai-orb";
 
 interface SearchResult {
-  id: string
-  name: string | null
-  city: string | null
-  state: string | null
-  country: string | null
-  websiteDomain: string | null
-  score: number
-  photoUrl: string | null
-  status: string
+  id: string;
+  name: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  websiteDomain: string | null;
+  score: number;
+  photoUrl: string | null;
+  status: string;
 }
 
 // ── Context for opening search from anywhere ──────────────
 
 interface SearchContextValue {
-  open: () => void
-  selectedLeadId: string | null
-  clearSelectedLead: () => void
+  open: () => void;
+  selectedLeadId: string | null;
+  setSelectedLead: (id: string) => void;
+  clearSelectedLead: () => void;
 }
 
 const SearchContext = createContext<SearchContextValue>({
   open: () => {},
   selectedLeadId: null,
+  setSelectedLead: () => {},
   clearSelectedLead: () => {},
-})
+});
 
 export function useSearch() {
-  return useContext(SearchContext)
+  return useContext(SearchContext);
 }
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault()
-        setIsOpen(true)
+        e.preventDefault();
+        setIsOpen(true);
       }
       if (e.key === "Escape") {
-        setIsOpen(false)
+        setIsOpen(false);
       }
     }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
-    <SearchContext.Provider value={{
-      open: () => setIsOpen(true),
-      selectedLeadId,
-      clearSelectedLead: () => setSelectedLeadId(null),
-    }}>
+    <SearchContext.Provider
+      value={{
+        open: () => setIsOpen(true),
+        selectedLeadId,
+        setSelectedLead: setSelectedLeadId,
+        clearSelectedLead: () => setSelectedLeadId(null),
+      }}
+    >
       {children}
       <SearchOverlay
         isOpen={isOpen}
@@ -67,7 +80,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         onSelectLead={setSelectedLeadId}
       />
     </SearchContext.Provider>
-  )
+  );
 }
 
 // ── Overlay ───────────────────────────────────────────────
@@ -77,92 +90,97 @@ function SearchOverlay({
   onClose,
   onSelectLead,
 }: {
-  isOpen: boolean
-  onClose: () => void
-  onSelectLead: (id: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectLead: (id: string) => void;
 }) {
-  const router = useRouter()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [query, setQuery] = useState("")
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [loading, setLoading] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const abortRef = useRef<AbortController | null>(null)
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setQuery("")
-      setResults([])
-      setHasSearched(false)
-      setSelectedIndex(0)
-      setTimeout(() => inputRef.current?.focus(), 50)
+      setQuery("");
+      setResults([]);
+      setHasSearched(false);
+      setSelectedIndex(0);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const search = useCallback(async (q: string) => {
-    abortRef.current?.abort()
+    abortRef.current?.abort();
 
     if (q.length < 2) {
-      setResults([])
-      setHasSearched(false)
-      setLoading(false)
-      return
+      setResults([]);
+      setHasSearched(false);
+      setLoading(false);
+      return;
     }
 
-    const controller = new AbortController()
-    abortRef.current = controller
-    setLoading(true)
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/leads/search?q=${encodeURIComponent(q)}`, {
         signal: controller.signal,
-      })
+      });
       if (res.ok) {
-        const data = await res.json()
-        setResults(data.results)
-        setSelectedIndex(0)
-        setHasSearched(true)
+        const data = await res.json();
+        setResults(data.results);
+        setSelectedIndex(0);
+        setHasSearched(true);
       }
     } catch {
       // Aborted or failed
     }
-    setLoading(false)
-  }, [])
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => search(query), 200)
-    return () => clearTimeout(timer)
-  }, [query, search])
+    const timer = setTimeout(() => search(query), 200);
+    return () => clearTimeout(timer);
+  }, [query, search]);
 
   function navigateToLead(id: string) {
-    onClose()
-    onSelectLead(id)
-    router.push("/admin/leads")
+    onClose();
+    onSelectLead(id);
+    router.push("/admin/leads");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
-      e.preventDefault()
-      setSelectedIndex((i) => Math.min(i + 1, results.length - 1))
+      e.preventDefault();
+      setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      setSelectedIndex((i) => Math.max(i - 1, 0))
+      e.preventDefault();
+      setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && results[selectedIndex]) {
-      e.preventDefault()
-      navigateToLead(results[selectedIndex].id)
+      e.preventDefault();
+      navigateToLead(results[selectedIndex].id);
     }
   }
 
   function scoreColor(score: number) {
-    if (score >= 4) return "text-emerald-400 bg-emerald-500/10"
-    if (score >= 3) return "text-amber-400 bg-amber-500/10"
-    return "text-red-400 bg-red-500/10"
+    if (score >= 4) return "text-emerald-400 bg-emerald-500/10";
+    if (score >= 3) return "text-amber-400 bg-amber-500/10";
+    return "text-red-400 bg-red-500/10";
   }
 
   function getInitials(name: string | null) {
-    if (!name) return "?"
-    return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   }
 
   return (
@@ -173,7 +191,7 @@ function SearchOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4"
+          className="fixed inset-0 z-100 flex items-start justify-center pt-[15vh] px-4"
           onClick={onClose}
         >
           {/* Backdrop */}
@@ -222,7 +240,7 @@ function SearchOverlay({
 
             {/* Results */}
             {query.length >= 2 && (
-              <div className="max-h-[320px] overflow-auto">
+              <div className="max-h-80 overflow-auto">
                 {loading || !hasSearched ? (
                   <div className="px-4 py-8 flex items-center justify-center">
                     <div className="w-4 h-4 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin" />
@@ -239,14 +257,19 @@ function SearchOverlay({
                         onClick={() => navigateToLead(result.id)}
                         onMouseEnter={() => setSelectedIndex(i)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                          i === selectedIndex ? "bg-zinc-800/70" : "hover:bg-zinc-800/40"
+                          i === selectedIndex
+                            ? "bg-zinc-800/70"
+                            : "hover:bg-zinc-800/40"
                         }`}
                       >
                         {result.photoUrl ? (
-                          <img
+                          <Image
                             src={result.photoUrl}
                             alt=""
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover shrink-0"
+                            unoptimized
                           />
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
@@ -262,10 +285,14 @@ function SearchOverlay({
                           <p className="text-xs text-zinc-500 truncate">
                             {[result.city, result.state, result.country]
                               .filter(Boolean)
-                              .join(", ") || result.websiteDomain || "No location"}
+                              .join(", ") ||
+                              result.websiteDomain ||
+                              "No location"}
                           </p>
                         </div>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums shrink-0 ${scoreColor(result.score)}`}>
+                        <span
+                          className={`text-xs font-bold px-2 py-0.5 rounded-lg tabular-nums shrink-0 ${scoreColor(result.score)}`}
+                        >
                           {result.score.toFixed(1)}
                         </span>
                       </button>
@@ -278,12 +305,14 @@ function SearchOverlay({
             {/* Footer hints */}
             {query.length < 2 && (
               <div className="px-4 py-6 text-center">
-                <p className="text-zinc-600 text-xs">Type at least 2 characters to search</p>
+                <p className="text-zinc-600 text-xs">
+                  Type at least 2 characters to search
+                </p>
               </div>
             )}
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

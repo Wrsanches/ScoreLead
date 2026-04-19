@@ -168,6 +168,103 @@ Be concise and accurate. If information is unclear, make reasonable inferences f
 }
 
 // ---------------------------------------------------------------------------
+// content-calendar-generator.ts
+// ---------------------------------------------------------------------------
+
+export interface ContentCalendarPromptParams {
+  languageLabel: string
+  monthLabel: string
+  /** Optional hard target. When omitted, the model chooses based on business context. */
+  postCount?: number
+  startDateIso: string
+  endDateIso: string
+}
+
+export function buildContentCalendarPrompt(
+  params: ContentCalendarPromptParams,
+): string {
+  const { languageLabel, monthLabel, postCount, startDateIso, endDateIso } = params
+
+  const countLine = postCount
+    ? `You will produce exactly ${postCount} posts scheduled between ${startDateIso} and ${endDateIso} (this is ${monthLabel}).`
+    : `Decide how many posts to produce based on the business profile. Use these heuristics:
+- **B2C lifestyle / fashion / food / beauty / fitness / travel**: 16-22 posts per month. Audiences expect near-daily content.
+- **B2C services (pottery studio, gym, salon, cafe)**: 12-18 posts per month. Quality over volume.
+- **B2B / professional services / agencies / SaaS**: 8-14 posts per month. Cadence matters less than depth.
+- **Solo creators / freelancers / early brands**: 8-12 posts per month. Sustainable beats ambitious.
+- Scale up for long months (31 days), down for short months (Feb = 28/29).
+- Scale down if the brand voice is clearly selective/premium (luxury, minimal, artisanal).
+- NEVER go below 6 or above 26.
+Commit to a number up front, then generate exactly that many posts scheduled between ${startDateIso} and ${endDateIso} (this is ${monthLabel}).`
+
+  return `You are an expert Instagram content strategist and copywriter planning an entire month of high-performing posts for a small business.
+
+${countLine} All captions, CTAs, visualIdea text and hashtags must be written in ${languageLabel}.
+
+CONTENT PILLAR MIX (enforce these weights across all posts):
+- educate: ~40% - tips, how-tos, frameworks, myth-busting. These drive SAVES (the strongest algorithm signal in 2024+).
+- showcase: ~20% - product shots, process, portfolio, before/after.
+- story: ~15% - behind-the-scenes, founder voice, humanize the brand.
+- proof: ~10% - testimonials, reviews, case studies, numbers.
+- engagement: ~15% - questions, polls, "this or that", carousels that ask the viewer to comment.
+
+FORMAT MIX (enforce per week of posts):
+- ~55% reel - priority format; Instagram heavily boosts Reels for discovery.
+- ~30% carousel - best for educate; drives saves and long watch time.
+- ~15% single - reserved for a single strong photograph or a bold quote.
+- Do NOT use "story" as postType in the generated plan (ephemeral stories are not scheduled here).
+- Valid postType values: "single" | "carousel" | "reel".
+
+CONTENT-TO-FORMAT RULES (these override the format mix when the content calls for it - match format to substance, not quota):
+- If the caption hook starts with a number+noun ("5 things", "3 mistakes", "7 ways", "10 tips", "4 steps") or implies a list/checklist/breakdown → MUST be "carousel". Lists are carousels. Always. Never single.
+- If the caption teaches a framework, walks through steps, or compares options (A vs B) → "carousel".
+- If the caption shows a transformation, a time-lapse, a process, a demo, a reaction, or anything that benefits from motion → "reel".
+- If the caption is ONE strong sentence (quote, stat, proof point, bold claim) OR a single hero photograph → "single".
+- If the caption asks a direct question that wants comments → "single" or "carousel" (open-ended question on a single; "this or that" or poll on a carousel).
+- When in doubt, prefer "carousel" for educate/proof and "reel" for showcase/story/engagement.
+
+SCHEDULING RULES:
+- Spread posts evenly across the month (do not stack many on the same day).
+- Weight feed posts toward Tue/Wed/Thu, then Mon/Fri, then weekends. Reels can go on any day.
+- No more than 1 post per day.
+- Every scheduledFor date must fall between ${startDateIso} and ${endDateIso}, inclusive.
+- Use ISO 8601 UTC timestamps with a time component (e.g. "2025-04-15T14:00:00Z"). Prefer 11:00, 14:00, or 19:00 UTC.
+
+CAPTION RULES (this is where posts win or lose):
+- First line is the HOOK. It must be under 80 characters, stand on its own, and earn the tap on "more" (curiosity, bold claim, specific number, or a punchy question).
+- After the hook, add 2-6 short lines of value or story. Use line breaks (\\n\\n) for readability.
+- End with a clear CTA that matches the pillar: "Save this", "Share with someone who...", "Comment [emoji] if this hits", "DM me for the full guide", etc.
+- Hard cap: 2200 characters total per caption.
+- Do NOT use corporate clichés ("unlock", "game-changer", "crush it", "level up") or em dashes.
+- Feel like a real person wrote it, not a template.
+
+HASHTAG RULES:
+- 5-10 per post, lowercase, no "#" prefix in the JSON array.
+- Mix: 2-3 niche category tags, 2-3 audience tags, 1-2 location tags if location is provided, 1-2 brand-adjacent lifestyle tags.
+- Prefer niche tags (100k-500k posts) over giant generic ones (#love, #instagood).
+
+VISUAL IDEA RULES:
+- 1-3 sentences describing what to shoot/design.
+- When brand colors are provided, explicitly reference them so the monthly grid feels cohesive.
+- Be concrete: name the subject, composition, and mood.
+
+OUTPUT SHAPE - return ONLY valid JSON in this exact form:
+{
+  "posts": [
+    {
+      "scheduledFor": "YYYY-MM-DDTHH:MM:SSZ",
+      "postType": "reel" | "carousel" | "single",
+      "pillar": "educate" | "showcase" | "story" | "proof" | "engagement",
+      "caption": "hook line\\n\\nbody\\n\\nCTA",
+      "hashtags": ["tag1", "tag2"],
+      "visualIdea": "1-3 sentences on the visual",
+      "callToAction": "short CTA verb phrase, e.g. 'Save for later'"
+    }
+  ]
+}`
+}
+
+// ---------------------------------------------------------------------------
 // outreach-messages.ts
 // ---------------------------------------------------------------------------
 

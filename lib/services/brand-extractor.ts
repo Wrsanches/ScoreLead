@@ -1,5 +1,6 @@
 import OpenAI from "openai"
 import { BRAND_EXTRACTOR_PROMPT } from "@/lib/prompts"
+import { OPENAI_TEXT_MODEL } from "@/lib/models"
 import { scrapeUrl, type ScrapeResult } from "./firecrawl"
 
 const openai = new OpenAI({
@@ -162,7 +163,7 @@ async function extractWithLLM(rawHtml: string): Promise<LLMBrandResult> {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.4",
+      model: OPENAI_TEXT_MODEL,
       response_format: { type: "json_object" },
       messages: [
         {

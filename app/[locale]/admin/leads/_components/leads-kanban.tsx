@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
+import { useMemo, useState } from "react";
+import Image from "next/image";
 import {
   DndContext,
   DragOverlay,
@@ -13,26 +14,30 @@ import {
   useDroppable,
   type DragEndEvent,
   type DragStartEvent,
-} from "@dnd-kit/core"
-import { CSS } from "@dnd-kit/utilities"
-import { Mail, Phone, Globe, MapPin, Bot, GripVertical } from "lucide-react"
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { Mail, Phone, Globe, MapPin, Bot, GripVertical } from "lucide-react";
 import {
   LEAD_STATUS_KEYS,
   STATUS_CONFIG,
   type Lead,
   type LeadStatus,
-} from "../_shared"
-import { StatNumber } from "@/components/admin"
-import { getInitials, scoreBadgeClasses } from "@/lib/admin-utils"
+} from "../_shared";
+import { StatNumber } from "@/components/admin";
+import { getInitials, scoreBadgeClasses } from "@/lib/admin-utils";
 
 interface LeadsKanbanProps {
-  leads: Lead[]
-  onStatusChange: (leadId: string, status: LeadStatus) => void
-  onCardClick?: (leadId: string) => void
+  leads: Lead[];
+  onStatusChange: (leadId: string, status: LeadStatus) => void;
+  onCardClick?: (leadId: string) => void;
 }
 
-export function LeadsKanban({ leads, onStatusChange, onCardClick }: LeadsKanbanProps) {
-  const [activeLead, setActiveLead] = useState<Lead | null>(null)
+export function LeadsKanban({
+  leads,
+  onStatusChange,
+  onCardClick,
+}: LeadsKanbanProps) {
+  const [activeLead, setActiveLead] = useState<Lead | null>(null);
 
   // PointerSensor with activation distance — a small drag distance (6px) is
   // required before drag starts, so plain clicks still fire onClick normally.
@@ -42,7 +47,7 @@ export function LeadsKanban({ leads, onStatusChange, onCardClick }: LeadsKanbanP
       activationConstraint: { distance: 6 },
     }),
     useSensor(KeyboardSensor),
-  )
+  );
 
   // Group leads by status. Unknown statuses fall into "new".
   const grouped = useMemo(() => {
@@ -53,36 +58,36 @@ export function LeadsKanban({ leads, onStatusChange, onCardClick }: LeadsKanbanP
       no_profile: [],
       not_interested: [],
       customer: [],
-    }
+    };
     for (const lead of leads) {
       const key = (LEAD_STATUS_KEYS as readonly string[]).includes(lead.status)
         ? (lead.status as LeadStatus)
-        : "new"
-      map[key].push(lead)
+        : "new";
+      map[key].push(lead);
     }
-    return map
-  }, [leads])
+    return map;
+  }, [leads]);
 
   function handleDragStart(event: DragStartEvent) {
-    const id = event.active.id as string
-    const lead = leads.find((l) => l.id === id)
-    setActiveLead(lead || null)
+    const id = event.active.id as string;
+    const lead = leads.find((l) => l.id === id);
+    setActiveLead(lead || null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    setActiveLead(null)
-    if (!over) return
-    const leadId = active.id as string
-    const newStatus = over.id as LeadStatus
-    if (!(LEAD_STATUS_KEYS as readonly string[]).includes(newStatus)) return
-    const lead = leads.find((l) => l.id === leadId)
-    if (!lead || lead.status === newStatus) return
-    onStatusChange(leadId, newStatus)
+    const { active, over } = event;
+    setActiveLead(null);
+    if (!over) return;
+    const leadId = active.id as string;
+    const newStatus = over.id as LeadStatus;
+    if (!(LEAD_STATUS_KEYS as readonly string[]).includes(newStatus)) return;
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead || lead.status === newStatus) return;
+    onStatusChange(leadId, newStatus);
   }
 
   function handleDragCancel() {
-    setActiveLead(null)
+    setActiveLead(null);
   }
 
   return (
@@ -107,11 +112,13 @@ export function LeadsKanban({ leads, onStatusChange, onCardClick }: LeadsKanbanP
       </div>
 
       {/* Floating preview of the dragging card */}
-      <DragOverlay dropAnimation={{ duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" }}>
+      <DragOverlay
+        dropAnimation={{ duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" }}
+      >
         {activeLead ? <KanbanCardPreview lead={activeLead} /> : null}
       </DragOverlay>
     </DndContext>
-  )
+  );
 }
 
 // ── Column ──────────────────────────────────────────────
@@ -121,29 +128,31 @@ function KanbanColumn({
   items,
   onCardClick,
 }: {
-  status: LeadStatus
-  items: Lead[]
-  onCardClick?: (leadId: string) => void
+  status: LeadStatus;
+  items: Lead[];
+  onCardClick?: (leadId: string) => void;
 }) {
-  const cfg = STATUS_CONFIG[status]
-  const { isOver, setNodeRef } = useDroppable({ id: status })
+  const cfg = STATUS_CONFIG[status];
+  const { isOver, setNodeRef } = useDroppable({ id: status });
 
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col w-[280px] shrink-0 rounded-xl border transition-all duration-150 ${
+      className={`flex flex-col w-70 shrink-0 rounded-xl border transition-all duration-150 ${
         isOver
-          ? "border-emerald-500/40 bg-emerald-500/[0.04] shadow-[0_0_32px_-8px_rgba(16,185,129,0.3)]"
+          ? "border-emerald-500/40 bg-emerald-500/4 shadow-[0_0_32px_-8px_rgba(16,185,129,0.3)]"
           : "border-zinc-800/70 bg-zinc-900/30"
       }`}
     >
       {/* Column header */}
       <div className="flex items-center gap-2 px-3.5 py-3 border-b border-zinc-800/60 shrink-0">
         <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-        <h3 className="text-sm font-semibold text-zinc-200 tracking-tight">{cfg.label}</h3>
+        <h3 className="text-sm font-semibold text-zinc-200 tracking-tight">
+          {cfg.label}
+        </h3>
         <StatNumber
           value={items.length}
-          className="ml-auto text-xs text-zinc-500 bg-zinc-800/60 rounded-md px-1.5 py-0.5 min-w-[24px] text-center"
+          className="ml-auto text-xs text-zinc-500 bg-zinc-800/60 rounded-md px-1.5 py-0.5 min-w-6 text-center"
         />
       </div>
 
@@ -160,7 +169,7 @@ function KanbanColumn({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ── Draggable card ──────────────────────────────────────
@@ -169,17 +178,18 @@ function KanbanCard({
   lead,
   onCardClick,
 }: {
-  lead: Lead
-  onCardClick?: (leadId: string) => void
+  lead: Lead;
+  onCardClick?: (leadId: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: lead.id,
-  })
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: lead.id,
+    });
 
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.35 : 1,
-  }
+  };
 
   return (
     <div
@@ -188,7 +198,7 @@ function KanbanCard({
       {...listeners}
       {...attributes}
       onClick={() => {
-        if (!isDragging) onCardClick?.(lead.id)
+        if (!isDragging) onCardClick?.(lead.id);
       }}
       className="group relative cursor-grab active:cursor-grabbing select-none rounded-lg border border-zinc-800/70 bg-zinc-900/60 p-2.5 hover:border-zinc-700 hover:bg-zinc-900 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
     >
@@ -198,31 +208,36 @@ function KanbanCard({
       </div>
       <CardContent lead={lead} />
     </div>
-  )
+  );
 }
 
 // ── Drag overlay preview (non-interactive) ──────────────
 
 function KanbanCardPreview({ lead }: { lead: Lead }) {
   return (
-    <div className="w-[260px] cursor-grabbing rounded-lg border border-emerald-500/40 bg-zinc-900 p-2.5 shadow-2xl shadow-emerald-500/20 ring-1 ring-emerald-500/20 rotate-[2deg]">
+    <div className="w-65 cursor-grabbing rounded-lg border border-emerald-500/40 bg-zinc-900 p-2.5 shadow-2xl shadow-emerald-500/20 ring-1 ring-emerald-500/20 rotate-2">
       <CardContent lead={lead} />
     </div>
-  )
+  );
 }
 
 // ── Shared card body ────────────────────────────────────
 
 function CardContent({ lead }: { lead: Lead }) {
-  const location = [lead.city, lead.state, lead.country].filter(Boolean).join(", ")
+  const location = [lead.city, lead.state, lead.country]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div className="flex items-start gap-2.5">
       {lead.photoUrl ? (
-        <img
+        <Image
           src={lead.photoUrl}
           alt=""
+          width={32}
+          height={32}
           className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-zinc-800"
+          unoptimized
         />
       ) : (
         <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-700/50">
@@ -255,15 +270,19 @@ function CardContent({ lead }: { lead: Lead }) {
 
         <div className="flex items-center gap-1 mt-1.5">
           {lead.website && <ContactDot icon={Globe} title="Has website" />}
-          {lead.email && <ContactDot icon={Mail} title={`Email: ${lead.email}`} />}
-          {lead.phone && <ContactDot icon={Phone} title={`Phone: ${lead.phone}`} />}
+          {lead.email && (
+            <ContactDot icon={Mail} title={`Email: ${lead.email}`} />
+          )}
+          {lead.phone && (
+            <ContactDot icon={Phone} title={`Phone: ${lead.phone}`} />
+          )}
           {lead.firecrawlEnriched && (
             <ContactDot icon={Bot} title="AI enriched" variant="violet" />
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ContactDot({
@@ -271,11 +290,11 @@ function ContactDot({
   title,
   variant = "zinc",
 }: {
-  icon: React.ElementType
-  title: string
-  variant?: "zinc" | "violet"
+  icon: React.ElementType;
+  title: string;
+  variant?: "zinc" | "violet";
 }) {
-  const color = variant === "violet" ? "text-violet-400" : "text-zinc-500"
+  const color = variant === "violet" ? "text-violet-400" : "text-zinc-500";
   return (
     <div
       title={title}
@@ -283,5 +302,5 @@ function ContactDot({
     >
       <Icon className="w-2.5 h-2.5" />
     </div>
-  )
+  );
 }

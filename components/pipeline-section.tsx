@@ -53,7 +53,7 @@ export function PipelineSection() {
               transformOrigin: "center center",
             }}
           >
-            <div className="relative h-[400px]">
+            <div className="relative h-100">
               <div
                 className="absolute w-px bg-zinc-600/50"
                 style={{
@@ -66,7 +66,7 @@ export function PipelineSection() {
               />
 
               <div className="absolute top-0 left-0 right-0 flex items-end">
-                <div className="flex items-end gap-[3px] absolute bottom-0 left-[5%] right-0">
+                <div className="flex items-end gap-0.75 absolute bottom-0 left-[5%] right-0">
                   {Array.from({ length: 60 }).map((_, i) => (
                     <div
                       key={i}
