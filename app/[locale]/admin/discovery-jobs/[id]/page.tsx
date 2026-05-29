@@ -91,20 +91,20 @@ export default function DiscoveryJobDetailPage({
                   <StatusBadge status={job.status} />
                 </div>
 
-                <h1 className="text-2xl md:text-3xl text-white font-medium tracking-tight mb-4">
+                <h1 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-medium tracking-tight mb-4">
                   {job.name}
                 </h1>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-400">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">
                   <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-zinc-600" />
+                    <MapPin className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                     {job.location}
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Radar className="w-3.5 h-3.5 text-zinc-600" />
+                    <Radar className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                     {job.insertedLeads} leads found
                   </div>
-                  <div className="text-zinc-600">
+                  <div className="text-zinc-500 dark:text-zinc-600">
                     {formatRelativeDate(job.createdAt)}
                   </div>
                 </div>
@@ -112,13 +112,13 @@ export default function DiscoveryJobDetailPage({
                 {keywords.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
                     {keywords.map((kw: string) => (
-                      <span key={kw} className="text-xs text-zinc-500 bg-zinc-800/50 px-2 py-1 rounded-lg">{kw}</span>
+                      <span key={kw} className="text-xs text-zinc-500 bg-zinc-200/50 dark:bg-zinc-800/50 px-2 py-1 rounded-lg">{kw}</span>
                     ))}
                   </div>
                 )}
 
                 {job.errorMessage && (
-                  <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">
+                  <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-600 dark:text-red-400">
                     {job.errorMessage}
                   </div>
                 )}
@@ -128,12 +128,12 @@ export default function DiscoveryJobDetailPage({
               {(job.status === "running" || job.status === "pending") && (
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-zinc-400 text-sm">Progress</span>
-                    <span className="text-zinc-400 text-sm tabular-nums">
+                    <span className="text-zinc-600 dark:text-zinc-400 text-sm">Progress</span>
+                    <span className="text-zinc-600 dark:text-zinc-400 text-sm tabular-nums">
                       {job.totalProcessed} / {job.maxResults} processed
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full transition-all duration-500"
                       style={{ width: `${job.maxResults > 0 ? (job.totalProcessed / job.maxResults) * 100 : 0}%` }}
@@ -149,7 +149,7 @@ export default function DiscoveryJobDetailPage({
                   {stats && stats.totalLeads > 0 && (
                     <button
                       onClick={() => router.push(`/admin/leads?jobId=${id}`)}
-                      className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
+                      className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
                       View all leads
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -187,10 +187,10 @@ export default function DiscoveryJobDetailPage({
                           return (
                             <div key={label} className="flex-1">
                               <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-xs text-zinc-400">{label}</span>
+                                <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                 <span className="text-xs text-zinc-500 tabular-nums">{count}</span>
                               </div>
-                              <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                              <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
                               </div>
                             </div>
@@ -211,13 +211,13 @@ export default function DiscoveryJobDetailPage({
                             const pct = stats.totalLeads > 0 ? (count / stats.totalLeads) * 100 : 0
                             return (
                               <div key={label} className="flex items-center gap-3">
-                                <Icon className="w-4 h-4 text-zinc-600 shrink-0" />
+                                <Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-600 shrink-0" />
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs text-zinc-400">{label}</span>
+                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                     <span className="text-xs text-zinc-500 tabular-nums">{count} ({pct.toFixed(0)}%)</span>
                                   </div>
-                                  <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                  <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-zinc-500 rounded-full" style={{ width: `${pct}%` }} />
                                   </div>
                                 </div>
@@ -235,10 +235,10 @@ export default function DiscoveryJobDetailPage({
                             return (
                               <div key={source}>
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="text-xs text-zinc-400">{label}</span>
+                                  <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                   <span className="text-xs text-zinc-500 tabular-nums">{count} ({pct.toFixed(0)}%)</span>
                                 </div>
-                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                   <div className="h-full bg-zinc-500 rounded-full" style={{ width: `${pct}%` }} />
                                 </div>
                               </div>
@@ -252,8 +252,8 @@ export default function DiscoveryJobDetailPage({
                     {job.completedAt && (
                       <SectionCard title="Duration">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-zinc-600" />
-                          <span className="text-sm text-zinc-300">
+                          <Clock className="w-4 h-4 text-zinc-500 dark:text-zinc-600" />
+                          <span className="text-sm text-zinc-700 dark:text-zinc-300">
                             {(() => {
                               const ms = new Date(job.completedAt).getTime() - new Date(job.createdAt).getTime()
                               const seconds = Math.floor(ms / 1000)

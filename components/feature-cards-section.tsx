@@ -8,7 +8,7 @@ import { ChevronRight } from "lucide-react"
 const featureCards = [
   {
     illustration: (
-      <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
+      <div className="relative w-full h-80 lg:h-90 flex items-center justify-center overflow-hidden rounded-lg">
         <Image
           src="/images/radar-discovery.svg"
           alt=""
@@ -22,7 +22,7 @@ const featureCards = [
   },
   {
     illustration: (
-      <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
+      <div className="relative w-full h-80 lg:h-90 flex items-center justify-center overflow-hidden rounded-lg">
         <Image
           src="/images/lead-scoring.svg"
           alt=""

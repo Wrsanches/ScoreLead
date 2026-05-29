@@ -47,9 +47,9 @@ const STEP_CONFIGS = [
     border: "border-sky-500/25",
     bg: "bg-sky-500/[0.04]",
     iconBg: "bg-sky-500/15 ring-sky-500/30",
-    iconText: "text-sky-300",
+    iconText: "text-sky-700 dark:text-sky-300",
     chipBg: "bg-sky-500/15",
-    chipText: "text-sky-200",
+    chipText: "text-sky-700 dark:text-sky-200",
     line: "from-sky-500/40 via-sky-500/20 to-violet-500/30",
   },
   {
@@ -57,9 +57,9 @@ const STEP_CONFIGS = [
     border: "border-violet-500/25",
     bg: "bg-violet-500/[0.04]",
     iconBg: "bg-violet-500/15 ring-violet-500/30",
-    iconText: "text-violet-300",
+    iconText: "text-violet-700 dark:text-violet-300",
     chipBg: "bg-violet-500/15",
-    chipText: "text-violet-200",
+    chipText: "text-violet-700 dark:text-violet-200",
     line: "from-violet-500/40 via-violet-500/20 to-emerald-500/30",
   },
   {
@@ -67,9 +67,9 @@ const STEP_CONFIGS = [
     border: "border-emerald-500/25",
     bg: "bg-emerald-500/[0.04]",
     iconBg: "bg-emerald-500/15 ring-emerald-500/30",
-    iconText: "text-emerald-300",
+    iconText: "text-emerald-700 dark:text-emerald-300",
     chipBg: "bg-emerald-500/15",
-    chipText: "text-emerald-200",
+    chipText: "text-emerald-700 dark:text-emerald-200",
     line: "",
   },
 ] as const
@@ -193,17 +193,17 @@ export function OutreachMessagesCard({
   // ── Loading skeleton ────────────────────────────────
   if (initialLoading) {
     return (
-      <div className="mb-6 rounded-xl border border-zinc-800/70 bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
+      <div className="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/80 dark:bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
         <OutreachHeader title={t("title")} subtitle="" />
         <div className="p-8 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+          <Loader2 className="w-5 h-5 animate-spin text-zinc-500 dark:text-zinc-600" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="mb-6 rounded-xl border border-zinc-800/70 bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
+    <div className="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/80 dark:bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
       {/* Header with subtle emerald glow */}
       <OutreachHeader
         title={t("title")}
@@ -218,7 +218,7 @@ export function OutreachMessagesCard({
             type="button"
             onClick={generate}
             disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-300 hover:text-white rounded-md bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
+            className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -287,14 +287,14 @@ export function OutreachMessagesCard({
                       className={`group flex-1 rounded-xl border overflow-hidden transition-colors ${cfg.border} ${cfg.bg}`}
                     >
                       {/* Card header */}
-                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-800/50">
+                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-200/70 dark:border-zinc-800/50">
                         <div className="flex items-center gap-2 min-w-0">
                           <span
                             className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${cfg.chipBg} ${cfg.chipText} tabular-nums`}
                           >
                             {msg.step}
                           </span>
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 truncate">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 truncate">
                             {msg.label}
                           </span>
                         </div>
@@ -332,18 +332,18 @@ export function OutreachMessagesCard({
                               if (e.key === "Escape") cancelEditing()
                             }}
                             rows={6}
-                            className="w-full resize-none rounded-lg bg-zinc-900/80 border border-zinc-800/80 px-3 py-2.5 text-sm text-zinc-100 leading-relaxed placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/40 transition-all"
+                            className="w-full resize-none rounded-lg bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 leading-relaxed placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/40 transition-all"
                             autoFocus
                           />
                           <div className="flex items-center justify-between mt-2.5">
-                            <div className="flex items-center gap-2 text-[11px] text-zinc-600 tabular-nums">
+                            <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-600 tabular-nums">
                               <span>{editValue.length}</span>
-                              <span className="hidden sm:inline text-zinc-700">·</span>
-                              <span className="hidden sm:inline text-zinc-700">
-                                <kbd className="px-1 py-0.5 bg-zinc-800/60 rounded text-[10px]">
+                              <span className="hidden sm:inline text-zinc-400 dark:text-zinc-700">·</span>
+                              <span className="hidden sm:inline text-zinc-400 dark:text-zinc-700">
+                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-zinc-800/60 rounded text-[10px]">
                                   ⌘
                                 </kbd>{" "}
-                                <kbd className="px-1 py-0.5 bg-zinc-800/60 rounded text-[10px]">
+                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-zinc-800/60 rounded text-[10px]">
                                   ↵
                                 </kbd>{" "}
                                 to save
@@ -354,7 +354,7 @@ export function OutreachMessagesCard({
                                 type="button"
                                 onClick={cancelEditing}
                                 disabled={saving}
-                                className="flex items-center gap-1 h-7 px-2.5 text-xs text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800/60 transition-colors disabled:opacity-50"
+                                className="flex items-center gap-1 h-7 px-2.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors disabled:opacity-50"
                               >
                                 <X className="w-3.5 h-3.5" />
                                 {t("cancel")}
@@ -377,7 +377,7 @@ export function OutreachMessagesCard({
                         </div>
                       ) : (
                         <>
-                          <p className="px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap text-zinc-200">
+                          <p className="px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap text-zinc-800 dark:text-zinc-200">
                             {msg.body}
                           </p>
 
@@ -440,7 +440,7 @@ function OutreachHeader({
   children?: React.ReactNode
 }) {
   return (
-    <div className="relative px-5 py-4 border-b border-zinc-800/60 overflow-hidden">
+    <div className="relative px-5 py-4 border-b border-zinc-200/80 dark:border-zinc-800/60 overflow-hidden">
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.06] via-transparent to-transparent pointer-events-none"
@@ -449,9 +449,9 @@ function OutreachHeader({
         <div className="flex items-center gap-3 min-w-0">
           <OrbIcon size={32} />
           <div className="min-w-0">
-            <h4 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <span className="truncate">{title}</span>
-              <span className="text-[9px] font-bold bg-emerald-500/15 text-emerald-300 px-1.5 py-0.5 rounded uppercase tracking-wider ring-1 ring-emerald-500/30 shrink-0">
+              <span className="text-[9px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded uppercase tracking-wider ring-1 ring-emerald-500/30 shrink-0">
                 AI
               </span>
             </h4>
@@ -487,7 +487,7 @@ function EmptyState({
         <div className="mb-5">
           <OrbIcon size={56} />
         </div>
-        <p className="text-sm font-semibold text-zinc-100 mb-1">{title}</p>
+        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">{title}</p>
         <p className="text-xs text-zinc-500 mb-5 max-w-80 leading-relaxed">{description}</p>
         <button
           type="button"
@@ -508,7 +508,7 @@ function GeneratingState({ text }: { text: string }) {
         <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20" />
         <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-400 animate-spin" />
       </div>
-      <p className="text-sm text-zinc-400">{text}</p>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">{text}</p>
     </div>
   )
 }
@@ -532,8 +532,8 @@ function IconButton({
       onClick={onClick}
       className={`flex items-center gap-1 h-6 px-2 text-[11px] font-medium rounded-md transition-all duration-150 ${
         active
-          ? "text-emerald-400 bg-emerald-500/10"
-          : "text-zinc-500 hover:text-white hover:bg-zinc-800/70"
+          ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
+          : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/70"
       } ${hoverReveal ? "opacity-0 group-hover:opacity-100 focus:opacity-100" : ""}`}
       title={label}
     >
@@ -579,8 +579,8 @@ function SendActions({
   }
 
   return (
-    <div className="px-4 py-2 border-t border-zinc-800/50 flex items-center justify-between gap-2 bg-zinc-950/30">
-      <span className="text-[10px] text-zinc-600 tabular-nums">{charCount}</span>
+    <div className="px-4 py-2 border-t border-zinc-200/70 dark:border-zinc-800/50 flex items-center justify-between gap-2 bg-zinc-950/30">
+      <span className="text-[10px] text-zinc-500 dark:text-zinc-600 tabular-nums">{charCount}</span>
       {actions.length > 0 && (
         <div className="flex items-center gap-1">
           {actions.map((a) => {
@@ -591,7 +591,7 @@ function SendActions({
                 href={a.href}
                 target={a.href.startsWith("http") ? "_blank" : undefined}
                 rel={a.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800/60 border border-transparent hover:border-zinc-700 transition-all duration-150"
+                className="flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150"
                 title={`Send via ${a.label}`}
               >
                 <A className="w-3 h-3" />

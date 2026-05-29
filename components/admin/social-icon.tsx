@@ -50,8 +50,8 @@ const CONFIGS: Record<SocialPlatform, SocialConfig> = {
 const FALLBACK_CONFIG: SocialConfig = {
   label: "Link",
   color: "#a1a1aa",
-  bg: "bg-zinc-800/50",
-  ring: "ring-zinc-700/50",
+  bg: "bg-zinc-200/50 dark:bg-zinc-800/50",
+  ring: "ring-zinc-300/50 dark:ring-zinc-700/50",
 }
 
 /** Normalize a platform key (lowercase, strip whitespace) and resolve aliases. */

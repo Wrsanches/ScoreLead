@@ -147,7 +147,7 @@ export function MonthGrid({
         {weekdayLabels.map((label) => (
           <div
             key={label}
-            className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold text-center py-1.5"
+            className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-600 font-semibold text-center py-1.5"
           >
             {label}
           </div>

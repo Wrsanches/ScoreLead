@@ -99,6 +99,13 @@
       "when": 1776531962410,
       "tag": "0013_spicy_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1778031035473,
+      "tag": "0014_breezy_karma",
+      "breakpoints": true
     }
   ]
 }

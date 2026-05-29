@@ -90,18 +90,35 @@ export function AiOrb({ state = "idle", className = "", size = "lg" }: AiOrbProp
       style={{ perspective: "600px", transformStyle: "preserve-3d" }}
       aria-hidden="true"
     >
-      {/* ---- Ambient glow ---- */}
-      <motion.div
-        className="absolute inset-[-60%] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(16,185,129,0.1) 0%, rgba(63,63,70,0.04) 40%, transparent 65%)",
-          filter: "blur(40px)",
-        }}
-        animate={{
-          scale: state === "processing" ? [1, 1.35, 1] : [1, 1.15, 1],
-          opacity: state === "processing" ? [0.5, 0.9, 0.5] : [0.3, 0.6, 0.3],
-        }}
-        transition={{ duration: c.glow, repeat: Infinity, ease: "easeInOut" }}
+      {/* ---- Ambient glow ----
+        The orb's wave layers use `mix-blend-mode: screen` which only
+        composites correctly against a dark backdrop. In dark mode the
+        page provides this; in light mode we have to provide our own,
+        so the inner stage below extends slightly beyond the wave bounds.
+        Wrapper applies a dark-mode dim so the boosted glow gradient
+        doesn't blow out on a dark page. (Framer animates the child
+        opacity, so a class-based dim on the child would be overridden -
+        the wrapper multiplies through cleanly.) */}
+      <div className="absolute inset-0 dark:opacity-60">
+        <motion.div
+          className="absolute inset-[-60%] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(16,185,129,0.18) 0%, rgba(16,185,129,0.06) 40%, transparent 65%)",
+            filter: "blur(40px)",
+          }}
+          animate={{
+            scale: state === "processing" ? [1, 1.35, 1] : [1, 1.15, 1],
+            opacity: state === "processing" ? [0.55, 0.95, 0.55] : [0.35, 0.7, 0.35],
+          }}
+          transition={{ duration: c.glow, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      {/* ---- Stage (light mode only): a dark backdrop slightly larger than
+        the outermost wave so screen-blend layers render correctly on white. */}
+      <div
+        className="absolute inset-[3%] rounded-full bg-zinc-950 dark:hidden"
+        aria-hidden="true"
       />
 
       {/* ---- Core sphere (dark base) ---- */}
@@ -182,15 +199,18 @@ export function AiOrb({ state = "idle", className = "", size = "lg" }: AiOrbProp
         transition={{ duration: c.pulse * 1.5, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* ---- Processing rings ---- */}
+      {/* ---- Processing rings ----
+        Border alphas chosen to render visibly on both light and dark
+        backgrounds. Top/bottom emerald accents lead; right/left grays
+        provide subtle motion contrast. */}
       {state === "processing" && (
         <>
           <motion.div
             className="absolute inset-[-8%] rounded-full"
             style={{
               border: "1.5px solid transparent",
-              borderTopColor: "rgba(52,211,153,0.35)",
-              borderRightColor: "rgba(161,161,170,0.15)",
+              borderTopColor: "rgba(5,150,105,0.55)",
+              borderRightColor: "rgba(82,82,91,0.22)",
             }}
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -199,8 +219,8 @@ export function AiOrb({ state = "idle", className = "", size = "lg" }: AiOrbProp
             className="absolute inset-[-14%] rounded-full"
             style={{
               border: "1px solid transparent",
-              borderBottomColor: "rgba(16,185,129,0.2)",
-              borderLeftColor: "rgba(113,113,122,0.1)",
+              borderBottomColor: "rgba(5,150,105,0.4)",
+              borderLeftColor: "rgba(82,82,91,0.18)",
             }}
             animate={{ rotate: -360 }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
@@ -208,11 +228,13 @@ export function AiOrb({ state = "idle", className = "", size = "lg" }: AiOrbProp
         </>
       )}
 
-      {/* ---- Active ring ---- */}
+      {/* ---- Active ring ----
+        Deeper emerald-500/40 in light mode for legibility; brighter
+        emerald-400/20 in dark. */}
       {state === "active" && (
         <motion.div
-          className="absolute inset-[-5%] rounded-full border border-emerald-400/12"
-          animate={{ scale: [1, 1.12, 1], opacity: [0.2, 0.5, 0.2] }}
+          className="absolute inset-[-5%] rounded-full border border-emerald-500/40 dark:border-emerald-400/20"
+          animate={{ scale: [1, 1.12, 1], opacity: [0.35, 0.7, 0.35] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       )}

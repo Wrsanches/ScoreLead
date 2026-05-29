@@ -243,11 +243,11 @@ export function PostSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="max-w-lg! w-full bg-zinc-950 border-zinc-800 text-zinc-200 p-0 flex flex-col"
+        className="max-w-lg! w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 p-0 flex flex-col"
       >
-        <SheetHeader className="border-b border-zinc-800 px-5 py-4">
-          <SheetTitle className="text-white flex items-center gap-2 text-base">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+        <SheetHeader className="border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
+          <SheetTitle className="text-zinc-900 dark:text-white flex items-center gap-2 text-base">
+            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             {isNew ? t("newPost") : t("editPost")}
           </SheetTitle>
           <SheetDescription className="text-zinc-500 text-xs">
@@ -273,7 +273,7 @@ export function PostSheet({
                     <button
                       type="button"
                       onClick={() => setViewerOpen(true)}
-                      className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-200 transition-colors"
+                      className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
                     >
                       <Expand className="w-3 h-3" />
                       View
@@ -283,7 +283,7 @@ export function PostSheet({
                     <a
                       href={currentImage.url}
                       download
-                      className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-200 transition-colors"
+                      className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
                     >
                       <Download className="w-3 h-3" />
                       {t("imageDownload")}
@@ -293,7 +293,7 @@ export function PostSheet({
               </div>
               <div className="relative max-w-60 mx-auto">
                 <div
-                  className={`relative rounded-2xl overflow-hidden border border-zinc-800 ${imageAspect} bg-zinc-900/40 cursor-pointer`}
+                  className={`relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 ${imageAspect} bg-zinc-50/80 dark:bg-zinc-900/40 cursor-pointer`}
                   onClick={() =>
                     currentImage && !generatingImage && setViewerOpen(true)
                   }
@@ -310,28 +310,28 @@ export function PostSheet({
                         unoptimized
                       />
                       {regeneratingSlideIndex === clampedIndex && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-950/70 backdrop-blur-sm">
-                          <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
-                          <p className="text-[10px] text-zinc-300">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-sm">
+                          <Loader2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 animate-spin" />
+                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300">
                             {t("regeneratingSlide")}
                           </p>
                         </div>
                       )}
                     </>
                   ) : generatingImage ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-zinc-950/80">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/90 dark:bg-zinc-950/80">
                       <div className="relative">
                         <div className="absolute inset-0 rounded-full bg-emerald-500/30 blur-xl animate-pulse" />
-                        <Loader2 className="relative w-6 h-6 text-emerald-400 animate-spin" />
+                        <Loader2 className="relative w-6 h-6 text-emerald-600 dark:text-emerald-400 animate-spin" />
                       </div>
-                      <p className="text-[11px] text-zinc-400 text-center px-3">
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 text-center px-3">
                         {isCarousel
                           ? t("generatingCarousel")
                           : t("generatingImage")}
                       </p>
                     </div>
                   ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-zinc-600">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-zinc-500 dark:text-zinc-600">
                       <ImageIcon className="w-8 h-8" />
                       <p className="text-[10px] px-4 text-center leading-relaxed">
                         {t("imageHint")}
@@ -349,7 +349,7 @@ export function PostSheet({
                           (i) => (i - 1 + images.length) % images.length,
                         )
                       }
-                      className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200 shadow-lg"
+                      className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shadow-lg"
                       aria-label="Previous slide"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -359,7 +359,7 @@ export function PostSheet({
                       onClick={() =>
                         setSlideIndex((i) => (i + 1) % images.length)
                       }
-                      className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200 shadow-lg"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shadow-lg"
                       aria-label="Next slide"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -380,7 +380,7 @@ export function PostSheet({
                           ? "w-6 bg-emerald-400"
                           : imageFailures.includes(i)
                             ? "w-1.5 bg-red-500"
-                            : "w-1.5 bg-zinc-700 hover:bg-zinc-500"
+                            : "w-1.5 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-500"
                       }`}
                       aria-label={`Slide ${i + 1}`}
                     />
@@ -389,13 +389,13 @@ export function PostSheet({
               )}
 
               {hasImages && currentImage?.headline && (
-                <p className="mt-2 text-center text-[11px] text-zinc-400 italic leading-snug px-2">
+                <p className="mt-2 text-center text-[11px] text-zinc-600 dark:text-zinc-400 italic leading-snug px-2">
                   &ldquo;{currentImage.headline}&rdquo;
                 </p>
               )}
 
               {imageFailures.length > 0 && (
-                <div className="mt-2 flex items-start gap-1.5 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-300">
+                <div className="mt-2 flex items-start gap-1.5 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-700 dark:text-red-300">
                   <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
                   <span>
                     {t("slidesFailed", { count: imageFailures.length })}{" "}
@@ -408,7 +408,7 @@ export function PostSheet({
               {hasImages && !generatingImage && (
                 <div className="mt-3 space-y-2">
                   {refinementOpen ? (
-                    <div className="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
                       <label className="block text-[10px] uppercase tracking-wider text-zinc-500 mb-1.5 font-medium">
                         {t("refineSlideLabel", { n: clampedIndex + 1 })}
                       </label>
@@ -419,7 +419,7 @@ export function PostSheet({
                         }
                         placeholder={t("refinePlaceholder")}
                         rows={3}
-                        className="w-full px-2.5 py-2 bg-zinc-950/60 border border-zinc-800 rounded-lg text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 resize-none"
+                        className="w-full px-2.5 py-2 bg-white/80 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 resize-none"
                       />
                       <div className="flex items-center gap-2 mt-2">
                         <button
@@ -444,7 +444,7 @@ export function PostSheet({
                             setRefinementOpen(false);
                             setRefinementPrompt("");
                           }}
-                          className="px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
                         >
                           {t("cancel")}
                         </button>
@@ -458,7 +458,7 @@ export function PostSheet({
                         disabled={
                           regeneratingSlideIndex !== null || !onRegenerateSlide
                         }
-                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/60 hover:border-zinc-700 text-zinc-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         {regeneratingSlideIndex === clampedIndex ? (
                           <Loader2 className="w-3 h-3 animate-spin" />
@@ -473,7 +473,7 @@ export function PostSheet({
                         disabled={
                           regeneratingSlideIndex !== null || !onRegenerateSlide
                         }
-                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Sparkles className="w-3 h-3" />
                         {t("refineSlide")}
@@ -484,7 +484,7 @@ export function PostSheet({
                         disabled={
                           regeneratingSlideIndex !== null || !onUploadSlide
                         }
-                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/60 hover:border-zinc-700 text-zinc-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Upload className="w-3 h-3" />
                         {t("uploadSlide")}
@@ -509,7 +509,7 @@ export function PostSheet({
                 type="button"
                 onClick={handleGenerateImage}
                 disabled={generatingImage || regeneratingSlideIndex !== null}
-                className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {generatingImage ? (
                   <>
@@ -532,7 +532,7 @@ export function PostSheet({
                 )}
               </button>
               {imageError && (
-                <p className="mt-1.5 text-[10px] text-red-400">{imageError}</p>
+                <p className="mt-1.5 text-[10px] text-red-600 dark:text-red-400">{imageError}</p>
               )}
             </div>
           )}
@@ -556,8 +556,8 @@ export function PostSheet({
                     }
                     className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border transition-all duration-150 ${
                       active
-                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                        : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                        : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -593,7 +593,7 @@ export function PostSheet({
                     scheduledFor: fromLocalInputValue(e.target.value),
                   }))
                 }
-                className="w-full px-3 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all scheme-dark"
+                className="w-full px-3 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all scheme-dark"
               />
             </div>
             <div>
@@ -617,7 +617,7 @@ export function PostSheet({
                       className={`h-10 rounded-lg border flex items-center justify-center transition-all duration-150 ${
                         active
                           ? `${p.bgClass} border-current ${p.textClass} ring-1 ${p.ringClass}`
-                          : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
+                          : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700"
                       }`}
                     >
                       <span className={`w-2 h-2 rounded-full ${p.dotClass}`} />
@@ -652,8 +652,8 @@ export function PostSheet({
               <span
                 className={`text-[10px] tabular-nums ${
                   values.caption.length > 2000
-                    ? "text-amber-400"
-                    : "text-zinc-600"
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-zinc-500 dark:text-zinc-600"
                 }`}
               >
                 {t("charactersLeft", { n: values.caption.length })}
@@ -669,27 +669,27 @@ export function PostSheet({
                   }))
                 }
                 rows={8}
-                className="w-full px-3.5 py-3 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
+                className="w-full px-3.5 py-3 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
                 placeholder="Hook that stops the scroll...\n\nYour value or story\n\nSave this if it helped"
               />
             </div>
             <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
               {hookGood ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-400">
+                  <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-600 dark:text-emerald-400">
                     {t("hookGood")} ({hookLen}/80)
                   </span>
                 </>
               ) : hookLen > 80 ? (
                 <>
-                  <AlertCircle className="w-3 h-3 text-amber-400" />
-                  <span className="text-amber-400">
+                  <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                  <span className="text-amber-600 dark:text-amber-400">
                     {t("hookTooLong")} ({hookLen}/80)
                   </span>
                 </>
               ) : (
-                <span className="text-zinc-600">{t("captionHint")}</span>
+                <span className="text-zinc-500 dark:text-zinc-600">{t("captionHint")}</span>
               )}
             </div>
           </div>
@@ -710,11 +710,11 @@ export function PostSheet({
               placeholder="photography  tuesdaytip  saopaulo"
               maxTags={15}
               stripHashPrefix
-              inputClassName="w-full px-3.5 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-              chipClassName="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-800/60 border border-zinc-700/50 text-zinc-300 text-[11px] font-medium"
-              chipRemoveClassName="text-zinc-500 hover:text-zinc-200 transition-colors"
+              inputClassName="w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              chipClassName="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300/50 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium"
+              chipRemoveClassName="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
             />
-            <p className="text-[10px] text-zinc-600 mt-1.5">
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-600 mt-1.5">
               {t("hashtagsHint")}
             </p>
           </div>
@@ -730,7 +730,7 @@ export function PostSheet({
                 setValues((v) => ({ ...v, visualIdea: e.target.value }))
               }
               rows={4}
-              className="w-full px-3.5 py-3 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
+              className="w-full px-3.5 py-3 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
               placeholder={t("visualIdeaHint")}
             />
           </div>
@@ -747,7 +747,7 @@ export function PostSheet({
                 setValues((v) => ({ ...v, callToAction: e.target.value }))
               }
               placeholder={t("callToActionPlaceholder")}
-              className="w-full px-3.5 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              className="w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
@@ -763,8 +763,8 @@ export function PostSheet({
               }
               className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold transition-all duration-150 ${
                 values.status === "approved"
-                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                  : "border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300"
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                  : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
               }`}
             >
               {values.status === "approved" ? (
@@ -779,13 +779,13 @@ export function PostSheet({
           </div>
         </div>
 
-        <div className="border-t border-zinc-800 px-5 py-3 flex items-center gap-2">
+        <div className="border-t border-zinc-200 dark:border-zinc-800 px-5 py-3 flex items-center gap-2">
           {!isNew && onDelete && (
             <button
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
             >
               {deleting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -812,7 +812,7 @@ export function PostSheet({
       </SheetContent>
 
       <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
-        <DialogContent className="p-0 bg-zinc-950 border-zinc-800 max-w-3xl">
+        <DialogContent className="p-0 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 max-w-3xl">
           <VisuallyHidden.Root>
             <DialogTitle>
               {currentImage?.headline || t("postImage")}
@@ -841,7 +841,7 @@ export function PostSheet({
                           (i) => (i - 1 + images.length) % images.length,
                         )
                       }
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                       aria-label="Previous slide"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -851,7 +851,7 @@ export function PostSheet({
                       onClick={() =>
                         setSlideIndex((i) => (i + 1) % images.length)
                       }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                       aria-label="Next slide"
                     >
                       <ChevronRight className="w-5 h-5" />
@@ -861,14 +861,14 @@ export function PostSheet({
                 <button
                   type="button"
                   onClick={() => setViewerOpen(false)}
-                  className="absolute top-3 right-3 w-9 h-9 rounded-full bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200"
+                  className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                   aria-label="Close"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="px-5 py-3 flex items-center justify-between border-t border-zinc-800">
-                <p className="text-sm text-zinc-300 italic truncate max-w-[60%]">
+              <div className="px-5 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
+                <p className="text-sm text-zinc-700 dark:text-zinc-300 italic truncate max-w-[60%]">
                   &ldquo;{currentImage.headline}&rdquo;
                 </p>
                 <div className="flex items-center gap-3 text-xs text-zinc-500">
@@ -880,7 +880,7 @@ export function PostSheet({
                   <a
                     href={currentImage.url}
                     download
-                    className="flex items-center gap-1 hover:text-zinc-200 transition-colors"
+                    className="flex items-center gap-1 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
                   >
                     <Download className="w-3 h-3" />
                     {t("imageDownload")}

@@ -295,7 +295,7 @@ export default function NewDiscoveryJobPage() {
       <div className="flex-1 overflow-auto">
         <ContentWrapper narrow>
           <div className="mb-8">
-            <h1 className="text-white text-2xl font-semibold tracking-tight mb-2">{t("createJob")}</h1>
+            <h1 className="text-zinc-900 dark:text-white text-2xl font-semibold tracking-tight mb-2">{t("createJob")}</h1>
             <p className="text-zinc-500 text-sm">Configure your discovery parameters. Our AI will scan the web, find matching businesses, and score them as leads.</p>
           </div>
 
@@ -303,30 +303,30 @@ export default function NewDiscoveryJobPage() {
             <div className="space-y-8">
               {/* Section: Basic info */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Basic Information</span>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-300 mb-2">{t("jobName")}</label>
+                  <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">{t("jobName")}</label>
                   <div className="relative">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 dark:text-zinc-600" />
                     <input
                       type="text"
                       value={jobName}
                       onChange={(e) => setJobName(e.target.value)}
                       placeholder={t("jobNamePlaceholder")}
                       disabled={isSubmitting}
-                      className="w-full h-11 pl-11 pr-4 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-zinc-200 placeholder:text-zinc-700 focus:outline-none focus:border-zinc-700 transition-colors disabled:opacity-50"
+                      className="w-full h-11 pl-11 pr-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700 transition-colors disabled:opacity-50"
                     />
                   </div>
-                  <p className="text-zinc-600 text-xs mt-1.5">Give your job a descriptive name so you can find it later.</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Give your job a descriptive name so you can find it later.</p>
                 </div>
               </div>
 
               {/* Section: Location */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("targetLocation")}</span>
                 </div>
 
@@ -365,7 +365,7 @@ export default function NewDiscoveryJobPage() {
 
               {/* Section: Keywords */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("keywords")}</span>
                 </div>
 
@@ -373,11 +373,11 @@ export default function NewDiscoveryJobPage() {
                 {(loadingSuggestions || suggestedKeywords.length > 0) && (
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-xs text-zinc-400">AI Suggestions</span>
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs text-zinc-600 dark:text-zinc-400">AI Suggestions</span>
                     </div>
                     {loadingSuggestions ? (
-                      <div className="flex items-center gap-2 text-zinc-600 text-sm">
+                      <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-600 text-sm">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         Generating suggestions...
                       </div>
@@ -393,8 +393,8 @@ export default function NewDiscoveryJobPage() {
                               disabled={isSubmitting}
                               className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 disabled:opacity-50 ${
                                 isSelected
-                                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                                  : "bg-transparent border-dashed border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300"
+                                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                                  : "bg-transparent border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300"
                               }`}
                             >
                               {isSelected && <CheckCircle2 className="w-3 h-3" />}
@@ -409,22 +409,22 @@ export default function NewDiscoveryJobPage() {
 
                 {/* Custom keywords input */}
                 <div>
-                  <label className="block text-sm text-zinc-300 mb-2">{t("keywords")}</label>
-                  <div className="min-h-11 flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus-within:border-zinc-700 transition-colors">
+                  <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">{t("keywords")}</label>
+                  <div className="min-h-11 flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl focus-within:border-zinc-400 dark:focus-within:border-zinc-700 transition-colors">
                     {keywords.map((kw) => (
                       <span
                         key={kw}
                         className={`inline-flex items-center gap-1 text-xs pl-2.5 pr-1.5 py-1 rounded-lg ${
                           suggestedKeywords.includes(kw)
-                            ? "text-emerald-300 bg-emerald-500/10"
-                            : "text-zinc-300 bg-zinc-800"
+                            ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/10"
+                            : "text-zinc-700 dark:text-zinc-300 bg-zinc-200 dark:bg-zinc-800"
                         }`}
                       >
                         {kw}
                         <button
                           onClick={() => removeKeyword(kw)}
                           disabled={isSubmitting}
-                          className="p-0.5 text-zinc-600 hover:text-zinc-400 transition-colors"
+                          className="p-0.5 text-zinc-500 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -438,16 +438,16 @@ export default function NewDiscoveryJobPage() {
                       onBlur={addKeyword}
                       disabled={isSubmitting}
                       placeholder={keywords.length === 0 ? t("keywordsPlaceholder") : "Add more..."}
-                      className="flex-1 min-w-30 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-700 focus:outline-none disabled:opacity-50"
+                      className="flex-1 min-w-30 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none disabled:opacity-50"
                     />
                   </div>
-                  <p className="text-zinc-600 text-xs mt-1.5">Press Enter to add custom keywords. Click suggestions above to toggle them.</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Press Enter to add custom keywords. Click suggestions above to toggle them.</p>
                 </div>
               </div>
 
               {/* Summary card */}
               {canSubmit && (
-                <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-5">
+                <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Info className="w-4 h-4 text-zinc-500" />
                     <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Summary</span>
@@ -455,26 +455,26 @@ export default function NewDiscoveryJobPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-zinc-500">Job name</span>
-                      <span className="text-zinc-200">{jobName}</span>
+                      <span className="text-zinc-800 dark:text-zinc-200">{jobName}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-zinc-500">Location</span>
-                      <span className="text-zinc-200">{buildLocation()}</span>
+                      <span className="text-zinc-800 dark:text-zinc-200">{buildLocation()}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-zinc-500">Keywords</span>
-                      <span className="text-zinc-200 text-right max-w-[60%] truncate">{keywords.join(", ")}</span>
+                      <span className="text-zinc-800 dark:text-zinc-200 text-right max-w-[60%] truncate">{keywords.join(", ")}</span>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/60">
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-200/80 dark:border-zinc-800/60">
                 <button
                   onClick={() => router.back()}
                   disabled={isSubmitting}
-                  className="h-10 px-4 text-sm text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50"
+                  className="h-10 px-4 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -482,7 +482,7 @@ export default function NewDiscoveryJobPage() {
                 <button
                   onClick={handleSaveSearch}
                   disabled={!canSave}
-                  className="h-10 px-4 text-sm text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="h-10 px-4 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {savingSearch ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

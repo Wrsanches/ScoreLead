@@ -20,7 +20,7 @@ export default async function AdminLayout({
   const initialBusinessId = cookieStore.get(ACTIVE_BUSINESS_COOKIE)?.value ?? null
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-zinc-950">
+    <div className="h-screen w-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
       <ActiveBusinessProvider initialId={initialBusinessId}>
         <AdminShell>{children}</AdminShell>
       </ActiveBusinessProvider>

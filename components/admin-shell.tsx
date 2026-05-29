@@ -26,7 +26,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SearchProvider>
-      <div className="flex h-full w-full overflow-hidden bg-zinc-950">
+      <div className="flex h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950">
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
@@ -43,11 +43,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         />
 
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-2 lg:p-3">
-          <div className="relative flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-950/50 shadow-[0_0_0_1px_rgba(0,0,0,0.45),0_1px_0_0_rgba(255,255,255,0.04)_inset]">
-            {/* Ambient emerald glow — breaks up the flat dark without hurting contrast */}
+          <div className="relative flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/50 shadow-[0_1px_2px_0_rgba(0,0,0,0.04),0_1px_0_0_rgba(255,255,255,1)_inset] dark:shadow-[0_0_0_1px_rgba(0,0,0,0.45),0_1px_0_0_rgba(255,255,255,0.04)_inset]">
+            {/* Ambient emerald glow - dark only; on white it reads as a sickly tint */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-0"
+              className="pointer-events-none absolute inset-0 z-0 hidden dark:block"
               style={{
                 backgroundImage: `
                   radial-gradient(ellipse 60% 50% at top left, rgba(16,185,129,0.08), transparent 55%),
@@ -77,7 +77,7 @@ export function useMobileMenu() {
 export function MobileMenuButton() {
   const openMenu = useMobileMenu()
   return (
-    <button onClick={openMenu} className="lg:hidden p-1 text-zinc-400 hover:text-white">
+    <button onClick={openMenu} className="lg:hidden p-1 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
       <Menu className="w-4 h-4" />
     </button>
   )

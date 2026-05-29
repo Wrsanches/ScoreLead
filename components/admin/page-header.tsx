@@ -44,17 +44,17 @@ function BreadcrumbTrail({
     <div className={`flex items-center gap-2 ${className}`}>
       {breadcrumbs.map((crumb, i) => {
         const textColor = crumb.accent
-          ? "text-emerald-400"
+          ? "text-emerald-600 dark:text-emerald-400"
           : i === breadcrumbs.length - 1
-            ? "text-zinc-300"
+            ? "text-zinc-700 dark:text-zinc-300"
             : "text-zinc-500"
         return (
           <div key={i} className="flex items-center gap-2">
-            {i > 0 && <span className="text-zinc-700">/</span>}
+            {i > 0 && <span className="text-zinc-400 dark:text-zinc-700">/</span>}
             {crumb.href ? (
               <button
                 onClick={() => router.push(crumb.href!)}
-                className={`text-sm transition-colors hover:text-white ${textColor}`}
+                className={`text-sm transition-colors hover:text-zinc-900 dark:hover:text-white ${textColor}`}
               >
                 {crumb.label}
               </button>
@@ -82,11 +82,11 @@ export function PageHeader(props: PageHeaderProps) {
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl text-white font-semibold tracking-tight leading-tight">
+            <h1 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-semibold tracking-tight leading-tight">
               {title}
             </h1>
             {description && (
-              <p className="text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed">
+              <p className="text-zinc-600 dark:text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed">
                 {description}
               </p>
             )}
@@ -100,24 +100,24 @@ export function PageHeader(props: PageHeaderProps) {
   // Bar variant
   const barProps = props as PageHeaderBarProps
   return (
-    <div className="px-6 h-14 flex items-center justify-between border-b border-zinc-800/60 shrink-0">
+    <div className="px-6 h-14 flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/60 shrink-0">
       <div className="flex items-center gap-3 min-w-0">
         <MobileMenuButton />
         {barProps.backHref && (
           <>
             <button
               onClick={() => router.push(barProps.backHref!)}
-              className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm"
+              className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               {breadcrumbs?.[0]?.label && (
                 <span className="hidden sm:inline">{breadcrumbs[0].label}</span>
               )}
             </button>
-            <span className="text-zinc-700">/</span>
+            <span className="text-zinc-400 dark:text-zinc-700">/</span>
           </>
         )}
-        <h1 className="text-white text-sm font-semibold tracking-tight truncate max-w-65">
+        <h1 className="text-zinc-900 dark:text-white text-sm font-semibold tracking-tight truncate max-w-65">
           {title}
         </h1>
       </div>

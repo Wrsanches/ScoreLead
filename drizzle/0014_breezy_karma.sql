@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "notificationPreferences" jsonb DEFAULT '{"leadAlerts":true,"weeklyDigest":true,"productUpdates":false}'::jsonb NOT NULL;

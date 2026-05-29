@@ -346,7 +346,7 @@ export default function ContentCalendarPage() {
         <ContentWrapper>
           {/* Sticky header: month nav + provider + generate */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <div className="flex items-center gap-1 rounded-xl border border-zinc-800/70 bg-zinc-900/30 p-1">
+            <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/60 dark:bg-zinc-900/30 p-1">
               <button
                 type="button"
                 onClick={() =>
@@ -360,12 +360,12 @@ export default function ContentCalendarPage() {
                     ),
                   )
                 }
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800/60 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
                 aria-label={t("monthPrev")}
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-3 text-sm font-semibold text-white capitalize min-w-35 text-center tabular-nums">
+              <span className="px-3 text-sm font-semibold text-zinc-900 dark:text-white capitalize min-w-35 text-center tabular-nums">
                 {monthLabel}
               </span>
               <button
@@ -381,7 +381,7 @@ export default function ContentCalendarPage() {
                     ),
                   )
                 }
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800/60 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
                 aria-label={t("monthNext")}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -391,14 +391,14 @@ export default function ContentCalendarPage() {
             <button
               type="button"
               onClick={() => setCursor(monthStartUtc(new Date()))}
-              className="px-3 h-10 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-900/30 hover:bg-zinc-800/60 border border-zinc-800/70 rounded-xl transition-colors"
+              className="px-3 h-10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50/60 dark:bg-zinc-900/30 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800/70 rounded-xl transition-colors"
             >
               {t("today")}
             </button>
 
             <div className="ml-auto flex items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 h-10 bg-zinc-900/30 border border-zinc-800/70 rounded-xl text-xs text-zinc-300">
-                <AtSign className="w-3.5 h-3.5 text-rose-400" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 h-10 bg-zinc-50/60 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800/70 rounded-xl text-xs text-zinc-700 dark:text-zinc-300">
+                <AtSign className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                 {t("provider")}
               </div>
               {posts.length > 0 && (
@@ -424,7 +424,7 @@ export default function ContentCalendarPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-300">
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-700 dark:text-red-300">
               {error}
             </div>
           )}

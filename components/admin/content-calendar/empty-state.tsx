@@ -62,7 +62,7 @@ export function CalendarEmptyState({
   const currentStepIndex = genSteps.findIndex((s) => s.key === genStatus);
 
   return (
-    <div className="relative rounded-3xl border border-zinc-800/70 bg-zinc-950/60 overflow-hidden">
+    <div className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-950/60 overflow-hidden">
       {/* Soft brand radial behind the orb */}
       <div
         aria-hidden
@@ -82,7 +82,7 @@ export function CalendarEmptyState({
         {[260, 380, 520].map((size, i) => (
           <div
             key={size}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-800/40"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-zinc-800/40"
             style={{
               width: size,
               height: size,
@@ -113,14 +113,14 @@ export function CalendarEmptyState({
         <motion.h2
           {...fadeUp}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="text-2xl sm:text-3xl font-semibold text-white tracking-tight max-w-md"
+          className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight max-w-md"
         >
           {isGenerating ? t("genTitle") : t("emptyTitle")}
         </motion.h2>
         <motion.p
           {...fadeUp}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className="text-sm text-zinc-400 mt-3 max-w-md leading-relaxed"
+          className="text-sm text-zinc-600 dark:text-zinc-400 mt-3 max-w-md leading-relaxed"
         >
           {isGenerating ? t("genBody") : t("emptyBody")}
         </motion.p>
@@ -146,7 +146,7 @@ export function CalendarEmptyState({
                     isActive
                       ? "bg-emerald-500/8 border border-emerald-500/20"
                       : isDone
-                        ? "bg-zinc-800/20 border border-zinc-800/40"
+                        ? "bg-zinc-800/20 border border-zinc-200/60 dark:border-zinc-800/40"
                         : "border border-transparent opacity-30"
                   }`}
                 >
@@ -155,8 +155,8 @@ export function CalendarEmptyState({
                       isActive
                         ? "bg-emerald-500/15"
                         : isDone
-                          ? "bg-zinc-800/50"
-                          : "bg-zinc-800/30"
+                          ? "bg-zinc-200/50 dark:bg-zinc-800/50"
+                          : "bg-zinc-200/30 dark:bg-zinc-800/30"
                     }`}
                   >
                     {isDone ? (
@@ -169,21 +169,21 @@ export function CalendarEmptyState({
                           damping: 20,
                         }}
                       >
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       </motion.div>
                     ) : (
                       <Icon
-                        className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400" : "text-zinc-600"}`}
+                        className={`w-3.5 h-3.5 ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500 dark:text-zinc-600"}`}
                       />
                     )}
                   </div>
                   <span
                     className={`text-sm text-left ${
                       isActive
-                        ? "text-zinc-200"
+                        ? "text-zinc-800 dark:text-zinc-200"
                         : isDone
                           ? "text-zinc-500"
-                          : "text-zinc-600"
+                          : "text-zinc-500 dark:text-zinc-600"
                     }`}
                   >
                     {step.label}

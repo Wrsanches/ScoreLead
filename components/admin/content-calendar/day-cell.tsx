@@ -42,10 +42,10 @@ export function DayCell({
   const state = isOver
     ? "border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_32px_-12px_rgba(16,185,129,0.4)]"
     : isToday
-      ? "border-emerald-500/40 bg-zinc-900/40 ring-1 ring-emerald-500/30"
+      ? "border-emerald-500/40 bg-zinc-50/80 dark:bg-zinc-900/40 ring-1 ring-emerald-500/30"
       : inMonth
-        ? "border-zinc-800/70 bg-zinc-900/20 hover:border-zinc-700/70 hover:bg-zinc-900/40"
-        : "border-zinc-900/60 bg-zinc-950/30"
+        ? "border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/50 dark:bg-zinc-900/20 hover:border-zinc-300/70 dark:hover:border-zinc-700/70 hover:bg-white/60 dark:hover:bg-zinc-900/40"
+        : "border-zinc-200/60 dark:border-zinc-900/60 bg-zinc-50/40 dark:bg-zinc-950/30"
 
   return (
     <motion.div
@@ -60,12 +60,12 @@ export function DayCell({
         <span
           className={`text-xs font-semibold tabular-nums ${
             isToday
-              ? "text-emerald-300"
+              ? "text-emerald-700 dark:text-emerald-300"
               : inMonth
                 ? isPast
-                  ? "text-zinc-600"
-                  : "text-zinc-300"
-                : "text-zinc-700"
+                  ? "text-zinc-500 dark:text-zinc-600"
+                  : "text-zinc-700 dark:text-zinc-300"
+                : "text-zinc-400 dark:text-zinc-700"
           }`}
         >
           {date.getUTCDate()}
@@ -77,7 +77,7 @@ export function DayCell({
               e.stopPropagation()
               onAdd(date)
             }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 rounded-md flex items-center justify-center text-zinc-500 hover:text-emerald-300 hover:bg-emerald-500/10"
+            className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 rounded-md flex items-center justify-center text-zinc-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10"
             aria-label="Add post"
           >
             <Plus className="w-3 h-3" />
@@ -96,7 +96,7 @@ export function DayCell({
               e.stopPropagation()
               onSelectPost(posts[MAX_VISIBLE_CHIPS].id)
             }}
-            className="text-[10px] text-zinc-500 hover:text-zinc-300 text-left px-1.5 transition-colors"
+            className="text-[10px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-left px-1.5 transition-colors"
           >
             +{hidden} more
           </button>

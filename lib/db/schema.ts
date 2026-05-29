@@ -1,11 +1,27 @@
 import { pgTable, text, timestamp, boolean, integer, real, jsonb } from "drizzle-orm/pg-core"
 
+export type NotificationPreferences = {
+  leadAlerts: boolean
+  weeklyDigest: boolean
+  productUpdates: boolean
+}
+
+export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  leadAlerts: true,
+  weeklyDigest: true,
+  productUpdates: false,
+}
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
+  notificationPreferences: jsonb("notificationPreferences")
+    .$type<NotificationPreferences>()
+    .notNull()
+    .default(DEFAULT_NOTIFICATION_PREFERENCES),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })

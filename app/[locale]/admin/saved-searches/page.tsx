@@ -72,7 +72,7 @@ export default function SavedSearchesPage() {
           actions={
             <Link
               href="/admin/discovery-jobs/new"
-              className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm flex items-center gap-2"
+              className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
             >
               {t("createJob")}
               <ChevronRight className="w-4 h-4" />
@@ -89,8 +89,8 @@ export default function SavedSearchesPage() {
             description="Save a search from the create job form to reuse it later."
           />
         ) : (
-          <div className="border border-zinc-800/60 rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[1fr_180px_120px_80px] px-6 h-11 items-center text-xs text-zinc-500 font-medium uppercase tracking-wider bg-zinc-900/30 border-b border-zinc-800/60">
+          <div className="border border-zinc-200/80 dark:border-zinc-800/60 rounded-xl overflow-hidden">
+            <div className="grid grid-cols-[1fr_180px_120px_80px] px-6 h-11 items-center text-xs text-zinc-500 font-medium uppercase tracking-wider bg-zinc-50/60 dark:bg-zinc-900/30 border-b border-zinc-200/80 dark:border-zinc-800/60">
               <span>Name</span>
               <span>Location</span>
               <span className="text-right">Created</span>
@@ -100,33 +100,33 @@ export default function SavedSearchesPage() {
             {searches.map((search, index) => (
               <div
                 key={search.id}
-                className={`grid grid-cols-[1fr_180px_120px_80px] px-6 py-4 items-center hover:bg-zinc-900/40 transition-colors group ${
-                  index < searches.length - 1 ? "border-b border-zinc-800/40" : ""
+                className={`grid grid-cols-[1fr_180px_120px_80px] px-6 py-4 items-center hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-colors group ${
+                  index < searches.length - 1 ? "border-b border-zinc-200/60 dark:border-zinc-800/40" : ""
                 }`}
               >
                 <div className="min-w-0">
-                  <p className="text-zinc-200 text-sm truncate">{search.name}</p>
+                  <p className="text-zinc-800 dark:text-zinc-200 text-sm truncate">{search.name}</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     {search.keywords.slice(0, 3).map((kw) => (
-                      <span key={kw} className="text-[11px] text-zinc-600 bg-zinc-800/50 px-1.5 py-0.5 rounded">{kw}</span>
+                      <span key={kw} className="text-[11px] text-zinc-500 dark:text-zinc-600 bg-zinc-200/50 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded">{kw}</span>
                     ))}
                     {search.keywords.length > 3 && (
-                      <span className="text-[11px] text-zinc-600">+{search.keywords.length - 3}</span>
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-600">+{search.keywords.length - 3}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 text-zinc-500 text-sm">
-                  <MapPin className="w-3.5 h-3.5 text-zinc-600" />
+                  <MapPin className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                   <span className="truncate">{search.location}</span>
                 </div>
 
-                <p className="text-zinc-600 text-sm text-right">{formatRelativeDate(search.createdAt)}</p>
+                <p className="text-zinc-500 dark:text-zinc-600 text-sm text-right">{formatRelativeDate(search.createdAt)}</p>
 
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Link
                     href={`/admin/discovery-jobs/new?savedSearchId=${search.id}`}
-                    className="p-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                    className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
                     title="Run this search"
                   >
                     <Play className="w-4 h-4" />
@@ -134,7 +134,7 @@ export default function SavedSearchesPage() {
                   <button
                     onClick={() => handleDelete(search.id)}
                     disabled={deleting === search.id}
-                    className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
+                    className="p-1.5 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
                     title="Delete"
                   >
                     {deleting === search.id ? (

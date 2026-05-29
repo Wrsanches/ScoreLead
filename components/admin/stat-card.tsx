@@ -12,7 +12,7 @@ const ACCENTS: Record<StatAccent, {
   hoverShadow: string
 }> = {
   emerald: {
-    icon: "text-emerald-300",
+    icon: "text-emerald-700 dark:text-emerald-300",
     iconBg: "bg-emerald-500/10 ring-emerald-500/25",
     gradient: "bg-gradient-to-br from-emerald-500/[0.08] via-emerald-500/[0.02] to-transparent",
     ring: "ring-1 ring-emerald-500/15",
@@ -20,7 +20,7 @@ const ACCENTS: Record<StatAccent, {
     hoverShadow: "hover:shadow-[0_0_32px_-8px_rgba(16,185,129,0.35)]",
   },
   sky: {
-    icon: "text-sky-300",
+    icon: "text-sky-700 dark:text-sky-300",
     iconBg: "bg-sky-500/10 ring-sky-500/25",
     gradient: "bg-gradient-to-br from-sky-500/[0.06] via-sky-500/[0.02] to-transparent",
     ring: "ring-1 ring-sky-500/15",
@@ -28,7 +28,7 @@ const ACCENTS: Record<StatAccent, {
     hoverShadow: "hover:shadow-[0_0_32px_-8px_rgba(14,165,233,0.3)]",
   },
   violet: {
-    icon: "text-violet-300",
+    icon: "text-violet-700 dark:text-violet-300",
     iconBg: "bg-violet-500/10 ring-violet-500/25",
     gradient: "bg-gradient-to-br from-violet-500/[0.06] via-violet-500/[0.02] to-transparent",
     ring: "ring-1 ring-violet-500/15",
@@ -36,7 +36,7 @@ const ACCENTS: Record<StatAccent, {
     hoverShadow: "hover:shadow-[0_0_32px_-8px_rgba(139,92,246,0.3)]",
   },
   amber: {
-    icon: "text-amber-300",
+    icon: "text-amber-700 dark:text-amber-300",
     iconBg: "bg-amber-500/10 ring-amber-500/25",
     gradient: "bg-gradient-to-br from-amber-500/[0.06] via-amber-500/[0.02] to-transparent",
     ring: "ring-1 ring-amber-500/15",
@@ -44,7 +44,7 @@ const ACCENTS: Record<StatAccent, {
     hoverShadow: "hover:shadow-[0_0_32px_-8px_rgba(245,158,11,0.3)]",
   },
   rose: {
-    icon: "text-rose-300",
+    icon: "text-rose-700 dark:text-rose-300",
     iconBg: "bg-rose-500/10 ring-rose-500/25",
     gradient: "bg-gradient-to-br from-rose-500/[0.06] via-rose-500/[0.02] to-transparent",
     ring: "ring-1 ring-rose-500/15",
@@ -52,8 +52,8 @@ const ACCENTS: Record<StatAccent, {
     hoverShadow: "hover:shadow-[0_0_32px_-8px_rgba(244,63,94,0.3)]",
   },
   zinc: {
-    icon: "text-zinc-400",
-    iconBg: "bg-zinc-800/60 ring-zinc-700/50",
+    icon: "text-zinc-600 dark:text-zinc-400",
+    iconBg: "bg-zinc-200/60 dark:bg-zinc-800/60 ring-zinc-300/50 dark:ring-zinc-700/50",
     gradient: "",
     ring: "ring-1 ring-zinc-800/60",
     hoverRing: "hover:ring-zinc-700/70",
@@ -99,7 +99,7 @@ export function StatCard({
           </div>
         )}
       </div>
-      <StatNumber value={value} className="text-2xl text-white font-semibold" />
+      <StatNumber value={value} className="text-2xl text-zinc-900 dark:text-white font-semibold" />
       {sub && <p className="text-xs text-zinc-500 mt-1.5 tabular-nums">{sub}</p>}
     </div>
   )

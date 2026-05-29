@@ -7,6 +7,7 @@ import { hasLocale } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { generateSiteMetadata, generateJsonLd, siteViewport } from '@/lib/seo'
+import { ThemeProvider } from '@/components/theme-provider'
 import '../globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
@@ -41,7 +42,12 @@ export default async function LocaleLayout({
   const jsonLd = generateJsonLd(locale);
 
   return (
-    <html lang={locale} data-scroll-behavior="smooth" className={`${geist.variable} ${geistMono.variable}`}>
+    <html
+      lang={locale}
+      data-scroll-behavior="smooth"
+      className={`${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           type="application/ld+json"
@@ -68,7 +74,15 @@ export default async function LocaleLayout({
           Skip to content
         </a>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+            storageKey="scorelead:theme"
+          >
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
         <ConsentGatedAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>

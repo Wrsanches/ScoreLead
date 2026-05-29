@@ -97,11 +97,11 @@ function LinkRow({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900/40 transition-all duration-150"
+      className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-all duration-150"
     >
       <Icon className="w-4 h-4 text-zinc-500 shrink-0" />
-      <span className="flex-1 text-sm text-zinc-300 truncate">{label}</span>
-      <ExternalLink className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-colors" />
+      <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 truncate">{label}</span>
+      <ExternalLink className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 shrink-0 transition-colors" />
     </a>
   )
 }
@@ -112,7 +112,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <p className="text-xs uppercase tracking-wider text-zinc-500 font-medium mb-1.5">
         {label}
       </p>
-      <div className="text-sm text-zinc-200">{children}</div>
+      <div className="text-sm text-zinc-800 dark:text-zinc-200">{children}</div>
     </div>
   )
 }
@@ -297,7 +297,7 @@ export default function BusinessDetailPage({
             <div className="space-y-6">
               {/* Hero */}
               <div className="flex items-start gap-5">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0">
                   {logo ? (
                     <Image
                       src={logo}
@@ -308,38 +308,38 @@ export default function BusinessDetailPage({
                       unoptimized
                     />
                   ) : initials ? (
-                    <span className="text-2xl font-semibold text-zinc-300">{initials}</span>
+                    <span className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300">{initials}</span>
                   ) : (
-                    <Building2 className="w-8 h-8 text-zinc-600" />
+                    <Building2 className="w-8 h-8 text-zinc-500 dark:text-zinc-600" />
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl md:text-3xl text-white font-medium tracking-tight">
+                  <h1 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-medium tracking-tight">
                     {data.name || t("untitled")}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-sm text-zinc-400">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     {data.field && (
                       <span className="flex items-center gap-1.5">
-                        <Target className="w-3.5 h-3.5 text-zinc-600" />
+                        <Target className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                         {data.field}
                       </span>
                     )}
                     {data.category && (
                       <span className="flex items-center gap-1.5">
-                        <Tag className="w-3.5 h-3.5 text-zinc-600" />
+                        <Tag className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                         {data.category}
                       </span>
                     )}
                     {data.location && (
                       <span className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-zinc-600" />
+                        <MapPin className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                         {data.location}
                       </span>
                     )}
                     {data.language && (
                       <span className="flex items-center gap-1.5">
-                        <Languages className="w-3.5 h-3.5 text-zinc-600" />
+                        <Languages className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600" />
                         {data.language.toUpperCase()}
                       </span>
                     )}
@@ -349,7 +349,7 @@ export default function BusinessDetailPage({
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
-                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-300 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/40 hover:text-white rounded-lg transition-colors"
+                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   {t("edit")}
@@ -361,7 +361,7 @@ export default function BusinessDetailPage({
                 <SectionCard title={t("overview")}>
                   <div className="space-y-4">
                     {data.description && (
-                      <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+                      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
                         {data.description}
                       </p>
                     )}
@@ -370,7 +370,7 @@ export default function BusinessDetailPage({
                         {tags.map((tag) => (
                           <span
                             key={tag}
-                            className="text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg"
+                            className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg"
                           >
                             {tag}
                           </span>
@@ -386,14 +386,14 @@ export default function BusinessDetailPage({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {data.persona && (
                     <SectionCard title={tOnb("reviewPersona")}>
-                      <p className="text-sm text-zinc-300 leading-relaxed">
+                      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
                         {data.persona}
                       </p>
                     </SectionCard>
                   )}
                   {data.clientPersona && (
                     <SectionCard title={tOnb("reviewClientPersona")}>
-                      <p className="text-sm text-zinc-300 leading-relaxed">
+                      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
                         {data.clientPersona}
                       </p>
                     </SectionCard>
@@ -411,7 +411,7 @@ export default function BusinessDetailPage({
                       type="button"
                       onClick={refreshBrand}
                       disabled={refreshingBrand}
-                      className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors px-2.5 py-1.5 rounded-md hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20"
+                      className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors px-2.5 py-1.5 rounded-md hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20"
                     >
                       <RefreshCw
                         className={`w-3 h-3 ${refreshingBrand ? "animate-spin" : ""}`}
@@ -422,7 +422,7 @@ export default function BusinessDetailPage({
                 }
               >
                 {brandError && (
-                  <div className="mb-4 flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-300">
+                  <div className="mb-4 flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-700 dark:text-red-300">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>{brandError}</span>
                   </div>
@@ -450,7 +450,7 @@ export default function BusinessDetailPage({
                           {data.brandFonts!.map((font) => (
                             <span
                               key={font}
-                              className="inline-flex items-center gap-1.5 text-sm text-zinc-200 bg-zinc-900/60 border border-zinc-800 px-3 py-1.5 rounded-lg"
+                              className="inline-flex items-center gap-1.5 text-sm text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-lg"
                               style={{ fontFamily: `"${font}", system-ui, sans-serif` }}
                             >
                               <Type className="w-3.5 h-3.5 text-zinc-500" />
@@ -462,7 +462,7 @@ export default function BusinessDetailPage({
                     )}
                     {hasBrandStyle && (
                       <Field label={t("brandStyle")}>
-                        <p className="text-sm text-zinc-300 leading-relaxed">
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
                           {data.brandStyle}
                         </p>
                       </Field>
@@ -470,11 +470,11 @@ export default function BusinessDetailPage({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-3">
-                      <Palette className="w-5 h-5 text-zinc-600" />
+                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center mb-3">
+                      <Palette className="w-5 h-5 text-zinc-500 dark:text-zinc-600" />
                     </div>
-                    <p className="text-sm text-zinc-400">{t("noBrand")}</p>
-                    <p className="text-xs text-zinc-600 mt-1">{t("noBrandHint")}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("noBrand")}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">{t("noBrandHint")}</p>
                   </div>
                 )}
               </SectionCard>
@@ -496,19 +496,19 @@ export default function BusinessDetailPage({
                   <div className="space-y-4">
                     {data.services && (
                       <Field label={t("services")}>
-                        <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
                           {data.services}
                         </p>
                       </Field>
                     )}
                     {data.serviceArea && (
                       <Field label={t("serviceArea")}>
-                        <p className="text-sm text-zinc-300">{data.serviceArea}</p>
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300">{data.serviceArea}</p>
                       </Field>
                     )}
                     {data.competitors && (
                       <Field label={t("competitors")}>
-                        <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
                           {data.competitors}
                         </p>
                       </Field>
@@ -519,7 +519,7 @@ export default function BusinessDetailPage({
                           {data.suggestedKeywords.map((kw) => (
                             <span
                               key={kw}
-                              className="text-xs text-zinc-300 bg-zinc-800/60 border border-zinc-800 px-2.5 py-1 rounded-lg"
+                              className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-lg"
                             >
                               {kw}
                             </span>

@@ -41,14 +41,14 @@ function Slot({
     accent === "emerald"
       ? "ring-emerald-500/30 bg-emerald-500/5"
       : "ring-sky-500/30 bg-sky-500/5"
-  const iconColor = accent === "emerald" ? "text-emerald-400" : "text-sky-400"
+  const iconColor = accent === "emerald" ? "text-emerald-600 dark:text-emerald-400" : "text-sky-600 dark:text-sky-400"
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-xl border border-zinc-800/70 ring-1 ${ring}`}
+      className={`flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/70 ring-1 ${ring}`}
     >
       <div className="relative shrink-0">
         <div
-          className="w-10 h-10 rounded-lg border border-zinc-800 shadow-inner"
+          className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-inner"
           style={{
             backgroundColor: value || "transparent",
             backgroundImage: value
@@ -57,7 +57,7 @@ function Slot({
           }}
         />
         <div
-          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center ${iconColor}`}
+          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center ${iconColor}`}
         >
           <Icon className="w-2.5 h-2.5" />
         </div>
@@ -67,18 +67,18 @@ function Slot({
           {label}
         </p>
         {value ? (
-          <p className="text-sm text-zinc-200 font-mono tabular-nums uppercase truncate">
+          <p className="text-sm text-zinc-800 dark:text-zinc-200 font-mono tabular-nums uppercase truncate">
             {value}
           </p>
         ) : (
-          <p className="text-sm text-zinc-600 italic">{emptyLabel}</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-600 italic">{emptyLabel}</p>
         )}
       </div>
       {value && (
         <button
           type="button"
           onClick={onClear}
-          className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60 transition-colors"
+          className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
           aria-label="Clear"
         >
           <X className="w-3.5 h-3.5" />
@@ -139,10 +139,10 @@ export function BrandColorPicker({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className={`group flex items-center gap-2.5 p-2 pr-2.5 rounded-xl border border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900/40 transition-all duration-150 text-left ${ringClass}`}
+                  className={`group flex items-center gap-2.5 p-2 pr-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-all duration-150 text-left ${ringClass}`}
                 >
                   <div
-                    className="w-9 h-9 rounded-lg border border-zinc-800 shrink-0 shadow-inner relative"
+                    className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0 shadow-inner relative"
                     style={{ backgroundColor: color }}
                   >
                     {(isPrimary || isSecondary) && (
@@ -156,16 +156,16 @@ export function BrandColorPicker({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-zinc-200 font-mono tabular-nums uppercase truncate">
+                    <p className="text-xs text-zinc-800 dark:text-zinc-200 font-mono tabular-nums uppercase truncate">
                       {color}
                     </p>
                     <p
                       className={`text-[10px] font-medium ${
                         isPrimary
-                          ? "text-emerald-400"
+                          ? "text-emerald-600 dark:text-emerald-400"
                           : isSecondary
-                            ? "text-sky-400"
-                            : "text-zinc-600 group-hover:text-zinc-500"
+                            ? "text-sky-600 dark:text-sky-400"
+                            : "text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-500"
                       }`}
                     >
                       {isPrimary
@@ -185,7 +185,7 @@ export function BrandColorPicker({
                   }}
                   disabled={isPrimary}
                 >
-                  <Star className="w-3.5 h-3.5 text-emerald-400" />
+                  <Star className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   {t("setAsPrimary")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -195,7 +195,7 @@ export function BrandColorPicker({
                   }}
                   disabled={isSecondary}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                   {t("setAsSecondary")}
                 </DropdownMenuItem>
                 {(isPrimary || isSecondary) && (
@@ -224,7 +224,7 @@ export function BrandColorPicker({
 export function BrandColorPickerEmpty() {
   const t = useTranslations("business")
   return (
-    <div className="flex items-center gap-2 text-xs text-zinc-600">
+    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-600">
       <Palette className="w-3.5 h-3.5" />
       {t("noBrand")}
     </div>

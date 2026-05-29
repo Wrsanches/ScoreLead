@@ -123,7 +123,7 @@ export default function AdminPage() {
                   delay: 0.15,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="text-[11px] text-emerald-400/80 font-semibold uppercase tracking-widest mb-2"
+                className="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 font-semibold uppercase tracking-widest mb-2"
               >
                 {t("dashboard")}
               </motion.p>
@@ -135,7 +135,7 @@ export default function AdminPage() {
                   delay: 0.3,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="text-2xl md:text-3xl text-white font-semibold tracking-tight leading-tight"
+                className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-semibold tracking-tight leading-tight"
               >
                 {hasRunningJobs ? "Your AI is working" : "Welcome back"}
               </motion.h1>
@@ -147,7 +147,7 @@ export default function AdminPage() {
                   delay: 0.45,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed"
+                className="text-zinc-600 dark:text-zinc-400 mt-2 max-w-lg text-sm leading-relaxed"
               >
                 {hasRunningJobs
                   ? `${stats?.jobs.running} discovery job${(stats?.jobs.running ?? 0) > 1 ? "s" : ""} running in the background.`
@@ -283,7 +283,7 @@ export default function AdminPage() {
                     </AreaChart>
                   </ChartContainer>
                 ) : (
-                  <div className="h-50 flex items-center justify-center text-zinc-600 text-sm">
+                  <div className="h-50 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
                     No data yet
                   </div>
                 )}
@@ -331,7 +331,7 @@ export default function AdminPage() {
                     </BarChart>
                   </ChartContainer>
                 ) : (
-                  <div className="h-50 flex items-center justify-center text-zinc-600 text-sm">
+                  <div className="h-50 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
                     No data yet
                   </div>
                 )}
@@ -380,7 +380,7 @@ export default function AdminPage() {
                                 PIE_COLORS[i % PIE_COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-zinc-400">
+                          <span className="text-sm text-zinc-600 dark:text-zinc-400">
                             {s.source}
                           </span>
                           <span className="text-sm text-zinc-500 tabular-nums ml-auto">
@@ -391,7 +391,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="h-35 flex items-center justify-center text-zinc-600 text-sm">
+                  <div className="h-35 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
                     No data yet
                   </div>
                 )}
@@ -424,17 +424,17 @@ export default function AdminPage() {
                         : 0;
                     return (
                       <div key={label} className="flex items-center gap-3">
-                        <Icon className="w-4 h-4 text-zinc-600 shrink-0" />
+                        <Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-600 shrink-0" />
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-zinc-400">
+                            <span className="text-sm text-zinc-600 dark:text-zinc-400">
                               {label}
                             </span>
                             <span className="text-xs text-zinc-500 tabular-nums">
                               {count} ({pct.toFixed(0)}%)
                             </span>
                           </div>
-                          <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-zinc-500 rounded-full"
                               style={{ width: `${pct}%` }}
@@ -452,7 +452,7 @@ export default function AdminPage() {
                 actions={
                   <Link
                     href="/admin/discovery-jobs"
-                    className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
+                    className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                   >
                     View all <ArrowRight className="w-3 h-3" />
                   </Link>
@@ -464,13 +464,13 @@ export default function AdminPage() {
                       <Link
                         key={job.id}
                         href={`/admin/discovery-jobs/${job.id}`}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/40 transition-colors group"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors group"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-zinc-200 truncate group-hover:text-white transition-colors">
+                          <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                             {job.name}
                           </p>
-                          <p className="text-xs text-zinc-600 mt-0.5">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-0.5">
                             <StatNumber value={job.insertedLeads} /> leads
                           </p>
                         </div>
@@ -490,7 +490,7 @@ export default function AdminPage() {
               actions={
                 <Link
                   href="/admin/leads"
-                  className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
+                  className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                 >
                   View all <ArrowRight className="w-3 h-3" />
                 </Link>
@@ -501,7 +501,7 @@ export default function AdminPage() {
                   {stats.recentLeads.map((lead) => (
                     <div
                       key={lead.id}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800/40 transition-colors group"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors group"
                     >
                       {lead.photoUrl ? (
                         <Image
@@ -513,17 +513,17 @@ export default function AdminPage() {
                           unoptimized
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-700/50">
-                          <span className="text-[10px] font-medium text-zinc-400">
+                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/50 dark:ring-zinc-700/50">
+                          <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
                             {getInitials(lead.name)}
                           </span>
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-zinc-200 truncate group-hover:text-white transition-colors">
+                        <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                           {lead.name || "Unknown"}
                         </p>
-                        <p className="text-xs text-zinc-600 truncate">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-600 truncate">
                           {[lead.city, lead.country]
                             .filter(Boolean)
                             .join(", ") || "No location"}
@@ -532,7 +532,7 @@ export default function AdminPage() {
                       <ScoreBadge score={lead.score} />
                       <StatNumber
                         value={formatRelativeDate(lead.createdAt)}
-                        className="text-xs text-zinc-600 shrink-0"
+                        className="text-xs text-zinc-500 dark:text-zinc-600 shrink-0"
                       />
                     </div>
                   ))}

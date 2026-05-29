@@ -133,7 +133,7 @@ export function AdminSidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-60 bg-zinc-950/95 backdrop-blur-xl flex flex-col shrink-0 duration-200 ease-out lg:relative lg:bg-transparent lg:backdrop-blur-none lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 w-60 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl flex flex-col shrink-0 duration-200 ease-out lg:relative lg:bg-transparent lg:backdrop-blur-none lg:translate-x-0 ${
         animateLayout ? "transition-[transform,width]" : "transition-transform"
       } ${open ? "translate-x-0" : "-translate-x-full"} ${
         collapsed ? "lg:w-18" : "lg:w-60"
@@ -145,7 +145,7 @@ export function AdminSidebar({
         <button
           type="button"
           onClick={() => onCollapsedChange(false)}
-          className={`hidden h-9 w-9 items-center justify-center rounded-lg text-white hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:flex" : ""}`}
+          className={`hidden h-9 w-9 items-center justify-center rounded-lg text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:flex" : ""}`}
           title="Expand sidebar"
           aria-label="Expand sidebar"
         >
@@ -154,15 +154,15 @@ export function AdminSidebar({
         <div
           className={`flex items-center gap-2.5 min-w-0 ${collapsed ? "lg:hidden" : ""}`}
         >
-          <ScoreLeadLogo className="w-6 h-6 text-white" />
-          <span className="text-white font-semibold text-[15px] tracking-tight truncate">
+          <ScoreLeadLogo className="w-6 h-6 text-zinc-900 dark:text-white" />
+          <span className="text-zinc-900 dark:text-white font-semibold text-[15px] tracking-tight truncate">
             ScoreLead
           </span>
         </div>
         <button
           type="button"
           onClick={() => onCollapsedChange(!collapsed)}
-          className={`hidden h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:hidden" : "lg:flex"}`}
+          className={`hidden h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:hidden" : "lg:flex"}`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-pressed={collapsed}
@@ -175,7 +175,7 @@ export function AdminSidebar({
         </button>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600"
+          className="lg:hidden p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600"
         >
           <X className="w-4 h-4" />
         </button>
@@ -185,7 +185,7 @@ export function AdminSidebar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 border border-zinc-800 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-800 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-800 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
               title={selectedBusiness?.name || t("noBusiness")}
             >
               {getBusinessLogo(selectedBusiness) ? (
@@ -200,17 +200,17 @@ export function AdminSidebar({
                   />
                 </span>
               ) : (
-                <div className="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                   <Building2 className="w-3.5 h-3.5 text-zinc-500" />
                 </div>
               )}
               <span
-                className={`flex-1 text-sm text-zinc-200 text-left truncate ${collapsed ? "lg:hidden" : ""}`}
+                className={`flex-1 text-sm text-zinc-800 dark:text-zinc-200 text-left truncate ${collapsed ? "lg:hidden" : ""}`}
               >
                 {selectedBusiness?.name || t("noBusiness")}
               </span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200 shrink-0 ${collapsed ? "lg:hidden" : ""}`}
+                className={`w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors duration-200 shrink-0 ${collapsed ? "lg:hidden" : ""}`}
               />
             </button>
           </DropdownMenuTrigger>
@@ -218,7 +218,7 @@ export function AdminSidebar({
             side="bottom"
             align="start"
             sideOffset={4}
-            className="w-54 bg-zinc-900 border-zinc-700/60 shadow-xl shadow-black/40"
+            className="w-54 bg-zinc-50 dark:bg-zinc-900 border-zinc-300/60 dark:border-zinc-700/60 shadow-xl shadow-black/40"
           >
             <DropdownMenuLabel className="px-3 py-1.5 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
               {t("businesses")}
@@ -232,7 +232,7 @@ export function AdminSidebar({
                     router.push(`/admin/business/${b.id}`);
                   }
                 }}
-                className="px-3 py-2 text-zinc-400 focus:text-zinc-200 focus:bg-zinc-800/60 cursor-pointer"
+                className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 w-full">
                   {getBusinessLogo(b) ? (
@@ -247,7 +247,7 @@ export function AdminSidebar({
                       />
                     </span>
                   ) : (
-                    <div className="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                       <Building2 className="w-3.5 h-3.5 text-zinc-500" />
                     </div>
                   )}
@@ -260,15 +260,15 @@ export function AdminSidebar({
                     )}
                   </div>
                   {b.id === selectedBusinessId && (
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   )}
                 </div>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
             <DropdownMenuItem
               onClick={() => router.push("/onboarding?new=true")}
-              className="px-3 py-2 text-zinc-400 focus:text-zinc-200 focus:bg-zinc-800/60 cursor-pointer"
+              className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               {t("addBusiness")}
@@ -278,7 +278,7 @@ export function AdminSidebar({
 
         <button
           onClick={openSearch}
-          className={`w-full flex items-center gap-2.5 px-3 py-2 bg-zinc-800/40 rounded-lg text-zinc-500 text-sm cursor-pointer hover:bg-zinc-800/70 border border-zinc-800 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-700 transition-all duration-150 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+          className={`w-full flex items-center gap-2.5 px-3 py-2 bg-zinc-200/40 dark:bg-zinc-800/40 rounded-lg text-zinc-500 text-sm cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-800 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-300 dark:focus-within:ring-zinc-700 transition-all duration-150 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
           title={t("searchLeads")}
         >
           <Search className="w-4 h-4" />
@@ -286,7 +286,7 @@ export function AdminSidebar({
             {t("searchLeads")}
           </span>
           <span
-            className={`ml-auto text-xs bg-zinc-700/60 text-zinc-400 px-1.5 py-0.5 rounded-md font-medium ${collapsed ? "lg:hidden" : ""}`}
+            className={`ml-auto text-xs bg-zinc-300/60 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-400 px-1.5 py-0.5 rounded-md font-medium ${collapsed ? "lg:hidden" : ""}`}
           >
             &#8984;K
           </span>
@@ -361,7 +361,7 @@ export function AdminSidebar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+              className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-800 dark:hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
               title={userName || userEmail || "Account"}
             >
               {userImage ? (
@@ -370,28 +370,28 @@ export function AdminSidebar({
                   alt=""
                   width={28}
                   height={28}
-                  className="w-7 h-7 rounded-full shrink-0 ring-1 ring-zinc-600/50 group-hover:ring-zinc-500/50 transition-all duration-200 object-cover"
+                  className="w-7 h-7 rounded-full shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200 object-cover"
                   unoptimized
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-linear-to-br from-zinc-600 to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-600/50 group-hover:ring-zinc-500/50 transition-all duration-200">
+                <div className="w-7 h-7 rounded-full bg-linear-to-br from-zinc-400 dark:from-zinc-600 to-zinc-500 dark:to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200">
                   {userInitials ? (
-                    <span className="text-xs font-medium text-zinc-300">
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                       {userInitials}
                     </span>
                   ) : (
-                    <User className="w-3.5 h-3.5 text-zinc-300" />
+                    <User className="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" />
                   )}
                 </div>
               )}
               <div
                 className={`flex-1 min-w-0 text-left ${collapsed ? "lg:hidden" : ""}`}
               >
-                <p className="text-sm text-zinc-200 truncate">{userName}</p>
+                <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{userName}</p>
                 <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
               </div>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors duration-200 ${collapsed ? "lg:hidden" : ""}`}
+                className={`w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors duration-200 ${collapsed ? "lg:hidden" : ""}`}
               />
             </button>
           </DropdownMenuTrigger>
@@ -399,7 +399,7 @@ export function AdminSidebar({
             side="top"
             align="start"
             sideOffset={8}
-            className="w-54 bg-zinc-900 border-zinc-700/60 shadow-xl shadow-black/40"
+            className="w-54 bg-zinc-50 dark:bg-zinc-900 border-zinc-300/60 dark:border-zinc-700/60 shadow-xl shadow-black/40"
           >
             <DropdownMenuLabel className="px-3 py-2.5 font-normal">
               <div className="flex items-center gap-2.5">
@@ -409,40 +409,40 @@ export function AdminSidebar({
                     alt=""
                     width={32}
                     height={32}
-                    className="w-8 h-8 rounded-full shrink-0 ring-1 ring-zinc-600/50 object-cover"
+                    className="w-8 h-8 rounded-full shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 object-cover"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-zinc-600 to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-600/50">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-zinc-400 dark:from-zinc-600 to-zinc-500 dark:to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50">
                     {userInitials ? (
-                      <span className="text-xs font-medium text-zinc-300">
+                      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                         {userInitials}
                       </span>
                     ) : (
-                      <User className="w-4 h-4 text-zinc-300" />
+                      <User className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
                     )}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-zinc-200 truncate">
+                  <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
                     {userName}
                   </p>
                   <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-800" />
-            <DropdownMenuItem className="px-3 py-2 text-zinc-400 focus:text-zinc-200 focus:bg-zinc-800/60 cursor-pointer">
+            <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
+            <DropdownMenuItem className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer">
               <Settings className="w-4 h-4" />
               {t("settings")}
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
             <DropdownMenuItem
               onClick={async () => {
                 await authClient.signOut();
                 router.push("/login");
               }}
-              className="px-3 py-2 text-red-400/80 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
+              className="px-3 py-2 text-red-600/80 dark:text-red-400/80 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               {t("signOut")}
@@ -474,8 +474,8 @@ function NavItem({
       <Icon
         className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
           active
-            ? "text-emerald-400"
-            : "text-zinc-500 group-hover:text-emerald-300"
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-zinc-500 group-hover:text-emerald-700 dark:group-hover:text-emerald-300"
         }`}
       />
       <span className={`flex-1 text-sm ${collapsed ? "lg:hidden" : ""}`}>
@@ -491,10 +491,10 @@ function NavItem({
     </>
   );
 
-  const className = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 group ${
+  const className = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 group ${
     active
-      ? "bg-emerald-500/8 text-white"
-      : "text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200"
+      ? "bg-emerald-500/8 text-zinc-900 dark:text-white"
+      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/40 hover:text-zinc-800 dark:hover:text-zinc-200"
   } ${collapsed ? "lg:justify-center lg:px-0" : ""}`;
 
   if (href) {

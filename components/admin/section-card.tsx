@@ -1,7 +1,7 @@
 export type SectionAccent = "none" | "emerald" | "sky" | "violet" | "amber"
 
 const ACCENT_CLASSES: Record<SectionAccent, string> = {
-  none:    "border-zinc-800/60",
+  none:    "border-zinc-200/80 dark:border-zinc-800/60",
   emerald: "border-emerald-500/25 bg-gradient-to-b from-emerald-500/[0.04] to-transparent",
   sky:     "border-sky-500/25 bg-gradient-to-b from-sky-500/[0.04] to-transparent",
   violet:  "border-violet-500/25 bg-gradient-to-b from-violet-500/[0.04] to-transparent",
