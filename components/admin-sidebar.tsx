@@ -21,12 +21,14 @@ import {
   Plus,
   Columns3,
   CalendarDays,
+  Zap,
 } from "lucide-react";
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
 import { authClient } from "@/lib/auth-client";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
+import { usePlan } from "@/components/admin/plan-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +74,8 @@ export function AdminSidebar({
   animateLayout: boolean;
 }) {
   const t = useTranslations("dashboard");
+  const tb = useTranslations("billing");
+  const { isPro, openUpgrade } = usePlan();
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
@@ -351,6 +355,26 @@ export function AdminSidebar({
       )}
 
       <div className="mt-auto p-3">
+        {!isPro && (
+          <button
+            type="button"
+            onClick={openUpgrade}
+            title={tb("upgradeCta")}
+            className={`group w-full mb-2 flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/10 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/40 ${collapsed ? "lg:justify-center lg:px-0 lg:py-2 px-3 py-2.5" : "px-3 py-2.5"}`}
+          >
+            <span className="shrink-0 w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            </span>
+            <span className={`flex-1 min-w-0 text-left ${collapsed ? "lg:hidden" : ""}`}>
+              <span className="block text-sm font-medium text-emerald-700 dark:text-emerald-300 truncate">
+                {tb("upgradeCta")}
+              </span>
+              <span className="block text-[11px] text-emerald-700/70 dark:text-emerald-400/60 truncate">
+                {tb("proTagline")}
+              </span>
+            </span>
+          </button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -421,6 +445,16 @@ export function AdminSidebar({
                     {userName}
                   </p>
                   <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
+                  <span
+                    className={`mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[10px] font-medium ${
+                      isPro
+                        ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                        : "bg-zinc-500/10 border-zinc-500/20 text-zinc-500 dark:text-zinc-400"
+                    }`}
+                  >
+                    {isPro ? <Zap className="w-2.5 h-2.5" /> : null}
+                    {isPro ? tb("proPlan") : tb("freePlan")}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>

@@ -20,6 +20,7 @@ import { GenerateBanner } from "@/components/admin/content-calendar/generate-ban
 import { CalendarEmptyState } from "@/components/admin/content-calendar/empty-state";
 import type { ContentPostRow } from "@/components/admin/content-calendar/types";
 import { uploadImage } from "@/lib/upload-client";
+import { usePlan } from "@/components/admin/plan-context";
 
 function monthStartUtc(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
@@ -37,6 +38,7 @@ export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
   const locale = useLocale();
   const businessId = useBusinessId();
+  const { openUpgrade } = usePlan();
   const weekStartsOn: 0 | 1 = locale === "en" ? 0 : 1;
   const [cursor, setCursor] = useState<Date>(() => monthStartUtc(new Date()));
   const [posts, setPosts] = useState<ContentPostRow[]>([]);
@@ -127,7 +129,8 @@ export default function ContentCalendarPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(body?.error || "Generation failed");
+        if (res.status === 402) openUpgrade();
+        else setError(body?.error || "Generation failed");
         return;
       }
       const fresh = (body.posts as ContentPostRow[]) ?? [];
@@ -261,6 +264,10 @@ export default function ContentCalendarPage() {
     const res = await fetch(`/api/content-calendar/${postId}/image`, {
       method: "POST",
     });
+    if (res.status === 402) {
+      openUpgrade();
+      throw new Error("PLAN_LIMIT");
+    }
     if (!res.ok) throw new Error("Failed");
     const body = await res.json();
     if (body.post) {
@@ -289,6 +296,10 @@ export default function ContentCalendarPage() {
         body: JSON.stringify({ refinementPrompt }),
       },
     );
+    if (res.status === 402) {
+      openUpgrade();
+      throw new Error("PLAN_LIMIT");
+    }
     if (!res.ok) throw new Error("Failed");
     const body = await res.json();
     if (body.post) {

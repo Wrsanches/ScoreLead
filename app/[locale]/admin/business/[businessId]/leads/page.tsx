@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
+import { ZoomableImage } from "@/components/admin/zoomable-image";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSearch } from "@/components/search-overlay";
@@ -571,16 +572,12 @@ export default function LeadsPage() {
                         {/* Avatar */}
                         <div className="relative shrink-0">
                           {lead.photoUrl ? (
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden ring-1 ring-zinc-700/80 shadow-lg shadow-black/30">
-                              <Image
-                                src={lead.photoUrl}
-                                alt=""
-                                fill
-                                sizes="(min-width: 640px) 80px, 64px"
-                                className="object-cover"
-                                unoptimized
-                              />
-                            </div>
+                            <ZoomableImage
+                              src={lead.photoUrl}
+                              alt={lead.name ?? ""}
+                              sizes="(min-width: 640px) 80px, 64px"
+                              thumbClassName="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ring-1 ring-zinc-700/80 shadow-lg shadow-black/30"
+                            />
                           ) : (
                             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-200/80 dark:bg-zinc-800/80 flex items-center justify-center ring-1 ring-zinc-700/60 shadow-lg shadow-black/25">
                               <span className="text-xl sm:text-2xl font-semibold text-zinc-600 dark:text-zinc-400">

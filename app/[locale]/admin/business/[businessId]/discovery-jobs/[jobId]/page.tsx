@@ -13,6 +13,7 @@ import {
   LoadingState,
 } from "@/components/admin"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
+import { DiscoveryRunningPanel } from "@/components/admin/discovery-running-panel"
 
 interface Job {
   id: string
@@ -23,7 +24,10 @@ interface Job {
   serviceArea: string
   status: string
   insertedLeads: number
-  totalProcessed: number
+  totalFound: number
+  duplicateLeads: number
+  completedQueries: number
+  currentQuery: string | null
   errorMessage: string | null
   createdAt: string
   completedAt: string | null
@@ -55,18 +59,37 @@ export default function DiscoveryJobDetailPage({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`/api/discovery/jobs/${id}`)
-      .then((r) => r.ok ? r.json() : null)
-      .then(setJob)
-      .catch(() => {})
-  }, [id])
+    let cancelled = false
+    let interval: ReturnType<typeof setInterval> | null = null
 
-  useEffect(() => {
-    fetch(`/api/discovery/jobs/${id}/stats`)
-      .then((r) => r.ok ? r.json() : null)
-      .then(setStats)
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    const stop = () => {
+      if (interval) {
+        clearInterval(interval)
+        interval = null
+      }
+    }
+
+    async function load() {
+      const [j, s] = await Promise.all([
+        fetch(`/api/discovery/jobs/${id}`).then((r) => (r.ok ? r.json() : null)),
+        fetch(`/api/discovery/jobs/${id}/stats`).then((r) => (r.ok ? r.json() : null)),
+      ]).catch(() => [null, null])
+      if (cancelled) return
+      if (j) setJob(j)
+      if (s) setStats(s)
+      setLoading(false)
+      // Keep polling only while the job is still working.
+      if (!j || (j.status !== "running" && j.status !== "queued" && j.status !== "pending")) {
+        stop()
+      }
+    }
+
+    load()
+    interval = setInterval(load, 2500)
+    return () => {
+      cancelled = true
+      stop()
+    }
   }, [id])
 
   const keywords = job ? parseKeywords(job.keywords) : []
@@ -124,23 +147,10 @@ export default function DiscoveryJobDetailPage({
                 )}
               </div>
 
-              {/* Progress */}
-              {(job.status === "running" || job.status === "pending") && (
-                <div className="mb-8">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-zinc-600 dark:text-zinc-400 text-sm">Progress</span>
-                    <span className="text-zinc-600 dark:text-zinc-400 text-sm tabular-nums">
-                      {job.totalProcessed} / {job.maxResults} processed
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                      style={{ width: `${job.maxResults > 0 ? (job.totalProcessed / job.maxResults) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+              {/* Live progress while the job is working */}
+              {(job.status === "running" ||
+                job.status === "queued" ||
+                job.status === "pending") && <DiscoveryRunningPanel job={job} />}
 
               {/* Stats */}
               <div>

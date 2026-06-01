@@ -73,9 +73,9 @@ export function getPillar(key: string | null | undefined): PillarMeta | null {
   return PILLAR_BY_KEY[key as ContentPillar] ?? null
 }
 
+// We only generate static images, so video formats (Reel) are not offered.
 export const POST_TYPES: { key: ContentPostType; label: string }[] = [
   { key: "single", label: "Single" },
   { key: "carousel", label: "Carousel" },
-  { key: "reel", label: "Reel" },
   { key: "story", label: "Story" },
 ]

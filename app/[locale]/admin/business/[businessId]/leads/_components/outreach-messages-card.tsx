@@ -18,6 +18,7 @@ import {
   Smartphone,
 } from "lucide-react"
 import { toast } from "sonner"
+import { usePlan } from "@/components/admin/plan-context"
 import { AiOrb } from "@/components/ai-orb"
 
 export interface OutreachMessage {
@@ -40,39 +41,9 @@ interface OutreachMessagesCardProps {
   }
 }
 
-// Per-step visual config: icon + colors + connecting line gradient.
-const STEP_CONFIGS = [
-  {
-    icon: Handshake,
-    border: "border-sky-500/25",
-    bg: "bg-sky-500/[0.04]",
-    iconBg: "bg-sky-500/15 ring-sky-500/30",
-    iconText: "text-sky-700 dark:text-sky-300",
-    chipBg: "bg-sky-500/15",
-    chipText: "text-sky-700 dark:text-sky-200",
-    line: "from-sky-500/40 via-sky-500/20 to-violet-500/30",
-  },
-  {
-    icon: Lightbulb,
-    border: "border-violet-500/25",
-    bg: "bg-violet-500/[0.04]",
-    iconBg: "bg-violet-500/15 ring-violet-500/30",
-    iconText: "text-violet-700 dark:text-violet-300",
-    chipBg: "bg-violet-500/15",
-    chipText: "text-violet-700 dark:text-violet-200",
-    line: "from-violet-500/40 via-violet-500/20 to-emerald-500/30",
-  },
-  {
-    icon: Send,
-    border: "border-emerald-500/25",
-    bg: "bg-emerald-500/[0.04]",
-    iconBg: "bg-emerald-500/15 ring-emerald-500/30",
-    iconText: "text-emerald-700 dark:text-emerald-300",
-    chipBg: "bg-emerald-500/15",
-    chipText: "text-emerald-700 dark:text-emerald-200",
-    line: "",
-  },
-] as const
+// A cohesive 3-beat cadence: greet -> give value -> ask. One emerald accent
+// throughout (matches the app) - the step number + icon carry the distinction.
+const STEP_ICONS = [Handshake, Lightbulb, Send] as const
 
 export function OutreachMessagesCard({
   leadId,
@@ -81,6 +52,7 @@ export function OutreachMessagesCard({
   contact,
 }: OutreachMessagesCardProps) {
   const t = useTranslations("outreach")
+  const { openUpgrade } = usePlan()
   const [messages, setMessages] = useState<OutreachMessage[]>(initialMessages ?? [])
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(initialMessages === undefined)
@@ -130,6 +102,8 @@ export function OutreachMessagesCard({
         setMessages(data.messages)
         onMessagesChange?.(data.messages)
         toast.success(t("toastGenerated"))
+      } else if (res.status === 402) {
+        openUpgrade()
       } else {
         const body = await res.json().catch(() => ({}))
         toast.error(body?.error || t("toastGenerateError"))
@@ -138,7 +112,7 @@ export function OutreachMessagesCard({
       toast.error(t("toastGenerateError"))
     }
     setLoading(false)
-  }, [leadId, onMessagesChange, t])
+  }, [leadId, onMessagesChange, t, openUpgrade])
 
   const handleCopy = useCallback(
     (body: string, idx: number) => {
@@ -149,6 +123,14 @@ export function OutreachMessagesCard({
     },
     [t],
   )
+
+  const handleCopyAll = useCallback(() => {
+    const text = messages
+      .map((m) => `${m.label}${m.subject ? `\n${m.subject}` : ""}\n${m.body}`)
+      .join("\n\n")
+    navigator.clipboard.writeText(text)
+    toast.success(t("toastCopied"))
+  }, [messages, t])
 
   const startEditing = useCallback(
     (idx: number) => {
@@ -208,25 +190,34 @@ export function OutreachMessagesCard({
       <OutreachHeader
         title={t("title")}
         subtitle={
-          hasMessages
-            ? `${messages.length} ${messages.length === 1 ? "message" : "messages"}`
-            : t("emptyTitle")
+          hasMessages ? t("stepSequence", { count: messages.length }) : t("emptyTitle")
         }
       >
         {hasMessages && (
-          <button
-            type="button"
-            onClick={generate}
-            disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="w-3.5 h-3.5" />
-            )}
-            {loading ? t("generating") : t("regenerate")}
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleCopyAll}
+              className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-all duration-150"
+              title={t("copyAll")}
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t("copyAll")}</span>
+            </button>
+            <button
+              type="button"
+              onClick={generate}
+              disabled={loading}
+              className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5" />
+              )}
+              {loading ? t("generating") : t("regenerate")}
+            </button>
+          </div>
         )}
       </OutreachHeader>
 
@@ -249,11 +240,10 @@ export function OutreachMessagesCard({
           <div className="relative">
             <AnimatePresence>
               {messages.map((msg, idx) => {
-                const cfg = STEP_CONFIGS[idx] || STEP_CONFIGS[0]
+                const Icon = STEP_ICONS[idx] || STEP_ICONS[0]
                 const isEditing = editingIdx === idx
                 const isCopied = copiedIdx === idx
                 const isLast = idx === messages.length - 1
-                const Icon = cfg.icon
 
                 return (
                   <motion.div
@@ -266,38 +256,34 @@ export function OutreachMessagesCard({
                       delay: idx * 0.12,
                       ease: [0.25, 0.46, 0.45, 0.94],
                     }}
-                    className="relative flex gap-4 pb-4 last:pb-0"
+                    className="relative flex gap-4 pb-5 last:pb-0"
                   >
-                    {/* Left rail: step icon + connecting line */}
+                    {/* Left rail: numbered, glowing step node + drawn connector */}
                     <div className="relative flex flex-col items-center shrink-0">
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ring-1 ${cfg.iconBg} ${cfg.iconText} shadow-lg shadow-black/20`}
-                      >
+                      <div className="relative z-10 w-9 h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-500/25 to-emerald-600/10 ring-1 ring-emerald-500/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_22px_-6px_rgba(16,185,129,0.65)]">
                         <Icon className="w-4 h-4" />
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-950 ring-1 ring-emerald-500/40 text-[9px] font-bold text-emerald-600 dark:text-emerald-300 flex items-center justify-center tabular-nums">
+                          {msg.step}
+                        </span>
                       </div>
                       {!isLast && (
-                        <div
-                          className={`w-px flex-1 min-h-4 mt-1.5 bg-gradient-to-b ${cfg.line}`}
+                        <motion.div
+                          initial={{ scaleY: 0 }}
+                          animate={{ scaleY: 1 }}
+                          transition={{ duration: 0.5, delay: idx * 0.12 + 0.25, ease: "easeOut" }}
+                          style={{ originY: 0 }}
+                          className="w-px flex-1 min-h-5 mt-1.5 bg-gradient-to-b from-emerald-500/45 to-emerald-500/5"
                         />
                       )}
                     </div>
 
                     {/* Message card */}
-                    <div
-                      className={`group flex-1 rounded-xl border overflow-hidden transition-colors ${cfg.border} ${cfg.bg}`}
-                    >
+                    <div className="group flex-1 rounded-xl border border-zinc-200/80 dark:border-zinc-800/70 bg-gradient-to-br from-white/70 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/30 overflow-hidden transition-all duration-200 hover:border-emerald-500/30 hover:shadow-[0_10px_30px_-14px_rgba(0,0,0,0.55)] hover:-translate-y-0.5">
                       {/* Card header */}
-                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-200/70 dark:border-zinc-800/50">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${cfg.chipBg} ${cfg.chipText} tabular-nums`}
-                          >
-                            {msg.step}
-                          </span>
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 truncate">
-                            {msg.label}
-                          </span>
-                        </div>
+                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-zinc-800/50">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 truncate">
+                          {msg.label}
+                        </span>
                         <div className="flex items-center gap-0.5 shrink-0">
                           {isEditing ? null : (
                             <>
@@ -377,6 +363,16 @@ export function OutreachMessagesCard({
                         </div>
                       ) : (
                         <>
+                          {msg.subject && (
+                            <div className="px-4 pt-3">
+                              <span className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
+                                {t("subject")}
+                              </span>
+                              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 leading-snug">
+                                {msg.subject}
+                              </p>
+                            </div>
+                          )}
                           <p className="px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap text-zinc-800 dark:text-zinc-200">
                             {msg.body}
                           </p>

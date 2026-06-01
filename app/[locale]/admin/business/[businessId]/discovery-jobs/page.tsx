@@ -237,10 +237,24 @@ export default function DiscoveryJobsPage() {
                       </div>
                     </div>
 
-                    {isRunning && job.currentQuery && (
-                      <div className="mt-2.5 pt-2.5 border-t border-emerald-500/10">
-                        <span className="text-zinc-500 dark:text-zinc-600 text-[11px]">Searching: </span>
-                        <span className="text-emerald-600/80 dark:text-emerald-400/80 text-[11px]">{job.currentQuery}</span>
+                    {isRunning && (
+                      <div className="mt-2.5 pt-2.5 border-t border-emerald-500/10 flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex items-center gap-1.5">
+                          <span className="relative flex h-1.5 w-1.5 shrink-0">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          </span>
+                          {job.currentQuery ? (
+                            <span className="truncate text-[11px] text-emerald-600/80 dark:text-emerald-400/80">
+                              {job.currentQuery}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-600">Starting...</span>
+                          )}
+                        </div>
+                        <span className="shrink-0 text-[11px] text-zinc-500 dark:text-zinc-600 tabular-nums">
+                          {job.completedQueries} queries · {job.totalFound} found
+                        </span>
                       </div>
                     )}
                   </div>

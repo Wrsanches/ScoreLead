@@ -10,6 +10,7 @@ import {
   type OutreachLead,
   type OutreachSender,
 } from "@/lib/services/outreach-messages"
+import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
 
 export const maxDuration = 60
 
@@ -71,6 +72,23 @@ export async function POST(
     return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
 
+  // Gate: Free allows 3 AI outreach generations total.
+  try {
+    await assertCanUse(session.user.id, "outreachMessage")
+  } catch (e) {
+    if (e instanceof PlanLimitError) {
+      return NextResponse.json(
+        {
+          error: "You've used your free outreach messages. Upgrade to Pro for unlimited.",
+          code: "PLAN_LIMIT",
+          action: e.action,
+        },
+        { status: 402 },
+      )
+    }
+    throw e
+  }
+
   // Fetch the sender's business profile so the prompt knows who is writing.
   const [senderBusiness] = await db
     .select()
@@ -124,6 +142,8 @@ export async function POST(
       { status: 500 },
     )
   }
+
+  await recordUsage(session.user.id, "outreachMessage")
 
   await db
     .update(lead)

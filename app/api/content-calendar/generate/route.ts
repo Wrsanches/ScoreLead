@@ -8,6 +8,7 @@ import { z } from "zod"
 import { generateContentPlan } from "@/lib/services/content-calendar-generator"
 import { removePublicImage } from "@/lib/services/content-image-generator"
 import { resolveBusinessId } from "@/lib/active-business"
+import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
 
 const schema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
@@ -49,6 +50,23 @@ export async function POST(request: Request) {
       { error: "Active business not found" },
       { status: 404 },
     )
+  }
+
+  // Gate: Free allows 1 content plan generation total.
+  try {
+    await assertCanUse(session.user.id, "contentPlan")
+  } catch (e) {
+    if (e instanceof PlanLimitError) {
+      return NextResponse.json(
+        {
+          error: "You've used your free content plan. Upgrade to Pro for unlimited plans.",
+          code: "PLAN_LIMIT",
+          action: e.action,
+        },
+        { status: 402 },
+      )
+    }
+    throw e
   }
 
   const now = new Date()
@@ -153,6 +171,7 @@ export async function POST(request: Request) {
   }))
 
   await db.insert(contentPost).values(toInsert)
+  await recordUsage(session.user.id, "contentPlan")
 
   const inserted = await db
     .select()

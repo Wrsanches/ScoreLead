@@ -901,7 +901,7 @@ function blank(draftDate: Date | null): PostFormValues {
   d.setHours(11, 0, 0, 0);
   return {
     scheduledFor: d.toISOString(),
-    postType: "reel",
+    postType: "single",
     pillar: "educate",
     caption: "",
     hashtags: [],

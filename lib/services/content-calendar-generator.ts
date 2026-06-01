@@ -75,7 +75,8 @@ function buildBusinessContext(b: GeneratorBusiness): string {
   return parts.join("\n")
 }
 
-const VALID_POST_TYPES = new Set(["single", "carousel", "reel"])
+// We only produce static image posts - no video/reels.
+const VALID_POST_TYPES = new Set(["single", "carousel"])
 const VALID_PILLARS = new Set([
   "educate",
   "showcase",
@@ -154,7 +155,12 @@ export async function generateContentPlan(
     for (const raw of data.posts as Array<Record<string, unknown>>) {
       const date = parseDate(raw.scheduledFor)
       if (!date) continue
-      const postType = raw.postType
+      let postType = raw.postType
+      // Safety net: we only generate images, so coerce any video/reel/story
+      // the model still suggests into a static image format.
+      if (postType === "reel" || postType === "story" || postType === "video") {
+        postType = "carousel"
+      }
       const pillar = raw.pillar
       const caption = raw.caption
       const visualIdea = raw.visualIdea

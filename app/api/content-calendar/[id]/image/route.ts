@@ -6,6 +6,7 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { generatePostImages } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
+import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
 
 export const maxDuration = 300
@@ -50,6 +51,26 @@ export async function POST(
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
+  // Gate: AI image generation (priciest op). Free = 3 lifetime; Pro = monthly cap.
+  try {
+    await assertCanUse(session.user.id, "aiImage", 1)
+  } catch (e) {
+    if (e instanceof PlanLimitError) {
+      return NextResponse.json(
+        {
+          error:
+            e.plan === "free"
+              ? "You've used your free AI images. Upgrade to Pro to generate more."
+              : "Monthly AI image limit reached.",
+          code: "PLAN_LIMIT",
+          action: e.action,
+        },
+        { status: 402 },
+      )
+    }
+    throw e
+  }
+
   const result = await generatePostImages(
     {
       name: biz.name,
@@ -79,6 +100,9 @@ export async function POST(
       { status: 502 },
     )
   }
+
+  // Record the actual number of images produced (carousels generate several).
+  await recordUsage(session.user.id, "aiImage", result.slides.length)
 
   await db
     .update(contentPost)

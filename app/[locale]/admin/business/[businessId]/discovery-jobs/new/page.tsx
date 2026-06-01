@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useBusinessId } from "@/components/admin/business-context"
+import { usePlan } from "@/components/admin/plan-context"
 import {
   MapPin,
   Search,
@@ -28,6 +29,7 @@ export default function NewDiscoveryJobPage() {
   const savedSearchId = searchParams.get("savedSearchId")
   // The business is fixed by the URL - this form always creates a job under it.
   const businessId = useBusinessId()
+  const { openUpgrade } = usePlan()
 
   // Form state
   const [jobName, setJobName] = useState("")
@@ -252,8 +254,12 @@ export default function NewDiscoveryJobPage() {
       })
 
       if (!res.ok) {
-        const err = await res.json()
-        toast.error(err.error || "Failed to start discovery")
+        const err = await res.json().catch(() => ({}))
+        if (res.status === 402) {
+          openUpgrade()
+        } else {
+          toast.error(err.error || "Failed to start discovery")
+        }
         setIsSubmitting(false)
         return
       }

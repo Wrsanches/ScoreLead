@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { assertCanUse, PlanLimitError } from "@/lib/plan"
 
 const completeSchema = z.object({
   name: z.string().min(1),
@@ -74,6 +75,22 @@ export async function POST(request: Request) {
       })
       .where(eq(business.id, inProgress.id))
   } else {
+    // Creating a brand-new business - gated by plan (Free = 1 business).
+    try {
+      await assertCanUse(session.user.id, "business")
+    } catch (e) {
+      if (e instanceof PlanLimitError) {
+        return NextResponse.json(
+          {
+            error: "The Free plan includes 1 business. Upgrade to Pro to add more.",
+            code: "PLAN_LIMIT",
+            action: e.action,
+          },
+          { status: 402 },
+        )
+      }
+      throw e
+    }
     await db.insert(business).values({
       id: crypto.randomUUID(),
       userId: session.user.id,

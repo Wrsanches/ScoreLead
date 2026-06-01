@@ -16,6 +16,7 @@ import { AISection } from "./ai-section"
 import { PipelineSection } from "./pipeline-section"
 import { WaitlistSection } from "./waitlist-section"
 import { WaitlistFooter } from "./waitlist-footer"
+import { PricingSection } from "./pricing-section"
 import { CookieConsent } from "./cookie-consent"
 import { Link } from "@/i18n/routing"
 
@@ -172,6 +173,7 @@ export function LandingPage() {
           <FeatureCardsSection />
           <AISection />
           <PipelineSection />
+          <PricingSection />
           <WaitlistSection />
           <WaitlistFooter />
         </div>

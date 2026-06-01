@@ -1,7 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { ZoomableImage } from "@/components/admin/zoomable-image"
 import {
   Mail,
   Phone,
@@ -89,16 +89,12 @@ export function LeadDetailModal({
         <div className="relative px-6 pt-6 pb-5 border-b border-zinc-200 dark:border-zinc-800/70">
           <div className="flex items-start gap-4">
             {lead.photoUrl ? (
-              <span className="relative w-16 h-16 rounded-2xl overflow-hidden ring-1 ring-zinc-700/80 shadow-lg shadow-black/30 shrink-0 block">
-                <Image
-                  src={lead.photoUrl}
-                  alt=""
-                  fill
-                  sizes="64px"
-                  className="object-cover"
-                  unoptimized
-                />
-              </span>
+              <ZoomableImage
+                src={lead.photoUrl}
+                alt={lead.name ?? ""}
+                sizes="64px"
+                thumbClassName="w-16 h-16 rounded-2xl ring-1 ring-zinc-700/80 shadow-lg shadow-black/30 shrink-0"
+              />
             ) : (
               <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-700/60">
                 <span className="text-xl font-semibold text-zinc-600 dark:text-zinc-400">

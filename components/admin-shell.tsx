@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext } from "react"
 import { Menu } from "lucide-react"
 import { AdminSidebar } from "./admin-sidebar"
 import { SearchProvider } from "./search-overlay"
+import { PlanProvider } from "@/components/admin/plan-context"
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -25,6 +26,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [sidebarCollapsed, sidebarPreferenceLoaded])
 
   return (
+    <PlanProvider>
     <SearchProvider>
       <div className="flex h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950">
         {sidebarOpen && (
@@ -65,6 +67,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     </SearchProvider>
+    </PlanProvider>
   )
 }
 

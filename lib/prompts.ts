@@ -208,24 +208,21 @@ CONTENT PILLAR MIX (enforce these weights across all posts):
 - proof: ~10% - testimonials, reviews, case studies, numbers.
 - engagement: ~15% - questions, polls, "this or that", carousels that ask the viewer to comment.
 
-FORMAT MIX (enforce per week of posts):
-- ~55% reel - priority format; Instagram heavily boosts Reels for discovery.
-- ~30% carousel - best for educate; drives saves and long watch time.
-- ~15% single - reserved for a single strong photograph or a bold quote.
-- Do NOT use "story" as postType in the generated plan (ephemeral stories are not scheduled here).
-- Valid postType values: "single" | "carousel" | "reel".
+FORMAT MIX (IMPORTANT: we only produce static IMAGE posts - never suggest video, Reels, stories, or anything requiring motion):
+- ~60% carousel - best for educate/proof; multi-image, drives saves.
+- ~40% single - a single strong image: hero photograph, bold quote, or stat.
+- Valid postType values: "single" | "carousel" ONLY. Never use "reel", "story", "video", or any motion/video format.
 
-CONTENT-TO-FORMAT RULES (these override the format mix when the content calls for it - match format to substance, not quota):
+CONTENT-TO-FORMAT RULES (match format to substance; both formats are still static images):
 - If the caption hook starts with a number+noun ("5 things", "3 mistakes", "7 ways", "10 tips", "4 steps") or implies a list/checklist/breakdown → MUST be "carousel". Lists are carousels. Always. Never single.
-- If the caption teaches a framework, walks through steps, or compares options (A vs B) → "carousel".
-- If the caption shows a transformation, a time-lapse, a process, a demo, a reaction, or anything that benefits from motion → "reel".
-- If the caption is ONE strong sentence (quote, stat, proof point, bold claim) OR a single hero photograph → "single".
+- If the caption teaches a framework, walks through steps, compares options (A vs B), or shows a process / transformation / before-after → "carousel" (tell it across slides as images, NOT a video).
+- If the caption is ONE strong sentence (quote, stat, proof point, bold claim) OR a single hero image → "single".
 - If the caption asks a direct question that wants comments → "single" or "carousel" (open-ended question on a single; "this or that" or poll on a carousel).
-- When in doubt, prefer "carousel" for educate/proof and "reel" for showcase/story/engagement.
+- When in doubt, prefer "carousel" for educate/proof and "single" for showcase/story/engagement.
 
 SCHEDULING RULES:
 - Spread posts evenly across the month (do not stack many on the same day).
-- Weight feed posts toward Tue/Wed/Thu, then Mon/Fri, then weekends. Reels can go on any day.
+- Weight feed posts toward Tue/Wed/Thu, then Mon/Fri, then weekends.
 - No more than 1 post per day.
 - Every scheduledFor date must fall between ${startDateIso} and ${endDateIso}, inclusive.
 - Use ISO 8601 UTC timestamps with a time component (e.g. "2025-04-15T14:00:00Z"). Prefer 11:00, 14:00, or 19:00 UTC.
@@ -253,7 +250,7 @@ OUTPUT SHAPE - return ONLY valid JSON in this exact form:
   "posts": [
     {
       "scheduledFor": "YYYY-MM-DDTHH:MM:SSZ",
-      "postType": "reel" | "carousel" | "single",
+      "postType": "carousel" | "single",
       "pillar": "educate" | "showcase" | "story" | "proof" | "engagement",
       "caption": "hook line\\n\\nbody\\n\\nCTA",
       "hashtags": ["tag1", "tag2"],

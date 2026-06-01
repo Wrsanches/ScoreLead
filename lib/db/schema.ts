@@ -18,6 +18,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
+  stripeCustomerId: text("stripeCustomerId"),
   notificationPreferences: jsonb("notificationPreferences")
     .$type<NotificationPreferences>()
     .notNull()
@@ -232,6 +233,44 @@ export const verification = pgTable("verification", {
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+})
+
+// Managed by the @better-auth/stripe plugin. Field names must match what the
+// plugin reads/writes. referenceId is the user id (account-level subscription).
+export const subscription = pgTable("subscription", {
+  id: text("id").primaryKey(),
+  plan: text("plan").notNull(),
+  referenceId: text("referenceId").notNull(),
+  stripeCustomerId: text("stripeCustomerId"),
+  stripeSubscriptionId: text("stripeSubscriptionId"),
+  status: text("status").notNull(),
+  periodStart: timestamp("periodStart"),
+  periodEnd: timestamp("periodEnd"),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd"),
+  cancelAt: timestamp("cancelAt"),
+  canceledAt: timestamp("canceledAt"),
+  endedAt: timestamp("endedAt"),
+  seats: integer("seats"),
+  trialStart: timestamp("trialStart"),
+  trialEnd: timestamp("trialEnd"),
+  billingInterval: text("billingInterval"),
+  stripeScheduleId: text("stripeScheduleId"),
+})
+
+// Custom freemium usage metering. One row per user. Lifetime counters enforce
+// the Free caps; aiImagesMonth(+key) enforces the Pro monthly fair-use cap.
+export const usage = pgTable("usage", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  discoveryJobs: integer("discoveryJobs").notNull().default(0),
+  outreachMessages: integer("outreachMessages").notNull().default(0),
+  contentPlans: integer("contentPlans").notNull().default(0),
+  aiImages: integer("aiImages").notNull().default(0),
+  aiImagesMonth: integer("aiImagesMonth").notNull().default(0),
+  aiImagesMonthKey: text("aiImagesMonthKey"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })

@@ -7,6 +7,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { regenerateSlide } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
+import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
 
 export const maxDuration = 180
@@ -64,6 +65,26 @@ export async function POST(
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
+  // Gate: regenerating a slide is one AI image.
+  try {
+    await assertCanUse(session.user.id, "aiImage", 1)
+  } catch (e) {
+    if (e instanceof PlanLimitError) {
+      return NextResponse.json(
+        {
+          error:
+            e.plan === "free"
+              ? "You've used your free AI images. Upgrade to Pro to generate more."
+              : "Monthly AI image limit reached.",
+          code: "PLAN_LIMIT",
+          action: e.action,
+        },
+        { status: 402 },
+      )
+    }
+    throw e
+  }
+
   const images = post.images ?? []
   const previousSlide = images[index] ?? null
 
@@ -102,6 +123,8 @@ export async function POST(
       { status: 502 },
     )
   }
+
+  await recordUsage(session.user.id, "aiImage", 1)
 
   const nextImages = [...images]
   nextImages[index] = slide

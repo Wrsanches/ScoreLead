@@ -7,6 +7,13 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { runDiscoveryJob } from "@/lib/services/discovery-pipeline"
+import {
+  assertCanUse,
+  recordUsage,
+  getUserPlan,
+  freeLeadCap,
+  PlanLimitError,
+} from "@/lib/plan"
 
 const startJobSchema = z.object({
   businessId: z.string(),
@@ -56,6 +63,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
+  // Gate: Free allows 1 discovery job total.
+  try {
+    await assertCanUse(session.user.id, "discoveryJob")
+  } catch (e) {
+    if (e instanceof PlanLimitError) {
+      return NextResponse.json(
+        {
+          error: "You've used your free discovery run. Upgrade to Pro for unlimited discovery.",
+          code: "PLAN_LIMIT",
+          action: e.action,
+        },
+        { status: 402 },
+      )
+    }
+    throw e
+  }
+
+  // Free plans are clamped to a smaller lead cap to protect API costs.
+  const plan = await getUserPlan(session.user.id)
+  const maxResults = freeLeadCap(plan, data.maxResults)
+
   // Save keywords for next time
   await db
     .update(business)
@@ -74,10 +102,12 @@ export async function POST(request: Request) {
     city: data.city,
     location: data.location,
     keywords: JSON.stringify(data.keywords),
-    maxResults: data.maxResults,
+    maxResults,
     serviceArea: data.serviceArea,
     status: "queued",
   })
+
+  await recordUsage(session.user.id, "discoveryJob")
 
   // Run the pipeline in the background
   after(async () => {
@@ -102,7 +132,7 @@ export async function POST(request: Request) {
         },
         keywords: data.keywords,
         location: data.location,
-        maxResults: data.maxResults,
+        maxResults,
       })
     } catch (error) {
       console.error("[discovery-job] failed:", error)
