@@ -40,6 +40,27 @@ export async function getActiveBusinessIdForUser(
 }
 
 /**
+ * Resolves a business id for a request that carries one explicitly (now the
+ * primary path: the id lives in the URL and is passed to scoped APIs as
+ * `?businessId=`). Validates ownership; if the requested id is missing or not
+ * owned by the user, falls back to `getActiveBusinessIdForUser` (cookie/first
+ * business) so older callers keep working.
+ */
+export async function resolveBusinessId(
+  userId: string,
+  requestedId: string | null | undefined,
+): Promise<string | null> {
+  if (requestedId) {
+    const [owned] = await db
+      .select({ id: business.id })
+      .from(business)
+      .where(and(eq(business.id, requestedId), eq(business.userId, userId)))
+    if (owned) return owned.id
+  }
+  return getActiveBusinessIdForUser(userId)
+}
+
+/**
  * Same as getActiveBusinessIdForUser but returns the full row for callers
  * that need more than just the ID.
  */

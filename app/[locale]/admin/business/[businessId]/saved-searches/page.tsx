@@ -12,7 +12,7 @@ import {
   EmptyState,
 } from "@/components/admin"
 import { formatRelativeDate } from "@/lib/admin-utils"
-import { useActiveBusiness } from "@/components/admin/active-business-context"
+import { useBusinessId } from "@/components/admin/business-context"
 
 interface SavedSearch {
   id: string
@@ -27,7 +27,7 @@ interface SavedSearch {
 
 export default function SavedSearchesPage() {
   const t = useTranslations("dashboard")
-  const { activeBusinessId } = useActiveBusiness()
+  const businessId = useBusinessId()
   const [searches, setSearches] = useState<SavedSearch[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -35,7 +35,7 @@ export default function SavedSearchesPage() {
   useEffect(() => {
     setLoading(true)
     const controller = new AbortController()
-    fetch("/api/discovery/saved-searches", { signal: controller.signal })
+    fetch(`/api/discovery/saved-searches?businessId=${businessId}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
         if (!controller.signal.aborted) setSearches(data)
@@ -45,7 +45,7 @@ export default function SavedSearchesPage() {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
-  }, [activeBusinessId])
+  }, [businessId])
 
   async function handleDelete(id: string) {
     setDeleting(id)
@@ -71,7 +71,7 @@ export default function SavedSearchesPage() {
           breadcrumbs={[{ label: t("discovery") }]}
           actions={
             <Link
-              href="/admin/discovery-jobs/new"
+              href={`/admin/business/${businessId}/discovery-jobs/new`}
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
             >
               {t("createJob")}
@@ -125,7 +125,7 @@ export default function SavedSearchesPage() {
 
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Link
-                    href={`/admin/discovery-jobs/new?savedSearchId=${search.id}`}
+                    href={`/admin/business/${businessId}/discovery-jobs/new?savedSearchId=${search.id}`}
                     className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
                     title="Run this search"
                   >

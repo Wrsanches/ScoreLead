@@ -37,7 +37,18 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = "/admin"
+    // Navigate straight to the active business. Going through the bare `/admin`
+    // resolver would render an interstitial and meta-refresh redirect (a visible
+    // flash + reload), since the redirect happens after the document streams.
+    try {
+      const res = await fetch("/api/businesses")
+      const list = res.ok ? await res.json() : []
+      window.location.href = list[0]?.id
+        ? `/admin/business/${list[0].id}`
+        : "/onboarding"
+    } catch {
+      window.location.href = "/admin"
+    }
   }
 
   function handleGoogleSignIn() {

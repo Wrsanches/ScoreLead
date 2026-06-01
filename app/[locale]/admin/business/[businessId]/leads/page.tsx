@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSearch } from "@/components/search-overlay";
-import { useActiveBusiness } from "@/components/admin/active-business-context";
+import { useBusinessId } from "@/components/admin/business-context";
 import {
   Mail,
   MoreHorizontal,
@@ -61,7 +61,7 @@ import { OutreachMessagesCard } from "./_components/outreach-messages-card";
 export default function LeadsPage() {
   const t = useTranslations("dashboard");
   const { selectedLeadId, setSelectedLead, clearSelectedLead } = useSearch();
-  const { activeBusinessId } = useActiveBusiness();
+  const businessId = useBusinessId();
   const searchParams = useSearchParams();
 
   // Hydrate the search context from the ?focus=<id> query param - used when
@@ -137,6 +137,7 @@ export default function LeadsPage() {
       setIsLoading(true);
       try {
         const params = new URLSearchParams({
+          businessId,
           page: String(page),
           limit: "50",
           sortBy,
@@ -162,7 +163,7 @@ export default function LeadsPage() {
     }
     fetchLeads();
     return () => controller.abort();
-  }, [page, activeBusinessId, sortBy, sortOrder, statusFilter]);
+  }, [page, businessId, sortBy, sortOrder, statusFilter]);
 
   // Handle search selection
   useEffect(() => {

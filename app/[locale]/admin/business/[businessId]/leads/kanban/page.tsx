@@ -9,13 +9,13 @@ import {
   EmptyState,
 } from "@/components/admin"
 import { LeadDetailModal } from "@/components/admin/lead-detail-modal"
-import { useActiveBusiness } from "@/components/admin/active-business-context"
+import { useBusinessId } from "@/components/admin/business-context"
 import { LeadsKanban } from "../_components/leads-kanban"
 import type { Lead, LeadStatus } from "../_shared"
 
 export default function LeadsKanbanPage() {
   const t = useTranslations("dashboard")
-  const { activeBusinessId } = useActiveBusiness()
+  const businessId = useBusinessId()
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
@@ -27,7 +27,7 @@ export default function LeadsKanbanPage() {
       setLoading(true)
       try {
         const res = await fetch(
-          "/api/leads?page=1&limit=200&sortBy=score&sortOrder=desc",
+          `/api/leads?businessId=${businessId}&page=1&limit=200&sortBy=score&sortOrder=desc`,
           { signal: controller.signal },
         )
         if (!res.ok) throw new Error("Failed")
@@ -40,7 +40,7 @@ export default function LeadsKanbanPage() {
     }
     fetchLeads()
     return () => controller.abort()
-  }, [activeBusinessId])
+  }, [businessId])
 
   async function handleStatusChange(leadId: string, nextStatus: LeadStatus) {
     // Optimistic update with rollback on failure
@@ -71,7 +71,7 @@ export default function LeadsKanbanPage() {
           variant="hero"
           title={t("pipeline")}
           description="Drag cards between columns to move leads through your pipeline."
-          breadcrumbs={[{ label: t("allLeads"), href: "/admin/leads" }, { label: t("pipeline") }]}
+          breadcrumbs={[{ label: t("allLeads"), href: `/admin/business/${businessId}/leads` }, { label: t("pipeline") }]}
         />
       </div>
 

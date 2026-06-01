@@ -4,9 +4,9 @@ import { discoveryJob, lead } from "@/lib/db/schema"
 import { eq, and, count, avg, gte, desc, sql, inArray } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { resolveBusinessId } from "@/lib/active-business"
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -16,7 +16,11 @@ export async function GET() {
   }
 
   const userId = session.user.id
-  const activeBusinessId = await getActiveBusinessIdForUser(userId)
+  const url = new URL(request.url)
+  const activeBusinessId = await resolveBusinessId(
+    userId,
+    url.searchParams.get("businessId"),
+  )
   const businessScope = activeBusinessId
     ? and(
         eq(discoveryJob.userId, userId),

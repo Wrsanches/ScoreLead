@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useActiveBusiness } from "@/components/admin/active-business-context"
+import { useBusinessId } from "@/components/admin/business-context"
 import {
   MapPin,
   Search,
@@ -26,21 +26,8 @@ export default function NewDiscoveryJobPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const savedSearchId = searchParams.get("savedSearchId")
-  const { activeBusinessId } = useActiveBusiness()
-
-  // If the user switches businesses mid-form, bounce back to the jobs list
-  // for the newly selected business instead of letting them accidentally
-  // create a job under the wrong org.
-  const initialBusinessRef = useRef<string | null | undefined>(undefined)
-  useEffect(() => {
-    if (initialBusinessRef.current === undefined) {
-      initialBusinessRef.current = activeBusinessId
-      return
-    }
-    if (initialBusinessRef.current !== activeBusinessId) {
-      router.replace("/admin/discovery-jobs")
-    }
-  }, [activeBusinessId, router])
+  // The business is fixed by the URL - this form always creates a job under it.
+  const businessId = useBusinessId()
 
   // Form state
   const [jobName, setJobName] = useState("")
@@ -54,7 +41,6 @@ export default function NewDiscoveryJobPage() {
   // Suggested keywords
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([])
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
-  const [businessId, setBusinessId] = useState<string | null>(null)
 
   // Submit state
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -63,48 +49,44 @@ export default function NewDiscoveryJobPage() {
   useEffect(() => {
     async function init() {
       try {
-        const res = await fetch("/api/businesses")
+        const res = await fetch(`/api/businesses/${businessId}`)
         if (!res.ok) return
-        const businesses = await res.json()
-        if (businesses.length > 0) {
-          const biz = businesses[0]
-          setBusinessId(biz.id)
+        const biz = await res.json()
 
-          // Load saved search if ID is in URL
-          if (savedSearchId) {
-            try {
-              const ssRes = await fetch(`/api/discovery/saved-searches/${savedSearchId}`)
-              if (ssRes.ok) {
-                const ss = await ssRes.json()
-                setJobName(ss.name)
-                setCountryCode(ss.country)
-                if (ss.state) setStateCode(ss.state)
-                if (ss.city) setCityName(ss.city)
-                if (ss.keywords) setKeywords(ss.keywords)
-              }
-            } catch {
-              // Failed to load saved search
+        // Load saved search if ID is in URL
+        if (savedSearchId) {
+          try {
+            const ssRes = await fetch(`/api/discovery/saved-searches/${savedSearchId}`)
+            if (ssRes.ok) {
+              const ss = await ssRes.json()
+              setJobName(ss.name)
+              setCountryCode(ss.country)
+              if (ss.state) setStateCode(ss.state)
+              if (ss.city) setCityName(ss.city)
+              if (ss.keywords) setKeywords(ss.keywords)
             }
-          } else {
-            // Pre-fill keywords from last discovery job if available
-            if (biz.lastDiscoveryKeywords && biz.lastDiscoveryKeywords.length > 0) {
-              setKeywords(biz.lastDiscoveryKeywords)
-            }
+          } catch {
+            // Failed to load saved search
           }
-
-          // Use cached suggestions if available, otherwise fetch from AI
-          if (biz.suggestedKeywords && biz.suggestedKeywords.length > 0) {
-            setSuggestedKeywords(biz.suggestedKeywords)
-          } else {
-            fetchSuggestions(biz.id)
+        } else {
+          // Pre-fill keywords from last discovery job if available
+          if (biz.lastDiscoveryKeywords && biz.lastDiscoveryKeywords.length > 0) {
+            setKeywords(biz.lastDiscoveryKeywords)
           }
         }
+
+        // Use cached suggestions if available, otherwise fetch from AI
+        if (biz.suggestedKeywords && biz.suggestedKeywords.length > 0) {
+          setSuggestedKeywords(biz.suggestedKeywords)
+        } else {
+          fetchSuggestions(businessId)
+        }
       } catch {
-        // Failed to fetch businesses
+        // Failed to fetch business
       }
     }
     init()
-  }, [])
+  }, [businessId, savedSearchId])
 
   async function fetchSuggestions(bizId: string) {
     setLoadingSuggestions(true)
@@ -277,7 +259,7 @@ export default function NewDiscoveryJobPage() {
       }
 
       toast.success("Discovery job started! Redirecting...")
-      router.push("/admin/discovery-jobs")
+      router.push(`/admin/business/${businessId}/discovery-jobs`)
     } catch {
       toast.error("Failed to start discovery")
       setIsSubmitting(false)
@@ -288,7 +270,7 @@ export default function NewDiscoveryJobPage() {
     <>
       <PageHeader
         title={t("createJob")}
-        backHref="/admin/discovery-jobs"
+        backHref={`/admin/business/${businessId}/discovery-jobs`}
         breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
       />
 

@@ -4,6 +4,7 @@ import { business } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { getActiveBusinessIdForUser } from "@/lib/active-business"
 
 async function getSession() {
   return auth.api.getSession({
@@ -53,9 +54,12 @@ export async function redirectIfAuthenticated(locale: string) {
   const prefix = locale === "en" ? "" : `/${locale}`
   const completed = await hasCompletedBusiness(session.user.id)
 
-  if (completed) {
-    redirect(`${prefix}/admin`)
-  } else {
+  if (!completed) {
     redirect(`${prefix}/onboarding`)
   }
+
+  // Land directly on the active business so we skip the bare `/admin` resolver
+  // (which would meta-refresh redirect and flash an interstitial).
+  const businessId = await getActiveBusinessIdForUser(session.user.id)
+  redirect(businessId ? `${prefix}/admin/business/${businessId}` : `${prefix}/admin`)
 }

@@ -4,13 +4,15 @@ import { contentPost } from "@/lib/db/schema"
 import { and, eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { saveUploadedSlideImage } from "@/lib/services/content-image-generator"
+import { removePublicImage } from "@/lib/services/content-image-generator"
+import { publicUrl } from "@/lib/s3"
 
-export const maxDuration = 30
-
-const MAX_BYTES = 8 * 1024 * 1024
-const ALLOWED_MIME = new Set(["image/png", "image/jpeg", "image/webp"])
-
+/**
+ * Confirms a user-uploaded slide image. The browser has already uploaded the
+ * file directly to S3 via a presigned URL (see /api/uploads/presign); this
+ * endpoint validates the resulting object key, persists its public URL onto
+ * the post, and cleans up the previous image.
+ */
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string; slideIndex: string }> },
@@ -32,35 +34,17 @@ export async function POST(
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
-  const formData = await request.formData().catch(() => null)
-  if (!formData) {
-    return NextResponse.json({ error: "Invalid form data" }, { status: 400 })
-  }
-  const file = formData.get("file")
-  const headline = formData.get("headline")
-  if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Missing file" }, { status: 400 })
-  }
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "File too large (max 8MB)" }, { status: 413 })
-  }
-  if (!ALLOWED_MIME.has(file.type)) {
-    return NextResponse.json(
-      { error: "Only PNG, JPEG, or WEBP are supported" },
-      { status: 415 },
-    )
+  const body = await request.json().catch(() => null)
+  const key = body?.key
+  const headline = body?.headline
+  // The presign route mints keys as `content/<postId>/...`; enforce that the
+  // confirmed object actually lives under this post.
+  if (typeof key !== "string" || !key.startsWith(`content/${id}/`)) {
+    return NextResponse.json({ error: "Invalid image key" }, { status: 400 })
   }
 
-  const arrayBuffer = await file.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
   const images = post.images ?? []
   const previous = images[index] ?? null
-  const url = await saveUploadedSlideImage(
-    post.id,
-    index,
-    buffer,
-    previous?.url ?? null,
-  )
 
   const nextImages = [...images]
   const resolvedHeadline =
@@ -68,7 +52,7 @@ export async function POST(
       ? headline.trim().slice(0, 160)
       : previous?.headline ?? ""
   nextImages[index] = {
-    url,
+    url: publicUrl(key),
     headline: resolvedHeadline,
     prompt: "uploaded-by-user",
   }
@@ -77,6 +61,9 @@ export async function POST(
     .update(contentPost)
     .set({ images: nextImages, updatedAt: new Date() })
     .where(eq(contentPost.id, id))
+
+  // Best-effort cleanup of the image we just replaced.
+  if (previous?.url) await removePublicImage(previous.url)
 
   const [updated] = await db
     .select()

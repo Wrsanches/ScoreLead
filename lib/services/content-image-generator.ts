@@ -1,12 +1,23 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import OpenAI from "openai";
-import { writeFile, mkdir, unlink, readFile } from "node:fs/promises";
+import { unlink, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars";
 import {
   GEMINI_IMAGE_MODEL,
   OPENAI_TEXT_MODEL,
 } from "@/lib/models";
+import {
+  buildKey,
+  deleteObject,
+  getObjectBase64,
+  isManagedUrl,
+  keyFromUrl,
+  putObject,
+} from "@/lib/s3";
+
+// Legacy filesystem location for images created before the S3 migration.
+const LEGACY_PREFIX = "/generated/content-images/";
 
 let genai: GoogleGenAI | null = null;
 function getGenAI(): GoogleGenAI | null {
@@ -379,43 +390,54 @@ function carouselVariationForIndex(index: number, total: number): string {
   return `Vary the composition from the previous slide. This slide: ${choice} Keep palette, grade, and typography identical to the cover.`;
 }
 
+/**
+ * Upload a generated slide image (PNG buffer) to S3 and return its public URL.
+ */
 async function writeImageToPublic(
   postId: string,
   slideIndex: number,
   bytes: Buffer,
 ): Promise<string> {
-  const dir = join(process.cwd(), "public", "generated", "content-images");
-  await mkdir(dir, { recursive: true });
-  const filename = `${postId}-${slideIndex}-${Date.now()}.png`;
-  await writeFile(join(dir, filename), bytes);
-  return `/generated/content-images/${filename}`;
+  const key = buildKey("content-slide", { postId, slideIndex, ext: "png" });
+  return putObject({ key, body: bytes, contentType: "image/png" });
 }
 
 /**
- * Best-effort cleanup of an old public image URL. Silently ignores missing files.
- * Safety: only unlinks files inside the public/generated/content-images directory.
+ * Best-effort cleanup of an old slide image. Deletes from S3 if the URL is one
+ * we manage; falls back to unlinking legacy filesystem images. Silently ignores
+ * missing objects/files.
  */
 export async function removePublicImage(url: string): Promise<void> {
-  if (!url.startsWith("/generated/content-images/")) return;
+  if (isManagedUrl(url)) {
+    const key = keyFromUrl(url);
+    if (key) await deleteObject(key);
+    return;
+  }
+  // Legacy: image stored under public/generated/content-images before S3.
+  if (!url.startsWith(LEGACY_PREFIX)) return;
   try {
     const relativePath = url.replace(/^\/+/, "");
-    const absolute = join(process.cwd(), "public", relativePath);
-    await unlink(absolute);
+    await unlink(join(process.cwd(), "public", relativePath));
   } catch {
     // file already gone or permission issue; not worth blocking the flow
   }
 }
 
 /**
- * Reads a public image URL back into a base64 string so it can be fed into
- * Gemini edit mode. Returns null if the file cannot be read.
+ * Reads a slide image back into a base64 string so it can be fed into Gemini
+ * edit mode. Handles both S3-stored and legacy filesystem images. Returns null
+ * if the image cannot be read.
  */
 async function readPublicImageAsBase64(url: string): Promise<string | null> {
-  if (!url.startsWith("/generated/content-images/")) return null;
+  if (isManagedUrl(url)) {
+    const key = keyFromUrl(url);
+    return key ? getObjectBase64(key) : null;
+  }
+  // Legacy filesystem image.
+  if (!url.startsWith(LEGACY_PREFIX)) return null;
   try {
     const relativePath = url.replace(/^\/+/, "");
-    const absolute = join(process.cwd(), "public", relativePath);
-    const buffer = await readFile(absolute);
+    const buffer = await readFile(join(process.cwd(), "public", relativePath));
     return buffer.toString("base64");
   } catch {
     return null;
@@ -655,21 +677,6 @@ export async function regenerateSlide(
     await removePublicImage(opts.previousUrl);
   }
   return result;
-}
-
-/**
- * Write an uploaded image (buffer) to the public folder and return its URL.
- * Used by the "upload custom image" route.
- */
-export async function saveUploadedSlideImage(
-  postId: string,
-  slideIndex: number,
-  bytes: Buffer,
-  previousUrl: string | null,
-): Promise<string> {
-  const url = await writeImageToPublic(postId, slideIndex, bytes);
-  if (previousUrl) await removePublicImage(previousUrl);
-  return url;
 }
 
 export { planCarouselSlides, buildSlidePrompt };

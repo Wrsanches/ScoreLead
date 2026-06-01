@@ -2,7 +2,7 @@ import { db } from "@/lib/db"
 import { discoveryJob, lead } from "@/lib/db/schema"
 import { eq, or, inArray } from "drizzle-orm"
 import { searchBusiness, filterUsefulResults } from "./brave-search"
-import { searchPlaces } from "./google-places"
+import { searchPlaces, persistPlacePhoto } from "./google-places"
 import { generateSearchQueries } from "./query-generator"
 import {
   crawlAndExtract,
@@ -306,29 +306,34 @@ export async function runDiscoveryJob(
 
       // Search Google Places
       const places = await searchPlaces(query, location)
-      const googleLeads: LeadCandidate[] = places.map((place) => ({
-        name: place.name,
-        website: place.website || null,
-        websiteDomain: getWebsiteDomain(place.website) ?? null,
-        phone: place.phone || null,
-        address: place.address,
-        city: params.location.split(",")[0]?.trim() || null,
-        country: params.location.split(",").pop()?.trim() || null,
-        googlePlaceId: place.placeId,
-        googleRating: place.rating ?? null,
-        googleReviewCount: place.reviewCount ?? null,
-        googleReviews: place.reviews.length > 0 ? place.reviews : null,
-        lat: null,
-        lng: null,
-        priceRange: null,
-        photoUrl: place.photoRef
-          ? `/api/leads/photo?name=${encodeURIComponent(place.photoRef)}`
-          : null,
-        source: "google_places",
-        firecrawlEnriched: false,
-        discoveryQuery: query,
-        discoveryQueries: [query],
-      }))
+      const googleLeads: LeadCandidate[] = await Promise.all(
+        places.map(async (place) => ({
+          name: place.name,
+          website: place.website || null,
+          websiteDomain: getWebsiteDomain(place.website) ?? null,
+          phone: place.phone || null,
+          address: place.address,
+          city: params.location.split(",")[0]?.trim() || null,
+          country: params.location.split(",").pop()?.trim() || null,
+          googlePlaceId: place.placeId,
+          googleRating: place.rating ?? null,
+          googleReviewCount: place.reviewCount ?? null,
+          googleReviews: place.reviews.length > 0 ? place.reviews : null,
+          lat: null,
+          lng: null,
+          priceRange: null,
+          // Persist the photo to S3; fall back to the on-demand proxy if that
+          // fails or S3 isn't configured.
+          photoUrl: place.photoRef
+            ? (await persistPlacePhoto(place.photoRef)) ??
+              `/api/leads/photo?name=${encodeURIComponent(place.photoRef)}`
+            : null,
+          source: "google_places",
+          firecrawlEnriched: false,
+          discoveryQuery: query,
+          discoveryQueries: [query],
+        })),
+      )
 
       // Also search Brave
       try {

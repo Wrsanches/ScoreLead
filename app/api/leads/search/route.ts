@@ -4,6 +4,7 @@ import { lead, discoveryJob } from "@/lib/db/schema"
 import { eq, desc, ilike, or, inArray, and } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
+import { resolveBusinessId } from "@/lib/active-business"
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({
@@ -21,10 +22,24 @@ export async function GET(request: Request) {
     return NextResponse.json({ results: [] })
   }
 
+  // Scope the search to the current business (from the URL).
+  const businessId = await resolveBusinessId(
+    session.user.id,
+    url.searchParams.get("businessId"),
+  )
+  if (!businessId) {
+    return NextResponse.json({ results: [] })
+  }
+
   const userJobs = await db
     .select({ id: discoveryJob.id })
     .from(discoveryJob)
-    .where(eq(discoveryJob.userId, session.user.id))
+    .where(
+      and(
+        eq(discoveryJob.userId, session.user.id),
+        eq(discoveryJob.businessId, businessId),
+      ),
+    )
 
   if (userJobs.length === 0) {
     return NextResponse.json({ results: [] })

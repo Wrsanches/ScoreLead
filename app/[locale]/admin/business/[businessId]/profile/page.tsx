@@ -120,9 +120,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 export default function BusinessDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; locale: string }>
+  params: Promise<{ businessId: string; locale: string }>
 }) {
-  const { id } = use(params)
+  const { businessId: id } = use(params)
   const t = useTranslations("business")
   const tOnb = useTranslations("onboarding")
   const [data, setData] = useState<Business | null>(null)
@@ -283,7 +283,7 @@ export default function BusinessDetailPage({
     <>
       <PageHeader
         title={data?.name || t("title")}
-        backHref="/admin"
+        backHref={`/admin/business/${id}`}
         breadcrumbs={[{ label: t("title") }]}
       />
 

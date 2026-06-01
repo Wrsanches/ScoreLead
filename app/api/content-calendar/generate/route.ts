@@ -7,7 +7,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { generateContentPlan } from "@/lib/services/content-calendar-generator"
 import { removePublicImage } from "@/lib/services/content-image-generator"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { resolveBusinessId } from "@/lib/active-business"
 
 const schema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
@@ -25,7 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
-  const activeBusinessId = await getActiveBusinessIdForUser(session.user.id)
+  const activeBusinessId = await resolveBusinessId(
+    session.user.id,
+    body?.businessId,
+  )
   if (!activeBusinessId) {
     return NextResponse.json(
       { error: "Complete onboarding before planning content." },

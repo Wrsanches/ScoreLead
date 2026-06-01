@@ -4,7 +4,7 @@ import { lead, discoveryJob } from "@/lib/db/schema"
 import { and, eq, desc, count } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { resolveBusinessId } from "@/lib/active-business"
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({
@@ -31,9 +31,12 @@ export async function GET(request: Request) {
 
   const orderFn = sortOrder === "asc" ? (await import("drizzle-orm")).asc : desc
 
-  // Scope to the currently active business. If no business is selected yet
-  // (e.g. before onboarding completes), the response is empty.
-  const activeBusinessId = await getActiveBusinessIdForUser(session.user.id)
+  // Scope to the business from the URL (?businessId=), validated for ownership.
+  // If none is provided/owned, the response is empty.
+  const activeBusinessId = await resolveBusinessId(
+    session.user.id,
+    url.searchParams.get("businessId"),
+  )
   if (!activeBusinessId) {
     return NextResponse.json({ leads: [], total: 0, page, totalPages: 0 })
   }

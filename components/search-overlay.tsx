@@ -10,7 +10,7 @@ import {
 } from "react";
 import Image from "next/image";
 import { Search, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOrb } from "@/components/ai-orb";
 
@@ -95,6 +95,9 @@ function SearchOverlay({
   onSelectLead: (id: string) => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  // Current business from the URL (search is scoped to it).
+  const businessId = pathname.match(/\/admin\/business\/([^/]+)/)?.[1] ?? null;
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -128,9 +131,10 @@ function SearchOverlay({
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/leads/search?q=${encodeURIComponent(q)}`, {
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        `/api/leads/search?q=${encodeURIComponent(q)}${businessId ? `&businessId=${businessId}` : ""}`,
+        { signal: controller.signal },
+      );
       if (res.ok) {
         const data = await res.json();
         setResults(data.results);
@@ -141,7 +145,7 @@ function SearchOverlay({
       // Aborted or failed
     }
     setLoading(false);
-  }, []);
+  }, [businessId]);
 
   useEffect(() => {
     const timer = setTimeout(() => search(query), 200);
@@ -151,7 +155,7 @@ function SearchOverlay({
   function navigateToLead(id: string) {
     onClose();
     onSelectLead(id);
-    router.push("/admin/leads");
+    router.push(businessId ? `/admin/business/${businessId}/leads` : "/admin");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {

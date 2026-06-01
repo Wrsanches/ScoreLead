@@ -77,7 +77,7 @@ export default async function LocaleLayout({
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
-            enableSystem
+            forcedTheme="dark"
             disableTransitionOnChange
             storageKey="scorelead:theme"
           >

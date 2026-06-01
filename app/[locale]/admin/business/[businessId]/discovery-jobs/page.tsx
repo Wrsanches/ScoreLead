@@ -15,7 +15,7 @@ import {
   StatNumber,
 } from "@/components/admin"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
-import { useActiveBusiness } from "@/components/admin/active-business-context"
+import { useBusinessId } from "@/components/admin/business-context"
 
 interface DiscoveryJob {
   id: string
@@ -33,14 +33,14 @@ interface DiscoveryJob {
 
 export default function DiscoveryJobsPage() {
   const t = useTranslations("dashboard")
-  const { activeBusinessId } = useActiveBusiness()
+  const businessId = useBusinessId()
   const [jobs, setJobs] = useState<DiscoveryJob[]>([])
   const [loading, setLoading] = useState(true)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   async function fetchJobs() {
     try {
-      const res = await fetch("/api/discovery/jobs")
+      const res = await fetch(`/api/discovery/jobs?businessId=${businessId}`)
       if (res.ok) {
         const data = await res.json()
         setJobs(data)
@@ -58,7 +58,7 @@ export default function DiscoveryJobsPage() {
     fetchJobs().then(() => setLoading(false))
     // Refetching whenever active business changes keeps this list scoped to
     // the currently selected business. fetchJobs is stable by definition.
-  }, [activeBusinessId])
+  }, [businessId])
 
   useEffect(() => {
     const hasActive = jobs.some((j) => j.status === "running" || j.status === "queued")
@@ -104,7 +104,7 @@ export default function DiscoveryJobsPage() {
           breadcrumbs={[{ label: t("discovery") }]}
           actions={
             <Link
-              href="/admin/discovery-jobs/new"
+              href={`/admin/business/${businessId}/discovery-jobs/new`}
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
             >
               {t("createJob")}
@@ -157,7 +157,7 @@ export default function DiscoveryJobsPage() {
               return (
                 <Link
                   key={job.id}
-                  href={`/admin/discovery-jobs/${job.id}`}
+                  href={`/admin/business/${businessId}/discovery-jobs/${job.id}`}
                   className={`block rounded-xl border transition-all duration-200 group ${
                     isActive
                       ? "border-emerald-500/25 bg-gradient-to-r from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent hover:border-emerald-500/40 shadow-[0_0_24px_-12px_rgba(16,185,129,0.4)]"

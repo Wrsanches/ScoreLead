@@ -5,7 +5,7 @@ import { and, eq, gte, lt } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { resolveBusinessId } from "@/lib/active-business"
 
 function monthRange(monthParam: string | null): { start: Date; end: Date } {
   const now = new Date()
@@ -27,7 +27,10 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url)
   const { start, end } = monthRange(url.searchParams.get("month"))
-  const businessId = await getActiveBusinessIdForUser(session.user.id)
+  const businessId = await resolveBusinessId(
+    session.user.id,
+    url.searchParams.get("businessId"),
+  )
   if (!businessId) {
     return NextResponse.json({ posts: [], businessId: null })
   }
@@ -70,7 +73,8 @@ export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const businessId = await getActiveBusinessIdForUser(session.user.id)
+  const body = await request.json().catch(() => ({}))
+  const businessId = await resolveBusinessId(session.user.id, body?.businessId)
   if (!businessId) {
     return NextResponse.json(
       { error: "Complete onboarding before planning content." },
@@ -78,7 +82,6 @@ export async function POST(request: Request) {
     )
   }
 
-  const body = await request.json().catch(() => ({}))
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })

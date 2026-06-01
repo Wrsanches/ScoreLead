@@ -1,3 +1,5 @@
+import { buildKey, extForMime, isS3Configured, putObject } from "@/lib/s3"
+
 export interface GooglePlaceReview {
   author: string
   rating: number
@@ -87,5 +89,33 @@ export async function searchPlaces(
   } catch (error) {
     console.error("Google Places search failed:", error)
     return []
+  }
+}
+
+/**
+ * Fetches a Google Places photo and stores it in S3, returning the public URL.
+ * Returns null if S3 isn't configured or the fetch/upload fails, so callers can
+ * fall back to the on-demand proxy URL.
+ */
+export async function persistPlacePhoto(
+  photoRef: string,
+): Promise<string | null> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY
+  if (!apiKey || !isS3Configured()) return null
+  try {
+    const res = await fetch(
+      `https://places.googleapis.com/v1/${photoRef}/media?maxHeightPx=400&key=${apiKey}`,
+      { redirect: "follow" },
+    )
+    if (!res.ok) return null
+    const contentType = (res.headers.get("content-type") || "image/jpeg")
+      .split(";")[0]
+      .trim()
+    const buffer = Buffer.from(await res.arrayBuffer())
+    const key = buildKey("lead-photo", { ext: extForMime(contentType) })
+    return await putObject({ key, body: buffer, contentType })
+  } catch (error) {
+    console.error("Failed to persist place photo:", error)
+    return null
   }
 }

@@ -1,9 +1,5 @@
-import { cookies } from "next/headers"
 import { setRequestLocale } from "next-intl/server"
 import { requireAuth } from "@/lib/auth-guard"
-import { AdminShell } from "@/components/admin-shell"
-import { ActiveBusinessProvider } from "@/components/admin/active-business-context"
-import { ACTIVE_BUSINESS_COOKIE } from "@/lib/active-business"
 
 export default async function AdminLayout({
   children,
@@ -16,14 +12,13 @@ export default async function AdminLayout({
   setRequestLocale(locale)
   await requireAuth(locale)
 
-  const cookieStore = await cookies()
-  const initialBusinessId = cookieStore.get(ACTIVE_BUSINESS_COOKIE)?.value ?? null
-
+  // The sidebar/chrome (AdminShell) is rendered by the business and settings
+  // layouts below - NOT here - so the bare `/admin` index can redirect to the
+  // active business without first painting the shell (which caused a visible
+  // flash + client-side reload).
   return (
     <div className="h-screen w-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
-      <ActiveBusinessProvider initialId={initialBusinessId}>
-        <AdminShell>{children}</AdminShell>
-      </ActiveBusinessProvider>
+      {children}
     </div>
   )
 }

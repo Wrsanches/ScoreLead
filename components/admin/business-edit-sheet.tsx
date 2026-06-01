@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/sheet"
 import { TagsInput } from "@/components/admin/tags-input"
 import { getTranslatedCategories } from "@/lib/categories"
+import { uploadImage, UploadError } from "@/lib/upload-client"
+import { toast } from "sonner"
 import { Loader2, Check, Upload, ImageIcon, Building2 } from "lucide-react"
 
 export interface BusinessEditValues {
@@ -58,6 +60,7 @@ export function BusinessEditSheet({
 
   const [values, setValues] = useState<BusinessEditValues>(defaults)
   const [saving, setSaving] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const fileRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -83,16 +86,24 @@ export function BusinessEditSheet({
     }
   }
 
-  function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 2 * 1024 * 1024) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      set("logo", reader.result as string)
-    }
-    reader.readAsDataURL(file)
     e.target.value = ""
+    if (!file) return
+    setUploadingLogo(true)
+    try {
+      const { url } = await uploadImage(file, {
+        kind: "business-logo",
+        maxBytes: 2 * 1024 * 1024,
+      })
+      set("logo", url)
+    } catch (err) {
+      toast.error(
+        err instanceof UploadError ? err.message : t("uploadFailed"),
+      )
+    } finally {
+      setUploadingLogo(false)
+    }
   }
 
   const initials = values.name
@@ -142,10 +153,15 @@ export function BusinessEditSheet({
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+                disabled={uploadingLogo}
+                className={`absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl transition-opacity ${uploadingLogo ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
                 aria-label={t("uploadLogo")}
               >
-                <Upload className="w-4 h-4 text-zinc-900 dark:text-white" />
+                {uploadingLogo ? (
+                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4 text-zinc-900 dark:text-white" />
+                )}
               </button>
               <input
                 ref={fileRef}

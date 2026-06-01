@@ -27,7 +27,6 @@ import { ScoreLeadLogo } from "@/components/scorelead-logo";
 import { authClient } from "@/lib/auth-client";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
-import { useActiveBusiness } from "@/components/admin/active-business-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,9 +78,12 @@ export function AdminSidebar({
 
   const { open: openSearch } = useSearch();
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const { activeBusinessId, setActiveBusinessId } = useActiveBusiness();
-  const selectedBusinessId = activeBusinessId;
-  const setSelectedBusinessId = setActiveBusinessId;
+
+  // The active business is read from the URL (/admin/business/[businessId]).
+  // On non-business routes (e.g. /admin/settings) fall back to the first one.
+  const businessIdFromPath =
+    pathname.match(/\/admin\/business\/([^/]+)/)?.[1] ?? null;
+  const businessId = businessIdFromPath ?? businesses[0]?.id ?? null;
 
   const userName = session?.user?.name || "";
   const userEmail = session?.user?.email || "";
@@ -96,39 +98,33 @@ export function AdminSidebar({
   useEffect(() => {
     fetch("/api/businesses")
       .then((res) => res.json())
-      .then((data: Business[]) => {
-        setBusinesses(data);
-        if (data.length > 0 && !activeBusinessId) {
-          setActiveBusinessId(data[0].id);
-        }
-      })
+      .then((data: Business[]) => setBusinesses(data))
       .catch(() => {});
-  }, [activeBusinessId, setActiveBusinessId]);
-
-  // Keep selection in sync with /admin/business/[id] route
-  useEffect(() => {
-    const match = pathname.match(/\/admin\/business\/([^/]+)/);
-    if (match) {
-      setSelectedBusinessId(match[1]);
-    }
-  }, [pathname]);
+  }, []);
 
   const selectedBusiness = useMemo(
-    () => businesses.find((b) => b.id === selectedBusinessId) || businesses[0],
-    [businesses, selectedBusinessId],
+    () => businesses.find((b) => b.id === businessId) || businesses[0],
+    [businesses, businessId],
   );
 
-  // Determine active nav item from pathname.
-  // Special case for /admin/leads: don't match when we're on the nested kanban page.
-  const isActive = (path: string) => {
-    if (path === "/admin") return pathname.endsWith("/admin");
-    if (path === "/admin/leads") {
-      return (
-        pathname.includes("/admin/leads") &&
-        !pathname.includes("/admin/leads/kanban")
-      );
+  // Switch business by rewriting the [businessId] segment of the current path
+  // (preserving the sub-page); from a non-business route, land on its dashboard.
+  const switchBusiness = (id: string) => {
+    const next = pathname.match(/\/admin\/business\/[^/]+/)
+      ? pathname.replace(/\/admin\/business\/[^/]+/, `/admin/business/${id}`)
+      : `/admin/business/${id}`;
+    router.push(next);
+  };
+
+  // Path within the current business (everything after /admin/business/<id>),
+  // used to highlight the active nav item.
+  const section = pathname.replace(/^\/admin\/business\/[^/]+/, "");
+  const isActive = (sub: string) => {
+    if (sub === "") return section === "";
+    if (sub === "/leads") {
+      return section.startsWith("/leads") && !section.startsWith("/leads/kanban");
     }
-    return pathname.includes(path);
+    return section.startsWith(sub);
   };
 
   return (
@@ -226,12 +222,7 @@ export function AdminSidebar({
             {businesses.map((b) => (
               <DropdownMenuItem
                 key={b.id}
-                onClick={() => {
-                  setSelectedBusinessId(b.id);
-                  if (pathname.includes("/admin/business/")) {
-                    router.push(`/admin/business/${b.id}`);
-                  }
-                }}
+                onClick={() => switchBusiness(b.id)}
                 className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 w-full">
@@ -259,7 +250,7 @@ export function AdminSidebar({
                       </p>
                     )}
                   </div>
-                  {b.id === selectedBusinessId && (
+                  {b.id === businessId && (
                     <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   )}
                 </div>
@@ -293,69 +284,71 @@ export function AdminSidebar({
         </button>
       </div>
 
-      <div className="px-3 space-y-0.5">
-        <NavItem
-          icon={LayoutDashboard}
-          label={t("dashboard")}
-          href="/admin"
-          active={isActive("/admin")}
-          collapsed={collapsed}
-        />
-        <NavItem
-          icon={Users}
-          label={t("allLeads")}
-          href="/admin/leads"
-          active={isActive("/admin/leads")}
-          collapsed={collapsed}
-        />
-        <NavItem
-          icon={Columns3}
-          label={t("pipeline")}
-          href="/admin/leads/kanban"
-          active={isActive("/admin/leads/kanban")}
-          collapsed={collapsed}
-        />
-        <NavItem
-          icon={CalendarDays}
-          label={t("contentCalendar")}
-          href="/admin/content-calendar"
-          active={isActive("/admin/content-calendar")}
-          collapsed={collapsed}
-        />
-        {selectedBusinessId && (
+      {businessId && (
+        <div className="px-3 space-y-0.5">
+          <NavItem
+            icon={LayoutDashboard}
+            label={t("dashboard")}
+            href={`/admin/business/${businessId}`}
+            active={isActive("")}
+            collapsed={collapsed}
+          />
+          <NavItem
+            icon={Users}
+            label={t("allLeads")}
+            href={`/admin/business/${businessId}/leads`}
+            active={isActive("/leads")}
+            collapsed={collapsed}
+          />
+          <NavItem
+            icon={Columns3}
+            label={t("pipeline")}
+            href={`/admin/business/${businessId}/leads/kanban`}
+            active={isActive("/leads/kanban")}
+            collapsed={collapsed}
+          />
+          <NavItem
+            icon={CalendarDays}
+            label={t("contentCalendar")}
+            href={`/admin/business/${businessId}/content-calendar`}
+            active={isActive("/content-calendar")}
+            collapsed={collapsed}
+          />
           <NavItem
             icon={Building2}
             label={t("businessPage")}
-            href={`/admin/business/${selectedBusinessId}`}
-            active={isActive("/admin/business")}
+            href={`/admin/business/${businessId}/profile`}
+            active={isActive("/profile")}
             collapsed={collapsed}
           />
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="mt-8 px-3">
-        <div
-          className={`px-2.5 py-1 mb-2 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest ${collapsed ? "lg:hidden" : ""}`}
-        >
-          {t("discovery")}
+      {businessId && (
+        <div className="mt-8 px-3">
+          <div
+            className={`px-2.5 py-1 mb-2 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest ${collapsed ? "lg:hidden" : ""}`}
+          >
+            {t("discovery")}
+          </div>
+          <div className="space-y-0.5">
+            <NavItem
+              icon={Radar}
+              label={t("discoveryJobs")}
+              href={`/admin/business/${businessId}/discovery-jobs`}
+              active={isActive("/discovery-jobs")}
+              collapsed={collapsed}
+            />
+            <NavItem
+              icon={Bookmark}
+              label={t("savedSearches")}
+              href={`/admin/business/${businessId}/saved-searches`}
+              active={isActive("/saved-searches")}
+              collapsed={collapsed}
+            />
+          </div>
         </div>
-        <div className="space-y-0.5">
-          <NavItem
-            icon={Radar}
-            label={t("discoveryJobs")}
-            href="/admin/discovery-jobs"
-            active={isActive("/admin/discovery-jobs")}
-            collapsed={collapsed}
-          />
-          <NavItem
-            icon={Bookmark}
-            label={t("savedSearches")}
-            href="/admin/saved-searches"
-            active={isActive("/admin/saved-searches")}
-            collapsed={collapsed}
-          />
-        </div>
-      </div>
+      )}
 
       <div className="mt-auto p-3">
         <DropdownMenu>
@@ -432,9 +425,14 @@ export function AdminSidebar({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
-            <DropdownMenuItem className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer">
-              <Settings className="w-4 h-4" />
-              {t("settings")}
+            <DropdownMenuItem
+              asChild
+              className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
+            >
+              <Link href="/admin/settings">
+                <Settings className="w-4 h-4" />
+                {t("settings")}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
             <DropdownMenuItem

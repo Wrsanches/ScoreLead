@@ -5,7 +5,7 @@ import { eq, and, desc } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { resolveBusinessId } from "@/lib/active-business"
 
 const createSchema = z.object({
   businessId: z.string(),
@@ -17,7 +17,7 @@ const createSchema = z.object({
   keywords: z.array(z.string()).min(1),
 })
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -26,7 +26,11 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const activeBusinessId = await getActiveBusinessIdForUser(session.user.id)
+  const url = new URL(request.url)
+  const activeBusinessId = await resolveBusinessId(
+    session.user.id,
+    url.searchParams.get("businessId"),
+  )
   if (!activeBusinessId) {
     return NextResponse.json([])
   }

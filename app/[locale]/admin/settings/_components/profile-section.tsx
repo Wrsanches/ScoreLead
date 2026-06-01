@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,10 +8,11 @@ import { z } from "zod"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
+import { uploadImage, UploadError } from "@/lib/upload-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User as UserIcon, Loader2 } from "lucide-react"
+import { User as UserIcon, Loader2, Upload } from "lucide-react"
 
 function makeSchema(t: (k: string) => string) {
   return z.object({
@@ -30,6 +31,8 @@ type ProfileValues = z.infer<ReturnType<typeof makeSchema>>
 export function ProfileSection() {
   const t = useTranslations("settings")
   const { data: session, refetch } = authClient.useSession()
+  const fileRef = useRef<HTMLInputElement | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const form = useForm<ProfileValues>({
     resolver: zodResolver(makeSchema(t)),
@@ -45,24 +48,45 @@ export function ProfileSection() {
     }
   }, [session?.user?.id, session?.user?.name, session?.user?.image, form])
 
+  async function persistProfile(values: { name: string; image: string }) {
+    const res = await fetch("/api/user/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: values.name, image: values.image }),
+    })
+    if (!res.ok) throw new Error("save-failed")
+    refetch?.()
+  }
+
   async function onSubmit(values: ProfileValues) {
     try {
-      const res = await fetch("/api/user/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: values.name,
-          image: values.image ?? "",
-        }),
-      })
-      if (!res.ok) {
-        toast.error(t("saveFailed"))
-        return
-      }
+      await persistProfile({ name: values.name, image: values.image ?? "" })
       toast.success(t("saved"), { description: t("savedDescription") })
-      refetch?.()
     } catch {
       toast.error(t("saveFailed"))
+    }
+  }
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+    setUploading(true)
+    try {
+      const { url } = await uploadImage(file, {
+        kind: "avatar",
+        maxBytes: 4 * 1024 * 1024,
+      })
+      form.setValue("image", url, { shouldValidate: true, shouldDirty: true })
+      // Persist immediately so the new avatar shows everywhere without
+      // requiring a separate Save click.
+      const name = form.getValues("name") || session?.user?.name || ""
+      await persistProfile({ name, image: url })
+      toast.success(t("saved"))
+    } catch (err) {
+      toast.error(err instanceof UploadError ? err.message : t("saveFailed"))
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -80,7 +104,13 @@ export function ProfileSection() {
         noValidate
       >
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 overflow-hidden flex items-center justify-center shrink-0">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="group relative w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 overflow-hidden flex items-center justify-center shrink-0"
+            aria-label={t("profileImage")}
+          >
             {imagePreview ? (
               <Image
                 src={imagePreview}
@@ -93,7 +123,23 @@ export function ProfileSection() {
             ) : (
               <UserIcon className="w-5 h-5 text-zinc-500" />
             )}
-          </div>
+            <span
+              className={`absolute inset-0 flex items-center justify-center bg-black/60 transition-opacity ${uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+            >
+              {uploading ? (
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4 text-white" />
+              )}
+            </span>
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={handleAvatarUpload}
+          />
           <div className="text-xs text-zinc-500">
             {session?.user?.email}
           </div>
@@ -112,24 +158,6 @@ export function ProfileSection() {
           {form.formState.errors.name && (
             <p className="text-xs text-red-600 dark:text-red-400">
               {form.formState.errors.name.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="settings-image" className="text-zinc-700 dark:text-zinc-300">
-            {t("profileImage")}
-          </Label>
-          <Input
-            id="settings-image"
-            type="url"
-            placeholder={t("profileImagePlaceholder")}
-            className="bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
-            {...form.register("image")}
-          />
-          {form.formState.errors.image && (
-            <p className="text-xs text-red-600 dark:text-red-400">
-              {form.formState.errors.image.message}
             </p>
           )}
         </div>

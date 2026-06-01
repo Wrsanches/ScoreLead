@@ -45,9 +45,9 @@ interface JobStats {
 export default function DiscoveryJobDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; locale: string }>
+  params: Promise<{ businessId: string; jobId: string; locale: string }>
 }) {
-  const { id } = use(params)
+  const { businessId, jobId: id } = use(params)
   const t = useTranslations("dashboard")
   const router = useRouter()
   const [job, setJob] = useState<Job | null>(null)
@@ -75,7 +75,7 @@ export default function DiscoveryJobDetailPage({
     <>
       <PageHeader
         title={job?.name || "..."}
-        backHref="/admin/discovery-jobs"
+        backHref={`/admin/business/${businessId}/discovery-jobs`}
         breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
       />
 
@@ -148,7 +148,7 @@ export default function DiscoveryJobDetailPage({
                   <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Statistics</p>
                   {stats && stats.totalLeads > 0 && (
                     <button
-                      onClick={() => router.push(`/admin/leads?jobId=${id}`)}
+                      onClick={() => router.push(`/admin/business/${businessId}/leads?jobId=${id}`)}
                       className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
                       View all leads

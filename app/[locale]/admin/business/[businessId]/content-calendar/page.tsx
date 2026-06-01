@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useActiveBusiness } from "@/components/admin/active-business-context";
+import { useBusinessId } from "@/components/admin/business-context";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -19,6 +19,7 @@ import {
 import { GenerateBanner } from "@/components/admin/content-calendar/generate-banner";
 import { CalendarEmptyState } from "@/components/admin/content-calendar/empty-state";
 import type { ContentPostRow } from "@/components/admin/content-calendar/types";
+import { uploadImage } from "@/lib/upload-client";
 
 function monthStartUtc(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
@@ -35,7 +36,7 @@ function monthParam(d: Date): string {
 export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
   const locale = useLocale();
-  const { activeBusinessId } = useActiveBusiness();
+  const businessId = useBusinessId();
   const weekStartsOn: 0 | 1 = locale === "en" ? 0 : 1;
   const [cursor, setCursor] = useState<Date>(() => monthStartUtc(new Date()));
   const [posts, setPosts] = useState<ContentPostRow[]>([]);
@@ -78,7 +79,7 @@ export default function ContentCalendarPage() {
     setError(null);
     try {
       const res = await fetch(
-        `/api/content-calendar?month=${monthParam(cursor)}`,
+        `/api/content-calendar?businessId=${businessId}&month=${monthParam(cursor)}`,
       );
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -98,7 +99,7 @@ export default function ContentCalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [cursor, t, activeBusinessId]);
+  }, [cursor, t, businessId]);
 
   useEffect(() => {
     fetchPosts();
@@ -119,6 +120,7 @@ export default function ContentCalendarPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          businessId,
           month: monthParam(cursor),
           replaceExisting: true,
         }),
@@ -242,7 +244,7 @@ export default function ContentCalendarPage() {
         const res = await fetch("/api/content-calendar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
+          body: JSON.stringify({ ...values, businessId }),
         });
         if (!res.ok) throw new Error("Failed");
         const body = await res.json();
@@ -302,12 +304,18 @@ export default function ContentCalendarPage() {
     file: File,
     headline: string,
   ) {
-    const form = new FormData();
-    form.append("file", file);
-    if (headline) form.append("headline", headline);
+    const { key } = await uploadImage(file, {
+      kind: "content-slide",
+      postId,
+      slideIndex,
+    });
     const res = await fetch(
       `/api/content-calendar/${postId}/image/${slideIndex}/upload`,
-      { method: "POST", body: form },
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, headline }),
+      },
     );
     if (!res.ok) throw new Error("Failed");
     const body = await res.json();
