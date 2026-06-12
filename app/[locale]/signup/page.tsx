@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useTranslations } from "next-intl"
-import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Loader2 } from "lucide-react"
-import { Link, useRouter } from "@/i18n/routing"
+import { useTranslations, useLocale } from "next-intl"
+import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Loader2, MailCheck } from "lucide-react"
+import { Link } from "@/i18n/routing"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,9 +53,10 @@ function PasswordStrength({ password }: { password: string }) {
 
 export default function SignUpPage() {
   const t = useTranslations("auth")
-  const router = useRouter()
+  const locale = useLocale()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState("")
+  const [verificationSentTo, setVerificationSentTo] = useState("")
 
   const {
     register,
@@ -75,6 +76,8 @@ export default function SignUpPage() {
       name: data.name,
       email: data.email,
       password: data.password,
+      // Where the email verification link lands after verifying.
+      callbackURL: locale === "en" ? "/onboarding" : `/${locale}/onboarding`,
     })
 
     if (error) {
@@ -82,7 +85,9 @@ export default function SignUpPage() {
       return
     }
 
-    router.push("/onboarding")
+    // Email verification is required, so there's no session yet. Show the
+    // check-your-inbox state instead of redirecting.
+    setVerificationSentTo(data.email)
   }
 
   function handleGoogleSignIn() {
@@ -90,6 +95,40 @@ export default function SignUpPage() {
       provider: "google",
       callbackURL: "/onboarding",
     })
+  }
+
+  if (verificationSentTo) {
+    return (
+      <AuthLayout
+        brandingHeading={t("brandingHeadingSignup")}
+        brandingDescription={t("brandingDescSignup")}
+      >
+        <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/30 backdrop-blur-sm p-8 shadow-2xl shadow-black/20 relative overflow-hidden">
+          <div className="absolute inset-0 rounded-xl bg-linear-to-b from-zinc-800/10 to-transparent pointer-events-none" />
+          <div className="relative text-center">
+            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <MailCheck className="w-5 h-5 text-emerald-400" />
+            </div>
+            <h1 className="text-white text-2xl font-semibold tracking-tight">
+              {t("verifyEmailTitle")}
+            </h1>
+            <p className="text-zinc-500 text-sm mt-3">
+              {t("verifyEmailDesc", { email: verificationSentTo })}
+            </p>
+            <p className="text-zinc-600 text-xs mt-6">{t("verifyEmailSpam")}</p>
+          </div>
+        </div>
+        <p className="text-center text-sm text-zinc-500 mt-6">
+          {t("hasAccount")}{" "}
+          <Link
+            href="/login"
+            className="text-emerald-400 hover:text-emerald-300 transition-colors duration-200 font-medium"
+          >
+            {t("loginLink")}
+          </Link>
+        </p>
+      </AuthLayout>
+    )
   }
 
   return (

@@ -4,6 +4,7 @@ import { stripe } from "@better-auth/stripe"
 import Stripe from "stripe"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
+import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email"
 
 // Only enable Stripe billing when a key is configured, so the app keeps working
 // before billing is set up (Stripe throws if constructed with an empty key).
@@ -36,6 +37,18 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail({ to: user.email, name: user.name, url })
+    },
+  },
+  emailVerification: {
+    // Also re-sends when an unverified user attempts to sign in.
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendVerificationEmail({ to: user.email, name: user.name, url })
+    },
   },
   socialProviders: {
     google: {

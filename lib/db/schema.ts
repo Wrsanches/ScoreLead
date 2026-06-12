@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer, real, jsonb } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, boolean, integer, real, jsonb, index } from "drizzle-orm/pg-core"
 
 export type NotificationPreferences = {
   leadAlerts: boolean
@@ -135,10 +135,18 @@ export const discoveryJob = pgTable("discovery_job", {
   completedQueries: integer("completedQueries").notNull().default(0),
   currentQuery: text("currentQuery"),
   errorMessage: text("errorMessage"),
+  // Queue bookkeeping: workers bump heartbeatAt while running so stalled
+  // jobs (killed instance, crashed worker) can be detected and requeued.
+  attempts: integer("attempts").notNull().default(0),
+  heartbeatAt: timestamp("heartbeatAt"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   startedAt: timestamp("startedAt"),
   completedAt: timestamp("completedAt"),
-})
+}, (table) => [
+  index("discovery_job_status_idx").on(table.status),
+  index("discovery_job_user_idx").on(table.userId),
+  index("discovery_job_business_idx").on(table.businessId),
+])
 
 export const lead = pgTable("lead", {
   id: text("id").primaryKey(),
@@ -201,7 +209,10 @@ export const lead = pgTable("lead", {
   discoveryQueries: jsonb("discoveryQueries").$type<string[]>(),
   status: text("status").notNull().default("new"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-})
+}, (table) => [
+  index("lead_business_idx").on(table.businessId),
+  index("lead_job_idx").on(table.jobId),
+])
 
 export const contentPost = pgTable("content_post", {
   id: text("id").primaryKey(),

@@ -15,6 +15,7 @@ export default function LoginPage() {
   const t = useTranslations("auth")
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState("")
+  const [unverifiedNotice, setUnverifiedNotice] = useState(false)
 
   const {
     register,
@@ -26,6 +27,7 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginValues) {
     setServerError("")
+    setUnverifiedNotice(false)
 
     const { error } = await authClient.signIn.email({
       email: data.email,
@@ -33,6 +35,12 @@ export default function LoginPage() {
     })
 
     if (error) {
+      // Unverified accounts get a 403; better-auth re-sends the
+      // verification email automatically on this attempt.
+      if (error.status === 403) {
+        setUnverifiedNotice(true)
+        return
+      }
       setServerError(error.message || t("loginError"))
       return
     }
@@ -88,6 +96,12 @@ export default function LoginPage() {
             </div>
           )}
 
+          {unverifiedNotice && (
+            <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+              {t("emailNotVerified")}
+            </div>
+          )}
+
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label
@@ -117,12 +131,12 @@ export default function LoginPage() {
                 >
                   {t("password")}
                 </label>
-                <button
-                  type="button"
+                <Link
+                  href="/forgot-password"
                   className="text-xs text-zinc-500 hover:text-emerald-400 cursor-pointer transition-colors duration-200"
                 >
                   {t("forgotPassword")}
-                </button>
+                </Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors duration-200 group-focus-within:text-zinc-400" />

@@ -120,6 +120,20 @@
       "when": 1780358708794,
       "tag": "0016_perfect_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1781288540031,
+      "tag": "0017_shallow_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1781288742651,
+      "tag": "0018_third_alice",
+      "breakpoints": true
     }
   ]
 }

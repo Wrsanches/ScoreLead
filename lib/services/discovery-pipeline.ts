@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { discoveryJob, lead } from "@/lib/db/schema"
-import { eq, or, inArray } from "drizzle-orm"
+import { and, eq, or, inArray } from "drizzle-orm"
 import { searchBusiness, filterUsefulResults } from "./brave-search"
 import { searchPlaces, persistPlacePhoto } from "./google-places"
 import { generateSearchQueries } from "./query-generator"
@@ -180,7 +180,7 @@ function mergeCandidateCollection(leads: LeadCandidate[]): LeadCandidate[] {
 
 async function dedupLeads(
   candidates: LeadCandidate[],
-  _businessId: string,
+  businessId: string,
 ): Promise<{ newLeads: LeadCandidate[]; alreadyExists: number }> {
   if (candidates.length === 0) return { newLeads: [], alreadyExists: 0 }
 
@@ -199,6 +199,8 @@ async function dedupLeads(
     conditions.push(inArray(lead.website, candidateWebsites))
   }
 
+  // Dedup is scoped to this business: other tenants' leads must not
+  // swallow ours, and an unscoped scan grows with the whole table.
   const existing =
     conditions.length > 0
       ? await db
@@ -211,7 +213,7 @@ async function dedupLeads(
             country: lead.country,
           })
           .from(lead)
-          .where(or(...conditions))
+          .where(and(eq(lead.businessId, businessId), or(...conditions)))
       : []
 
   // Also fetch names from DB for fuzzy matching
@@ -222,6 +224,7 @@ async function dedupLeads(
       country: lead.country,
     })
     .from(lead)
+    .where(eq(lead.businessId, businessId))
 
   const existingKeys = new Set(existing.flatMap((l) => getIdentityKeys(l as LeadCandidate)))
   const seenKeys = new Set<string>()
@@ -255,6 +258,19 @@ async function dedupLeads(
 
 // ── Main pipeline ──────────────────────────────────────────
 
+/**
+ * Bump the job heartbeat (so the queue doesn't requeue us as stalled) and
+ * report the current status in the same roundtrip, for cancel checks.
+ */
+async function touchJob(jobId: string): Promise<string | null> {
+  const rows = await db
+    .update(discoveryJob)
+    .set({ heartbeatAt: new Date() })
+    .where(eq(discoveryJob.id, jobId))
+    .returning({ status: discoveryJob.status })
+  return rows[0]?.status ?? null
+}
+
 export async function runDiscoveryJob(
   jobId: string,
   params: DiscoveryPipelineParams,
@@ -270,7 +286,7 @@ export async function runDiscoveryJob(
   try {
     await db
       .update(discoveryJob)
-      .set({ status: "running", startedAt: new Date() })
+      .set({ status: "running", startedAt: new Date(), heartbeatAt: new Date() })
       .where(eq(discoveryJob.id, jobId))
 
     // Step 1: Generate search queries
@@ -285,18 +301,16 @@ export async function runDiscoveryJob(
 
     // Step 2: Process each query
     for (let qi = 0; qi < queries.length; qi++) {
-      // Check if cancelled
-      const [currentJob] = await db
-        .select({ status: discoveryJob.status })
-        .from(discoveryJob)
-        .where(eq(discoveryJob.id, jobId))
-      if (currentJob?.status === "cancelled") {
+      // Heartbeat + cancel check
+      const statusNow = await touchJob(jobId)
+      if (statusNow === "cancelled") {
         console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`)
         return
       }
 
       const query = queries[qi]
 
+      // touchJob just bumped the heartbeat, so this only sets the query.
       await db
         .update(discoveryJob)
         .set({ currentQuery: query })
@@ -381,6 +395,14 @@ export async function runDiscoveryJob(
 
       // Step 3: Enrich each new lead
       for (let li = 0; li < newLeads.length && totalInserted < maxResults; li++) {
+        // Enrichment is the slow part (crawls + AI calls per lead), so
+        // heartbeat and honor cancellation per lead, not just per query.
+        const leadLoopStatus = await touchJob(jobId)
+        if (leadLoopStatus === "cancelled") {
+          console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`)
+          return
+        }
+
         let candidate = newLeads[li]
         candidate.id = crypto.randomUUID()
 
@@ -530,6 +552,7 @@ export async function runDiscoveryJob(
           totalFound,
           insertedLeads: totalInserted,
           duplicateLeads: totalDuplicates,
+          heartbeatAt: new Date(),
         })
         .where(eq(discoveryJob.id, jobId))
 

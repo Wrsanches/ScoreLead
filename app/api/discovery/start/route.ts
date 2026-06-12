@@ -6,7 +6,8 @@ import { eq, and } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { runDiscoveryJob } from "@/lib/services/discovery-pipeline"
+import { processDiscoveryQueue } from "@/lib/jobs/discovery-queue"
+import { rateLimit } from "@/lib/rate-limit"
 import {
   assertCanUse,
   recordUsage,
@@ -34,6 +35,17 @@ export async function POST(request: Request) {
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const limit = rateLimit(`discovery-start:${session.user.id}`, 3, 60_000)
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "Too many discovery requests. Please wait a moment." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) },
+      },
+    )
   }
 
   const body = await request.json()
@@ -109,35 +121,9 @@ export async function POST(request: Request) {
 
   await recordUsage(session.user.id, "discoveryJob")
 
-  // Run the pipeline in the background
-  after(async () => {
-    try {
-      await runDiscoveryJob(jobId, {
-        business: {
-          id: biz.id,
-          name: biz.name,
-          description: biz.description,
-          persona: biz.persona,
-          clientPersona: biz.clientPersona,
-          field: biz.field,
-          category: biz.category,
-          tags: biz.tags,
-          businessModel: biz.businessModel,
-          services: biz.services,
-          serviceArea: biz.serviceArea,
-          location: biz.location,
-          language: biz.language,
-          competitors: biz.competitors,
-          website: biz.website,
-        },
-        keywords: data.keywords,
-        location: data.location,
-        maxResults,
-      })
-    } catch (error) {
-      console.error("[discovery-job] failed:", error)
-    }
-  })
+  // The job is queued; the pump claims and runs it subject to the global
+  // and per-user concurrency caps (see lib/jobs/discovery-queue.ts).
+  after(() => processDiscoveryQueue())
 
   return NextResponse.json({ jobId }, { status: 202 })
 }

@@ -1,18 +1,11 @@
 import { Resend } from "resend"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { escapeHtml } from "@/lib/email"
 
 const waitlistSchema = z.object({
   email: z.email(),
 })
-
-function escapeHtml(str: string) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-}
 
 export async function POST(request: Request) {
   const body = await request.json()
