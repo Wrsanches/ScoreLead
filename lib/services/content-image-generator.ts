@@ -70,6 +70,10 @@ export interface GeneratePostImagesResult {
   failures: SlideFailure[];
 }
 
+interface GeneratePostImagesOptions {
+  beforeGenerate?: (plannedImageCount: number) => Promise<void>;
+}
+
 interface PillarDirection {
   archetype: string;
   composition: string;
@@ -605,6 +609,7 @@ export async function generatePostImages(
   business: ImageGenBusiness,
   post: ImageGenPost,
   previousImages: { url: string }[] | null = null,
+  options: GeneratePostImagesOptions = {},
 ): Promise<GeneratePostImagesResult> {
   let slides: SlidePlan[];
   if (post.postType === "carousel") {
@@ -618,6 +623,8 @@ export async function generatePostImages(
   }
 
   const total = slides.length;
+  await options.beforeGenerate?.(total);
+
   const generated = await Promise.all(
     slides.map((s, i) => runSlideGeneration(business, post, s, i, total)),
   );

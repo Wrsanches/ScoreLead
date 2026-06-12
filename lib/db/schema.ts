@@ -260,7 +260,7 @@ export const subscription = pgTable("subscription", {
 })
 
 // Custom freemium usage metering. One row per user. Lifetime counters enforce
-// the Free caps; aiImagesMonth(+key) enforces the Pro monthly fair-use cap.
+// the Free caps; aiImagesMonth/Day(+key) enforce Pro image fair-use caps.
 export const usage = pgTable("usage", {
   userId: text("userId")
     .primaryKey()
@@ -271,6 +271,8 @@ export const usage = pgTable("usage", {
   aiImages: integer("aiImages").notNull().default(0),
   aiImagesMonth: integer("aiImagesMonth").notNull().default(0),
   aiImagesMonthKey: text("aiImagesMonthKey"),
+  aiImagesDay: integer("aiImagesDay").notNull().default(0),
+  aiImagesDayKey: text("aiImagesDayKey"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })

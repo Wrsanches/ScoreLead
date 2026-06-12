@@ -51,48 +51,53 @@ export async function POST(
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
-  // Gate: AI image generation (priciest op). Free = 3 lifetime; Pro = monthly cap.
+  let result: Awaited<ReturnType<typeof generatePostImages>>
   try {
-    await assertCanUse(session.user.id, "aiImage", 1)
+    result = await generatePostImages(
+      {
+        name: biz.name,
+        category: biz.category,
+        field: biz.field,
+        persona: biz.persona,
+        brandStyle: biz.brandStyle,
+        brandColorPrimary: biz.brandColorPrimary,
+        brandColorSecondary: biz.brandColorSecondary,
+        brandFonts: biz.brandFonts ?? null,
+        language: biz.language,
+      },
+      {
+        id: post.id,
+        postType: post.postType as ContentPostType,
+        pillar: post.pillar as ContentPillar | null,
+        caption: post.caption,
+        visualIdea: post.visualIdea,
+        callToAction: post.callToAction,
+      },
+      post.images ?? null,
+      {
+        beforeGenerate: (plannedImageCount) =>
+          assertCanUse(session.user.id, "aiImage", plannedImageCount),
+      },
+    )
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
           error:
             e.plan === "free"
-              ? "You've used your free AI images. Upgrade to Pro to generate more."
-              : "Monthly AI image limit reached.",
+              ? "Free includes 1 AI image. Upgrade to Pro to generate more."
+              : e.reason === "daily"
+                ? "Daily AI image limit reached."
+                : "Monthly AI image limit reached.",
           code: "PLAN_LIMIT",
           action: e.action,
+          reason: e.reason,
         },
         { status: 402 },
       )
     }
     throw e
   }
-
-  const result = await generatePostImages(
-    {
-      name: biz.name,
-      category: biz.category,
-      field: biz.field,
-      persona: biz.persona,
-      brandStyle: biz.brandStyle,
-      brandColorPrimary: biz.brandColorPrimary,
-      brandColorSecondary: biz.brandColorSecondary,
-      brandFonts: biz.brandFonts ?? null,
-      language: biz.language,
-    },
-    {
-      id: post.id,
-      postType: post.postType as ContentPostType,
-      pillar: post.pillar as ContentPillar | null,
-      caption: post.caption,
-      visualIdea: post.visualIdea,
-      callToAction: post.callToAction,
-    },
-    post.images ?? null,
-  )
 
   if (result.slides.length === 0) {
     return NextResponse.json(

@@ -5,10 +5,11 @@ import { subscription, usage, business } from "@/lib/db/schema"
 /**
  * Freemium entitlement + usage metering.
  *
- * Free caps are LIFETIME totals (a one-time taste). Pro lifts them but keeps a
- * monthly fair-use cap on the most expensive op (AI image generation) to
- * protect API costs. Enforcement is server-side: routes call `assertCanUse`
- * before doing the expensive work and `recordUsage` after it succeeds.
+ * Free caps are LIFETIME totals (a one-time taste). Pro lifts them but keeps
+ * monthly and daily fair-use caps on the most expensive op (AI image
+ * generation) to protect API costs. Enforcement is server-side: routes call
+ * `assertCanUse` before doing the expensive work and `recordUsage` after it
+ * succeeds.
  */
 
 export type Plan = "free" | "pro"
@@ -27,7 +28,7 @@ export const PLAN_LIMITS = {
     discoveryJobs: 1,
     outreachMessages: 3,
     contentPlans: 1,
-    aiImages: 3, // lifetime
+    aiImages: 1, // lifetime
     freeLeadsPerJob: 25,
   },
   pro: {
@@ -35,23 +36,32 @@ export const PLAN_LIMITS = {
     discoveryJobs: Infinity,
     outreachMessages: Infinity,
     contentPlans: Infinity,
-    aiImagesPerMonth: 300, // fair-use
+    aiImagesPerMonth: 30, // fair-use
+    aiImagesPerDay: 10, // fair-use
   },
 } as const
+
+export type PlanLimitReason = "lifetime" | "monthly" | "daily"
 
 export class PlanLimitError extends Error {
   action: GateAction
   plan: Plan
-  constructor(action: GateAction, plan: Plan) {
+  reason: PlanLimitReason
+  constructor(action: GateAction, plan: Plan, reason: PlanLimitReason = "lifetime") {
     super(`Plan limit reached for "${action}" on the ${plan} plan`)
     this.name = "PlanLimitError"
     this.action = action
     this.plan = plan
+    this.reason = reason
   }
 }
 
 function monthKey(date = new Date()): string {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`
+}
+
+function dayKey(date = new Date()): string {
+  return date.toISOString().slice(0, 10)
 }
 
 /** "pro" if the user has an active or trialing Pro subscription, else "free". */
@@ -76,6 +86,8 @@ export interface UsageSnapshot {
   aiImages: number
   aiImagesMonth: number
   aiImagesMonthKey: string | null
+  aiImagesDay: number
+  aiImagesDayKey: string | null
 }
 
 const EMPTY_USAGE: UsageSnapshot = {
@@ -85,6 +97,8 @@ const EMPTY_USAGE: UsageSnapshot = {
   aiImages: 0,
   aiImagesMonth: 0,
   aiImagesMonthKey: null,
+  aiImagesDay: 0,
+  aiImagesDayKey: null,
 }
 
 export async function getUsage(userId: string): Promise<UsageSnapshot> {
@@ -97,6 +111,8 @@ export async function getUsage(userId: string): Promise<UsageSnapshot> {
     aiImages: row.aiImages,
     aiImagesMonth: row.aiImagesMonth,
     aiImagesMonthKey: row.aiImagesMonthKey,
+    aiImagesDay: row.aiImagesDay,
+    aiImagesDayKey: row.aiImagesDayKey,
   }
 }
 
@@ -122,6 +138,11 @@ function imagesCap(plan: Plan): number {
     : PLAN_LIMITS.free.aiImages
 }
 
+function imagesUsedToday(plan: Plan, u: UsageSnapshot): number {
+  if (plan !== "pro") return 0
+  return u.aiImagesDayKey === dayKey() ? u.aiImagesDay : 0
+}
+
 /**
  * Throws PlanLimitError if performing `n` more of `action` would exceed the
  * user's plan. Call BEFORE the expensive work.
@@ -145,8 +166,11 @@ export async function assertCanUse(
   const u = await getUsage(userId)
 
   if (action === "aiImage") {
+    if (plan === "pro" && imagesUsedToday(plan, u) + n > PLAN_LIMITS.pro.aiImagesPerDay) {
+      throw new PlanLimitError(action, plan, "daily")
+    }
     if (imagesUsed(plan, u) + n > imagesCap(plan)) {
-      throw new PlanLimitError(action, plan)
+      throw new PlanLimitError(action, plan, plan === "pro" ? "monthly" : "lifetime")
     }
     return
   }
@@ -178,6 +202,7 @@ export async function recordUsage(
 
   const now = new Date()
   const key = monthKey(now)
+  const today = dayKey(now)
 
   if (action === "aiImage") {
     await db
@@ -187,6 +212,8 @@ export async function recordUsage(
         aiImages: n,
         aiImagesMonth: n,
         aiImagesMonthKey: key,
+        aiImagesDay: n,
+        aiImagesDayKey: today,
         updatedAt: now,
       })
       .onConflictDoUpdate({
@@ -196,6 +223,8 @@ export async function recordUsage(
           // reset the monthly bucket when the month rolls over
           aiImagesMonth: sql`CASE WHEN ${usage.aiImagesMonthKey} = ${key} THEN ${usage.aiImagesMonth} + ${n} ELSE ${n} END`,
           aiImagesMonthKey: key,
+          aiImagesDay: sql`CASE WHEN ${usage.aiImagesDayKey} = ${today} THEN ${usage.aiImagesDay} + ${n} ELSE ${n} END`,
+          aiImagesDayKey: today,
           updatedAt: now,
         },
       })
@@ -242,6 +271,7 @@ export async function getPlanStatus(userId: string) {
       outreachMessages: u.outreachMessages,
       contentPlans: u.contentPlans,
       aiImages: imagesUsed(plan, u),
+      aiImagesToday: imagesUsedToday(plan, u),
     },
     limits: {
       businesses: PLAN_LIMITS[plan === "pro" ? "pro" : "free"].businesses,
@@ -249,6 +279,7 @@ export async function getPlanStatus(userId: string) {
       outreachMessages: PLAN_LIMITS.free.outreachMessages,
       contentPlans: PLAN_LIMITS.free.contentPlans,
       aiImages: imagesCap(plan),
+      aiImagesPerDay: plan === "pro" ? PLAN_LIMITS.pro.aiImagesPerDay : PLAN_LIMITS.free.aiImages,
     },
   }
 }

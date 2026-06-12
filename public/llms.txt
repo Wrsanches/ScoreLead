@@ -1,0 +1,38 @@
+# ScoreLead
+
+> AI lead generation software for discovering, scoring, enriching, and contacting qualified B2B company leads.
+
+Site: https://scorelead.io
+Contact: hello@scorelead.io
+Languages: English, Portuguese, Spanish
+
+## Product
+
+ScoreLead helps B2B companies, sales teams, agencies, and growth operators turn target markets into qualified account pipeline.
+
+Core workflow:
+
+- Discover companies by region, industry, keyword, or target account profile.
+- Enrich company leads from websites, maps, and public web sources.
+- Score prospects across reach, trust, fit, engagement, and readiness.
+- Generate personalized multi-step outreach in multiple languages.
+- Track leads from discovery through conversion.
+- Export CRM-ready lead data.
+
+## Key Pages
+
+- English: https://scorelead.io
+- Portuguese: https://scorelead.io/pt
+- Spanish: https://scorelead.io/es
+- Sitemap: https://scorelead.io/sitemap.xml
+
+## Best-Fit Queries
+
+- AI lead generation software
+- B2B lead generation software
+- lead discovery software
+- lead scoring software
+- sales prospecting tool
+- lead enrichment software
+- automated outreach software
+- B2B account discovery

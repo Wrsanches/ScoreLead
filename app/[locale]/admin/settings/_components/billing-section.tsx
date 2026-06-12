@@ -33,13 +33,18 @@ export function BillingSection() {
 
   const usageRows =
     usage && limits
-      ? [
-          { label: t("usageBusinesses"), used: usage.businesses, max: limits.businesses },
-          { label: t("usageDiscovery"), used: usage.discoveryJobs, max: limits.discoveryJobs },
-          { label: t("usageOutreach"), used: usage.outreachMessages, max: limits.outreachMessages },
-          { label: t("usageContent"), used: usage.contentPlans, max: limits.contentPlans },
-          { label: t("usageImages"), used: usage.aiImages, max: limits.aiImages },
-        ]
+      ? isPro
+        ? [
+            { label: t("usageImagesMonthly"), used: usage.aiImages, max: limits.aiImages },
+            { label: t("usageImagesDaily"), used: usage.aiImagesToday ?? 0, max: limits.aiImagesPerDay },
+          ]
+        : [
+            { label: t("usageBusinesses"), used: usage.businesses, max: limits.businesses },
+            { label: t("usageDiscovery"), used: usage.discoveryJobs, max: limits.discoveryJobs },
+            { label: t("usageOutreach"), used: usage.outreachMessages, max: limits.outreachMessages },
+            { label: t("usageContent"), used: usage.contentPlans, max: limits.contentPlans },
+            { label: t("usageImages"), used: usage.aiImages, max: limits.aiImages },
+          ]
       : []
 
   return (
@@ -65,7 +70,7 @@ export function BillingSection() {
         </div>
       </div>
 
-      {!isPro && usageRows.length > 0 && (
+      {usageRows.length > 0 && (
         <div className="space-y-3 mb-6 max-w-sm">
           {usageRows.map((row) => {
             const unlimited = !Number.isFinite(row.max)

@@ -1,28 +1,16 @@
 import type { MetadataRoute } from "next"
-
-const baseUrl = "https://scorelead.io"
-const locales = ["en", "pt", "es"]
+import { getLocalizedUrl, languageAlternates, supportedLocales } from "@/lib/seo"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const sitemap: MetadataRoute.Sitemap = []
+  const lastModified = new Date()
 
-  for (const locale of locales) {
-    const url = locale === "en" ? baseUrl : `${baseUrl}/${locale}`
-
-    sitemap.push({
-      url,
-      lastModified: "2026-04-03",
-      changeFrequency: "weekly",
-      priority: 1,
-      alternates: {
-        languages: {
-          en: baseUrl,
-          pt: `${baseUrl}/pt`,
-          es: `${baseUrl}/es`,
-        },
-      },
-    })
-  }
-
-  return sitemap
+  return supportedLocales.map((locale) => ({
+    url: getLocalizedUrl(locale),
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 1,
+    alternates: {
+      languages: languageAlternates,
+    },
+  }))
 }

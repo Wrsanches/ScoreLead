@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
-  const data = parsed.data
+  const data = { ...parsed.data, businessModel: "b2b" }
 
   const existing = await db
     .select()

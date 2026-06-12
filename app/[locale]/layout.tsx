@@ -6,19 +6,19 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import { hasLocale } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
-import { generateSiteMetadata, generateJsonLd, siteViewport } from '@/lib/seo'
+import { getLocaleConfig, siteConfig, siteViewport } from '@/lib/seo'
 import { ThemeProvider } from '@/components/theme-provider'
 import '../globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
-export const viewport = siteViewport
-
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params
-  return generateSiteMetadata(locale)
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
 }
+
+export const viewport = siteViewport
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -39,33 +39,14 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const messages = await getMessages();
-  const jsonLd = generateJsonLd(locale);
 
   return (
     <html
-      lang={locale}
+      lang={getLocaleConfig(locale).htmlLang}
       data-scroll-behavior="smooth"
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.organization) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.webSite) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.softwareApplication) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.faqPage) }}
-        />
-      </head>
       <body className="font-sans antialiased bg-[#09090B]">
         <a
           href="#main"

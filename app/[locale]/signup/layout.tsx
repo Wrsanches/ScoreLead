@@ -1,4 +1,12 @@
+import type { Metadata } from "next"
 import { redirectIfAuthenticated } from "@/lib/auth-guard"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function SignUpLayout({
   children,

@@ -83,7 +83,7 @@ export default function OnboardingPage() {
   })
   const [location, setLocation] = useState("")
   const [targeting, setTargeting] = useState<TargetingValues>({
-    businessModel: "b2c",
+    businessModel: "b2b",
     services: [],
     serviceArea: "local",
     competitors: [],
@@ -196,7 +196,8 @@ export default function OnboardingPage() {
   }
 
   async function handleTargetingSubmit(data: TargetingValues) {
-    setTargeting(data)
+    const b2bTargeting: TargetingValues = { ...data, businessModel: "b2b" }
+    setTargeting(b2bTargeting)
     setError("")
 
     const allLinks: LinksData = {
@@ -267,7 +268,7 @@ export default function OnboardingPage() {
           linkedin: moreLinks.linkedin,
           other: moreLinks.other,
           logo: logo || "",
-          businessModel: targeting.businessModel,
+          businessModel: "b2b",
           services: JSON.stringify(targeting.services),
           serviceArea: targeting.serviceArea,
           competitors: JSON.stringify(targeting.competitors),

@@ -24,25 +24,31 @@ interface StepTargetingProps {
 }
 
 function RadioOption({
-  value,
   label,
   description,
+  badge,
+  disabled = false,
   selected,
   onSelect,
 }: {
-  value: string
   label: string
   description: string
+  badge?: string
+  disabled?: boolean
   selected: boolean
   onSelect: () => void
 }) {
   return (
     <button
       type="button"
+      disabled={disabled}
+      aria-disabled={disabled}
       onClick={onSelect}
       className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 ${
         selected
           ? "border-emerald-500/30 bg-emerald-500/[0.08]"
+          : disabled
+            ? "border-zinc-800/60 bg-zinc-900/30 opacity-70 cursor-not-allowed"
           : "border-zinc-800/80 bg-zinc-800/20 hover:border-zinc-700/80"
       }`}
     >
@@ -60,10 +66,17 @@ function RadioOption({
             />
           )}
         </div>
-        <div>
-          <p className={`text-sm font-medium ${selected ? "text-white" : "text-zinc-300"}`}>
-            {label}
-          </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className={`text-sm font-medium ${selected ? "text-white" : "text-zinc-300"}`}>
+              {label}
+            </p>
+            {badge && (
+              <span className="rounded-full border border-zinc-700/80 bg-zinc-800/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
+                {badge}
+              </span>
+            )}
+          </div>
           <p className="text-xs text-zinc-500 mt-0.5">{description}</p>
         </div>
       </div>
@@ -242,9 +255,7 @@ function CompetitorInputs({
 export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargetingProps) {
   const t = useTranslations("onboarding")
 
-  const [businessModel, setBusinessModel] = useState<TargetingValues["businessModel"]>(
-    defaultValues?.businessModel || "b2c",
-  )
+  const [businessModel, setBusinessModel] = useState<TargetingValues["businessModel"]>("b2b")
   const [services, setServices] = useState<string[]>(defaultValues?.services || [])
   const [serviceArea, setServiceArea] = useState<TargetingValues["serviceArea"]>(
     defaultValues?.serviceArea || "local",
@@ -255,7 +266,7 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
 
   function handleSubmit() {
     onSubmit({
-      businessModel,
+      businessModel: "b2b",
       services,
       serviceArea,
       competitors: competitors.filter((c) => c.trim()),
@@ -263,9 +274,9 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
   }
 
   const businessModelOptions = [
-    { value: "b2b" as const, label: t("targetB2B"), description: t("targetB2BDesc") },
-    { value: "b2c" as const, label: t("targetB2C"), description: t("targetB2CDesc") },
-    { value: "both" as const, label: t("targetBoth"), description: t("targetBothDesc") },
+    { value: "b2b" as const, label: t("targetB2B"), description: t("targetB2BDesc"), disabled: false },
+    { value: "b2c" as const, label: t("targetB2C"), description: t("targetB2CDesc"), disabled: true },
+    { value: "both" as const, label: t("targetBoth"), description: t("targetBothDesc"), disabled: true },
   ]
 
   const serviceAreaOptions = [
@@ -300,11 +311,14 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
             {businessModelOptions.map((opt) => (
               <RadioOption
                 key={opt.value}
-                value={opt.value}
                 label={opt.label}
                 description={opt.description}
+                badge={opt.disabled ? t("soon") : undefined}
+                disabled={opt.disabled}
                 selected={businessModel === opt.value}
-                onSelect={() => setBusinessModel(opt.value)}
+                onSelect={() => {
+                  if (!opt.disabled) setBusinessModel(opt.value)
+                }}
               />
             ))}
           </div>
@@ -345,7 +359,6 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
             {serviceAreaOptions.map((opt) => (
               <RadioOption
                 key={opt.value}
-                value={opt.value}
                 label={opt.label}
                 description={opt.description}
                 selected={serviceArea === opt.value}

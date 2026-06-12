@@ -19,6 +19,7 @@ interface PlanUsage {
   outreachMessages: number
   contentPlans: number
   aiImages: number
+  aiImagesToday?: number
 }
 
 interface PlanStatus {

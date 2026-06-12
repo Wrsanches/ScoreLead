@@ -96,43 +96,25 @@ Rules:
 
 type BusinessModel = string | null | undefined
 
-export function buildKeywordSuggestionPrompt(businessModel: BusinessModel): string {
-  const b2bLine =
-    businessModel === "b2b" || businessModel === "both"
-      ? "For B2B: suggest keywords describing types of businesses that would be clients (e.g., 'dental clinics', 'law firms', 'real estate agencies')."
-      : ""
-  const b2cLine =
-    businessModel === "b2c" || businessModel === "both"
-      ? "For B2C: suggest keywords describing types of individuals or communities that would be customers (e.g., 'fitness enthusiasts', 'pet owners', 'home buyers')."
-      : ""
+export function buildKeywordSuggestionPrompt(_businessModel: BusinessModel): string {
+  return `You are a B2B lead generation expert. Given a business profile, suggest 8-15 search keywords that would help find companies that could become customers for this business.
 
-  return `You are a lead generation expert. Given a business profile, suggest 8-15 search keywords that would help find potential leads (clients/customers) for this business.
-
-${b2bLine}
-${b2cLine}
+Only suggest B2B company/account targets. Suggest keywords describing types of businesses, teams, operators, organizations, or industries that would be clients (e.g., "dental clinics", "law firms", "real estate agencies", "SaaS companies", "manufacturing companies").
+Do not suggest individuals, consumer audiences, communities, hobby groups, or B2C lifestyle segments.
 
 Return JSON: { "keywords": ["keyword1", "keyword2", ...] }
 
-Each keyword should be 1-4 words, specific enough to produce relevant search results. Write keywords in the same language as the business profile.`
+Each keyword should be 1-4 words, specific enough to produce relevant B2B company search results. Write keywords in the same language as the business profile.`
 }
 
 export function buildSearchQueriesPrompt(
-  businessModel: BusinessModel,
+  _businessModel: BusinessModel,
   location: string,
 ): string {
-  const b2bLine =
-    businessModel === "b2b" || businessModel === "both"
-      ? "For B2B leads: generate queries to find businesses that would be clients. Include queries like '{keyword} {location}', '{keyword} companies near {location}', '{keyword} directory {location}'."
-      : ""
-  const b2cLine =
-    businessModel === "b2c" || businessModel === "both"
-      ? "For B2C leads: generate queries to find directories, communities, and listings of potential individual customers. Include queries like '{keyword} groups {location}', 'best {keyword} directory {location}'."
-      : ""
+  return `You are a B2B lead generation expert. Generate 8-12 web search queries to find companies that could become customers for a business.
 
-  return `You are a lead generation expert. Generate 8-12 web search queries to find potential leads for a business.
-
-${b2bLine}
-${b2cLine}
+Only generate B2B company/account discovery queries. Include queries like "{keyword} {location}", "{keyword} companies near {location}", "{keyword} directory {location}", "{keyword} businesses {location}", and "{keyword} agencies {location}".
+Do not generate queries for individuals, consumers, groups, communities, hobbyists, shoppers, or B2C audiences.
 
 IMPORTANT: Always include the full location "${location}" in every query. All results must be local to this specific area.
 
@@ -140,7 +122,7 @@ Also include 1-2 competitor-adjacent queries if competitors are provided (e.g., 
 
 Return JSON: { "queries": ["query1", "query2", ...] }
 
-Generate diverse queries. Maximum 15 queries.`
+Generate diverse B2B company discovery queries. Maximum 15 queries.`
 }
 
 // ---------------------------------------------------------------------------
@@ -187,17 +169,17 @@ export function buildContentCalendarPrompt(
 
   const countLine = postCount
     ? `You will produce exactly ${postCount} posts scheduled between ${startDateIso} and ${endDateIso} (this is ${monthLabel}).`
-    : `Decide how many posts to produce based on the business profile. Use these heuristics:
-- **B2C lifestyle / fashion / food / beauty / fitness / travel**: 16-22 posts per month. Audiences expect near-daily content.
-- **B2C services (pottery studio, gym, salon, cafe)**: 12-18 posts per month. Quality over volume.
-- **B2B / professional services / agencies / SaaS**: 8-14 posts per month. Cadence matters less than depth.
-- **Solo creators / freelancers / early brands**: 8-12 posts per month. Sustainable beats ambitious.
+    : `Decide how many posts to produce based on the business profile. Use these B2B heuristics:
+- **B2B professional services / agencies / SaaS**: 8-14 posts per month. Cadence matters less than depth.
+- **B2B local services / studios selling to companies**: 8-12 posts per month. Focus on proof, trust, and clear use cases.
+- **B2B enterprise / high-ticket offers**: 6-10 posts per month. Fewer, stronger posts beat daily content.
+- **Solo consultants / freelancers selling to companies**: 8-12 posts per month. Sustainable beats ambitious.
 - Scale up for long months (31 days), down for short months (Feb = 28/29).
 - Scale down if the brand voice is clearly selective/premium (luxury, minimal, artisanal).
-- NEVER go below 6 or above 26.
+- NEVER go below 6 or above 18.
 Commit to a number up front, then generate exactly that many posts scheduled between ${startDateIso} and ${endDateIso} (this is ${monthLabel}).`
 
-  return `You are an expert Instagram content strategist and copywriter planning an entire month of high-performing posts for a small business.
+  return `You are an expert B2B content strategist and copywriter planning an entire month of high-performing Instagram posts for a business that sells to companies.
 
 ${countLine} All captions, CTAs, visualIdea text and hashtags must be written in ${languageLabel}.
 

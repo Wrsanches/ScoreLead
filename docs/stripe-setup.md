@@ -79,7 +79,7 @@ STRIPE_PRO_ANNUAL_PRICE_ID=        # optional
    **Upgrade to Pro**, and Settings → Billing shows your usage.
 2. Trigger the paywall either way:
    - Click **Upgrade to Pro** (sidebar or Settings → Billing), or
-   - Hit a Free cap (e.g. start a 2nd discovery job, or generate a 4th AI image) →
+   - Hit a Free cap (e.g. start a 2nd discovery job, or generate a 2nd AI image) →
      the upgrade dialog opens automatically.
 3. Click **Upgrade - $49/mo** → you're redirected to Stripe-hosted Checkout.
 4. Pay with a **test card**:
@@ -91,7 +91,7 @@ STRIPE_PRO_ANNUAL_PRICE_ID=        # optional
 6. The subscription flips to active:
    - Sidebar badge → **Pro**
    - `GET /api/billing/status` returns `"plan":"pro"`
-   - The Free caps are lifted (AI images now metered monthly).
+   - The Free caps are lifted (AI images now metered at 30/month and 10/day).
 
 ### Test the billing portal / cancel
 - Settings → Billing → **Manage billing** → opens Stripe's hosted portal.

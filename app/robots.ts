@@ -1,22 +1,41 @@
 import type { MetadataRoute } from "next"
+import { siteConfig } from "@/lib/seo"
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://scorelead.io"
+  const privateRoutes = [
+    "/api/",
+    "/admin/",
+    "/*/admin/",
+    "/onboarding/",
+    "/*/onboarding/",
+  ]
 
   return {
     rules: [
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/api/"],
+        disallow: privateRoutes,
       },
       {
-        userAgent: ["GPTBot", "ChatGPT-User", "Claude-Web", "PerplexityBot", "Applebot-Extended"],
+        userAgent: [
+          "Googlebot",
+          "Bingbot",
+          "DuckDuckBot",
+          "OAI-SearchBot",
+          "GPTBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-Web",
+          "PerplexityBot",
+          "Applebot",
+          "Applebot-Extended",
+        ],
         allow: ["/"],
-        disallow: ["/api/"],
+        disallow: privateRoutes,
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    sitemap: `${siteConfig.url}/sitemap.xml`,
+    host: siteConfig.url,
   }
 }
