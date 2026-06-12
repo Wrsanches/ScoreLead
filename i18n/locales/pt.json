@@ -481,11 +481,6 @@
     "retry": "Tentar novamente",
     "goHome": "Ir para o início"
   },
-  "notFound": {
-    "title": "Esta página não foi encontrada",
-    "description": "A página que você está procurando não existe, foi removida ou a URL pode estar incorreta.",
-    "backHome": "Voltar ao início"
-  },
   "cookies": {
     "message": "Usamos cookies para melhorar sua experiência.",
     "accept": "Aceitar",

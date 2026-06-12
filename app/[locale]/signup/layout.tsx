@@ -1,11 +1,14 @@
 import type { Metadata } from "next"
 import { redirectIfAuthenticated } from "@/lib/auth-guard"
+import { generatePageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return generatePageMetadata(locale, "signup")
 }
 
 export default async function SignUpLayout({

@@ -481,11 +481,6 @@
     "retry": "Try again",
     "goHome": "Go to homepage"
   },
-  "notFound": {
-    "title": "This page could not be found",
-    "description": "The page you are looking for does not exist, has been removed, or the URL might be incorrect.",
-    "backHome": "Back to home"
-  },
   "cookies": {
     "message": "We use cookies to improve your experience.",
     "accept": "Accept",

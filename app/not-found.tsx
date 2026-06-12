@@ -1,5 +1,15 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import "./globals.css"
+
+// This is the app's single 404 page (the localized [locale]/[...rest] catch-all
+// was removed because, with an async locale layout, its notFound() ran after
+// streaming had already committed a 200 - a soft 404. Letting unknown routes
+// fall through to this native not-found returns a real 404 status.)
+export const metadata: Metadata = {
+  title: "Page not found | ScoreLead",
+  robots: { index: false, follow: false },
+}
 
 export default function NotFound() {
   return (

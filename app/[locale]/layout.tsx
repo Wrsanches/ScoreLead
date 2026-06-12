@@ -16,6 +16,12 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
+  // Child routes set a bare title segment (e.g. "Log in"); this appends the
+  // brand. The landing page overrides with its own full SEO title.
+  title: {
+    template: `%s | ${siteConfig.name}`,
+    default: siteConfig.name,
+  },
 }
 
 export const viewport = siteViewport

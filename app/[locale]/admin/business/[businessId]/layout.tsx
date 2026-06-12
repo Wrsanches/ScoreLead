@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { and, eq } from "drizzle-orm"
@@ -6,6 +7,18 @@ import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
 import { BusinessProvider } from "@/components/admin/business-context"
 import { AdminShell } from "@/components/admin-shell"
+import { generatePageMetadata } from "@/lib/seo"
+
+// Title for the business home (dashboard) and a fallback for any nested route
+// that doesn't set its own; the section layouts below override it.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return generatePageMetadata(locale, "dashboard")
+}
 
 export default async function BusinessLayout({
   children,

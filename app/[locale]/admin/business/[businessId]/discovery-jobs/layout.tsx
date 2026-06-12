@@ -1,25 +1,21 @@
 import type { Metadata } from "next"
-import { redirectIfAuthenticated } from "@/lib/auth-guard"
 import { generatePageMetadata } from "@/lib/seo"
 
+// Covers the discovery-jobs list, the new-job form, and job detail pages
+// (all client components).
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  return generatePageMetadata(locale, "login")
+  return generatePageMetadata(locale, "discovery")
 }
 
-export default async function LoginLayout({
+export default function DiscoveryJobsLayout({
   children,
-  params,
 }: {
   children: React.ReactNode
-  params: Promise<{ locale: string }>
 }) {
-  const { locale } = await params
-  await redirectIfAuthenticated(locale)
-
   return <>{children}</>
 }

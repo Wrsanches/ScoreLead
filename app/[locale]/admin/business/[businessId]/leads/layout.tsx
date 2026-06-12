@@ -1,25 +1,21 @@
 import type { Metadata } from "next"
-import { redirectIfAuthenticated } from "@/lib/auth-guard"
 import { generatePageMetadata } from "@/lib/seo"
 
+// The leaf pages here are client components and can't export metadata, so the
+// title lives in this server layout. Auth/chrome are handled by ancestors.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  return generatePageMetadata(locale, "login")
+  return generatePageMetadata(locale, "leads")
 }
 
-export default async function LoginLayout({
+export default function LeadsLayout({
   children,
-  params,
 }: {
   children: React.ReactNode
-  params: Promise<{ locale: string }>
 }) {
-  const { locale } = await params
-  await redirectIfAuthenticated(locale)
-
   return <>{children}</>
 }

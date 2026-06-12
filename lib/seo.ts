@@ -176,6 +176,143 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
   },
 }
 
+// ── Per-page metadata ──────────────────────────────────────
+// Titles for the app's non-landing routes. These are all noindex pages, so
+// the title is for browser tabs, bookmarks, history, and screen readers; it
+// is suffixed with "| ScoreLead" by the title template in the locale layout.
+// Descriptions are only worth setting on the public auth pages (login/signup/
+// password flows), which an unauthenticated visitor or link preview may hit.
+
+export type PageKey =
+  | "login"
+  | "signup"
+  | "forgotPassword"
+  | "resetPassword"
+  | "onboarding"
+  | "dashboard"
+  | "leads"
+  | "leadsKanban"
+  | "discovery"
+  | "contentCalendar"
+  | "businessProfile"
+  | "savedSearches"
+  | "settings"
+
+type PageCopy = { title: string; description?: string }
+
+const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
+  en: {
+    login: {
+      title: "Log in",
+      description:
+        "Sign in to your ScoreLead account to discover, score, and reach B2B leads with AI.",
+    },
+    signup: {
+      title: "Create your account",
+      description:
+        "Start finding and scoring B2B leads with ScoreLead. Free to get started, no credit card required.",
+    },
+    forgotPassword: {
+      title: "Reset your password",
+      description:
+        "Request a secure link to reset the password for your ScoreLead account.",
+    },
+    resetPassword: {
+      title: "Choose a new password",
+      description: "Set a new password for your ScoreLead account.",
+    },
+    onboarding: { title: "Set up your business" },
+    dashboard: { title: "Dashboard" },
+    leads: { title: "Leads" },
+    leadsKanban: { title: "Lead board" },
+    discovery: { title: "Lead discovery" },
+    contentCalendar: { title: "Content calendar" },
+    businessProfile: { title: "Business profile" },
+    savedSearches: { title: "Saved searches" },
+    settings: { title: "Settings" },
+  },
+  pt: {
+    login: {
+      title: "Entrar",
+      description:
+        "Acesse sua conta ScoreLead para descobrir, pontuar e contatar leads B2B com IA.",
+    },
+    signup: {
+      title: "Crie sua conta",
+      description:
+        "Comece a encontrar e pontuar leads B2B com o ScoreLead. Gratuito para comecar, sem cartao de credito.",
+    },
+    forgotPassword: {
+      title: "Redefinir sua senha",
+      description:
+        "Solicite um link seguro para redefinir a senha da sua conta ScoreLead.",
+    },
+    resetPassword: {
+      title: "Escolha uma nova senha",
+      description: "Defina uma nova senha para sua conta ScoreLead.",
+    },
+    onboarding: { title: "Configure seu negocio" },
+    dashboard: { title: "Painel" },
+    leads: { title: "Leads" },
+    leadsKanban: { title: "Quadro de leads" },
+    discovery: { title: "Descoberta de leads" },
+    contentCalendar: { title: "Calendario de conteudo" },
+    businessProfile: { title: "Perfil do negocio" },
+    savedSearches: { title: "Buscas salvas" },
+    settings: { title: "Configuracoes" },
+  },
+  es: {
+    login: {
+      title: "Iniciar sesion",
+      description:
+        "Accede a tu cuenta de ScoreLead para descubrir, puntuar y contactar leads B2B con IA.",
+    },
+    signup: {
+      title: "Crea tu cuenta",
+      description:
+        "Empieza a encontrar y puntuar leads B2B con ScoreLead. Gratis para empezar, sin tarjeta de credito.",
+    },
+    forgotPassword: {
+      title: "Restablecer tu contrasena",
+      description:
+        "Solicita un enlace seguro para restablecer la contrasena de tu cuenta ScoreLead.",
+    },
+    resetPassword: {
+      title: "Elige una nueva contrasena",
+      description: "Configura una nueva contrasena para tu cuenta ScoreLead.",
+    },
+    onboarding: { title: "Configura tu negocio" },
+    dashboard: { title: "Panel" },
+    leads: { title: "Leads" },
+    leadsKanban: { title: "Tablero de leads" },
+    discovery: { title: "Descubrimiento de leads" },
+    contentCalendar: { title: "Calendario de contenido" },
+    businessProfile: { title: "Perfil del negocio" },
+    savedSearches: { title: "Busquedas guardadas" },
+    settings: { title: "Configuracion" },
+  },
+}
+
+/**
+ * Metadata for a non-landing route. Defaults to noindex (these are app/auth
+ * pages); pass { index: true } only for a page that should be crawlable.
+ * The returned title is a bare segment - the locale layout's title template
+ * appends "| ScoreLead".
+ */
+export function generatePageMetadata(
+  locale: string,
+  key: PageKey,
+  opts?: { index?: boolean },
+): Metadata {
+  const copy = pageMetadata[normalizeLocale(locale)][key]
+
+  return {
+    title: copy.title,
+    ...(copy.description ? { description: copy.description } : {}),
+    robots: opts?.index ? undefined : { index: false, follow: false },
+  }
+}
+
 export const siteViewport: Viewport = {
   width: "device-width",
   initialScale: 1,
