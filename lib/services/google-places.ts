@@ -43,7 +43,13 @@ export async function searchPlaces(
     )
 
     if (!response.ok) {
-      console.error(`Google Places failed: ${response.statusText}`)
+      // Google returns a JSON error body explaining the failure (invalid
+      // field mask, empty query, key restriction, etc.). statusText alone
+      // ("Bad Request") is useless for diagnosis, so surface the body.
+      const detail = await response.text().catch(() => "")
+      console.error(
+        `Google Places failed: ${response.status} ${response.statusText} - ${detail}`,
+      )
       return []
     }
 

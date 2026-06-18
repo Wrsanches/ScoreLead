@@ -271,6 +271,31 @@ async function touchJob(jobId: string): Promise<string | null> {
   return rows[0]?.status ?? null
 }
 
+/**
+ * Persist live progress counters (and bump the heartbeat) so the polling
+ * UI updates mid-query. Enrichment is slow - crawls + AI + rate-limit
+ * delays per lead - so batching these writes to the end of each query
+ * would leave the panel stuck at 0 for minutes. Returns the job status in
+ * the same roundtrip for cancel checks.
+ */
+async function writeProgress(
+  jobId: string,
+  progress: Partial<{
+    totalFound: number
+    insertedLeads: number
+    duplicateLeads: number
+    completedQueries: number
+    currentQuery: string | null
+  }>,
+): Promise<string | null> {
+  const rows = await db
+    .update(discoveryJob)
+    .set({ ...progress, heartbeatAt: new Date() })
+    .where(eq(discoveryJob.id, jobId))
+    .returning({ status: discoveryJob.status })
+  return rows[0]?.status ?? null
+}
+
 export async function runDiscoveryJob(
   jobId: string,
   params: DiscoveryPipelineParams,
@@ -393,11 +418,25 @@ export async function runDiscoveryJob(
       totalFound += merged.length
       totalDuplicates += alreadyExists
 
+      // Persist Found/Duplicates now, before the slow per-lead enrichment
+      // loop, so the panel reflects this query immediately.
+      await writeProgress(jobId, {
+        totalFound,
+        duplicateLeads: totalDuplicates,
+        completedQueries: qi,
+      })
+
       // Step 3: Enrich each new lead
       for (let li = 0; li < newLeads.length && totalInserted < maxResults; li++) {
         // Enrichment is the slow part (crawls + AI calls per lead), so
-        // heartbeat and honor cancellation per lead, not just per query.
-        const leadLoopStatus = await touchJob(jobId)
+        // heartbeat, push live counters, and honor cancellation per lead,
+        // not just per query.
+        const leadLoopStatus = await writeProgress(jobId, {
+          totalFound,
+          insertedLeads: totalInserted,
+          duplicateLeads: totalDuplicates,
+          completedQueries: qi,
+        })
         if (leadLoopStatus === "cancelled") {
           console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`)
           return
@@ -527,6 +566,9 @@ export async function runDiscoveryJob(
 
           totalInserted++
           console.log(`[discovery] Job ${jobId.slice(0, 8)} inserted lead: ${candidate.name} (${breakdown.score.toFixed(1)})`)
+          // Reflect the new lead in the panel right away, rather than
+          // waiting for the next lead's heartbeat or the query to finish.
+          await writeProgress(jobId, { insertedLeads: totalInserted })
         } catch (err) {
           console.error(`[discovery] Failed to insert lead:`, err)
         }

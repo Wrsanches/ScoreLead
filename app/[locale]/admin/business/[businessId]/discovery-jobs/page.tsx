@@ -160,19 +160,10 @@ export default function DiscoveryJobsPage() {
                   href={`/admin/business/${businessId}/discovery-jobs/${job.id}`}
                   className={`block rounded-xl border transition-all duration-200 group ${
                     isActive
-                      ? "border-emerald-500/25 bg-gradient-to-r from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent hover:border-emerald-500/40 shadow-[0_0_24px_-12px_rgba(16,185,129,0.4)]"
+                      ? "border-emerald-500/20 hover:border-emerald-500/30 hover:bg-emerald-500/[0.02]"
                       : "border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300/80 dark:hover:border-zinc-700/60 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40"
                   }`}
                 >
-                  {isRunning && (
-                    <div className="h-0.5 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-t-xl overflow-hidden">
-                      <div
-                        className="h-full w-1/3 bg-gradient-to-r from-transparent via-emerald-400 to-transparent rounded-full"
-                        style={{ animation: "shimmer 1.8s ease-in-out infinite" }}
-                      />
-                    </div>
-                  )}
-
                   <div className="px-5 py-4">
                     <div className="flex items-start justify-between gap-4 mb-2.5">
                       <div className="flex items-center gap-3 min-w-0">
@@ -240,10 +231,7 @@ export default function DiscoveryJobsPage() {
                     {isRunning && (
                       <div className="mt-2.5 pt-2.5 border-t border-emerald-500/10 flex items-center justify-between gap-3">
                         <div className="min-w-0 flex items-center gap-1.5">
-                          <span className="relative flex h-1.5 w-1.5 shrink-0">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          </span>
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
                           {job.currentQuery ? (
                             <span className="truncate text-[11px] text-emerald-600/80 dark:text-emerald-400/80">
                               {job.currentQuery}
