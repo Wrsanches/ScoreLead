@@ -38,6 +38,7 @@ export default function NewDiscoveryJobPage() {
   const [cityName, setCityName] = useState("")
   const [keywordInput, setKeywordInput] = useState("")
   const [keywords, setKeywords] = useState<string[]>([])
+  const [batchSize, setBatchSize] = useState(20)
   const [savingSearch, setSavingSearch] = useState(false)
 
   // Suggested keywords
@@ -248,7 +249,7 @@ export default function NewDiscoveryJobPage() {
           city: cityName || null,
           location,
           keywords,
-          maxResults: 10,
+          maxResults: batchSize,
           serviceArea: "local",
         }),
       })
@@ -431,6 +432,34 @@ export default function NewDiscoveryJobPage() {
                   </div>
                   <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Press Enter to add custom keywords. Click suggestions above to toggle them.</p>
                 </div>
+              </div>
+
+              {/* Section: Batch size */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Radar className="w-4 h-4 text-zinc-500" />
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Leads per run</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {[10, 20, 50].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setBatchSize(n)}
+                      disabled={isSubmitting}
+                      className={`h-10 px-5 text-sm font-medium rounded-xl border transition-colors disabled:opacity-50 ${
+                        batchSize === n
+                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">
+                  Each run finds up to this many new leads. On Pro you can continue the job to discover more in the same area.
+                </p>
               </div>
 
               {/* Summary card */}

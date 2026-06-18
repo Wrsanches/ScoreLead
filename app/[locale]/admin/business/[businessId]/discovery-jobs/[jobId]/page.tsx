@@ -3,7 +3,8 @@
 import { useState, useEffect, use } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
-import { MapPin, Radar, Globe, Mail, Phone, Clock, ExternalLink, Users, Star } from "lucide-react"
+import { MapPin, Radar, Globe, Mail, Phone, Clock, ExternalLink, Users, Star, Plus, Loader2, CheckCircle2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   PageHeader,
   ContentWrapper,
@@ -12,6 +13,7 @@ import {
   StatusBadge,
   LoadingState,
 } from "@/components/admin"
+import { usePlan } from "@/components/admin/plan-context"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
 import { DiscoveryRunningPanel } from "@/components/admin/discovery-running-panel"
 
@@ -32,6 +34,8 @@ interface Job {
   createdAt: string
   completedAt: string | null
   leadCount: number
+  runs: number
+  exhausted: boolean
 }
 
 interface JobStats {
@@ -54,9 +58,36 @@ export default function DiscoveryJobDetailPage({
   const { businessId, jobId: id } = use(params)
   const t = useTranslations("dashboard")
   const router = useRouter()
+  const { openUpgrade } = usePlan()
   const [job, setJob] = useState<Job | null>(null)
   const [stats, setStats] = useState<JobStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [continuing, setContinuing] = useState(false)
+  // Bumped after a Continue to restart polling (the poll stops at terminal states).
+  const [pollKey, setPollKey] = useState(0)
+
+  async function handleContinue() {
+    if (continuing) return
+    setContinuing(true)
+    try {
+      const res = await fetch(`/api/discovery/jobs/${id}/continue`, { method: "POST" })
+      if (res.ok) {
+        toast.success("Finding more leads...")
+        // Optimistically flip to queued so the poll re-activates.
+        setJob((j) => (j ? { ...j, status: "queued" } : j))
+        setPollKey((k) => k + 1)
+      } else if (res.status === 402) {
+        openUpgrade()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(err.error || "Could not continue this job")
+      }
+    } catch {
+      toast.error("Could not continue this job")
+    } finally {
+      setContinuing(false)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -90,7 +121,7 @@ export default function DiscoveryJobDetailPage({
       cancelled = true
       stop()
     }
-  }, [id])
+  }, [id, pollKey])
 
   const keywords = job ? parseKeywords(job.keywords) : []
 
@@ -110,8 +141,30 @@ export default function DiscoveryJobDetailPage({
             <>
               {/* Job header */}
               <div className="mb-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <StatusBadge status={job.status} />
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={job.status} />
+                    {job.runs > 0 && (
+                      <span className="text-xs text-zinc-500 dark:text-zinc-600">
+                        Run {job.runs + 1}
+                      </span>
+                    )}
+                  </div>
+                  {(job.status === "partial" ||
+                    (job.status === "completed" && !job.exhausted)) && (
+                    <button
+                      onClick={handleContinue}
+                      disabled={continuing}
+                      className="flex items-center gap-2 h-9 px-4 text-sm font-medium bg-emerald-500 text-zinc-950 rounded-lg hover:bg-emerald-400 disabled:opacity-50 transition-colors"
+                    >
+                      {continuing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Plus className="w-4 h-4" />
+                      )}
+                      Find more leads
+                    </button>
+                  )}
                 </div>
 
                 <h1 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-medium tracking-tight mb-4">
@@ -143,6 +196,13 @@ export default function DiscoveryJobDetailPage({
                 {job.errorMessage && (
                   <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-600 dark:text-red-400">
                     {job.errorMessage}
+                  </div>
+                )}
+
+                {job.exhausted && (
+                  <div className="mt-4 flex items-center gap-2 p-3 bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-600 dark:text-zinc-400">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-zinc-500" />
+                    No more new leads to find in this area.
                   </div>
                 )}
               </div>

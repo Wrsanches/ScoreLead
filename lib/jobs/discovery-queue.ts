@@ -121,7 +121,13 @@ async function executeJob(jobId: string) {
       },
       keywords,
       location: job.location,
-      maxResults: job.maxResults,
+      // maxResults is the per-run cap; the continue route may rewrite it.
+      runCap: job.maxResults,
+      searchDepth: job.searchDepth,
+      // Seed cumulative counters so a Continue batch accumulates onto prior runs.
+      priorInserted: job.insertedLeads,
+      priorFound: job.totalFound,
+      priorDuplicates: job.duplicateLeads,
     })
   } catch (error) {
     // runDiscoveryJob already marked the job failed; just log here.

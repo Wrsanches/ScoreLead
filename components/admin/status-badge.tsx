@@ -1,12 +1,22 @@
-import { CheckCircle2, AlertCircle, Clock, Loader2, XCircle } from "lucide-react"
+import { CheckCircle2, AlertCircle, Clock, Loader2, XCircle, PlusCircle } from "lucide-react"
 
-type Status = "running" | "queued" | "pending" | "completed" | "failed" | "cancelled"
+type Status =
+  | "running"
+  | "queued"
+  | "pending"
+  | "completed"
+  | "partial"
+  | "exhausted"
+  | "failed"
+  | "cancelled"
 
 const config: Record<Status, { icon: React.ElementType; color: string; bg: string; label: string; ping?: boolean }> = {
   running: { icon: Loader2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", label: "Running", ping: true },
   queued: { icon: Clock, color: "text-zinc-600 dark:text-zinc-400", bg: "bg-zinc-500/10 border-zinc-500/20", label: "Queued" },
   pending: { icon: Clock, color: "text-zinc-600 dark:text-zinc-400", bg: "bg-zinc-500/10 border-zinc-500/20", label: "Pending" },
   completed: { icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", label: "Completed" },
+  partial: { icon: PlusCircle, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10 border-amber-500/20", label: "More available" },
+  exhausted: { icon: CheckCircle2, color: "text-zinc-500", bg: "bg-zinc-500/10 border-zinc-500/20", label: "Exhausted" },
   failed: { icon: AlertCircle, color: "text-red-600 dark:text-red-400", bg: "bg-red-500/10 border-red-500/20", label: "Failed" },
   cancelled: { icon: XCircle, color: "text-zinc-500", bg: "bg-zinc-500/10 border-zinc-500/20", label: "Cancelled" },
 }

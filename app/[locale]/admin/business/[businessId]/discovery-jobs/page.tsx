@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useTranslations } from "next-intl"
-import { MapPin, Tag, Radar, ChevronRight, XCircle } from "lucide-react"
+import { MapPin, Tag, Radar, ChevronRight, XCircle, Plus } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { toast } from "sonner"
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/admin"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
 import { useBusinessId } from "@/components/admin/business-context"
+import { usePlan } from "@/components/admin/plan-context"
 
 interface DiscoveryJob {
   id: string
@@ -29,13 +30,17 @@ interface DiscoveryJob {
   completedQueries: number
   currentQuery: string | null
   createdAt: string
+  runs: number
+  exhausted: boolean
 }
 
 export default function DiscoveryJobsPage() {
   const t = useTranslations("dashboard")
   const businessId = useBusinessId()
+  const { openUpgrade } = usePlan()
   const [jobs, setJobs] = useState<DiscoveryJob[]>([])
   const [loading, setLoading] = useState(true)
+  const [continuingId, setContinuingId] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   async function fetchJobs() {
@@ -91,6 +96,29 @@ export default function DiscoveryJobsPage() {
       }
     } catch {
       toast.error("Failed to cancel job")
+    }
+  }
+
+  async function handleContinue(jobId: string, e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (continuingId) return
+    setContinuingId(jobId)
+    try {
+      const res = await fetch(`/api/discovery/jobs/${jobId}/continue`, { method: "POST" })
+      if (res.ok) {
+        toast.success("Finding more leads...")
+        await fetchJobs() // status flips to queued -> polling reactivates
+      } else if (res.status === 402) {
+        openUpgrade()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(err.error || "Could not continue this job")
+      }
+    } catch {
+      toast.error("Could not continue this job")
+    } finally {
+      setContinuingId(null)
     }
   }
 
@@ -153,6 +181,10 @@ export default function DiscoveryJobsPage() {
               const kws = parseKeywords(job.keywords)
               const isActive = job.status === "running" || job.status === "queued"
               const isRunning = job.status === "running"
+              const isContinuable =
+                !isActive &&
+                !job.exhausted &&
+                (job.status === "partial" || job.status === "completed")
 
               return (
                 <Link
@@ -188,6 +220,16 @@ export default function DiscoveryJobsPage() {
                             title="Cancel job"
                           >
                             <XCircle className="w-4 h-4" />
+                          </button>
+                        ) : isContinuable ? (
+                          <button
+                            onClick={(e) => handleContinue(job.id, e)}
+                            disabled={continuingId === job.id}
+                            className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 disabled:opacity-50 transition-colors"
+                            title="Find more leads"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            More
                           </button>
                         ) : (
                           <ChevronRight className="w-4 h-4 text-zinc-400 dark:text-zinc-700 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors" />

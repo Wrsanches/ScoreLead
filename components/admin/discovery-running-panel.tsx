@@ -12,6 +12,7 @@ interface RunningJob {
   duplicateLeads: number
   completedQueries: number
   currentQuery: string | null
+  runs: number
 }
 
 /** A single live-updating counter that rolls when its value changes. */
@@ -41,7 +42,9 @@ function LiveStat({ label, value }: { label: string; value: number }) {
 
 export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
   const queued = job.status === "queued" || job.status === "pending"
-  const target = job.maxResults || 0
+  // insertedLeads is cumulative across batches; the target grows by the
+  // per-run cap (maxResults) for each Continue run so the bar stays 0-100%.
+  const target = (job.maxResults || 0) * ((job.runs || 0) + 1)
   const pct = target > 0 ? Math.min(100, Math.round((job.insertedLeads / target) * 100)) : 0
 
   return (

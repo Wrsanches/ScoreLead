@@ -1,202 +1,232 @@
-import { db } from "@/lib/db"
-import { discoveryJob, lead } from "@/lib/db/schema"
-import { and, eq, or, inArray } from "drizzle-orm"
-import { searchBusiness, filterUsefulResults } from "./brave-search"
-import { searchPlaces, persistPlacePhoto } from "./google-places"
-import { generateSearchQueries } from "./query-generator"
+import { db } from "@/lib/db";
+import { discoveryJob, lead } from "@/lib/db/schema";
+import { and, eq, or, inArray } from "drizzle-orm";
+import { searchBusiness, filterUsefulResults } from "./brave-search";
+import { searchPlaces, persistPlacePhoto } from "./google-places";
+import { generateSearchQueries } from "./query-generator";
 import {
   crawlAndExtract,
   scrapeAndExtract,
   mergeEnrichment,
   delay,
-} from "./lead-extractor"
-import { getLeadScoreBreakdown } from "./lead-scorer"
+} from "./lead-extractor";
+import { getLeadScoreBreakdown } from "./lead-scorer";
 import {
   normalizeWebsiteUrl,
   getWebsiteDomain,
-  normalizeBusinessName,
   cleanBusinessName,
   nameSimilarity,
   mergeDiscoveryQueries,
-} from "./lead-utils"
+} from "./lead-utils";
 
 // ── Types ──────────────────────────────────────────────────
 
 export interface DiscoveryPipelineParams {
   business: {
-    id: string
-    website: string | null
-    name: string | null
-    description: string | null
-    persona: string | null
-    clientPersona: string | null
-    field: string | null
-    category: string | null
-    tags: string | null
-    businessModel: string | null
-    services: string | null
-    serviceArea: string | null
-    location: string | null
-    language: string | null
-    competitors: string | null
-  }
-  keywords: string[]
-  location: string
-  maxResults: number
+    id: string;
+    website: string | null;
+    name: string | null;
+    description: string | null;
+    persona: string | null;
+    clientPersona: string | null;
+    field: string | null;
+    category: string | null;
+    tags: string | null;
+    businessModel: string | null;
+    services: string | null;
+    serviceArea: string | null;
+    location: string | null;
+    language: string | null;
+    competitors: string | null;
+  };
+  keywords: string[];
+  location: string;
+  /** Per-run cap: how many NEW leads this batch should insert before stopping. */
+  runCap: number;
+  /** Google Places page-depth reached by prior runs (0 = none yet). */
+  searchDepth: number;
+  /** Cumulative counters from prior runs, so this batch accumulates onto them. */
+  priorInserted: number;
+  priorFound: number;
+  priorDuplicates: number;
 }
+
+/** Google Places text search tops out at ~3 pages (~60 results) per query. */
+const MAX_PLACES_PAGES = 3;
 
 // ── Identity keys for fuzzy dedup ──────────────────────────
 
-type LeadCandidate = Record<string, unknown>
+type LeadCandidate = Record<string, unknown>;
 
 function getIdentityKeys(lead: LeadCandidate) {
-  const keys: string[] = []
+  const keys: string[] = [];
 
-  if (lead.googlePlaceId) keys.push(`place:${String(lead.googlePlaceId).trim()}`)
+  if (lead.googlePlaceId)
+    keys.push(`place:${String(lead.googlePlaceId).trim()}`);
 
-  const website = normalizeWebsiteUrl(lead.website as string | undefined)
-  if (website) keys.push(`site:${website}`)
+  const website = normalizeWebsiteUrl(lead.website as string | undefined);
+  if (website) keys.push(`site:${website}`);
 
-  return [...new Set(keys)]
+  return [...new Set(keys)];
 }
 
 /** Check if two leads are the same business by fuzzy name + location matching */
 function isSameBusinessByName(a: LeadCandidate, b: LeadCandidate): boolean {
-  const nameA = String(a.name || "")
-  const nameB = String(b.name || "")
-  if (!nameA || !nameB) return false
+  const nameA = String(a.name || "");
+  const nameB = String(b.name || "");
+  if (!nameA || !nameB) return false;
 
-  const similarity = nameSimilarity(nameA, nameB)
-  if (similarity < 0.6) return false
+  const similarity = nameSimilarity(nameA, nameB);
+  if (similarity < 0.6) return false;
 
   // If names are very similar (80%+), match regardless of location
-  if (similarity >= 0.8) return true
+  if (similarity >= 0.8) return true;
 
   // For 60-80% similarity, require same city or country
-  const cityA = String(a.city || "").trim().toLowerCase()
-  const cityB = String(b.city || "").trim().toLowerCase()
-  const countryA = String(a.country || "").trim().toLowerCase()
-  const countryB = String(b.country || "").trim().toLowerCase()
+  const cityA = String(a.city || "")
+    .trim()
+    .toLowerCase();
+  const cityB = String(b.city || "")
+    .trim()
+    .toLowerCase();
+  const countryA = String(a.country || "")
+    .trim()
+    .toLowerCase();
+  const countryB = String(b.country || "")
+    .trim()
+    .toLowerCase();
 
-  if (cityA && cityB && cityA === cityB) return true
-  if (countryA && countryB && countryA === countryB) return true
+  if (cityA && cityB && cityA === cityB) return true;
+  if (countryA && countryB && countryA === countryB) return true;
 
-  return false
+  return false;
 }
 
-function mergeCandidateLead(base: LeadCandidate, incoming: LeadCandidate): LeadCandidate {
-  const merged = { ...incoming, ...base }
+function mergeCandidateLead(
+  base: LeadCandidate,
+  incoming: LeadCandidate,
+): LeadCandidate {
+  const merged = { ...incoming, ...base };
 
-  merged.name = base.name || incoming.name || "Unknown"
-  merged.website = base.website || incoming.website
-  merged.websiteDomain = getWebsiteDomain(String(merged.website || ""))
-  merged.address = base.address || incoming.address
-  merged.city = base.city || incoming.city
-  merged.state = base.state || incoming.state
-  merged.country = base.country || incoming.country
-  merged.googlePlaceId = base.googlePlaceId || incoming.googlePlaceId
-  merged.googleMapsUrl = base.googleMapsUrl || incoming.googleMapsUrl
-  merged.googleRating = base.googleRating ?? incoming.googleRating
-  merged.googleReviewCount = base.googleReviewCount ?? incoming.googleReviewCount
-  merged.lat = base.lat ?? incoming.lat
-  merged.lng = base.lng ?? incoming.lng
-  merged.priceRange = base.priceRange || incoming.priceRange
-  merged.photoUrl = base.photoUrl || incoming.photoUrl
-  merged.source = base.source || incoming.source
+  merged.name = base.name || incoming.name || "Unknown";
+  merged.website = base.website || incoming.website;
+  merged.websiteDomain = getWebsiteDomain(String(merged.website || ""));
+  merged.address = base.address || incoming.address;
+  merged.city = base.city || incoming.city;
+  merged.state = base.state || incoming.state;
+  merged.country = base.country || incoming.country;
+  merged.googlePlaceId = base.googlePlaceId || incoming.googlePlaceId;
+  merged.googleMapsUrl = base.googleMapsUrl || incoming.googleMapsUrl;
+  merged.googleRating = base.googleRating ?? incoming.googleRating;
+  merged.googleReviewCount =
+    base.googleReviewCount ?? incoming.googleReviewCount;
+  merged.lat = base.lat ?? incoming.lat;
+  merged.lng = base.lng ?? incoming.lng;
+  merged.priceRange = base.priceRange || incoming.priceRange;
+  merged.photoUrl = base.photoUrl || incoming.photoUrl;
+  merged.source = base.source || incoming.source;
   merged.discoveryQueries = mergeDiscoveryQueries(
     base.discoveryQueries as string[] | undefined,
     incoming.discoveryQueries as string[] | undefined,
-  )
-  merged.discoveryQuery = (merged.discoveryQueries as string[])[0] || base.discoveryQuery || incoming.discoveryQuery
+  );
+  merged.discoveryQuery =
+    (merged.discoveryQueries as string[])[0] ||
+    base.discoveryQuery ||
+    incoming.discoveryQuery;
 
   // Merge arrays
   for (const key of ["emails", "phones", "services", "amenities"] as const) {
-    const combined = [...new Set([...((base[key] as string[]) || []), ...((incoming[key] as string[]) || [])])]
-    if (combined.length > 0) merged[key] = combined
+    const combined = [
+      ...new Set([
+        ...((base[key] as string[]) || []),
+        ...((incoming[key] as string[]) || []),
+      ]),
+    ];
+    if (combined.length > 0) merged[key] = combined;
   }
 
-  if (base.email && !merged.email) merged.email = base.email
-  if (incoming.email && !merged.email) merged.email = incoming.email
-  if (base.phone && !merged.phone) merged.phone = base.phone
-  if (incoming.phone && !merged.phone) merged.phone = incoming.phone
+  if (base.email && !merged.email) merged.email = base.email;
+  if (incoming.email && !merged.email) merged.email = incoming.email;
+  if (base.phone && !merged.phone) merged.phone = base.phone;
+  if (incoming.phone && !merged.phone) merged.phone = incoming.phone;
 
-  return merged
+  return merged;
 }
 
 function mergeCandidateCollection(leads: LeadCandidate[]): LeadCandidate[] {
-  const byKey = new Map<string, LeadCandidate>()
-  const merged: LeadCandidate[] = []
+  const byKey = new Map<string, LeadCandidate>();
+  const merged: LeadCandidate[] = [];
 
   // First pass: merge by exact identity keys (placeId, website)
   for (const lead of leads) {
-    const keys = getIdentityKeys(lead)
-    let didMerge = false
+    const keys = getIdentityKeys(lead);
+    let didMerge = false;
 
     for (const key of keys) {
-      const existing = byKey.get(key)
+      const existing = byKey.get(key);
       if (existing) {
-        const mergedLead = mergeCandidateLead(existing, lead)
-        byKey.set(key, mergedLead)
+        const mergedLead = mergeCandidateLead(existing, lead);
+        byKey.set(key, mergedLead);
         // Update all keys that pointed to existing
         for (const k of getIdentityKeys(mergedLead)) {
-          byKey.set(k, mergedLead)
+          byKey.set(k, mergedLead);
         }
-        didMerge = true
-        break
+        didMerge = true;
+        break;
       }
     }
 
     if (!didMerge) {
-      for (const key of keys) byKey.set(key, lead)
-      if (keys.length === 0) merged.push(lead)
+      for (const key of keys) byKey.set(key, lead);
+      if (keys.length === 0) merged.push(lead);
     }
   }
 
   // Collect unique entries from byKey
-  const seen = new Set<LeadCandidate>()
+  const seen = new Set<LeadCandidate>();
   for (const lead of byKey.values()) {
     if (!seen.has(lead)) {
-      seen.add(lead)
-      merged.push(lead)
+      seen.add(lead);
+      merged.push(lead);
     }
   }
 
   // Second pass: fuzzy name matching to catch remaining duplicates
-  const final: LeadCandidate[] = []
+  const final: LeadCandidate[] = [];
   for (const lead of merged) {
-    let didMerge = false
+    let didMerge = false;
     for (let i = 0; i < final.length; i++) {
       if (isSameBusinessByName(final[i], lead)) {
-        final[i] = mergeCandidateLead(final[i], lead)
-        didMerge = true
-        break
+        final[i] = mergeCandidateLead(final[i], lead);
+        didMerge = true;
+        break;
       }
     }
-    if (!didMerge) final.push(lead)
+    if (!didMerge) final.push(lead);
   }
 
-  return final
+  return final;
 }
 
 async function dedupLeads(
   candidates: LeadCandidate[],
   businessId: string,
 ): Promise<{ newLeads: LeadCandidate[]; alreadyExists: number }> {
-  if (candidates.length === 0) return { newLeads: [], alreadyExists: 0 }
+  if (candidates.length === 0) return { newLeads: [], alreadyExists: 0 };
 
   const candidatePlaceIds = candidates
     .map((l) => String(l.googlePlaceId || "").trim())
-    .filter(Boolean)
+    .filter(Boolean);
   const candidateWebsites = candidates
     .map((l) => normalizeWebsiteUrl(l.website as string | undefined))
-    .filter((url): url is string => Boolean(url))
+    .filter((url): url is string => Boolean(url));
 
-  const conditions = []
+  const conditions = [];
   if (candidatePlaceIds.length > 0) {
-    conditions.push(inArray(lead.googlePlaceId, candidatePlaceIds))
+    conditions.push(inArray(lead.googlePlaceId, candidatePlaceIds));
   }
   if (candidateWebsites.length > 0) {
-    conditions.push(inArray(lead.website, candidateWebsites))
+    conditions.push(inArray(lead.website, candidateWebsites));
   }
 
   // Dedup is scoped to this business: other tenants' leads must not
@@ -214,7 +244,7 @@ async function dedupLeads(
           })
           .from(lead)
           .where(and(eq(lead.businessId, businessId), or(...conditions)))
-      : []
+      : [];
 
   // Also fetch names from DB for fuzzy matching
   const allDbLeads = await db
@@ -224,36 +254,38 @@ async function dedupLeads(
       country: lead.country,
     })
     .from(lead)
-    .where(eq(lead.businessId, businessId))
+    .where(eq(lead.businessId, businessId));
 
-  const existingKeys = new Set(existing.flatMap((l) => getIdentityKeys(l as LeadCandidate)))
-  const seenKeys = new Set<string>()
-  const newLeads: LeadCandidate[] = []
-  let alreadyExists = 0
+  const existingKeys = new Set(
+    existing.flatMap((l) => getIdentityKeys(l as LeadCandidate)),
+  );
+  const seenKeys = new Set<string>();
+  const newLeads: LeadCandidate[] = [];
+  let alreadyExists = 0;
 
   for (const candidate of mergeCandidateCollection(candidates)) {
-    const keys = getIdentityKeys(candidate)
+    const keys = getIdentityKeys(candidate);
 
     // Check exact key match
     if (keys.some((key) => existingKeys.has(key) || seenKeys.has(key))) {
-      alreadyExists++
-      continue
+      alreadyExists++;
+      continue;
     }
 
     // Check fuzzy name match against DB
     const fuzzyMatch = allDbLeads.some((dbLead) =>
       isSameBusinessByName(candidate, dbLead as LeadCandidate),
-    )
+    );
     if (fuzzyMatch) {
-      alreadyExists++
-      continue
+      alreadyExists++;
+      continue;
     }
 
-    keys.forEach((key) => seenKeys.add(key))
-    newLeads.push(candidate)
+    keys.forEach((key) => seenKeys.add(key));
+    newLeads.push(candidate);
   }
 
-  return { newLeads, alreadyExists }
+  return { newLeads, alreadyExists };
 }
 
 // ── Main pipeline ──────────────────────────────────────────
@@ -267,8 +299,8 @@ async function touchJob(jobId: string): Promise<string | null> {
     .update(discoveryJob)
     .set({ heartbeatAt: new Date() })
     .where(eq(discoveryJob.id, jobId))
-    .returning({ status: discoveryJob.status })
-  return rows[0]?.status ?? null
+    .returning({ status: discoveryJob.status });
+  return rows[0]?.status ?? null;
 }
 
 /**
@@ -281,70 +313,91 @@ async function touchJob(jobId: string): Promise<string | null> {
 async function writeProgress(
   jobId: string,
   progress: Partial<{
-    totalFound: number
-    insertedLeads: number
-    duplicateLeads: number
-    completedQueries: number
-    currentQuery: string | null
+    totalFound: number;
+    insertedLeads: number;
+    duplicateLeads: number;
+    completedQueries: number;
+    currentQuery: string | null;
   }>,
 ): Promise<string | null> {
   const rows = await db
     .update(discoveryJob)
     .set({ ...progress, heartbeatAt: new Date() })
     .where(eq(discoveryJob.id, jobId))
-    .returning({ status: discoveryJob.status })
-  return rows[0]?.status ?? null
+    .returning({ status: discoveryJob.status });
+  return rows[0]?.status ?? null;
 }
 
 export async function runDiscoveryJob(
   jobId: string,
   params: DiscoveryPipelineParams,
 ) {
-  const { business, keywords, location, maxResults } = params
-  let totalInserted = 0
-  let totalDuplicates = 0
-  let totalFound = 0
-  let consecutiveEmptyQueries = 0
+  const { business, keywords, location, runCap, searchDepth } = params;
+  // Counters are cumulative across batches: seed them from the prior run so
+  // the panel keeps climbing instead of resetting to 0 each Continue.
+  let totalInserted = params.priorInserted;
+  let totalDuplicates = params.priorDuplicates;
+  let totalFound = params.priorFound;
+  // Per-run counter: this batch stops once it inserts `runCap` NEW leads.
+  let runInserted = 0;
+  let consecutiveEmptyQueries = 0;
+  let hitCap = false;
 
-  console.log(`[discovery] Job ${jobId.slice(0, 8)} started`)
+  // Each Continue run pages one level deeper into Google Places (run 1 -> 1
+  // page, run 2 -> 2 pages, ...), capped at the API's ~3-page ceiling.
+  const pagesThisRun = Math.min(searchDepth + 1, MAX_PLACES_PAGES);
+
+  console.log(
+    `[discovery] Job ${jobId.slice(0, 8)} started (depth ${pagesThisRun}, runCap ${runCap})`,
+  );
 
   try {
     await db
       .update(discoveryJob)
-      .set({ status: "running", startedAt: new Date(), heartbeatAt: new Date() })
-      .where(eq(discoveryJob.id, jobId))
+      .set({
+        status: "running",
+        startedAt: new Date(),
+        heartbeatAt: new Date(),
+      })
+      .where(eq(discoveryJob.id, jobId));
 
     // Step 1: Generate search queries
     const queries = await generateSearchQueries({
       business,
       keywords,
       location,
-    })
+    });
 
-    const totalQueries = queries.length
-    console.log(`[discovery] Job ${jobId.slice(0, 8)} generated ${totalQueries} queries`)
+    const totalQueries = queries.length;
+    console.log(
+      `[discovery] Job ${jobId.slice(0, 8)} generated ${totalQueries} queries`,
+    );
 
     // Step 2: Process each query
     for (let qi = 0; qi < queries.length; qi++) {
       // Heartbeat + cancel check
-      const statusNow = await touchJob(jobId)
+      const statusNow = await touchJob(jobId);
       if (statusNow === "cancelled") {
-        console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`)
-        return
+        console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`);
+        return;
       }
 
-      const query = queries[qi]
+      const query = queries[qi];
 
       // touchJob just bumped the heartbeat, so this only sets the query.
       await db
         .update(discoveryJob)
         .set({ currentQuery: query })
-        .where(eq(discoveryJob.id, jobId))
+        .where(eq(discoveryJob.id, jobId));
 
-      console.log(`[discovery] Job ${jobId.slice(0, 8)} query ${qi + 1}/${totalQueries}: ${query}`)
+      console.log(
+        `[discovery] Job ${jobId.slice(0, 8)} query ${qi + 1}/${totalQueries}: ${query}`,
+      );
 
-      // Search Google Places
-      const places = await searchPlaces(query, location)
+      // Search Google Places (paging deeper on continuation runs)
+      const places = await searchPlaces(query, location, {
+        maxPages: pagesThisRun,
+      });
       const googleLeads: LeadCandidate[] = await Promise.all(
         places.map(async (place) => ({
           name: place.name,
@@ -364,27 +417,48 @@ export async function runDiscoveryJob(
           // Persist the photo to S3; fall back to the on-demand proxy if that
           // fails or S3 isn't configured.
           photoUrl: place.photoRef
-            ? (await persistPlacePhoto(place.photoRef)) ??
-              `/api/leads/photo?name=${encodeURIComponent(place.photoRef)}`
+            ? ((await persistPlacePhoto(place.photoRef)) ??
+              `/api/leads/photo?name=${encodeURIComponent(place.photoRef)}`)
             : null,
           source: "google_places",
           firecrawlEnriched: false,
           discoveryQuery: query,
           discoveryQueries: [query],
         })),
-      )
+      );
 
       // Also search Brave
       try {
-        const braveResults = await searchBusiness(query)
+        const braveResults = await searchBusiness(query);
         for (const r of braveResults) {
           // Skip aggregator sites
           try {
-            const hostname = new URL(r.url).hostname.replace("www.", "")
-            const skipDomains = ["yelp.com", "facebook.com", "instagram.com", "yellowpages.com", "tripadvisor.com", "google.com", "wikipedia.org", "twitter.com", "x.com", "reddit.com", "linkedin.com", "linktr.ee", "tiktok.com", "youtube.com", "pinterest.com", "econodata.com.br", "rentechdigital.com", "glassdoor.com", "indeed.com", "crunchbase.com"]
-            if (skipDomains.some((d) => hostname.includes(d))) continue
+            const hostname = new URL(r.url).hostname.replace("www.", "");
+            const skipDomains = [
+              "yelp.com",
+              "facebook.com",
+              "instagram.com",
+              "yellowpages.com",
+              "tripadvisor.com",
+              "google.com",
+              "wikipedia.org",
+              "twitter.com",
+              "x.com",
+              "reddit.com",
+              "linkedin.com",
+              "linktr.ee",
+              "tiktok.com",
+              "youtube.com",
+              "pinterest.com",
+              "econodata.com.br",
+              "rentechdigital.com",
+              "glassdoor.com",
+              "indeed.com",
+              "crunchbase.com",
+            ];
+            if (skipDomains.some((d) => hostname.includes(d))) continue;
           } catch {
-            continue
+            continue;
           }
 
           googleLeads.push({
@@ -398,25 +472,30 @@ export async function runDiscoveryJob(
             firecrawlEnriched: false,
             discoveryQuery: query,
             discoveryQueries: [query],
-          })
+          });
         }
       } catch {
         // Brave search is supplementary
       }
 
       // Merge candidates across this query and dedup against DB
-      const merged = mergeCandidateCollection(googleLeads)
+      const merged = mergeCandidateCollection(googleLeads);
 
       // Exclude user's own website
-      const userDomain = getWebsiteDomain(business.website)
+      const userDomain = getWebsiteDomain(business.website);
       const filtered = userDomain
-        ? merged.filter((l) => getWebsiteDomain(l.website as string) !== userDomain)
-        : merged
+        ? merged.filter(
+            (l) => getWebsiteDomain(l.website as string) !== userDomain,
+          )
+        : merged;
 
-      const { newLeads, alreadyExists } = await dedupLeads(filtered, business.id)
+      const { newLeads, alreadyExists } = await dedupLeads(
+        filtered,
+        business.id,
+      );
 
-      totalFound += merged.length
-      totalDuplicates += alreadyExists
+      totalFound += merged.length;
+      totalDuplicates += alreadyExists;
 
       // Persist Found/Duplicates now, before the slow per-lead enrichment
       // loop, so the panel reflects this query immediately.
@@ -424,10 +503,10 @@ export async function runDiscoveryJob(
         totalFound,
         duplicateLeads: totalDuplicates,
         completedQueries: qi,
-      })
+      });
 
-      // Step 3: Enrich each new lead
-      for (let li = 0; li < newLeads.length && totalInserted < maxResults; li++) {
+      // Step 3: Enrich each new lead (stop once this batch hits its cap)
+      for (let li = 0; li < newLeads.length && runInserted < runCap; li++) {
         // Enrichment is the slow part (crawls + AI calls per lead), so
         // heartbeat, push live counters, and honor cancellation per lead,
         // not just per query.
@@ -436,14 +515,14 @@ export async function runDiscoveryJob(
           insertedLeads: totalInserted,
           duplicateLeads: totalDuplicates,
           completedQueries: qi,
-        })
+        });
         if (leadLoopStatus === "cancelled") {
-          console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`)
-          return
+          console.log(`[discovery] Job ${jobId.slice(0, 8)} was cancelled`);
+          return;
         }
 
-        let candidate = newLeads[li]
-        candidate.id = crypto.randomUUID()
+        let candidate = newLeads[li];
+        candidate.id = crypto.randomUUID();
 
         // Deep crawl if website exists
         const businessContext = {
@@ -451,7 +530,7 @@ export async function runDiscoveryJob(
           category: business.category,
           description: business.description,
           keywords,
-        }
+        };
 
         if (candidate.website) {
           try {
@@ -459,25 +538,30 @@ export async function runDiscoveryJob(
               String(candidate.website),
               candidate.country as string | undefined,
               businessContext,
-            )
-            candidate = mergeEnrichment(candidate, crawlData, String(candidate.website))
-            if (crawlData.aiSummary) candidate.aiSummary = crawlData.aiSummary
-            if (crawlData.websiteContent) candidate.websiteContent = crawlData.websiteContent
+            );
+            candidate = mergeEnrichment(
+              candidate,
+              crawlData,
+              String(candidate.website),
+            );
+            if (crawlData.aiSummary) candidate.aiSummary = crawlData.aiSummary;
+            if (crawlData.websiteContent)
+              candidate.websiteContent = crawlData.websiteContent;
             if (crawlData.enrichmentSources) {
               candidate.enrichmentSources = [
                 ...new Set([
                   ...((candidate.enrichmentSources as string[]) || []),
                   ...crawlData.enrichmentSources,
                 ]),
-              ]
+              ];
             }
-            candidate.firecrawlEnriched = true
-            candidate.relevant = crawlData.relevant
-            candidate.businessCategory = crawlData.businessCategory
+            candidate.firecrawlEnriched = true;
+            candidate.relevant = crawlData.relevant;
+            candidate.businessCategory = crawlData.businessCategory;
 
             // Prefer AI-extracted business name over raw page title
             if (crawlData.businessName && candidate.source === "brave_search") {
-              candidate.name = crawlData.businessName
+              candidate.name = crawlData.businessName;
             }
           } catch {
             // Keep partially enriched
@@ -487,13 +571,13 @@ export async function runDiscoveryJob(
         // Secondary: Brave search for social media enrichment
         if (candidate.name) {
           try {
-            const braveQuery = `"${candidate.name}" ${location}`
-            const braveResults = await searchBusiness(braveQuery)
-            const useful = filterUsefulResults(braveResults)
+            const braveQuery = `"${candidate.name}" ${location}`;
+            const braveResults = await searchBusiness(braveQuery);
+            const useful = filterUsefulResults(braveResults);
             for (const result of useful) {
               try {
-                const pageData = await scrapeAndExtract(result.url)
-                candidate = mergeEnrichment(candidate, pageData, result.url)
+                const pageData = await scrapeAndExtract(result.url);
+                candidate = mergeEnrichment(candidate, pageData, result.url);
               } catch {
                 // Ignore failed secondary enrichments
               }
@@ -505,15 +589,24 @@ export async function runDiscoveryJob(
 
         // Step 4: Relevance check - skip leads the AI flagged as irrelevant
         if (candidate.relevant === false) {
-          console.log(`[discovery] Job ${jobId.slice(0, 8)} skipping irrelevant lead: ${candidate.name} (category: ${candidate.businessCategory || "unknown"})`)
-          continue
+          console.log(
+            `[discovery] Job ${jobId.slice(0, 8)} skipping irrelevant lead: ${candidate.name} (category: ${candidate.businessCategory || "unknown"})`,
+          );
+          continue;
         }
 
         // Step 5: Score the lead
-        candidate.websiteDomain = getWebsiteDomain(String(candidate.website || "")) ?? null
-        const breakdown = getLeadScoreBreakdown(candidate as Record<string, unknown>)
-        candidate.score = breakdown.score
-        candidate.scoreBreakdown = { positives: breakdown.positives, risks: breakdown.risks, categories: breakdown.categories }
+        candidate.websiteDomain =
+          getWebsiteDomain(String(candidate.website || "")) ?? null;
+        const breakdown = getLeadScoreBreakdown(
+          candidate as Record<string, unknown>,
+        );
+        candidate.score = breakdown.score;
+        candidate.scoreBreakdown = {
+          positives: breakdown.positives,
+          risks: breakdown.risks,
+          categories: breakdown.categories,
+        };
 
         // Step 6: Insert into DB
         try {
@@ -539,51 +632,68 @@ export async function runDiscoveryJob(
             lng: (candidate.lng as number) ?? null,
             priceRange: (candidate.priceRange as string) || null,
             photoUrl: (candidate.photoUrl as string) || null,
-            googleReviews: (candidate.googleReviews as { author: string; rating: number; text: string; date: string }[]) || null,
+            googleReviews:
+              (candidate.googleReviews as {
+                author: string;
+                rating: number;
+                text: string;
+                date: string;
+              }[]) || null,
             emails: (candidate.emails as string[]) || null,
             phones: (candidate.phones as string[]) || null,
-            socialMedia: (candidate.socialMedia as Record<string, string>) || null,
+            socialMedia:
+              (candidate.socialMedia as Record<string, string>) || null,
             instagramHandle: (candidate.instagramHandle as string) || null,
             facebookUrl: (candidate.facebookUrl as string) || null,
             services: (candidate.services as string[]) || null,
             ownerName: (candidate.ownerName as string) || null,
-            teamMembers: (candidate.teamMembers as { name: string; role?: string }[]) || null,
+            teamMembers:
+              (candidate.teamMembers as { name: string; role?: string }[]) ||
+              null,
             operatingHours: (candidate.operatingHours as string) || null,
             yearEstablished: (candidate.yearEstablished as string) || null,
             pricingInfo: (candidate.pricingInfo as string) || null,
             amenities: (candidate.amenities as string[]) || null,
             aiSummary: (candidate.aiSummary as string) || null,
             websiteContent: (candidate.websiteContent as string) || null,
-            enrichmentSources: (candidate.enrichmentSources as string[]) || null,
+            enrichmentSources:
+              (candidate.enrichmentSources as string[]) || null,
             score: breakdown.score,
-            scoreBreakdown: { positives: breakdown.positives, risks: breakdown.risks, categories: breakdown.categories },
+            scoreBreakdown: {
+              positives: breakdown.positives,
+              risks: breakdown.risks,
+              categories: breakdown.categories,
+            },
             source: String(candidate.source || "google_places"),
             firecrawlEnriched: Boolean(candidate.firecrawlEnriched),
             discoveryQuery: (candidate.discoveryQuery as string) || null,
             discoveryQueries: (candidate.discoveryQueries as string[]) || null,
             status: "new",
-          })
+          });
 
-          totalInserted++
-          console.log(`[discovery] Job ${jobId.slice(0, 8)} inserted lead: ${candidate.name} (${breakdown.score.toFixed(1)})`)
+          totalInserted++;
+          runInserted++;
+          console.log(
+            `[discovery] Job ${jobId.slice(0, 8)} inserted lead: ${candidate.name} (${breakdown.score.toFixed(1)})`,
+          );
           // Reflect the new lead in the panel right away, rather than
           // waiting for the next lead's heartbeat or the query to finish.
-          await writeProgress(jobId, { insertedLeads: totalInserted })
+          await writeProgress(jobId, { insertedLeads: totalInserted });
         } catch (err) {
-          console.error(`[discovery] Failed to insert lead:`, err)
+          console.error(`[discovery] Failed to insert lead:`, err);
         }
 
         // Rate limiting between enrichments
         if (li < newLeads.length - 1) {
-          await delay(2000)
+          await delay(2000);
         }
       }
 
       // Track consecutive empty queries for early exit
       if (newLeads.length === 0) {
-        consecutiveEmptyQueries++
+        consecutiveEmptyQueries++;
       } else {
-        consecutiveEmptyQueries = 0
+        consecutiveEmptyQueries = 0;
       }
 
       // Update job progress
@@ -596,26 +706,45 @@ export async function runDiscoveryJob(
           duplicateLeads: totalDuplicates,
           heartbeatAt: new Date(),
         })
-        .where(eq(discoveryJob.id, jobId))
+        .where(eq(discoveryJob.id, jobId));
 
-      // Early exit: reached max results
-      if (totalInserted >= maxResults) {
-        console.log(`[discovery] Job ${jobId.slice(0, 8)} reached maxResults (${maxResults})`)
-        break
+      // Early exit: this batch filled its per-run cap.
+      if (runInserted >= runCap) {
+        console.log(
+          `[discovery] Job ${jobId.slice(0, 8)} reached runCap (${runCap})`,
+        );
+        hitCap = true;
+        break;
       }
 
-      // Early exit: 3 consecutive queries with no new leads (diminishing returns)
-      if (consecutiveEmptyQueries >= 3) {
-        console.log(`[discovery] Job ${jobId.slice(0, 8)} stopping early - ${consecutiveEmptyQueries} consecutive empty queries`)
-        break
+      // Early exit: 3 consecutive queries with no new leads (diminishing
+      // returns). Disabled on continuation runs (pagesThisRun > 1): deep
+      // pages often start with already-seen leads, so bailing here would
+      // wrongly flag the city exhausted while later queries still have data.
+      if (pagesThisRun === 1 && consecutiveEmptyQueries >= 3) {
+        console.log(
+          `[discovery] Job ${jobId.slice(0, 8)} stopping early - ${consecutiveEmptyQueries} consecutive empty queries`,
+        );
+        break;
       }
     }
 
-    // Complete
+    // Decide the terminal state for this batch:
+    //  - hit the cap            -> "partial"   (more data likely, Continue on)
+    //  - found nothing new      -> "exhausted" (city tapped out)
+    //  - some new, room to page -> "partial"   (try a deeper page next time)
+    //  - some new, paged to floor-> "exhausted"
+    const exhausted = hitCap
+      ? false
+      : runInserted === 0 || pagesThisRun >= MAX_PLACES_PAGES;
+    const status = exhausted ? "exhausted" : "partial";
+
     await db
       .update(discoveryJob)
       .set({
-        status: "completed",
+        status,
+        exhausted,
+        searchDepth: pagesThisRun,
         totalFound,
         insertedLeads: totalInserted,
         duplicateLeads: totalDuplicates,
@@ -623,11 +752,13 @@ export async function runDiscoveryJob(
         currentQuery: null,
         completedAt: new Date(),
       })
-      .where(eq(discoveryJob.id, jobId))
+      .where(eq(discoveryJob.id, jobId));
 
-    console.log(`[discovery] Job ${jobId.slice(0, 8)} completed - ${totalInserted} inserted, ${totalDuplicates} duplicates`)
+    console.log(
+      `[discovery] Job ${jobId.slice(0, 8)} ${status} - +${runInserted} this run, ${totalInserted} total, ${totalDuplicates} duplicates`,
+    );
   } catch (error) {
-    console.error("Discovery pipeline failed:", error)
+    console.error("Discovery pipeline failed:", error);
 
     await db
       .update(discoveryJob)
@@ -639,8 +770,8 @@ export async function runDiscoveryJob(
         errorMessage: error instanceof Error ? error.message : "Unknown error",
         completedAt: new Date(),
       })
-      .where(eq(discoveryJob.id, jobId))
+      .where(eq(discoveryJob.id, jobId));
 
-    throw error
+    throw error;
   }
 }

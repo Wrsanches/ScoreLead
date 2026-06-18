@@ -20,81 +20,130 @@ export interface GooglePlaceResult {
   reviews: GooglePlaceReview[]
 }
 
+interface RawPlace {
+  id: string
+  displayName?: { text: string }
+  formattedAddress?: string
+  types?: string[]
+  websiteUri?: string
+  nationalPhoneNumber?: string
+  rating?: number
+  userRatingCount?: number
+  photos?: { name: string }[]
+  reviews?: {
+    authorAttribution?: { displayName?: string }
+    rating?: number
+    text?: { text?: string }
+    publishTime?: string
+    relativePublishTimeDescription?: string
+  }[]
+}
+
+function mapPlace(p: RawPlace): GooglePlaceResult {
+  return {
+    name: p.displayName?.text || "",
+    address: p.formattedAddress || "",
+    types: p.types || [],
+    website: p.websiteUri || undefined,
+    phone: p.nationalPhoneNumber || undefined,
+    placeId: p.id,
+    rating: p.rating,
+    reviewCount: p.userRatingCount,
+    photoRef: p.photos?.[0]?.name || undefined,
+    reviews: (p.reviews || [])
+      .map((r) => ({
+        author: r.authorAttribution?.displayName || "Anonymous",
+        rating: r.rating || 0,
+        text: r.text?.text || "",
+        date: r.relativePublishTimeDescription || r.publishTime || "",
+      }))
+      .filter((r) => r.text.length > 0),
+  }
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+/**
+ * Text-search Google Places. Pass `maxPages` > 1 to page deeper via
+ * `nextPageToken` (the new Places API returns up to ~20 results/page and
+ * ~3 pages total per query). Batched discovery uses this so each
+ * "Continue" run reaches results the earlier runs never saw.
+ */
 export async function searchPlaces(
   query: string,
   location: string,
+  opts: { maxPages?: number } = {},
 ): Promise<GooglePlaceResult[]> {
-  try {
-    const response = await fetch(
-      "https://places.googleapis.com/v1/places:searchText",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
-          "X-Goog-FieldMask":
-            "places.id,places.displayName,places.formattedAddress,places.types,places.websiteUri,places.nationalPhoneNumber,places.rating,places.userRatingCount,places.photos,places.reviews",
-        },
-        body: JSON.stringify({
-          textQuery: `${query} in ${location}`,
-          maxResultCount: 20,
-        }),
-      },
-    )
+  const maxPages = Math.max(1, opts.maxPages ?? 1)
+  const results: GooglePlaceResult[] = []
+  let pageToken: string | undefined
 
-    if (!response.ok) {
-      // Google returns a JSON error body explaining the failure (invalid
-      // field mask, empty query, key restriction, etc.). statusText alone
-      // ("Bad Request") is useless for diagnosis, so surface the body.
-      const detail = await response.text().catch(() => "")
-      console.error(
-        `Google Places failed: ${response.status} ${response.statusText} - ${detail}`,
+  try {
+    for (let page = 0; page < maxPages; page++) {
+      // A fresh nextPageToken is rejected for ~1-2s; wait before reusing it.
+      if (pageToken) await sleep(2000)
+
+      const body: Record<string, unknown> = pageToken
+        ? { pageToken }
+        : { textQuery: `${query} in ${location}`, maxResultCount: 20 }
+
+      let response = await fetch(
+        "https://places.googleapis.com/v1/places:searchText",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+            // nextPageToken must be in the field mask or it's never returned.
+            "X-Goog-FieldMask":
+              "nextPageToken,places.id,places.displayName,places.formattedAddress,places.types,places.websiteUri,places.nationalPhoneNumber,places.rating,places.userRatingCount,places.photos,places.reviews",
+          },
+          body: JSON.stringify(body),
+        },
       )
-      return []
+
+      // A token that isn't ready yet returns 400; wait a beat and retry once.
+      if (!response.ok && pageToken && response.status === 400) {
+        await sleep(2000)
+        response = await fetch(
+          "https://places.googleapis.com/v1/places:searchText",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+              "X-Goog-FieldMask":
+                "nextPageToken,places.id,places.displayName,places.formattedAddress,places.types,places.websiteUri,places.nationalPhoneNumber,places.rating,places.userRatingCount,places.photos,places.reviews",
+            },
+            body: JSON.stringify(body),
+          },
+        )
+      }
+
+      if (!response.ok) {
+        // Google returns a JSON error body explaining the failure (invalid
+        // field mask, empty query, key restriction, etc.). statusText alone
+        // ("Bad Request") is useless for diagnosis, so surface the body.
+        const detail = await response.text().catch(() => "")
+        console.error(
+          `Google Places failed: ${response.status} ${response.statusText} - ${detail}`,
+        )
+        // Return whatever we gathered so far (graceful degradation when a
+        // deeper page fails - the run just goes less deep).
+        break
+      }
+
+      const data = await response.json()
+      for (const p of (data.places || []) as RawPlace[]) results.push(mapPlace(p))
+
+      pageToken = data.nextPageToken
+      if (!pageToken) break // no more pages available for this query
     }
 
-    const data = await response.json()
-    const places = data.places || []
-
-    return places.map(
-      (p: {
-        id: string
-        displayName?: { text: string }
-        formattedAddress?: string
-        types?: string[]
-        websiteUri?: string
-        nationalPhoneNumber?: string
-        rating?: number
-        userRatingCount?: number
-        photos?: { name: string }[]
-        reviews?: {
-          authorAttribution?: { displayName?: string }
-          rating?: number
-          text?: { text?: string }
-          publishTime?: string
-          relativePublishTimeDescription?: string
-        }[]
-      }) => ({
-        name: p.displayName?.text || "",
-        address: p.formattedAddress || "",
-        types: p.types || [],
-        website: p.websiteUri || undefined,
-        phone: p.nationalPhoneNumber || undefined,
-        placeId: p.id,
-        rating: p.rating,
-        reviewCount: p.userRatingCount,
-        photoRef: p.photos?.[0]?.name || undefined,
-        reviews: (p.reviews || []).map((r) => ({
-          author: r.authorAttribution?.displayName || "Anonymous",
-          rating: r.rating || 0,
-          text: r.text?.text || "",
-          date: r.relativePublishTimeDescription || r.publishTime || "",
-        })).filter((r) => r.text.length > 0),
-      }),
-    )
+    return results
   } catch (error) {
     console.error("Google Places search failed:", error)
-    return []
+    return results
   }
 }
 

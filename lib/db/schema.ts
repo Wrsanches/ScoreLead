@@ -135,6 +135,11 @@ export const discoveryJob = pgTable("discovery_job", {
   completedQueries: integer("completedQueries").notNull().default(0),
   currentQuery: text("currentQuery"),
   errorMessage: text("errorMessage"),
+  // Batched discovery: a job runs in parts. Each "Continue" run pages one
+  // level deeper into Google Places and accumulates onto the same row.
+  runs: integer("runs").notNull().default(0), // # of Continue batches run after the first
+  searchDepth: integer("searchDepth").notNull().default(0), // Places page-depth cursor (0 = page 1 only)
+  exhausted: boolean("exhausted").notNull().default(false), // mirrors status; gates the Continue action
   // Queue bookkeeping: workers bump heartbeatAt while running so stalled
   // jobs (killed instance, crashed worker) can be detected and requeued.
   attempts: integer("attempts").notNull().default(0),
