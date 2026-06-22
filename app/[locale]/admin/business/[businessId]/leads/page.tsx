@@ -739,7 +739,7 @@ export default function LeadsPage() {
                         {lead.score.toFixed(1)}
                       </span>
                     </div>
-                    <div className="grid grid-cols-5 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-6 gap-3 sm:gap-4">
                       {(
                         [
                           {
@@ -786,6 +786,15 @@ export default function LeadsPage() {
                             empty: "bg-rose-500/[0.06]",
                             valueText: "text-rose-600 dark:text-rose-400",
                             labelText: "text-rose-600/70 dark:text-rose-400/70",
+                          },
+                          {
+                            key: "fit",
+                            label: t("fit"),
+                            filled:
+                              "bg-gradient-to-t from-teal-500 to-teal-400 shadow-[0_0_6px_rgba(20,184,166,0.35)]",
+                            empty: "bg-teal-500/[0.06]",
+                            valueText: "text-teal-600 dark:text-teal-400",
+                            labelText: "text-teal-600/70 dark:text-teal-400/70",
                           },
                         ] as const
                       ).map((cat) => {

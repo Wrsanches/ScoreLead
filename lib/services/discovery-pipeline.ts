@@ -1,16 +1,24 @@
 import { db } from "@/lib/db";
 import { discoveryJob, lead } from "@/lib/db/schema";
-import { and, eq, or, inArray } from "drizzle-orm";
+import { and, eq, or, inArray, desc } from "drizzle-orm";
+import {
+  apolloMonthlyRemaining,
+  recordApolloUsage,
+  APOLLO_LEADS_PER_JOB,
+} from "@/lib/plan";
+import { enrichByDomain } from "./apollo";
 import { searchBusiness, filterUsefulResults } from "./brave-search";
 import { searchPlaces, persistPlacePhoto } from "./google-places";
-import { generateSearchQueries } from "./query-generator";
+import { generateSearchQueries, type WinningExemplars } from "./query-generator";
 import {
   crawlAndExtract,
   scrapeAndExtract,
+  extractFromSearchResults,
   mergeEnrichment,
   delay,
+  RELEVANCE_DROP_FLOOR,
 } from "./lead-extractor";
-import { getLeadScoreBreakdown } from "./lead-scorer";
+import { getLeadScoreBreakdown, type ScoringICP } from "./lead-scorer";
 import {
   normalizeWebsiteUrl,
   getWebsiteDomain,
@@ -24,6 +32,7 @@ import {
 export interface DiscoveryPipelineParams {
   business: {
     id: string;
+    userId: string;
     website: string | null;
     name: string | null;
     description: string | null;
@@ -328,11 +337,140 @@ async function writeProgress(
   return rows[0]?.status ?? null;
 }
 
+/**
+ * Feedback loop: pull traits + query patterns from leads this business already
+ * converted (interested/customer), so the next run is biased toward finding
+ * more of what actually works. Returns empty arrays when there's nothing yet.
+ */
+async function loadWinningExemplars(
+  businessId: string,
+): Promise<WinningExemplars> {
+  const rows = await db
+    .select({
+      discoveryQueries: lead.discoveryQueries,
+      industry: lead.industry,
+      services: lead.services,
+    })
+    .from(lead)
+    .where(
+      and(
+        eq(lead.businessId, businessId),
+        inArray(lead.status, ["interested", "customer"]),
+      ),
+    )
+    .orderBy(desc(lead.createdAt))
+    .limit(25);
+
+  const queries = new Set<string>();
+  const traits = new Set<string>();
+  for (const r of rows) {
+    for (const q of r.discoveryQueries ?? []) queries.add(q);
+    if (r.industry) traits.add(r.industry);
+    for (const s of r.services ?? []) traits.add(s);
+  }
+
+  return {
+    queries: [...queries].slice(0, 10),
+    traits: [...traits].slice(0, 10),
+  };
+}
+
+/**
+ * Pro-only post-pass: enrich this job's highest-scoring leads with Apollo
+ * firmographics + (optionally) decision-makers, then re-score them so the
+ * firmographic signals count. Runs only on the top-N by score and is bounded
+ * by the user's remaining monthly Apollo budget, to control the paid API cost.
+ */
+async function enrichTopLeadsWithApollo(
+  jobId: string,
+  userId: string,
+  icp: ScoringICP,
+): Promise<void> {
+  if (!process.env.APOLLO_API_KEY) return;
+
+  const budget = await apolloMonthlyRemaining(userId);
+  if (budget <= 0) return;
+
+  // Pull this job's best leads; filter to eligible ones (have a domain, not yet
+  // Apollo-enriched) in JS, then take the top-N within budget.
+  const candidates = await db
+    .select()
+    .from(lead)
+    .where(eq(lead.jobId, jobId))
+    .orderBy(desc(lead.score))
+    .limit(APOLLO_LEADS_PER_JOB + 20);
+
+  const eligible = candidates
+    .filter((l) => l.websiteDomain || l.website)
+    .filter((l) => !(l.enrichmentSources ?? []).includes("apollo"))
+    .slice(0, Math.min(APOLLO_LEADS_PER_JOB, budget));
+
+  let enriched = 0;
+  for (const row of eligible) {
+    const data = await enrichByDomain(String(row.website || row.websiteDomain));
+    if (!data) continue;
+
+    const sources = [...new Set([...(row.enrichmentSources ?? []), "apollo"])];
+    // Re-score with the firmographic signals now present.
+    const breakdown = getLeadScoreBreakdown(
+      {
+        ...row,
+        industry: data.industry ?? row.industry,
+        employeeCount: data.employeeCount ?? row.employeeCount,
+        techStack: data.techStack ?? row.techStack,
+        emailVerified: data.emailVerified ?? row.emailVerified,
+      } as Record<string, unknown>,
+      icp,
+    );
+
+    await db
+      .update(lead)
+      .set({
+        industry: data.industry ?? row.industry,
+        employeeCount: data.employeeCount ?? row.employeeCount,
+        revenueRange: data.revenueRange ?? row.revenueRange,
+        techStack: data.techStack ?? row.techStack,
+        decisionMakers: data.decisionMakers ?? row.decisionMakers,
+        emailVerified: data.emailVerified || row.emailVerified,
+        // Fill a missing primary email with Apollo's, when it found one.
+        email: row.email || data.email || null,
+        enrichmentSources: sources,
+        score: breakdown.score,
+        scoreBreakdown: {
+          positives: breakdown.positives,
+          risks: breakdown.risks,
+          categories: breakdown.categories,
+        },
+      })
+      .where(eq(lead.id, row.id));
+
+    enriched++;
+  }
+
+  if (enriched > 0) {
+    await recordApolloUsage(userId, enriched);
+    console.log(
+      `[discovery] Job ${jobId.slice(0, 8)} Apollo-enriched ${enriched} lead(s)`,
+    );
+  }
+}
+
 export async function runDiscoveryJob(
   jobId: string,
   params: DiscoveryPipelineParams,
 ) {
   const { business, keywords, location, runCap, searchDepth } = params;
+  // ICP for relative scoring: the same lead scores higher/lower depending on
+  // how well it fits this searcher's business and ideal customer.
+  const icp: ScoringICP = {
+    field: business.field,
+    category: business.category,
+    clientPersona: business.clientPersona,
+    services: business.services,
+    serviceArea: business.serviceArea,
+    competitors: business.competitors,
+    location: business.location,
+  };
   // Counters are cumulative across batches: seed them from the prior run so
   // the panel keeps climbing instead of resetting to 0 each Continue.
   let totalInserted = params.priorInserted;
@@ -361,11 +499,13 @@ export async function runDiscoveryJob(
       })
       .where(eq(discoveryJob.id, jobId));
 
-    // Step 1: Generate search queries
+    // Step 1: Generate search queries, biased by what has already converted.
+    const winning = await loadWinningExemplars(business.id);
     const queries = await generateSearchQueries({
       business,
       keywords,
       location,
+      winning,
     });
 
     const totalQueries = queries.length;
@@ -557,6 +697,8 @@ export async function runDiscoveryJob(
             }
             candidate.firecrawlEnriched = true;
             candidate.relevant = crawlData.relevant;
+            candidate.relevanceScore = crawlData.relevanceScore;
+            candidate.relevanceReason = crawlData.relevanceReason;
             candidate.businessCategory = crawlData.businessCategory;
 
             // Prefer AI-extracted business name over raw page title
@@ -568,12 +710,61 @@ export async function runDiscoveryJob(
           }
         }
 
-        // Secondary: Brave search for social media enrichment
+        // Secondary: web search to enrich social/contact data. This is the
+        // primary signal for leads with no website of their own (e.g. studios
+        // that live on Instagram): the result snippets + URLs carry the social
+        // handles, phone/WhatsApp, address, and services.
         if (candidate.name) {
           try {
             const braveQuery = `"${candidate.name}" ${location}`;
             const braveResults = await searchBusiness(braveQuery);
-            const useful = filterUsefulResults(braveResults);
+
+            // Mine snippets + URLs across all results. Run the AI extractor when
+            // the lead has no website (otherwise the site crawl already did it),
+            // so website-less leads still get services, a category, and a
+            // relevance grade instead of being scored on Google Places alone.
+            const snippetData = await extractFromSearchResults(braveResults, {
+              runAI: !candidate.website,
+              country: candidate.country as string | undefined,
+              businessContext,
+              sourceLabel: braveQuery,
+            });
+            candidate = mergeEnrichment(candidate, snippetData, braveQuery);
+
+            // Adopt AI category/relevance from snippets when the crawl didn't
+            // provide them (i.e. for website-less leads).
+            if (
+              snippetData.relevanceScore != null &&
+              candidate.relevanceScore == null
+            ) {
+              candidate.relevanceScore = snippetData.relevanceScore;
+              candidate.relevanceReason = snippetData.relevanceReason;
+            }
+            if (!candidate.businessCategory && snippetData.businessCategory) {
+              candidate.businessCategory = snippetData.businessCategory;
+            }
+            if (!candidate.aiSummary && snippetData.aiSummary) {
+              candidate.aiSummary = snippetData.aiSummary;
+            }
+            if (snippetData.enrichmentSources || braveResults.length > 0) {
+              candidate.enrichmentSources = [
+                ...new Set([
+                  ...((candidate.enrichmentSources as string[]) || []),
+                  "web_search",
+                ]),
+              ];
+            }
+
+            // Still scrape non-social directory pages for deeper data; skip
+            // social pages, which scrape poorly and are already covered above.
+            const useful = filterUsefulResults(braveResults).filter((r) => {
+              try {
+                const host = new URL(r.url).hostname;
+                return !/(instagram|facebook|tiktok|twitter|x)\.com/.test(host);
+              } catch {
+                return false;
+              }
+            });
             for (const result of useful) {
               try {
                 const pageData = await scrapeAndExtract(result.url);
@@ -587,10 +778,13 @@ export async function runDiscoveryJob(
           }
         }
 
-        // Step 4: Relevance check - skip leads the AI flagged as irrelevant
-        if (candidate.relevant === false) {
+        // Step 4: Relevance check - only hard-drop leads well below the floor.
+        // Borderline leads are kept and ranked down via the fit score, rather
+        // than silently discarded by a binary flag.
+        const relScore = candidate.relevanceScore as number | undefined;
+        if (relScore != null && relScore < RELEVANCE_DROP_FLOOR) {
           console.log(
-            `[discovery] Job ${jobId.slice(0, 8)} skipping irrelevant lead: ${candidate.name} (category: ${candidate.businessCategory || "unknown"})`,
+            `[discovery] Job ${jobId.slice(0, 8)} skipping low-relevance lead: ${candidate.name} (${relScore.toFixed(2)}, ${candidate.businessCategory || "unknown"})`,
           );
           continue;
         }
@@ -600,6 +794,7 @@ export async function runDiscoveryJob(
           getWebsiteDomain(String(candidate.website || "")) ?? null;
         const breakdown = getLeadScoreBreakdown(
           candidate as Record<string, unknown>,
+          icp,
         );
         candidate.score = breakdown.score;
         candidate.scoreBreakdown = {
@@ -664,6 +859,8 @@ export async function runDiscoveryJob(
               risks: breakdown.risks,
               categories: breakdown.categories,
             },
+            relevanceScore: (candidate.relevanceScore as number) ?? null,
+            relevanceReason: (candidate.relevanceReason as string) || null,
             source: String(candidate.source || "google_places"),
             firecrawlEnriched: Boolean(candidate.firecrawlEnriched),
             discoveryQuery: (candidate.discoveryQuery as string) || null,
@@ -727,6 +924,13 @@ export async function runDiscoveryJob(
         );
         break;
       }
+    }
+
+    // Pro-only enrichment pass over this run's best leads (cost-controlled).
+    try {
+      await enrichTopLeadsWithApollo(jobId, business.userId, icp);
+    } catch (err) {
+      console.error(`[discovery] Apollo enrichment pass failed:`, err);
     }
 
     // Decide the terminal state for this batch:

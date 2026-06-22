@@ -199,6 +199,15 @@ export const lead = pgTable("lead", {
   aiSummary: text("aiSummary"),
   websiteContent: text("websiteContent"),
   enrichmentSources: jsonb("enrichmentSources").$type<string[]>(),
+  // Firmographics (Apollo.io enrichment)
+  industry: text("industry"),
+  employeeCount: integer("employeeCount"),
+  revenueRange: text("revenueRange"),
+  techStack: jsonb("techStack").$type<string[]>(),
+  decisionMakers: jsonb("decisionMakers").$type<
+    { name: string; title?: string; linkedin?: string; email?: string }[]
+  >(),
+  emailVerified: boolean("emailVerified").notNull().default(false),
   outreachMessages: jsonb("outreachMessages").$type<{ step: number; label: string; subject?: string; body: string }[]>(),
   // Scoring
   score: real("score").notNull().default(1),
@@ -207,6 +216,9 @@ export const lead = pgTable("lead", {
     risks: { label: string; value: number; category: string }[]
     categories: Record<string, number>
   }>(),
+  // Relevance: graded 0-1 fit against the search context (was a binary flag).
+  relevanceScore: real("relevanceScore"),
+  relevanceReason: text("relevanceReason"),
   // Discovery metadata
   source: text("source").notNull(),
   firecrawlEnriched: boolean("firecrawlEnriched").notNull().default(false),
@@ -289,6 +301,10 @@ export const usage = pgTable("usage", {
   aiImagesMonthKey: text("aiImagesMonthKey"),
   aiImagesDay: integer("aiImagesDay").notNull().default(0),
   aiImagesDayKey: text("aiImagesDayKey"),
+  // Apollo enrichment fair-use (Pro): lifetime + monthly counters.
+  apolloEnrichments: integer("apolloEnrichments").notNull().default(0),
+  apolloEnrichmentsMonth: integer("apolloEnrichmentsMonth").notNull().default(0),
+  apolloEnrichmentsMonthKey: text("apolloEnrichmentsMonthKey"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })

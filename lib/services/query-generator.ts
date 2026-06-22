@@ -67,18 +67,35 @@ Competitors: ${competitors.join(", ")}`,
   return parsed.keywords.slice(0, 15)
 }
 
+/** Traits + query patterns from leads this business already converted. */
+export interface WinningExemplars {
+  queries: string[]
+  traits: string[]
+}
+
 interface QueryGenParams {
   business: BusinessProfileForQuery
   keywords: string[]
   location: string
+  /** Feedback signal: what has already converted for this business. */
+  winning?: WinningExemplars
 }
 
 export async function generateSearchQueries(
   params: QueryGenParams,
 ): Promise<string[]> {
-  const { business, keywords, location } = params
+  const { business, keywords, location, winning } = params
   const services = safeParseArray(business.services)
   const competitors = safeParseArray(business.competitors)
+
+  const hasWinning = Boolean(
+    winning && (winning.queries.length > 0 || winning.traits.length > 0),
+  )
+  const winningBlock = hasWinning
+    ? `\nProven winners (already converted - find more like these):
+Winning queries: ${winning!.queries.join(", ") || "none"}
+Winning traits: ${winning!.traits.join(", ") || "none"}`
+    : ""
 
   const response = await openai.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
@@ -86,7 +103,7 @@ export async function generateSearchQueries(
     messages: [
       {
         role: "system",
-        content: buildSearchQueriesPrompt(business.businessModel, location),
+        content: buildSearchQueriesPrompt(business.businessModel, location, hasWinning),
       },
       {
         role: "user",
@@ -97,7 +114,7 @@ Business model: ${business.businessModel}
 Services: ${services.join(", ")}
 Keywords: ${keywords.join(", ")}
 Location: ${location}
-Competitors: ${competitors.join(", ")}`,
+Competitors: ${competitors.join(", ")}${winningBlock}`,
       },
     ],
   })

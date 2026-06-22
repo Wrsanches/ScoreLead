@@ -141,6 +141,20 @@
       "when": 1781801888177,
       "tag": "0019_secret_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1781883196914,
+      "tag": "0020_abnormal_donald_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1781883703451,
+      "tag": "0021_public_kate_bishop",
+      "breakpoints": true
     }
   ]
 }

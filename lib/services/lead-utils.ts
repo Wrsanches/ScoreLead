@@ -97,3 +97,49 @@ export function mergeDiscoveryQueries(...queryLists: Array<string[] | undefined>
 export function leadHasDirectContact(lead: { email?: string | null; phone?: string | null; emails?: string[] | null; phones?: string[] | null }) {
   return Boolean(lead.email || lead.phone || lead.emails?.length || lead.phones?.length)
 }
+
+/** Domains/substrings that signal a tracking, placeholder, or asset email. */
+const EMAIL_JUNK_DOMAINS = [
+  "example.com",
+  "example.org",
+  "email.com",
+  "domain.com",
+  "yourdomain.com",
+  "sentry.io",
+  "wixpress.com",
+  "w3.org",
+  "schema.org",
+  "googleapis.com",
+  "googlemail.com.png",
+]
+
+/**
+ * Validate that a string is a plausible real business email, filtering the
+ * false positives the regex extractor tends to pick up: asset filenames, hashed
+ * strings, IP-literal domains, and known tracking/placeholder domains.
+ */
+export function isValidBusinessEmail(value?: string | null): boolean {
+  if (!value) return false
+  const email = value.trim().toLowerCase()
+
+  // Basic syntax: localpart@domain.tld
+  if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(email)) return false
+
+  const [local, domain] = email.split("@")
+  if (!local || !domain) return false
+  if (local.length > 64) return false
+
+  // Known junk / placeholder domains.
+  if (EMAIL_JUNK_DOMAINS.some((d) => domain === d || domain.endsWith("." + d))) {
+    return false
+  }
+
+  // Asset filenames mistaken for emails (e.g. logo@2x.png, icon@3x.svg).
+  if (/\.(png|jpe?g|gif|svg|webp|ico|css|js|woff2?|ttf)$/.test(domain)) return false
+
+  // IP-literal domains and hash-like localparts are almost never real contacts.
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(domain)) return false
+  if (/^[a-f0-9]{16,}$/.test(local)) return false
+
+  return true
+}

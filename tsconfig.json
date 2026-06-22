@@ -39,6 +39,7 @@
     "node_modules",
     ".next/cache",
     ".next/dev",
-    ".claude"
+    ".claude",
+    "**/*.test.ts"
   ]
 }

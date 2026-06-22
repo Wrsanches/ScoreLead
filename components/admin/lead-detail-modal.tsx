@@ -50,6 +50,7 @@ const SCORE_CATEGORIES = [
   { key: "offer", label: "engage", color: "from-violet-500 to-violet-400", empty: "bg-violet-500/[0.06]", text: "text-violet-600 dark:text-violet-400" },
   { key: "profile", label: "match", color: "from-amber-500 to-amber-400", empty: "bg-amber-500/[0.06]", text: "text-amber-600 dark:text-amber-400" },
   { key: "social", label: "ready", color: "from-rose-500 to-rose-400", empty: "bg-rose-500/[0.06]", text: "text-rose-600 dark:text-rose-400" },
+  { key: "fit", label: "fit", color: "from-teal-500 to-teal-400", empty: "bg-teal-500/[0.06]", text: "text-teal-600 dark:text-teal-400" },
 ] as const
 
 export function LeadDetailModal({
@@ -188,7 +189,7 @@ export function LeadDetailModal({
                   {lead.score.toFixed(1)}
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-6 gap-3">
                 {SCORE_CATEGORIES.map((cat) => {
                   const value =
                     lead.scoreBreakdown?.categories[cat.key] ?? 0

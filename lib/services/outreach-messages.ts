@@ -289,7 +289,8 @@ export async function generateOutreachMessages(
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.7,
+      // Slightly higher for a looser, more natural DM voice.
+      temperature: 0.8,
       max_completion_tokens: 1500,
     });
 

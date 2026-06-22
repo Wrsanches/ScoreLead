@@ -38,8 +38,12 @@ export const PLAN_LIMITS = {
     contentPlans: Infinity,
     aiImagesPerMonth: 30, // fair-use
     aiImagesPerDay: 10, // fair-use
+    apolloEnrichmentsPerMonth: 500, // fair-use - paid, credit-metered API
   },
 } as const
+
+/** Apollo enrichment is Pro-only and runs on the top-N leads of each job. */
+export const APOLLO_LEADS_PER_JOB = 10
 
 export type PlanLimitReason = "lifetime" | "monthly" | "daily"
 
@@ -88,6 +92,9 @@ export interface UsageSnapshot {
   aiImagesMonthKey: string | null
   aiImagesDay: number
   aiImagesDayKey: string | null
+  apolloEnrichments: number
+  apolloEnrichmentsMonth: number
+  apolloEnrichmentsMonthKey: string | null
 }
 
 const EMPTY_USAGE: UsageSnapshot = {
@@ -99,6 +106,9 @@ const EMPTY_USAGE: UsageSnapshot = {
   aiImagesMonthKey: null,
   aiImagesDay: 0,
   aiImagesDayKey: null,
+  apolloEnrichments: 0,
+  apolloEnrichmentsMonth: 0,
+  apolloEnrichmentsMonthKey: null,
 }
 
 export async function getUsage(userId: string): Promise<UsageSnapshot> {
@@ -113,6 +123,9 @@ export async function getUsage(userId: string): Promise<UsageSnapshot> {
     aiImagesMonthKey: row.aiImagesMonthKey,
     aiImagesDay: row.aiImagesDay,
     aiImagesDayKey: row.aiImagesDayKey,
+    apolloEnrichments: row.apolloEnrichments,
+    apolloEnrichmentsMonth: row.apolloEnrichmentsMonth,
+    apolloEnrichmentsMonthKey: row.apolloEnrichmentsMonthKey,
   }
 }
 
@@ -250,6 +263,46 @@ export async function recordUsage(
     .onConflictDoUpdate({
       target: usage.userId,
       set: { [valueKey]: sql`${column} + ${n}`, updatedAt: now },
+    })
+}
+
+/**
+ * How many Apollo enrichments this user may still run this month. Apollo is
+ * Pro-only (Free returns 0), capped by a monthly fair-use budget. Call before
+ * enriching and clamp the batch to the returned number; call recordApolloUsage
+ * after.
+ */
+export async function apolloMonthlyRemaining(userId: string): Promise<number> {
+  const plan = await getUserPlan(userId)
+  if (plan !== "pro") return 0
+  const u = await getUsage(userId)
+  const usedThisMonth =
+    u.apolloEnrichmentsMonthKey === monthKey() ? u.apolloEnrichmentsMonth : 0
+  return Math.max(0, PLAN_LIMITS.pro.apolloEnrichmentsPerMonth - usedThisMonth)
+}
+
+/** Increment Apollo enrichment counters (lifetime + monthly). */
+export async function recordApolloUsage(userId: string, n: number): Promise<void> {
+  if (n <= 0) return
+  const now = new Date()
+  const key = monthKey(now)
+  await db
+    .insert(usage)
+    .values({
+      userId,
+      apolloEnrichments: n,
+      apolloEnrichmentsMonth: n,
+      apolloEnrichmentsMonthKey: key,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: usage.userId,
+      set: {
+        apolloEnrichments: sql`${usage.apolloEnrichments} + ${n}`,
+        apolloEnrichmentsMonth: sql`CASE WHEN ${usage.apolloEnrichmentsMonthKey} = ${key} THEN ${usage.apolloEnrichmentsMonth} + ${n} ELSE ${n} END`,
+        apolloEnrichmentsMonthKey: key,
+        updatedAt: now,
+      },
     })
 }
 

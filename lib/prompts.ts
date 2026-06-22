@@ -54,10 +54,11 @@ export function buildLeadExtractorPrompt(params: LeadExtractorPromptParams): str
   const { country, businessContext } = params
 
   const relevanceInstruction = businessContext
-    ? `\nIMPORTANT - Relevance check:
-We are looking for leads that are potential competitors or similar businesses to: "${businessContext.description || businessContext.field || ""}" (category: ${businessContext.category || "unknown"}, keywords: ${businessContext.keywords?.join(", ") || "none"}).
+    ? `\nIMPORTANT - Relevance scoring:
+We are looking for leads that match this search context: "${businessContext.description || businessContext.field || ""}" (category: ${businessContext.category || "unknown"}, keywords: ${businessContext.keywords?.join(", ") || "none"}).
 - "businessCategory": The primary industry/category of THIS business (e.g. "pottery studio", "brick factory", "restaurant", "yoga studio")
-- "relevant": true if this business operates in the SAME field/industry as the search context above. A brick factory is NOT the same as a pottery studio even if both work with ceramics. A construction supply store is NOT the same as an architecture firm. Be strict - only mark as relevant if they truly serve the same market and offer similar services.`
+- "relevanceScore": A number from 0.0 to 1.0 grading how well THIS business fits the search context above. Use the full range: 1.0 = a clear, on-target match in the same field serving the same market; ~0.5 = adjacent or partially related; 0.0 = unrelated. A brick factory is a poor match (~0.1) for a pottery studio search even though both work with ceramics; a construction supply store is a poor match for an architecture firm. Judge by the actual market and services, not surface keywords.
+- "relevanceReason": One short sentence (max 15 words) explaining the score.`
     : ""
 
   return `You are an expert at extracting structured business data from website content.
@@ -67,7 +68,8 @@ Extract the following from the provided content. Return ONLY valid JSON:
 {
   "businessName": "The official business name",
   "businessCategory": "The primary industry/category of this business",
-  "relevant": true,
+  "relevanceScore": 0.0,
+  "relevanceReason": "Short reason for the relevance score",
   "description": "2-3 sentence factual description",
   "aiSummary": "A detailed paragraph analyzing: what makes this business unique, their main offerings, target audience, and overall digital presence quality.",
   "emails": ["all email addresses found"],
@@ -110,7 +112,12 @@ Each keyword should be 1-4 words, specific enough to produce relevant B2B compan
 export function buildSearchQueriesPrompt(
   _businessModel: BusinessModel,
   location: string,
+  hasWinningExamples = false,
 ): string {
+  const feedbackInstruction = hasWinningExamples
+    ? `\nIMPORTANT - Learn from past wins: The user message includes "Proven winners" - traits and queries from leads this business already converted into interested prospects or customers. Bias your queries toward finding more businesses like those: reuse the winning query patterns and target the same industries/segments. This feedback should shape at least half of your queries.`
+    : ""
+
   return `You are a B2B lead generation expert. Generate 8-12 web search queries to find companies that could become customers for a business.
 
 Only generate B2B company/account discovery queries. Include queries like "{keyword} {location}", "{keyword} companies near {location}", "{keyword} directory {location}", "{keyword} businesses {location}", and "{keyword} agencies {location}".
@@ -118,7 +125,7 @@ Do not generate queries for individuals, consumers, groups, communities, hobbyis
 
 IMPORTANT: Always include the full location "${location}" in every query. All results must be local to this specific area.
 
-Also include 1-2 competitor-adjacent queries if competitors are provided (e.g., "{competitor} alternatives {location}").
+Also include 1-2 competitor-adjacent queries if competitors are provided (e.g., "{competitor} alternatives {location}").${feedbackInstruction}
 
 Return JSON: { "queries": ["query1", "query2", ...] }
 
@@ -256,26 +263,29 @@ export interface OutreachPromptParams {
 export function buildOutreachPrompt(params: OutreachPromptParams): string {
   const { senderName, lang, labels } = params
 
-  return `You are writing outreach messages on behalf of ${senderName}. You write like a real human - warm, personal, and never salesy or automated.
+  return `You are ${senderName}, sliding into a prospect's DMs. You write exactly how a real person messages on Instagram/WhatsApp - casual, conversational, human - while still clearly being a business owner reaching out about something real.
 
-Write a 3-message outreach sequence that ${senderName} would send via WhatsApp, Instagram DM, or email. The messages must feel genuinely personal - NOT like a template, marketing automation, or chatbot.
+Write a 3-message outreach sequence that ${senderName} would actually send as direct messages. It should read like one person texting another, NOT like an email, a template, marketing automation, or a chatbot.
 
-TONE & STYLE:
+VOICE (sound like a person in a DM):
 - Write ALL messages in ${lang}.
-- Sound like a real person who genuinely cares, not a salesperson.
-- Be warm, respectful, and direct. Never pushy or overly enthusiastic.
-- Use the prospect's owner first name if available. If not, use a warm but not generic greeting.
-- NO corporate clichés (avoid filler like "que tal", "e aí", "não perca", "imperdível", "unlock", "game-changer", "perfect solution").
-- NO rhetorical questions as call-to-actions. Use direct but polite invitations instead.
-- Keep messages short - like real texts between people. Max 1-2 emojis per message, often zero.
-- Don't mention Google, scraping, or how you found the prospect.
-- Reference specific, real details about the prospect (their services, reviews, location, style) to show genuine familiarity.
-- Keep the sender's offer naturally woven in - do not pitch aggressively.
+- Talk like a real human typing on their phone: contractions, natural rhythm, short sentences, the occasional fragment. It's fine to open mid-thought ("just came across your work and...").
+- Casual but literate - relaxed, not sloppy. No formal email openers ("Dear", "To whom it may concern") and no formal sign-offs.
+- Greet naturally and lightly; use the owner's first name if available, otherwise a casual hello that fits the language/culture (e.g. "oi", "hey"). Skip it entirely if it flows better.
+- Warm and genuine, never pushy, hype-y, or salesy. You're a peer who noticed them, not a vendor pitching.
+- Max 1-2 emojis per message, often zero. Don't force them.
+- NO corporate clichés or growth-hacky filler (avoid "que tal", "não perca", "imperdível", "unlock", "game-changer", "perfect solution", "I hope this message finds you well").
+- Reference specific, real details about them (their work, services, reviews, location, style) so it's obvious you actually looked - not a blast.
+- Don't mention Google, scraping, search, or how you found them.
 
-MESSAGE STRUCTURE:
-1. Introduction: Genuine specific compliment about their work. Show you actually know them. Max 3 sentences.
-2. Value proposition: How ${senderName} can help a business like theirs. Be specific to their situation - reference their services, team, or scale. Max 4 sentences.
-3. Call to action: A simple, low-pressure invitation. Use direct language like "I'd love to show you..." or "Happy to share a quick 15-minute walkthrough if it's useful". Make saying yes feel effortless. Max 3 sentences.
+STILL A BUSINESS MESSAGE:
+- It must be clear, in a natural way, who you are and that you do something that could help them. Keep ${senderName}'s offer woven in casually - mentioned, not pitched.
+- Stay credible and respectful. Casual voice, real substance.
+
+MESSAGE STRUCTURE (each is its own DM - keep them tight, like real texts):
+1. Opener: a genuine, specific reaction to their work - like you actually follow them. 1-2 short sentences. No pitch yet.
+2. The hook: in plain, conversational language, what you do and why it could be useful for someone like them - tie it to something real about their business. 2-3 short sentences.
+3. The ask: a light, low-pressure invite that makes saying yes effortless (e.g. "want me to send a couple examples?", "happy to show you in a quick 15 min if you're up for it"). A casual question here is good. 1-2 short sentences.
 
 Return ONLY valid JSON in this exact shape. The "label" field MUST be in the same language as the message bodies:
 {

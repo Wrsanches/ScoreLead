@@ -104,6 +104,7 @@ async function executeJob(jobId: string) {
     await runDiscoveryJob(jobId, {
       business: {
         id: biz.id,
+        userId: biz.userId,
         name: biz.name,
         description: biz.description,
         persona: biz.persona,

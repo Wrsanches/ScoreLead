@@ -2,8 +2,15 @@ import Firecrawl from "@mendable/firecrawl-js"
 import OpenAI from "openai"
 import { buildLeadExtractorPrompt } from "@/lib/prompts"
 import { OPENAI_TEXT_MODEL } from "@/lib/models"
+import { isValidBusinessEmail } from "./lead-utils"
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+let openaiClient: OpenAI | null = null
+function getOpenAI(): OpenAI {
+  if (!openaiClient) {
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+  }
+  return openaiClient
+}
 
 let firecrawlClient: Firecrawl | null = null
 function getFirecrawl(): Firecrawl | null {
@@ -37,7 +44,38 @@ export interface EnrichmentResult {
   aiSummary?: string
   businessName?: string
   businessCategory?: string
+  /** Graded 0-1 fit against the search context. Replaces the old boolean flag. */
+  relevanceScore?: number
+  relevanceReason?: string
+  /** Derived from relevanceScore for backward compatibility. */
   relevant?: boolean
+}
+
+/** Below this graded relevance, a lead is dropped rather than scored. */
+export const RELEVANCE_DROP_FLOOR = 0.2
+
+/**
+ * Coerce the relevance value out of raw LLM JSON. Tolerates a number, a numeric
+ * string, or the legacy boolean `relevant` flag, and clamps to 0-1. Defaults to
+ * a passing 1.0 when absent so a missing field never silently drops a lead.
+ */
+export function parseRelevanceScore(data: {
+  relevanceScore?: unknown
+  relevant?: unknown
+}): number {
+  let score = 1
+  if (typeof data.relevanceScore === "number") {
+    score = data.relevanceScore
+  } else if (
+    typeof data.relevanceScore === "string" &&
+    data.relevanceScore.trim() !== ""
+  ) {
+    const parsed = Number(data.relevanceScore)
+    if (!Number.isNaN(parsed)) score = parsed
+  } else if (typeof data.relevant === "boolean") {
+    score = data.relevant ? 1 : 0
+  }
+  return Math.min(1, Math.max(0, score))
 }
 
 export interface BusinessContext {
@@ -220,6 +258,68 @@ export async function scrapeAndExtract(url: string): Promise<EnrichmentResult> {
   }
 }
 
+// ── Search-result (snippet) extraction ─────────────────────
+
+export interface SearchResult {
+  title: string
+  description: string
+  url: string
+}
+
+/**
+ * Enrich from web search results without visiting the pages. The result
+ * snippets and URLs already carry a lot - social profile links, phone/WhatsApp
+ * numbers, addresses, and a one-line description - which is often the ONLY
+ * structured data available for a lead that has no website of its own (e.g. a
+ * studio that operates entirely through Instagram). We mine the combined
+ * title+description+URL text with the same regex used for page markdown, and
+ * (optionally) run the AI extractor over it to pull services, a category, and a
+ * relevance grade. Reliable where scraping JS-heavy social pages is not.
+ */
+export async function extractFromSearchResults(
+  results: SearchResult[],
+  options: {
+    runAI?: boolean
+    country?: string
+    businessContext?: BusinessContext
+    sourceLabel?: string
+  } = {},
+): Promise<EnrichmentResult> {
+  if (results.length === 0) return {}
+
+  // Combine snippets + URLs. Including the raw URLs lets the social-link regex
+  // pick up profiles like instagram.com/<handle> straight from the result list.
+  const combined = results
+    .map((r) => `${r.title}\n${r.description}\n${r.url}`)
+    .join("\n\n")
+
+  const regexResult = extractFromMarkdown(combined)
+
+  if (!options.runAI) return regexResult
+
+  const aiResult = await extractWithAI(
+    combined,
+    options.sourceLabel || "web search results",
+    options.country,
+    options.businessContext,
+  )
+
+  // AI takes priority; regex fills gaps (esp. social links from URLs).
+  const merged: EnrichmentResult = { ...regexResult, ...aiResult }
+  merged.emails = [...new Set([...(aiResult.emails || []), ...(regexResult.emails || [])])]
+  merged.phones = [...new Set([...(aiResult.phones || []), ...(regexResult.phones || [])])]
+  merged.services = [...new Set([...(aiResult.services || []), ...(regexResult.services || [])])]
+
+  const mergedSocial: Record<string, string> = {}
+  for (const [k, v] of Object.entries(regexResult.socialMedia || {})) if (v) mergedSocial[k] = v
+  for (const [k, v] of Object.entries(aiResult.socialMedia || {})) if (v) mergedSocial[k] = v
+  if (Object.keys(mergedSocial).length > 0) merged.socialMedia = mergedSocial
+  merged.instagramHandle = aiResult.instagramHandle || regexResult.instagramHandle
+  merged.facebookUrl = aiResult.facebookUrl || regexResult.facebookUrl
+
+  return merged
+}
+
 // ── AI extraction ──────────────────────────────────────────
 
 async function extractWithAI(
@@ -231,7 +331,7 @@ async function extractWithAI(
   const trimmed = markdown.slice(0, 15000)
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: OPENAI_TEXT_MODEL,
       response_format: { type: "json_object" },
       messages: [
@@ -256,7 +356,10 @@ async function extractWithAI(
 
     if (data.businessName) result.businessName = data.businessName
     if (data.businessCategory) result.businessCategory = data.businessCategory
-    result.relevant = data.relevant !== false // default to true if not provided
+    // Graded relevance (0-1), replacing the legacy boolean flag.
+    result.relevanceScore = parseRelevanceScore(data)
+    result.relevant = result.relevanceScore >= RELEVANCE_DROP_FLOOR
+    if (data.relevanceReason) result.relevanceReason = String(data.relevanceReason)
     if (data.description) result.description = data.description
     if (data.aiSummary) result.aiSummary = data.aiSummary
     if (data.ownerName) result.ownerName = data.ownerName
@@ -264,9 +367,19 @@ async function extractWithAI(
     if (data.yearEstablished) result.yearEstablished = String(data.yearEstablished)
     if (data.pricingInfo) result.pricingInfo = data.pricingInfo
 
-    if (Array.isArray(data.emails) && data.emails.length > 0) {
-      result.emails = data.emails
-      result.email = data.emails[0]
+    if (Array.isArray(data.emails)) {
+      const validEmails: string[] = [
+        ...new Set(
+          (data.emails as unknown[]).filter(
+            (e): e is string =>
+              typeof e === "string" && isValidBusinessEmail(e),
+          ),
+        ),
+      ]
+      if (validEmails.length > 0) {
+        result.emails = validEmails
+        result.email = validEmails[0]
+      }
     }
     if (Array.isArray(data.phones) && data.phones.length > 0) {
       result.phones = data.phones
@@ -305,12 +418,9 @@ function extractFromMarkdown(markdown: string): EnrichmentResult {
 
   // Emails
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
-  const junkDomains = ["example.com", "sentry.io", "wixpress.com", "w3.org", "schema.org", "googleapis.com"]
   const allEmails = [
     ...new Set(
-      (markdown.match(emailRegex) || []).filter(
-        (e) => !junkDomains.some((d) => e.includes(d)),
-      ),
+      (markdown.match(emailRegex) || []).filter(isValidBusinessEmail),
     ),
   ]
   if (allEmails.length > 0) {
