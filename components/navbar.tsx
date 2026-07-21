@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
-import { Menu, X, LayoutDashboard } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { ScoreLeadLogo } from "./scorelead-logo"
 import { LanguageSwitcher } from "./language-switcher"
 import { Link } from "@/i18n/routing"
@@ -26,7 +26,7 @@ function UserAvatar({ name }: { name: string }) {
 export function Navbar() {
   const t = useTranslations("nav")
   const [open, setOpen] = useState(false)
-  const { data: session, isPending } = authClient.useSession()
+  const { data: session } = authClient.useSession()
 
   useEffect(() => {
     if (!open) return
@@ -40,6 +40,7 @@ export function Navbar() {
     { id: "features", label: t("features") },
     { id: "ai", label: t("ai") },
     { id: "pipeline", label: t("pipeline") },
+    { id: "pricing", label: t("pricing") },
   ]
 
   const isLoggedIn = !!session?.user
@@ -48,16 +49,16 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-[#09090B]/80 backdrop-blur-md">
       <div className="w-full flex justify-center px-6 h-16">
         <div className="w-full max-w-4xl flex items-center justify-between">
-          <a href="#hero" className="flex items-center gap-2">
+          <Link href="/#hero" className="flex items-center gap-2">
             <ScoreLeadLogo className="w-5 h-5 text-white" />
             <span className="text-white font-semibold">ScoreLead</span>
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-8">
             {links.map((link) => (
-              <a key={link.id} href={`#${link.id}`} className="text-sm text-zinc-400 hover:text-white transition-colors">
+              <Link key={link.id} href={`/#${link.id}`} className="text-sm text-zinc-400 hover:text-white transition-colors">
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -104,14 +105,14 @@ export function Navbar() {
         <div className="md:hidden border-t border-zinc-800 bg-[#09090B]/95 backdrop-blur-md px-6 pb-6 pt-4">
           <div className="flex flex-col gap-4">
             {links.map((link) => (
-              <a
+              <Link
                 key={link.id}
-                href={`#${link.id}`}
+                href={`/#${link.id}`}
                 onClick={() => setOpen(false)}
                 className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
               <LanguageSwitcher />

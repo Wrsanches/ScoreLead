@@ -1033,6 +1033,7 @@ export default function LeadsPage() {
                 <OutreachMessagesCard
                   key={lead.id}
                   leadId={lead.id}
+                  businessId={businessId}
                   initialMessages={lead.outreachMessages}
                   contact={{ email: lead.email, phone: lead.phone }}
                   onMessagesChange={(msgs) => {

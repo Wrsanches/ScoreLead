@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "whatsapp_sequence_active_recipient_uidx" ON "whatsapp_sequence" USING btree ("businessId","recipientPhone") WHERE "whatsapp_sequence"."status" = 'scheduled';

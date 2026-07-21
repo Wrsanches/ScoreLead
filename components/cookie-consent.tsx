@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Cookie } from "lucide-react"
+import { Link } from "@/i18n/routing"
 
 export function CookieConsent() {
   const t = useTranslations("cookies")
@@ -39,7 +40,15 @@ export function CookieConsent() {
           <div className="w-8 h-8 rounded-lg bg-zinc-800/80 flex items-center justify-center">
             <Cookie className="w-4 h-4 text-zinc-400" />
           </div>
-          <span className="text-sm font-medium text-white">{t("message")}</span>
+          <div>
+            <p className="text-sm font-medium text-white">{t("message")}</p>
+            <Link
+              href="/privacy#cookies"
+              className="mt-1 inline-block rounded-sm text-xs text-zinc-500 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+            >
+              {t("learnMore")}
+            </Link>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button

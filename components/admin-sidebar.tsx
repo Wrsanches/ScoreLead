@@ -22,6 +22,7 @@ import {
   Columns3,
   CalendarDays,
   Zap,
+  MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
@@ -75,6 +76,7 @@ export function AdminSidebar({
 }) {
   const t = useTranslations("dashboard");
   const tb = useTranslations("billing");
+  const tw = useTranslations("whatsapp");
   const { isPro, openUpgrade } = usePlan();
   const router = useRouter();
   const pathname = usePathname();
@@ -325,6 +327,14 @@ export function AdminSidebar({
             active={isActive("/profile")}
             collapsed={collapsed}
           />
+          <NavItem
+            icon={MessageCircle}
+            label={t("integrations")}
+            badge={tw("comingSoonBadge")}
+            href={`/admin/business/${businessId}/integrations`}
+            active={isActive("/integrations")}
+            collapsed={collapsed}
+          />
         </div>
       )}
 
@@ -496,7 +506,7 @@ function NavItem({
 }: {
   icon: React.ElementType;
   label: string;
-  badge?: number;
+  badge?: string;
   active?: boolean;
   href?: string;
   collapsed?: boolean;
@@ -515,7 +525,7 @@ function NavItem({
       </span>
       {badge !== undefined && (
         <span
-          className={`text-zinc-500 text-xs tabular-nums ${collapsed ? "lg:hidden" : ""}`}
+          className={`rounded-full border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 ${collapsed ? "lg:hidden" : ""}`}
         >
           {badge}
         </span>
@@ -531,14 +541,14 @@ function NavItem({
 
   if (href) {
     return (
-      <Link href={href} className={className} title={label}>
+      <Link href={href} className={className} title={badge ? `${label} — ${badge}` : label}>
         {content}
       </Link>
     );
   }
 
   return (
-    <div tabIndex={0} className={className} title={label}>
+    <div tabIndex={0} className={className} title={badge ? `${label} — ${badge}` : label}>
       {content}
     </div>
   );

@@ -9,6 +9,7 @@ export const signUpSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(8),
+  terms: z.boolean().refine((value) => value === true),
 })
 
 export const forgotPasswordSchema = z.object({

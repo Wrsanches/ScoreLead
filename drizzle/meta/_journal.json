@@ -155,6 +155,27 @@
       "when": 1781883703451,
       "tag": "0021_public_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1784076099507,
+      "tag": "0022_misty_forgotten_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1784077376139,
+      "tag": "0023_lying_rockslide",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784077583824,
+      "tag": "0024_youthful_talkback",
+      "breakpoints": true
     }
   ]
 }

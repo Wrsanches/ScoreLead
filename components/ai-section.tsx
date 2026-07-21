@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { Link } from "@/i18n/routing";
 import {
   ChevronRight,
   Globe,
@@ -115,17 +116,21 @@ export function AISection() {
             {t("description")}
           </motion.p>
 
-          <motion.button
-            type="button"
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="px-5 py-2.5 bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-colors text-sm flex items-center gap-2 mb-16"
+            className="mb-16"
           >
-            {t("cta")}
-            <ChevronRight className="w-4 h-4" />
-          </motion.button>
+            <Link
+              href="/signup"
+              className="px-5 py-2.5 bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-colors text-sm inline-flex items-center gap-2"
+            >
+              {t("cta")}
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 40 }}

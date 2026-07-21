@@ -1,4 +1,15 @@
-import { pgTable, text, timestamp, boolean, integer, real, jsonb, index } from "drizzle-orm/pg-core"
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+  real,
+  jsonb,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 
 export type NotificationPreferences = {
   leadAlerts: boolean
@@ -229,6 +240,222 @@ export const lead = pgTable("lead", {
 }, (table) => [
   index("lead_business_idx").on(table.businessId),
   index("lead_job_idx").on(table.jobId),
+])
+
+/**
+ * One customer-owned WhatsApp Business Platform connection per ScoreLead
+ * business. Access tokens are encrypted before they reach this table.
+ */
+export const whatsappConnection = pgTable("whatsapp_connection", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  wabaId: text("wabaId").notNull(),
+  phoneNumberId: text("phoneNumberId").notNull(),
+  displayPhoneNumber: text("displayPhoneNumber"),
+  verifiedName: text("verifiedName"),
+  status: text("status").notNull().default("connected"),
+  encryptedAccessToken: text("encryptedAccessToken"),
+  tokenKeyVersion: integer("tokenKeyVersion").notNull().default(1),
+  timezone: text("timezone").notNull().default("UTC"),
+  allowedWeekdays: jsonb("allowedWeekdays")
+    .$type<number[]>()
+    .notNull()
+    .default([1, 2, 3, 4, 5]),
+  dailyLimit: integer("dailyLimit").notNull().default(20),
+  sendWindowStart: text("sendWindowStart").notNull().default("09:00"),
+  sendWindowEnd: text("sendWindowEnd").notNull().default("17:00"),
+  connectedAt: timestamp("connectedAt").notNull().defaultNow(),
+  disconnectedAt: timestamp("disconnectedAt"),
+  lastTemplateSyncAt: timestamp("lastTemplateSyncAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("whatsapp_connection_business_uidx").on(table.businessId),
+  uniqueIndex("whatsapp_connection_phone_number_uidx").on(table.phoneNumberId),
+  index("whatsapp_connection_waba_idx").on(table.wabaId),
+])
+
+/** One-time server-side nonce binding Embedded Signup to a user + business. */
+export const whatsappSignupNonce = pgTable("whatsapp_signup_nonce", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+}, (table) => [
+  index("whatsapp_signup_nonce_business_idx").on(table.businessId),
+  index("whatsapp_signup_nonce_expires_idx").on(table.expiresAt),
+])
+
+export type WhatsAppTemplateComponent = {
+  type: string
+  format?: string
+  text?: string
+  buttons?: Array<Record<string, unknown>>
+  example?: Record<string, unknown>
+}
+
+/** Local cache of Meta templates; only supported approved marketing rows are selectable. */
+export const whatsappTemplate = pgTable("whatsapp_template", {
+  id: text("id").primaryKey(),
+  connectionId: text("connectionId")
+    .notNull()
+    .references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  metaTemplateId: text("metaTemplateId").notNull(),
+  name: text("name").notNull(),
+  language: text("language").notNull(),
+  category: text("category").notNull(),
+  status: text("status").notNull(),
+  components: jsonb("components").$type<WhatsAppTemplateComponent[]>().notNull(),
+  supported: boolean("supported").notNull().default(false),
+  rejectionReason: text("rejectionReason"),
+  syncedAt: timestamp("syncedAt").notNull().defaultNow(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("whatsapp_template_meta_uidx").on(table.connectionId, table.metaTemplateId),
+  index("whatsapp_template_selectable_idx").on(table.connectionId, table.status, table.supported),
+])
+
+/** Append-only WhatsApp marketing-consent audit log. */
+export const whatsappConsentEvent = pgTable("whatsapp_consent_event", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  leadId: text("leadId")
+    .notNull()
+    .references(() => lead.id, { onDelete: "cascade" }),
+  recordedByUserId: text("recordedByUserId")
+    .references(() => user.id, { onDelete: "cascade" }),
+  phoneE164: text("phoneE164").notNull(),
+  status: text("status").notNull(),
+  purpose: text("purpose").notNull().default("marketing"),
+  source: text("source").notNull(),
+  capturedAt: timestamp("capturedAt").notNull(),
+  evidenceReference: text("evidenceReference"),
+  evidenceNote: text("evidenceNote"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+}, (table) => [
+  index("whatsapp_consent_lead_phone_idx").on(table.leadId, table.phoneE164, table.createdAt),
+  index("whatsapp_consent_business_phone_idx").on(table.businessId, table.phoneE164, table.createdAt),
+])
+
+export type WhatsAppTemplateParameter = {
+  type: "text"
+  parameterName?: string
+  text: string
+}
+
+export type WhatsAppConsentSnapshot = {
+  eventId: string
+  status: "granted"
+  phoneE164: string
+  purpose: string
+  source: string
+  capturedAt: string
+  evidenceReference: string | null
+}
+
+export const whatsappSequence = pgTable("whatsapp_sequence", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  leadId: text("leadId")
+    .notNull()
+    .references(() => lead.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId")
+    .notNull()
+    .references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  recipientPhone: text("recipientPhone").notNull(),
+  status: text("status").notNull().default("draft"),
+  timezone: text("timezone").notNull(),
+  consentSnapshot: jsonb("consentSnapshot").$type<WhatsAppConsentSnapshot>(),
+  approvedByUserId: text("approvedByUserId").references(() => user.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approvedAt"),
+  pausedAt: timestamp("pausedAt"),
+  pauseReason: text("pauseReason"),
+  completedAt: timestamp("completedAt"),
+  cancelledAt: timestamp("cancelledAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  index("whatsapp_sequence_lead_idx").on(table.leadId, table.createdAt),
+  index("whatsapp_sequence_recipient_idx").on(table.businessId, table.recipientPhone, table.status),
+  uniqueIndex("whatsapp_sequence_active_recipient_uidx")
+    .on(table.businessId, table.recipientPhone)
+    .where(sql`${table.status} = 'scheduled'`),
+])
+
+export const whatsappSequenceStep = pgTable("whatsapp_sequence_step", {
+  id: text("id").primaryKey(),
+  sequenceId: text("sequenceId")
+    .notNull()
+    .references(() => whatsappSequence.id, { onDelete: "cascade" }),
+  position: integer("position").notNull(),
+  offsetDays: integer("offsetDays").notNull(),
+  localSendTime: text("localSendTime").notNull(),
+  scheduledAt: timestamp("scheduledAt").notNull(),
+  status: text("status").notNull().default("queued"),
+  metaTemplateId: text("metaTemplateId").notNull(),
+  templateName: text("templateName").notNull(),
+  templateLanguage: text("templateLanguage").notNull(),
+  templateComponents: jsonb("templateComponents").$type<WhatsAppTemplateComponent[]>().notNull(),
+  templateParameters: jsonb("templateParameters").$type<WhatsAppTemplateParameter[]>().notNull(),
+  renderedBody: text("renderedBody").notNull(),
+  metaMessageId: text("metaMessageId"),
+  attemptCount: integer("attemptCount").notNull().default(0),
+  retryAt: timestamp("retryAt"),
+  requestStartedAt: timestamp("requestStartedAt"),
+  acceptedAt: timestamp("acceptedAt"),
+  sentAt: timestamp("sentAt"),
+  deliveredAt: timestamp("deliveredAt"),
+  readAt: timestamp("readAt"),
+  failedAt: timestamp("failedAt"),
+  errorCode: text("errorCode"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("whatsapp_sequence_step_position_uidx").on(table.sequenceId, table.position),
+  uniqueIndex("whatsapp_sequence_step_message_uidx").on(table.metaMessageId),
+  index("whatsapp_sequence_step_queue_idx").on(table.status, table.scheduledAt, table.retryAt),
+])
+
+/** Minimal reply record for pause-and-handoff; this is intentionally not a full inbox. */
+export const whatsappInboundMessage = pgTable("whatsapp_inbound_message", {
+  id: text("id").primaryKey(),
+  connectionId: text("connectionId")
+    .notNull()
+    .references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  leadId: text("leadId").references(() => lead.id, { onDelete: "set null" }),
+  metaMessageId: text("metaMessageId").notNull(),
+  fromPhone: text("fromPhone").notNull(),
+  messageType: text("messageType").notNull(),
+  textBody: text("textBody"),
+  receivedAt: timestamp("receivedAt").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("whatsapp_inbound_message_meta_uidx").on(table.metaMessageId),
+  index("whatsapp_inbound_message_recipient_idx").on(table.connectionId, table.fromPhone, table.receivedAt),
+])
+
+/** Small idempotency ledger for delivery and template-status webhook changes. */
+export const whatsappWebhookEvent = pgTable("whatsapp_webhook_event", {
+  id: text("id").primaryKey(),
+  eventKey: text("eventKey").notNull(),
+  eventType: text("eventType").notNull(),
+  processedAt: timestamp("processedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("whatsapp_webhook_event_key_uidx").on(table.eventKey),
 ])
 
 export const contentPost = pgTable("content_post", {

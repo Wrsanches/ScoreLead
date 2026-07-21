@@ -1,10 +1,12 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/routing"
 import { ScoreLeadLogo } from "./scorelead-logo"
 
 export function Footer() {
   const t = useTranslations("footer")
+  const contactLabel = t("contactUs")
 
   const footerLinks = {
     [t("product")]: [t("features"), t("pricing"), t("changelog"), t("integrations"), t("security")],
@@ -23,6 +25,12 @@ export function Footer() {
               <ScoreLeadLogo className="w-5 h-5 text-white" />
               <span className="text-white font-semibold text-sm">ScoreLead</span>
             </div>
+            <a
+              href="mailto:hello@scorelead.io"
+              className="mt-4 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+            >
+              hello@scorelead.io
+            </a>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
@@ -31,9 +39,15 @@ export function Footer() {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
-                    <span className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm cursor-default">
-                      {link}
-                    </span>
+                    {link === contactLabel ? (
+                      <Link href="/contact" className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm">
+                        {link}
+                      </Link>
+                    ) : (
+                      <span className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm cursor-default">
+                        {link}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

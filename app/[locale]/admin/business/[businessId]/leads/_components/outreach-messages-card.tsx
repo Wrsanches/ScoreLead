@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner"
 import { usePlan } from "@/components/admin/plan-context"
 import { AiOrb } from "@/components/ai-orb"
+import { WhatsAppAutomationPanel } from "./whatsapp-automation-panel"
 
 export interface OutreachMessage {
   step: number
@@ -30,6 +31,7 @@ export interface OutreachMessage {
 
 interface OutreachMessagesCardProps {
   leadId: string
+  businessId: string
   /** Pre-loaded messages from the parent — avoids a second fetch on mount. */
   initialMessages?: OutreachMessage[] | null
   /** Optional callback so the parent can keep its local lead state in sync. */
@@ -47,6 +49,7 @@ const STEP_ICONS = [Handshake, Lightbulb, Send] as const
 
 export function OutreachMessagesCard({
   leadId,
+  businessId,
   initialMessages,
   onMessagesChange,
   contact,
@@ -392,6 +395,11 @@ export function OutreachMessagesCard({
             </AnimatePresence>
           </div>
         )}
+        <WhatsAppAutomationPanel
+          businessId={businessId}
+          leadId={leadId}
+          phone={contact?.phone}
+        />
       </div>
     </div>
   )

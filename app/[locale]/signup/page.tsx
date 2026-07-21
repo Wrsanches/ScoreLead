@@ -62,7 +62,7 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     watch,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
   })
@@ -237,6 +237,47 @@ export default function SignUpPage() {
               </p>
             </div>
 
+            <div>
+              <label
+                htmlFor="terms"
+                className="flex items-start gap-2.5 cursor-pointer"
+              >
+                <input
+                  {...register("terms")}
+                  id="terms"
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-zinc-700/50 bg-zinc-800/30 accent-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+                />
+                <span className="text-xs text-zinc-500">
+                  {t.rich("agreeTerms", {
+                    terms: (chunks) => (
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        className="rounded-sm text-zinc-400 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    privacy: (chunks) => (
+                      <Link
+                        href="/privacy"
+                        target="_blank"
+                        className="rounded-sm text-zinc-400 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
+                </span>
+              </label>
+              {errors.terms && (
+                <p className="text-red-400 text-xs mt-1.5">
+                  {t("agreeTermsRequired")}
+                </p>
+              )}
+            </div>
+
             <motion.button
               type="submit"
               disabled={isSubmitting}
@@ -265,10 +306,6 @@ export default function SignUpPage() {
         >
           {t("loginLink")}
         </Link>
-      </p>
-
-      <p className="text-center text-xs text-zinc-600 mt-4">
-        {t("agreeTerms")}
       </p>
     </AuthLayout>
   )

@@ -1,0 +1,1 @@
+ALTER TABLE "whatsapp_sequence" ADD COLUMN "consentSnapshot" jsonb;

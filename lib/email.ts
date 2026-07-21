@@ -1,4 +1,4 @@
-import { Resend } from "resend"
+import { Resend, type CreateEmailOptions } from "resend"
 
 /**
  * Transactional email sender (Resend). Auth emails must not silently fail:
@@ -6,13 +6,42 @@ import { Resend } from "resend"
  * errors as a 500 on the triggering request).
  */
 
-const FROM = process.env.EMAIL_FROM || "ScoreLead <hello@ceramik.app>"
+const DEFAULT_FROM = "ScoreLead <hello@uspostage.io>"
+const DEFAULT_REPLY_TO = "hello@uspostage.io"
+
+type EmailOptionsWithDefaults<T> = T extends unknown
+  ? Omit<T, "from" | "replyTo"> & {
+      from?: string
+      replyTo?: string | string[]
+    }
+  : never
+
+type SendEmailOptions = EmailOptionsWithDefaults<CreateEmailOptions>
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) {
     throw new Error("RESEND_API_KEY is not configured")
   }
   return new Resend(process.env.RESEND_API_KEY)
+}
+
+/**
+ * Send through Resend with the app-wide sender and Google Workspace reply
+ * address. Resend reports API failures in the response instead of throwing,
+ * so normalize them to exceptions for callers that require delivery.
+ */
+export async function sendEmail(options: SendEmailOptions) {
+  const { data, error } = await getResend().emails.send({
+    ...options,
+    from: options.from ?? process.env.EMAIL_FROM ?? DEFAULT_FROM,
+    replyTo: options.replyTo ?? process.env.EMAIL_REPLY_TO ?? DEFAULT_REPLY_TO,
+  } as CreateEmailOptions)
+
+  if (error) {
+    throw new Error(`Resend email failed: ${error.message}`, { cause: error })
+  }
+
+  return data
 }
 
 export function escapeHtml(str: string) {
@@ -63,8 +92,7 @@ export async function sendVerificationEmail(opts: {
   url: string
 }) {
   const firstName = opts.name?.split(" ")[0]
-  await getResend().emails.send({
-    from: FROM,
+  await sendEmail({
     to: opts.to,
     subject: "Verify your email - ScoreLead",
     html: authEmailHtml({
@@ -83,8 +111,7 @@ export async function sendPasswordResetEmail(opts: {
   name: string | null
   url: string
 }) {
-  await getResend().emails.send({
-    from: FROM,
+  await sendEmail({
     to: opts.to,
     subject: "Reset your password - ScoreLead",
     html: authEmailHtml({

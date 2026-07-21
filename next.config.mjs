@@ -1,4 +1,4 @@
-import createNextIntlPlugin from 'next-intl/plugin';
+import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
@@ -23,18 +23,13 @@ if (process.env.AWS_S3_PUBLIC_BASE_URL) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['192.168.15.5', '192.168.15.12'],
   // Only externalize the server-only packages that break Turbopack's ESM
   // bundling. Do NOT externalize `better-auth` / `@better-auth/stripe` - their
   // React client subpaths (better-auth/react) must stay bundled, or client
   // components resolve a null React at SSR ("Cannot read properties of null
   // (reading 'useRef')"). The kysely adapter is the piece that actually fails
   // to bundle; externalizing it stops Turbopack from analyzing its internals.
-  serverExternalPackages: [
-    '@better-auth/kysely-adapter',
-    'kysely',
-    'stripe',
-  ],
+  serverExternalPackages: ["@better-auth/kysely-adapter", "kysely", "stripe"],
   images: {
     remotePatterns: imageRemotePatterns,
   },
@@ -46,13 +41,19 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
           { key: "X-DNS-Prefetch-Control", value: "on" },
-          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
         ],
       },
-    ]
+    ];
   },
-}
+};
 
-export default withNextIntl(nextConfig)
+export default withNextIntl(nextConfig);

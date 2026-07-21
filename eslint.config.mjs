@@ -1,10 +1,19 @@
 import js from "@eslint/js"
+import globals from "globals"
 import tseslint from "typescript-eslint"
 import nextPlugin from "@next/eslint-plugin-next"
 
 export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    // Root config files (next.config.mjs, postcss.config.mjs, ...) run in
+    // Node, so give them the Node globals (process, URL, ...).
+    files: ["**/*.{js,mjs,cjs}"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   {
     plugins: {
       "@next/next": nextPlugin,

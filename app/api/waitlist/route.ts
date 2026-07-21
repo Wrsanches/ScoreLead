@@ -1,7 +1,6 @@
-import { Resend } from "resend"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { escapeHtml } from "@/lib/email"
+import { escapeHtml, sendEmail } from "@/lib/email"
 
 const waitlistSchema = z.object({
   email: z.email(),
@@ -16,12 +15,16 @@ export async function POST(request: Request) {
   }
 
   const { email } = result.data
-  const resend = new Resend(process.env.RESEND_API_KEY)
+  const notifyEmail = process.env.NOTIFY_EMAIL
+
+  if (!notifyEmail) {
+    console.error("NOTIFY_EMAIL is not configured")
+    return NextResponse.json({ error: "Email notification is not configured" }, { status: 500 })
+  }
 
   try {
-    await resend.emails.send({
-      from: "ScoreLead <hello@ceramik.app>",
-      to: process.env.NOTIFY_EMAIL!,
+    await sendEmail({
+      to: notifyEmail,
       subject: "New ScoreLead waitlist signup",
       html: `
         <h2>New waitlist signup</h2>

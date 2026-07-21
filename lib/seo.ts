@@ -184,6 +184,10 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
 // password flows), which an unauthenticated visitor or link preview may hit.
 
 export type PageKey =
+  | "contact"
+  | "privacy"
+  | "terms"
+  | "dataDeletion"
   | "login"
   | "signup"
   | "forgotPassword"
@@ -202,6 +206,26 @@ type PageCopy = { title: string; description?: string }
 
 const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
   en: {
+    contact: {
+      title: "Contact us",
+      description:
+        "Contact ScoreLead about sales, product support, partnerships, or questions about AI-powered B2B lead generation.",
+    },
+    privacy: {
+      title: "Privacy Policy",
+      description:
+        "Learn how ScoreLead collects, uses, shares, secures, and deletes account, lead, AI, billing, and WhatsApp Business data.",
+    },
+    terms: {
+      title: "Terms of Service",
+      description:
+        "Read the terms governing ScoreLead accounts, subscriptions, lead data, AI output, outreach, and WhatsApp Business features.",
+    },
+    dataDeletion: {
+      title: "Data deletion instructions",
+      description:
+        "Learn how to request deletion of your ScoreLead account or data associated with a connected Meta or WhatsApp account.",
+    },
     login: {
       title: "Log in",
       description:
@@ -232,6 +256,26 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     settings: { title: "Settings" },
   },
   pt: {
+    contact: {
+      title: "Fale conosco",
+      description:
+        "Fale com o ScoreLead sobre vendas, suporte ao produto, parcerias ou geracao de leads B2B com IA.",
+    },
+    privacy: {
+      title: "Política de Privacidade",
+      description:
+        "Saiba como o ScoreLead coleta, usa, compartilha, protege e exclui dados de conta, leads, IA, cobrança e WhatsApp Business.",
+    },
+    terms: {
+      title: "Termos de Serviço",
+      description:
+        "Leia os termos aplicáveis a contas, assinaturas, dados de leads, resultados de IA, abordagem e WhatsApp Business no ScoreLead.",
+    },
+    dataDeletion: {
+      title: "Instruções para exclusão de dados",
+      description:
+        "Saiba como solicitar a exclusão da conta ScoreLead ou de dados associados a uma conta Meta ou WhatsApp conectada.",
+    },
     login: {
       title: "Entrar",
       description:
@@ -262,6 +306,26 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     settings: { title: "Configuracoes" },
   },
   es: {
+    contact: {
+      title: "Contáctanos",
+      description:
+        "Contacta con ScoreLead sobre ventas, soporte del producto, alianzas o generacion de leads B2B con IA.",
+    },
+    privacy: {
+      title: "Política de Privacidad",
+      description:
+        "Conoce cómo ScoreLead recopila, usa, comparte, protege y elimina datos de cuenta, leads, IA, facturación y WhatsApp Business.",
+    },
+    terms: {
+      title: "Términos de Servicio",
+      description:
+        "Lee los términos de cuentas, suscripciones, datos de leads, resultados de IA, contacto y WhatsApp Business en ScoreLead.",
+    },
+    dataDeletion: {
+      title: "Instrucciones para eliminar datos",
+      description:
+        "Descubre cómo solicitar la eliminación de tu cuenta ScoreLead o de datos asociados a una cuenta de Meta o WhatsApp conectada.",
+    },
     login: {
       title: "Iniciar sesion",
       description:
@@ -319,12 +383,16 @@ export const siteViewport: Viewport = {
   themeColor: "#09090B",
 }
 
-export const languageAlternates = {
-  en: getLocalizedUrl("en"),
-  "pt-BR": getLocalizedUrl("pt"),
-  es: getLocalizedUrl("es"),
-  "x-default": getLocalizedUrl("en"),
+export function getLanguageAlternates(pathname = "") {
+  return {
+    en: getLocalizedUrl("en", pathname),
+    "pt-BR": getLocalizedUrl("pt", pathname),
+    es: getLocalizedUrl("es", pathname),
+    "x-default": getLocalizedUrl("en", pathname),
+  }
 }
+
+export const languageAlternates = getLanguageAlternates()
 
 export function normalizeLocale(locale: string): SupportedLocale {
   return supportedLocales.includes(locale as SupportedLocale) ? (locale as SupportedLocale) : "en"
