@@ -7,7 +7,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { regenerateSlide } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
-import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
+import { reserveImages, releaseImages, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
 
 export const maxDuration = 180
@@ -65,9 +65,11 @@ export async function POST(
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
-  // Gate: regenerating a slide is one AI image.
+  // Gate: regenerating a slide is one AI image. Reserve it atomically up-front
+  // (released below if generation fails) so concurrent requests can't exceed
+  // the cap during the slow generation.
   try {
-    await assertCanUse(session.user.id, "aiImage", 1)
+    await reserveImages(session.user.id, 1)
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -91,43 +93,52 @@ export async function POST(
   const images = post.images ?? []
   const previousSlide = images[index] ?? null
 
-  const slide = await regenerateSlide(
-    {
-      name: biz.name,
-      category: biz.category,
-      field: biz.field,
-      persona: biz.persona,
-      brandStyle: biz.brandStyle,
-      brandColorPrimary: biz.brandColorPrimary,
-      brandColorSecondary: biz.brandColorSecondary,
-      brandFonts: biz.brandFonts ?? null,
-      language: biz.language,
-    },
-    {
-      id: post.id,
-      postType: post.postType as ContentPostType,
-      pillar: post.pillar as ContentPillar | null,
-      caption: post.caption,
-      visualIdea: post.visualIdea,
-      callToAction: post.callToAction,
-    },
-    index,
-    Math.max(images.length, index + 1),
-    {
-      refinementPrompt: parsed.data.refinementPrompt,
-      baseImageUrl: previousSlide?.url,
-      previousUrl: previousSlide?.url,
-    },
-  )
+  let slide: Awaited<ReturnType<typeof regenerateSlide>>
+  try {
+    slide = await regenerateSlide(
+      {
+        name: biz.name,
+        category: biz.category,
+        field: biz.field,
+        persona: biz.persona,
+        brandStyle: biz.brandStyle,
+        brandColorPrimary: biz.brandColorPrimary,
+        brandColorSecondary: biz.brandColorSecondary,
+        brandFonts: biz.brandFonts ?? null,
+        language: biz.language,
+        productImages: biz.productImages ?? null,
+      },
+      {
+        id: post.id,
+        postType: post.postType as ContentPostType,
+        pillar: post.pillar as ContentPillar | null,
+        caption: post.caption,
+        visualIdea: post.visualIdea,
+        callToAction: post.callToAction,
+        referenceImagePref: post.referenceImagePref ?? null,
+      },
+      index,
+      Math.max(images.length, index + 1),
+      {
+        refinementPrompt: parsed.data.refinementPrompt,
+        baseImageUrl: previousSlide?.url,
+        previousUrl: previousSlide?.url,
+      },
+    )
+  } catch (e) {
+    // Generation threw after we reserved the credit - give it back.
+    await releaseImages(session.user.id, 1)
+    throw e
+  }
 
   if (!slide) {
+    // No image produced - release the reserved credit.
+    await releaseImages(session.user.id, 1)
     return NextResponse.json(
       { error: "Image generation failed" },
       { status: 502 },
     )
   }
-
-  await recordUsage(session.user.id, "aiImage", 1)
 
   const nextImages = [...images]
   nextImages[index] = slide

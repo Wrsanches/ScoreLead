@@ -14,6 +14,7 @@ import {
   Unplug,
 } from "lucide-react"
 import { toast } from "sonner"
+import { Link } from "@/i18n/routing"
 import { ContentWrapper, PageHeader } from "@/components/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -147,7 +148,7 @@ export default function IntegrationsPage({
       if (!response.ok) throw new Error(body.error || t("connectError"))
       setConnection(body.connection)
       toast.success(t("connectedToast"))
-      const sync = await fetch(`/api/businesses/${businessId}/whatsapp/templates`, { method: "POST" })
+      const sync = await fetch(`/api/businesses/${businessId}/whatsapp/templates/sync`, { method: "POST" })
       if (sync.ok) {
         const syncBody = await sync.json()
         setTemplateCount(syncBody.templates?.length ?? 0)
@@ -283,7 +284,7 @@ export default function IntegrationsPage({
   async function syncTemplates() {
     setSyncing(true)
     try {
-      const response = await fetch(`/api/businesses/${businessId}/whatsapp/templates`, { method: "POST" })
+      const response = await fetch(`/api/businesses/${businessId}/whatsapp/templates/sync`, { method: "POST" })
       const body = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(body.error || t("syncError"))
       setTemplateCount(body.templates?.length ?? 0)
@@ -498,7 +499,12 @@ export default function IntegrationsPage({
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("approvedTemplates")}</p>
                 <p className="mt-2 text-3xl font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">{templateCount}</p>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">{t("templateHelp")}</p>
-                <Button variant="outline" className="mt-5 w-full" onClick={syncTemplates} disabled={syncing}>
+                <Button asChild className="mt-5 w-full">
+                  <Link href={`/admin/business/${businessId}/integrations/whatsapp-templates`}>
+                    {t("manageTemplates")}
+                  </Link>
+                </Button>
+                <Button variant="outline" className="mt-2 w-full" onClick={syncTemplates} disabled={syncing}>
                   {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                   {t("syncTemplates")}
                 </Button>

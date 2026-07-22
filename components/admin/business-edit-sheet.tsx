@@ -11,7 +11,9 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { TagsInput } from "@/components/admin/tags-input"
+import { BusinessProductImages } from "@/components/admin/business-product-images"
 import { getTranslatedCategories } from "@/lib/categories"
+import type { ProductImage } from "@/lib/product-images"
 import { uploadImage, UploadError } from "@/lib/upload-client"
 import { toast } from "sonner"
 import { Loader2, Check, Upload, ImageIcon, Building2 } from "lucide-react"
@@ -36,6 +38,7 @@ export interface BusinessEditValues {
   serviceArea: string
   competitors: string
   brandStyle: string
+  productImages: ProductImage[]
 }
 
 interface BusinessEditSheetProps {
@@ -352,6 +355,14 @@ export function BusinessEditSheet({
                 placeholder="Modern, warm, editorial..."
               />
             </Field>
+          </Group>
+
+          {/* Product images */}
+          <Group label={t("groupProductImages")}>
+            <BusinessProductImages
+              value={values.productImages}
+              onChange={(next) => set("productImages", next)}
+            />
           </Group>
 
           <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-600 pt-2 border-t border-zinc-200/80 dark:border-zinc-800/60">

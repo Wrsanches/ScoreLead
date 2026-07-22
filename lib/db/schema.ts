@@ -88,6 +88,9 @@ export const business = pgTable("business", {
   category: text("category"),
   tags: text("tags"),
   logo: text("logo"),
+  productImages: jsonb("productImages").$type<
+    { id: string; url: string; description: string }[]
+  >(),
   language: text("language"),
   brandColors: jsonb("brandColors").$type<string[]>(),
   brandColorPrimary: text("brandColorPrimary"),
@@ -477,6 +480,12 @@ export const contentPost = pgTable("content_post", {
   images: jsonb("images").$type<
     { url: string; headline: string; prompt: string }[]
   >(),
+  // Which business product image to reference when generating this post's
+  // image. null = "auto" (AI picks the most relevant one, or none).
+  referenceImagePref: jsonb("referenceImagePref").$type<{
+    mode: "auto" | "none" | "specific"
+    imageId?: string | null
+  }>(),
   status: text("status").notNull().default("draft"),
   aiGenerated: boolean("aiGenerated").notNull().default(false),
   createdAt: timestamp("createdAt").notNull().defaultNow(),

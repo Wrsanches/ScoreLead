@@ -19,6 +19,16 @@ const patchSchema = z.object({
   visualIdea: z.string().nullable().optional(),
   callToAction: z.string().nullable().optional(),
   status: z.enum(["draft", "approved"]).optional(),
+  referenceImagePref: z
+    .discriminatedUnion("mode", [
+      z.object({ mode: z.enum(["auto", "none"]) }),
+      z.object({
+        mode: z.literal("specific"),
+        imageId: z.string().min(1).max(64),
+      }),
+    ])
+    .nullable()
+    .optional(),
 })
 
 export async function PATCH(
@@ -54,6 +64,8 @@ export async function PATCH(
   if (p.visualIdea !== undefined) update.visualIdea = p.visualIdea
   if (p.callToAction !== undefined) update.callToAction = p.callToAction
   if (p.status !== undefined) update.status = p.status
+  if (p.referenceImagePref !== undefined)
+    update.referenceImagePref = p.referenceImagePref
 
   await db.update(contentPost).set(update).where(eq(contentPost.id, id))
 

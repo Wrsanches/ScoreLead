@@ -162,6 +162,53 @@ export async function listMessageTemplates(
   return templates
 }
 
+/** Submit a brand-new message template for Meta review. Returns its id + status (usually PENDING). */
+export async function createMessageTemplate(
+  wabaId: string,
+  accessToken: string,
+  payload: {
+    name: string
+    language: string
+    category: string
+    components: WhatsAppTemplateComponent[]
+  },
+): Promise<{ id: string; status?: string; category?: string }> {
+  return graphRequest(`${wabaId}/message_templates`, accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
+}
+
+/**
+ * Edit an existing template's category and/or components. Meta only allows this
+ * for APPROVED/REJECTED/PAUSED templates (not while PENDING), and name/language
+ * cannot change. An accepted edit sends the template back to review.
+ */
+export async function editMessageTemplate(
+  metaTemplateId: string,
+  accessToken: string,
+  payload: { category?: string; components: WhatsAppTemplateComponent[] },
+): Promise<{ success?: boolean }> {
+  return graphRequest(metaTemplateId, accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
+}
+
+/** Delete a specific template (by id + name deletes just that language variant). */
+export async function deleteMessageTemplate(
+  wabaId: string,
+  accessToken: string,
+  name: string,
+  metaTemplateId?: string,
+): Promise<void> {
+  const params = new URLSearchParams({ name })
+  if (metaTemplateId) params.set("hsm_id", metaTemplateId)
+  await graphRequest(`${wabaId}/message_templates?${params.toString()}`, accessToken, {
+    method: "DELETE",
+  })
+}
+
 export async function sendTemplateMessage(input: {
   phoneNumberId: string
   accessToken: string

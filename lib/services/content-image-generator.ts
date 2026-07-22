@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { unlink, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars";
+import type { ProductImage, ReferenceImagePref } from "@/lib/product-images";
 import {
   GEMINI_IMAGE_MODEL,
   OPENAI_TEXT_MODEL,
@@ -43,6 +44,7 @@ export interface ImageGenBusiness {
   brandColorSecondary: string | null;
   brandFonts: string[] | null;
   language: string | null;
+  productImages: ProductImage[] | null;
 }
 
 export interface ImageGenPost {
@@ -52,6 +54,7 @@ export interface ImageGenPost {
   caption: string;
   visualIdea: string | null;
   callToAction: string | null;
+  referenceImagePref: ReferenceImagePref | null;
 }
 
 export interface GeneratedSlide {
@@ -269,6 +272,141 @@ function fallbackSlideSplit(caption: string): SlidePlan[] {
   return plans;
 }
 
+/**
+ * Decides which of the business's product images (if any) should be used as a
+ * Gemini reference for this post's image. Honors the post's explicit pref
+ * ("none" / "specific"); in "auto" mode asks OpenAI to match the post against
+ * the image descriptions, with a conservative keyword-overlap fallback.
+ * Returns null when no image should be referenced.
+ */
+async function selectProductReferenceImage(
+  business: ImageGenBusiness,
+  post: ImageGenPost,
+): Promise<ProductImage | null> {
+  const images = (business.productImages ?? []).filter((img) => img.url);
+  if (images.length === 0) return null;
+
+  const pref = post.referenceImagePref;
+  if (pref?.mode === "none") return null;
+  if (pref?.mode === "specific") {
+    // A pinned-but-deleted image degrades to no reference (predictable),
+    // never silently to auto.
+    return images.find((img) => img.id === pref.imageId) ?? null;
+  }
+
+  const postText = [post.caption, post.visualIdea ?? ""]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const openaiClient = getOpenAI();
+  if (openaiClient) {
+    try {
+      const system = `You decide whether an Instagram post's image should feature one of the brand's real product photos. You are given the post's caption and visual idea, and a numbered list of product-image descriptions.
+
+Pick the single most relevant image ONLY if the post is genuinely about the business's own product or service shown in that image. If the post is generic (tips, engagement question, industry story, behind-the-scenes) return null.
+
+Return ONLY JSON: {"selectedIndex": <zero-based number or null>}`;
+
+      const user = `POST:\n${postText}\n\nPRODUCT IMAGES:\n${images
+        .map(
+          (img, i) =>
+            `${i}. ${img.description.trim() || "(no description)"}`,
+        )
+        .join("\n")}`;
+
+      const response = await openaiClient.chat.completions.create({
+        model: OPENAI_TEXT_MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: 0,
+        max_completion_tokens: 100,
+      });
+      const content = response.choices[0]?.message?.content;
+      if (content) {
+        const data = JSON.parse(content) as { selectedIndex?: unknown };
+        const idx = data.selectedIndex;
+        if (typeof idx === "number" && Number.isInteger(idx)) {
+          const chosen = images[idx] ?? null;
+          console.log(
+            `[content-image] product reference auto-select: ${
+              chosen ? `image ${idx}` : "none"
+            } for post ${post.id}`,
+          );
+          return chosen;
+        }
+        return null;
+      }
+    } catch (err) {
+      console.error(
+        "[content-image] product reference selection failed, falling back:",
+        err,
+      );
+    }
+  }
+
+  return fallbackReferenceMatch(postText, images);
+}
+
+/**
+ * Keyword-overlap heuristic used when OpenAI is unavailable. Biased toward
+ * "no reference" - a wrong product photo is worse than none.
+ */
+function fallbackReferenceMatch(
+  postText: string,
+  images: ProductImage[],
+): ProductImage | null {
+  const tokenize = (text: string) =>
+    new Set(
+      text
+        .toLowerCase()
+        .split(/[^\p{L}\p{N}]+/u)
+        .filter((tok) => tok.length >= 4),
+    );
+  const postTokens = tokenize(postText);
+  let best: ProductImage | null = null;
+  let bestScore = 0;
+  for (const img of images) {
+    let score = 0;
+    for (const tok of tokenize(img.description)) {
+      if (postTokens.has(tok)) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = img;
+    }
+  }
+  return bestScore >= 2 ? best : null;
+}
+
+const MIME_BY_EXT: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+};
+
+function mimeFromUrl(url: string): string {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+  return MIME_BY_EXT[ext] ?? "image/png";
+}
+
+/** Reads a selected product image into the shape runSlideGeneration expects. */
+async function loadProductReference(
+  img: ProductImage,
+): Promise<ProductReference | undefined> {
+  const key = keyFromUrl(img.url);
+  const base64 = key ? await getObjectBase64(key) : null;
+  if (!base64) return undefined;
+  return {
+    base64,
+    mimeType: mimeFromUrl(img.url),
+    description: img.description,
+  };
+}
+
 function buildSlidePrompt(
   business: ImageGenBusiness,
   post: ImageGenPost,
@@ -448,15 +586,25 @@ async function readPublicImageAsBase64(url: string): Promise<string | null> {
   }
 }
 
+interface ProductReference {
+  base64: string;
+  mimeType: string;
+  description: string;
+}
+
 interface RunSlideOptions {
   refinementPrompt?: string;
   baseImageUrl?: string;
+  /** Business product image to feature in a fresh generation. */
+  productReference?: ProductReference;
 }
 
 /**
  * Generates or edits a single slide.
  * - If baseImageUrl + refinementPrompt are provided and the file is readable,
  *   runs Nano Banana in image-to-image mode.
+ * - If productReference is provided (and no refinement), runs a fresh
+ *   generation with the product photo attached as a reference image.
  * - Otherwise does a fresh text-to-image generation.
  * Tries up to 2 attempts before surfacing failure.
  */
@@ -488,11 +636,23 @@ async function runSlideGeneration(
   }
 
   const editMode = Boolean(refinement && inlineImageBase64);
+  const productReference = !editMode ? opts.productReference : undefined;
+  const referenceMode = Boolean(productReference);
 
   // Mention the aspect ratio explicitly in the prompt so the model honors it
   // even when we can't pass `imageConfig.aspectRatio` (some Gemini variants
   // like flash-lite reject the config).
   const aspectLine = `\n\n== FRAME ==\nDeliver the image at an exact ${aspectRatio} aspect ratio (width:height). Do not letterbox, do not crop text, do not pad. The canvas itself is ${aspectRatio}.`
+
+  const referenceLine = productReference
+    ? `\n\n== PRODUCT REFERENCE IMAGE (attached) ==
+The attached image is a REAL photo/screenshot of ${business.name || "the brand"}'s actual product${productReference.description.trim() ? `: "${productReference.description.trim()}"` : ""}.
+It is a REFERENCE for a brand-new photograph, not an image to edit or return.
+- Compose a completely NEW scene following all art direction above, featuring THIS exact product as the hero subject.
+- Reproduce the product faithfully: exact shape, proportions, colors, materials, labels, and any on-screen UI. Do not redesign, restyle, or invent a generic substitute.
+- If the reference is an app or software screenshot, show it naturally on a real device screen (phone or laptop) within the photographed scene, crisp and legible.
+- Do NOT copy the reference image's background, framing, or lighting - only the product itself carries over.`
+    : "";
 
   const editPrompt = editMode
     ? `${basePrompt}${aspectLine}
@@ -502,7 +662,7 @@ A prior version of this slide is attached. Apply this change while preserving ev
 "${refinement}"
 
 Deliver the refined photograph at the same aspect and quality.`
-    : `${basePrompt}${aspectLine}`;
+    : `${basePrompt}${aspectLine}${referenceLine}`;
 
   const contents = editMode
     ? [
@@ -511,13 +671,24 @@ Deliver the refined photograph at the same aspect and quality.`
         },
         { text: editPrompt },
       ]
-    : editPrompt;
+    : referenceMode
+      ? [
+          {
+            inlineData: {
+              mimeType: productReference!.mimeType,
+              data: productReference!.base64,
+            },
+          },
+          { text: editPrompt },
+        ]
+      : editPrompt;
 
   // All `*-image*` Gemini models accept imageConfig. Text-only models don't
-  // and must be avoided at the source (see lib/models.ts). In edit-mode we
-  // drop imageConfig because it isn't allowed alongside inline image input.
+  // and must be avoided at the source (see lib/models.ts). With any inline
+  // image input (edit or reference mode) we drop imageConfig because it isn't
+  // allowed alongside it - the == FRAME == prompt line covers aspect ratio.
   const supportsImageConfig = /image/.test(GEMINI_IMAGE_MODEL);
-  let disableImageConfig = editMode || !supportsImageConfig;
+  let disableImageConfig = editMode || referenceMode || !supportsImageConfig;
 
   function buildConfig() {
     const base: Record<string, unknown> = {
@@ -625,8 +796,21 @@ export async function generatePostImages(
   const total = slides.length;
   await options.beforeGenerate?.(total);
 
+  // Resolved AFTER the plan gate above so blocked users never trigger the
+  // OpenAI selection call. Policy: the product reference applies to the cover
+  // slide only - body slides inherit the visual language via carousel
+  // cohesion, and repeating the same product photo makes carousels monotonous.
+  const reference = await selectProductReferenceImage(business, post);
+  const productReference = reference
+    ? await loadProductReference(reference)
+    : undefined;
+
   const generated = await Promise.all(
-    slides.map((s, i) => runSlideGeneration(business, post, s, i, total)),
+    slides.map((s, i) =>
+      runSlideGeneration(business, post, s, i, total, {
+        productReference: s.role === "cover" ? productReference : undefined,
+      }),
+    ),
   );
 
   const successes: GeneratedSlide[] = [];
@@ -668,6 +852,14 @@ export async function regenerateSlide(
   }
   const slide = slides[slideIndex] ?? slides[0];
 
+  // Plain regeneration of a cover slide re-applies the product reference;
+  // refinements keep their single-base-image edit mode untouched.
+  let productReference: ProductReference | undefined;
+  if (!opts.refinementPrompt?.trim() && slide.role === "cover") {
+    const reference = await selectProductReferenceImage(business, post);
+    if (reference) productReference = await loadProductReference(reference);
+  }
+
   const result = await runSlideGeneration(
     business,
     post,
@@ -677,6 +869,7 @@ export async function regenerateSlide(
     {
       refinementPrompt: opts.refinementPrompt,
       baseImageUrl: opts.baseImageUrl,
+      productReference,
     },
   );
 

@@ -6,7 +6,7 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { generatePostImages } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
-import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
+import { reserveImages, releaseImages, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
 
 export const maxDuration = 300
@@ -52,6 +52,10 @@ export async function POST(
   }
 
   let result: Awaited<ReturnType<typeof generatePostImages>>
+  // Credits are reserved up-front (atomically) inside beforeGenerate and any
+  // unused portion is released afterwards, so concurrent requests can't each
+  // slip past the cap during the slow generation.
+  let reserved = 0
   try {
     result = await generatePostImages(
       {
@@ -64,6 +68,7 @@ export async function POST(
         brandColorSecondary: biz.brandColorSecondary,
         brandFonts: biz.brandFonts ?? null,
         language: biz.language,
+        productImages: biz.productImages ?? null,
       },
       {
         id: post.id,
@@ -72,14 +77,19 @@ export async function POST(
         caption: post.caption,
         visualIdea: post.visualIdea,
         callToAction: post.callToAction,
+        referenceImagePref: post.referenceImagePref ?? null,
       },
       post.images ?? null,
       {
-        beforeGenerate: (plannedImageCount) =>
-          assertCanUse(session.user.id, "aiImage", plannedImageCount),
+        beforeGenerate: async (plannedImageCount) => {
+          await reserveImages(session.user.id, plannedImageCount)
+          reserved = plannedImageCount
+        },
       },
     )
   } catch (e) {
+    // Generation failed after reserving - give the credits back.
+    if (reserved > 0) await releaseImages(session.user.id, reserved)
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
@@ -99,15 +109,17 @@ export async function POST(
     throw e
   }
 
+  // Release credits reserved for slides that failed to render.
+  if (reserved > result.slides.length) {
+    await releaseImages(session.user.id, reserved - result.slides.length)
+  }
+
   if (result.slides.length === 0) {
     return NextResponse.json(
       { error: "Image generation failed. Check GEMINI_API_KEY and try again." },
       { status: 502 },
     )
   }
-
-  // Record the actual number of images produced (carousels generate several).
-  await recordUsage(session.user.id, "aiImage", result.slides.length)
 
   await db
     .update(contentPost)

@@ -1,4 +1,5 @@
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
+import type { ReferenceImagePref } from "@/lib/product-images"
 
 export interface ContentPostRow {
   id: string
@@ -13,6 +14,7 @@ export interface ContentPostRow {
   visualIdea: string | null
   callToAction: string | null
   images: { url: string; headline: string; prompt: string }[] | null
+  referenceImagePref: ReferenceImagePref | null
   status: "draft" | "approved"
   aiGenerated: boolean
   createdAt: string

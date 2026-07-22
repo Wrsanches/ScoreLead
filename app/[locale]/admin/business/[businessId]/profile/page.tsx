@@ -30,6 +30,7 @@ import {
   BusinessEditSheet,
   type BusinessEditValues,
 } from "@/components/admin/business-edit-sheet"
+import type { ProductImage } from "@/lib/product-images"
 
 interface Business {
   id: string
@@ -57,6 +58,7 @@ interface Business {
   serviceArea: string | null
   competitors: string | null
   suggestedKeywords: string[] | null
+  productImages: ProductImage[] | null
 }
 
 function getFaviconUrl(website: string | null): string | null {
@@ -217,6 +219,7 @@ export default function BusinessDetailPage({
             serviceArea: values.serviceArea || null,
             competitors: values.competitors || null,
             brandStyle: values.brandStyle || null,
+            productImages: values.productImages,
           }
         : prev,
     )
@@ -559,6 +562,7 @@ export default function BusinessDetailPage({
             serviceArea: data.serviceArea ?? "",
             competitors: data.competitors ?? "",
             brandStyle: data.brandStyle ?? "",
+            productImages: data.productImages ?? [],
           }}
           onSubmit={handleEditSave}
         />

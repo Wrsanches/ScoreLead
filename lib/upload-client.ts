@@ -9,7 +9,11 @@
 const ALLOWED_MIME = ["image/png", "image/jpeg", "image/webp"]
 const DEFAULT_MAX_BYTES = 8 * 1024 * 1024
 
-export type UploadKind = "business-logo" | "avatar" | "content-slide"
+export type UploadKind =
+  | "business-logo"
+  | "business-product"
+  | "avatar"
+  | "content-slide"
 
 export interface UploadOptions {
   kind: UploadKind

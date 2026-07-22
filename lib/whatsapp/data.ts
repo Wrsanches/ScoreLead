@@ -8,8 +8,29 @@ import {
   whatsappTemplate,
 } from "@/lib/db/schema"
 import { decryptWhatsAppToken } from "@/lib/whatsapp/security"
-import { listMessageTemplates } from "@/lib/whatsapp/meta"
+import {
+  createMessageTemplate,
+  deleteMessageTemplate,
+  editMessageTemplate,
+  listMessageTemplates,
+} from "@/lib/whatsapp/meta"
 import { isSupportedMarketingTemplate } from "@/lib/whatsapp/templates"
+import {
+  buildTemplateComponents,
+  type TemplateFormInput,
+} from "@/lib/whatsapp/template-form"
+
+type WhatsAppConnectionRow = NonNullable<
+  Awaited<ReturnType<typeof getWhatsAppConnection>>
+>
+
+/** Decrypt the connection's access token, refusing a disconnected connection. */
+function connectionAccessToken(connection: WhatsAppConnectionRow): string {
+  if (connection.status !== "connected" || !connection.encryptedAccessToken) {
+    throw new Error("WhatsApp is not connected")
+  }
+  return decryptWhatsAppToken(connection.encryptedAccessToken)
+}
 
 export async function getOwnedBusiness(businessId: string, userId: string) {
   const [row] = await db
@@ -69,6 +90,141 @@ export function publicConnection(
     disconnectedAt: connection.disconnectedAt,
     lastTemplateSyncAt: connection.lastTemplateSyncAt,
   }
+}
+
+/** All templates for a connection (every status), newest first. */
+export async function listConnectionTemplates(connectionId: string) {
+  return db
+    .select()
+    .from(whatsappTemplate)
+    .where(eq(whatsappTemplate.connectionId, connectionId))
+    .orderBy(desc(whatsappTemplate.updatedAt))
+}
+
+/** A single template row scoped to its connection, or null. */
+export async function getConnectionTemplate(
+  connectionId: string,
+  templateId: string,
+) {
+  const [row] = await db
+    .select()
+    .from(whatsappTemplate)
+    .where(
+      and(
+        eq(whatsappTemplate.id, templateId),
+        eq(whatsappTemplate.connectionId, connectionId),
+      ),
+    )
+  return row ?? null
+}
+
+/** Submit a new template to Meta for approval and persist it as PENDING. */
+export async function createConnectionTemplate(
+  connection: WhatsAppConnectionRow,
+  input: TemplateFormInput,
+) {
+  const accessToken = connectionAccessToken(connection)
+  const components = buildTemplateComponents(input)
+  const created = await createMessageTemplate(connection.wabaId, accessToken, {
+    name: input.name,
+    language: input.language,
+    category: input.category,
+    components,
+  })
+  const status = (created.status ?? "PENDING").toUpperCase()
+  const now = new Date()
+  const supported = isSupportedMarketingTemplate({
+    category: input.category,
+    status,
+    components,
+  })
+  const [row] = await db
+    .insert(whatsappTemplate)
+    .values({
+      id: crypto.randomUUID(),
+      connectionId: connection.id,
+      metaTemplateId: created.id,
+      name: input.name,
+      language: input.language,
+      category: input.category,
+      status,
+      components,
+      supported,
+      rejectionReason: null,
+      syncedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: [whatsappTemplate.connectionId, whatsappTemplate.metaTemplateId],
+      set: {
+        name: input.name,
+        language: input.language,
+        category: input.category,
+        status,
+        components,
+        supported,
+        rejectionReason: null,
+        syncedAt: now,
+        updatedAt: now,
+      },
+    })
+    .returning()
+  return row
+}
+
+/**
+ * Push an edit to Meta and persist it. Meta re-reviews an edited template, so
+ * it returns to PENDING. Name and language are immutable and come from the
+ * existing row, not the input.
+ */
+export async function editConnectionTemplate(
+  connection: WhatsAppConnectionRow,
+  templateRow: { id: string; metaTemplateId: string },
+  input: TemplateFormInput,
+) {
+  const accessToken = connectionAccessToken(connection)
+  const components = buildTemplateComponents(input)
+  await editMessageTemplate(templateRow.metaTemplateId, accessToken, {
+    category: input.category,
+    components,
+  })
+  const now = new Date()
+  const status = "PENDING"
+  const supported = isSupportedMarketingTemplate({
+    category: input.category,
+    status,
+    components,
+  })
+  const [row] = await db
+    .update(whatsappTemplate)
+    .set({
+      category: input.category,
+      components,
+      status,
+      supported,
+      rejectionReason: null,
+      syncedAt: now,
+      updatedAt: now,
+    })
+    .where(eq(whatsappTemplate.id, templateRow.id))
+    .returning()
+  return row
+}
+
+/** Delete a template from Meta and remove the local row. */
+export async function deleteConnectionTemplate(
+  connection: WhatsAppConnectionRow,
+  templateRow: { id: string; name: string; metaTemplateId: string },
+) {
+  const accessToken = connectionAccessToken(connection)
+  await deleteMessageTemplate(
+    connection.wabaId,
+    accessToken,
+    templateRow.name,
+    templateRow.metaTemplateId,
+  )
+  await db.delete(whatsappTemplate).where(eq(whatsappTemplate.id, templateRow.id))
 }
 
 export async function syncWhatsAppTemplates(

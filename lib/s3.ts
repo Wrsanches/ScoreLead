@@ -37,7 +37,12 @@ export function extForMime(mime: string): string {
 }
 
 /** All image kinds we namespace in the bucket. */
-export type UploadKind = "business-logo" | "avatar" | "content-slide" | "lead-photo"
+export type UploadKind =
+  | "business-logo"
+  | "business-product"
+  | "avatar"
+  | "content-slide"
+  | "lead-photo"
 
 let client: S3Client | null = null
 
@@ -102,6 +107,8 @@ export function buildKey(
   switch (kind) {
     case "business-logo":
       return `business-logos/${ctx.userId}/${id}.${ctx.ext}`
+    case "business-product":
+      return `business-products/${ctx.userId}/${id}.${ctx.ext}`
     case "avatar":
       return `avatars/${ctx.userId}/${id}.${ctx.ext}`
     case "content-slide":

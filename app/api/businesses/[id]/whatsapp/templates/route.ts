@@ -1,62 +1,78 @@
 import { and, eq } from "drizzle-orm"
-import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappTemplate } from "@/lib/db/schema"
-import { getUserPlan } from "@/lib/plan"
 import {
-  getOwnedBusiness,
-  getWhatsAppConnection,
-  syncWhatsAppTemplates,
+  createConnectionTemplate,
+  listConnectionTemplates,
 } from "@/lib/whatsapp/data"
+import { MetaGraphError } from "@/lib/whatsapp/meta"
+import { scopeWhatsAppRoute } from "@/lib/whatsapp/route-scope"
+import { templateFormSchema } from "@/lib/whatsapp/template-form"
 
-async function scope(id: string) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }
-  if (!(await getOwnedBusiness(id, session.user.id))) {
-    return { error: NextResponse.json({ error: "Business not found" }, { status: 404 }) }
+/** Map a Meta Graph error to a client-facing response. */
+function metaErrorResponse(error: unknown) {
+  if (error instanceof MetaGraphError) {
+    // Surface Meta's own message; treat their 4xx as a 400 (bad template),
+    // anything else as an upstream failure.
+    const status = error.status >= 400 && error.status < 500 ? 400 : 502
+    return NextResponse.json({ error: error.message, code: error.code }, { status })
   }
-  if (await getUserPlan(session.user.id) !== "pro") {
-    return { error: NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 }) }
-  }
-  const connection = await getWhatsAppConnection(id)
-  if (!connection || connection.status !== "connected") {
-    return { error: NextResponse.json({ error: "WhatsApp is not connected" }, { status: 409 }) }
-  }
-  return { connection }
+  const message = error instanceof Error ? error.message : "Request failed"
+  return NextResponse.json({ error: message }, { status: 502 })
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const result = await scope(id)
-  if (result.error) return result.error
+  const scoped = await scopeWhatsAppRoute(id)
+  if ("error" in scoped) return scoped.error
+
+  // ?scope=all returns every template (management view); the default returns
+  // only the approved + supported templates the sending pipeline can use.
+  const scope = new URL(request.url).searchParams.get("scope")
+  if (scope === "all") {
+    const templates = await listConnectionTemplates(scoped.connection.id)
+    return NextResponse.json({ templates })
+  }
+
   const templates = await db
     .select()
     .from(whatsappTemplate)
-    .where(and(
-      eq(whatsappTemplate.connectionId, result.connection.id),
-      eq(whatsappTemplate.status, "APPROVED"),
-      eq(whatsappTemplate.supported, true),
-    ))
+    .where(
+      and(
+        eq(whatsappTemplate.connectionId, scoped.connection.id),
+        eq(whatsappTemplate.status, "APPROVED"),
+        eq(whatsappTemplate.supported, true),
+      ),
+    )
     .orderBy(whatsappTemplate.name, whatsappTemplate.language)
   return NextResponse.json({ templates })
 }
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const result = await scope(id)
-  if (result.error) return result.error
+  const scoped = await scopeWhatsAppRoute(id)
+  if ("error" in scoped) return scoped.error
+
+  const body = await request.json().catch(() => null)
+  const parsed = templateFormSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid template" },
+      { status: 400 },
+    )
+  }
+
   try {
-    return NextResponse.json({ templates: await syncWhatsAppTemplates(result.connection) })
+    const template = await createConnectionTemplate(scoped.connection, parsed.data)
+    return NextResponse.json({ template }, { status: 201 })
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Template sync failed"
-    return NextResponse.json({ error: message }, { status: 502 })
+    return metaErrorResponse(error)
   }
 }

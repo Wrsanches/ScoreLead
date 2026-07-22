@@ -16,6 +16,7 @@ import {
 
 const VALID_KINDS: UploadKind[] = [
   "business-logo",
+  "business-product",
   "avatar",
   "content-slide",
 ]

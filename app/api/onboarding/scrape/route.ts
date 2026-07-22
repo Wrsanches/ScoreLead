@@ -7,12 +7,63 @@ import { NextResponse } from "next/server"
 import { runOnboardingPipeline } from "@/lib/services/onboarding-pipeline"
 import { z } from "zod"
 
+/**
+ * Rejects non-http(s) URLs and any host that resolves to localhost, link-local,
+ * or a private IPv4 range. These URLs are currently fetched by a third-party
+ * scraper (Firecrawl), not this server, so this is defense-in-depth: it keeps a
+ * user from ever pointing the pipeline at internal infrastructure or the cloud
+ * metadata endpoint (169.254.169.254) if any code path later fetches them
+ * directly.
+ */
+function isSafePublicUrl(value: string): boolean {
+  let u: URL
+  try {
+    u = new URL(value)
+  } catch {
+    return false
+  }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return false
+  const host = u.hostname.toLowerCase()
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host === "0.0.0.0" ||
+    host === "::1" ||
+    host === "[::1]"
+  ) {
+    return false
+  }
+  const m = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+  if (m) {
+    const a = Number(m[1])
+    const b = Number(m[2])
+    if (
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168)
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+const safeUrl = z
+  .string()
+  .url()
+  .refine(isSafePublicUrl, "URL not allowed")
+  .optional()
+  .or(z.literal(""))
+
 const scrapeSchema = z.object({
-  website: z.string().url().optional().or(z.literal("")),
-  instagram: z.string().url().optional().or(z.literal("")),
-  facebook: z.string().url().optional().or(z.literal("")),
-  linkedin: z.string().url().optional().or(z.literal("")),
-  other: z.string().url().optional().or(z.literal("")),
+  website: safeUrl,
+  instagram: safeUrl,
+  facebook: safeUrl,
+  linkedin: safeUrl,
+  other: safeUrl,
   location: z.string().optional().or(z.literal("")),
 })
 

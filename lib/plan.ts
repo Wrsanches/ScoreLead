@@ -267,6 +267,100 @@ export async function recordUsage(
 }
 
 /**
+ * Atomically reserve `n` AI image credits BEFORE generation. This closes the
+ * check-then-record race that assertCanUse + recordUsage leave open: because
+ * generation takes several seconds between the check and the record,
+ * concurrent requests could each pass the cap check on a stale count and all
+ * generate. Here the check-and-increment runs under a per-user, transaction-
+ * scoped advisory lock, so concurrent reservations are serialized. The lock is
+ * held only for this short transaction, never across the slow generation.
+ *
+ * Throws PlanLimitError if the reservation would exceed the plan. Roll back any
+ * credits you reserved but didn't use (fewer images produced, or failure) with
+ * releaseImages.
+ */
+export async function reserveImages(userId: string, n = 1): Promise<void> {
+  if (n <= 0) return
+  const plan = await getUserPlan(userId)
+  const now = new Date()
+  const key = monthKey(now)
+  const today = dayKey(now)
+
+  await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtext(${`aiImage:${userId}`}))`,
+    )
+
+    const [row] = await tx.select().from(usage).where(eq(usage.userId, userId))
+    const u: UsageSnapshot = row
+      ? {
+          ...EMPTY_USAGE,
+          aiImages: row.aiImages,
+          aiImagesMonth: row.aiImagesMonth,
+          aiImagesMonthKey: row.aiImagesMonthKey,
+          aiImagesDay: row.aiImagesDay,
+          aiImagesDayKey: row.aiImagesDayKey,
+        }
+      : { ...EMPTY_USAGE }
+
+    if (
+      plan === "pro" &&
+      imagesUsedToday(plan, u) + n > PLAN_LIMITS.pro.aiImagesPerDay
+    ) {
+      throw new PlanLimitError("aiImage", plan, "daily")
+    }
+    if (imagesUsed(plan, u) + n > imagesCap(plan)) {
+      throw new PlanLimitError(
+        "aiImage",
+        plan,
+        plan === "pro" ? "monthly" : "lifetime",
+      )
+    }
+
+    await tx
+      .insert(usage)
+      .values({
+        userId,
+        aiImages: n,
+        aiImagesMonth: n,
+        aiImagesMonthKey: key,
+        aiImagesDay: n,
+        aiImagesDayKey: today,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: usage.userId,
+        set: {
+          aiImages: sql`${usage.aiImages} + ${n}`,
+          aiImagesMonth: sql`CASE WHEN ${usage.aiImagesMonthKey} = ${key} THEN ${usage.aiImagesMonth} + ${n} ELSE ${n} END`,
+          aiImagesMonthKey: key,
+          aiImagesDay: sql`CASE WHEN ${usage.aiImagesDayKey} = ${today} THEN ${usage.aiImagesDay} + ${n} ELSE ${n} END`,
+          aiImagesDayKey: today,
+          updatedAt: now,
+        },
+      })
+  })
+}
+
+/**
+ * Roll back `n` AI image credits reserved via reserveImages that were not used
+ * (generation failed, or produced fewer images than reserved). Best-effort;
+ * floors every counter at 0 so a rollback can never make usage negative.
+ */
+export async function releaseImages(userId: string, n = 1): Promise<void> {
+  if (n <= 0) return
+  await db
+    .update(usage)
+    .set({
+      aiImages: sql`GREATEST(${usage.aiImages} - ${n}, 0)`,
+      aiImagesMonth: sql`GREATEST(${usage.aiImagesMonth} - ${n}, 0)`,
+      aiImagesDay: sql`GREATEST(${usage.aiImagesDay} - ${n}, 0)`,
+      updatedAt: new Date(),
+    })
+    .where(eq(usage.userId, userId))
+}
+
+/**
  * How many Apollo enrichments this user may still run this month. Apollo is
  * Pro-only (Free returns 0), capped by a monthly fair-use budget. Call before
  * enriching and clamp the batch to the returned number; call recordApolloUsage

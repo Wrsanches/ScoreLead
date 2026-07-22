@@ -5,6 +5,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ZoomableImage } from "@/components/admin/zoomable-image";
 import { useSearchParams } from "next/navigation";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useSearch } from "@/components/search-overlay";
 import { useBusinessId } from "@/components/admin/business-context";
@@ -370,12 +371,34 @@ export default function LeadsPage() {
               ))}
             </div>
           ) : leads.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-              <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-1">No leads yet</p>
-              <p className="text-zinc-500 dark:text-zinc-600 text-xs">
-                Run a discovery job to find leads.
-              </p>
-            </div>
+            statusFilter !== "all" ? (
+              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
+                  No leads with this status
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter("all")}
+                  className="text-emerald-600 dark:text-emerald-400 hover:underline text-xs"
+                >
+                  Clear filter
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-1">No leads yet</p>
+                <p className="text-zinc-500 dark:text-zinc-600 text-xs">
+                  Run a discovery job to find leads.
+                </p>
+                <Link
+                  href={`/admin/business/${businessId}/discovery-jobs`}
+                  className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
+                >
+                  <Radar className="w-4 h-4" />
+                  Go to discovery jobs
+                </Link>
+              </div>
+            )
           ) : (
             <>
               {leads.map((l, i) => (
@@ -478,11 +501,34 @@ export default function LeadsPage() {
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-zinc-900/70 ring-1 ring-zinc-800">
                 <Users className="h-5 w-5 text-zinc-500" />
               </div>
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Select a lead</p>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-600">
-                Open a record from the list to review contact details, scoring,
-                and outreach.
-              </p>
+              {!isLoading && leads.length === 0 ? (
+                <>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    No leads yet
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-600">
+                    Run a discovery job to start finding and scoring leads for
+                    this business.
+                  </p>
+                  <Link
+                    href={`/admin/business/${businessId}/discovery-jobs`}
+                    className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Radar className="w-4 h-4" />
+                    Go to discovery jobs
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Select a lead
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-600">
+                    Open a record from the list to review contact details,
+                    scoring, and outreach.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         ) : (

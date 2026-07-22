@@ -176,6 +176,13 @@
       "when": 1784077583824,
       "tag": "0024_youthful_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784728608124,
+      "tag": "0025_spicy_skaar",
+      "breakpoints": true
     }
   ]
 }
