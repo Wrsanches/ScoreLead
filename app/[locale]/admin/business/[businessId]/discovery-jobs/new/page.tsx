@@ -29,7 +29,7 @@ export default function NewDiscoveryJobPage() {
   const savedSearchId = searchParams.get("savedSearchId")
   // The business is fixed by the URL - this form always creates a job under it.
   const businessId = useBusinessId()
-  const { openUpgrade } = usePlan()
+  const { openUpgrade, isPro, loading: planLoading } = usePlan()
 
   // Form state
   const [jobName, setJobName] = useState("")
@@ -199,6 +199,15 @@ export default function NewDiscoveryJobPage() {
       setKeywords(keywords.slice(0, -1))
     }
   }
+
+  // Free plans are capped at 10 leads per run and only get the 10 option;
+  // Pro unlocks the larger batches.
+  const isFreePlan = !planLoading && !isPro
+  const batchOptions = isFreePlan ? [10] : [10, 20, 50]
+
+  useEffect(() => {
+    if (isFreePlan) setBatchSize(10)
+  }, [isFreePlan])
 
   const canSubmit = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting
   const canSave = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting && !savingSearch
@@ -441,7 +450,7 @@ export default function NewDiscoveryJobPage() {
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Leads per run</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {[10, 20, 50].map((n) => (
+                  {batchOptions.map((n) => (
                     <button
                       key={n}
                       type="button"
@@ -456,9 +465,20 @@ export default function NewDiscoveryJobPage() {
                       {n}
                     </button>
                   ))}
+                  {isFreePlan && (
+                    <button
+                      type="button"
+                      onClick={openUpgrade}
+                      className="h-10 px-4 text-sm font-medium rounded-xl border border-dashed border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                    >
+                      Upgrade for more
+                    </button>
+                  )}
                 </div>
                 <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">
-                  Each run finds up to this many new leads. On Pro you can continue the job to discover more in the same area.
+                  {isFreePlan
+                    ? "Free plan finds up to 10 leads per job. Upgrade to Pro for larger batches and to continue jobs in the same area."
+                    : "Each run finds up to this many new leads. On Pro you can continue the job to discover more in the same area."}
                 </p>
               </div>
 

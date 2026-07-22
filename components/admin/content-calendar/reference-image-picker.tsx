@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import type { ProductImage, ReferenceImagePref } from "@/lib/product-images";
 import { microLabelClass } from "./post-sheet/shared";
 
@@ -117,26 +122,53 @@ export function ReferenceImagePicker({
         {images.map((img) => {
           const active = selectedId === img.id;
           return (
-            <button
-              key={img.id}
-              type="button"
-              onClick={() => updatePref({ mode: "specific", imageId: img.id })}
-              title={img.description || undefined}
-              className={`relative shrink-0 w-11 h-11 rounded-lg overflow-hidden border-2 transition-all ${
-                active
-                  ? "border-emerald-500"
-                  : "border-transparent ring-1 ring-zinc-200 dark:ring-zinc-800 hover:ring-zinc-400 dark:hover:ring-zinc-600 opacity-80 hover:opacity-100"
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.description || ""}
-                fill
-                className="object-cover"
-                sizes="44px"
-                unoptimized
-              />
-            </button>
+            <HoverCard key={img.id} openDelay={120} closeDelay={60}>
+              <HoverCardTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => updatePref({ mode: "specific", imageId: img.id })}
+                  className={`relative shrink-0 w-11 h-11 rounded-lg overflow-hidden border-2 bg-zinc-100 dark:bg-zinc-900 transition-all ${
+                    active
+                      ? "border-emerald-500"
+                      : "border-transparent ring-1 ring-zinc-200 dark:ring-zinc-800 hover:ring-zinc-400 dark:hover:ring-zinc-600 opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  <Image
+                    src={img.url}
+                    alt={img.description || ""}
+                    fill
+                    className="object-contain"
+                    sizes="44px"
+                    unoptimized
+                  />
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent
+                side="top"
+                align="start"
+                className="w-60 p-2 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+              >
+                <div className="relative w-full h-56 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                  <Image
+                    src={img.url}
+                    alt={img.description || ""}
+                    fill
+                    className="object-contain"
+                    sizes="240px"
+                    unoptimized
+                  />
+                </div>
+                {img.description.trim() ? (
+                  <p className="mt-2 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    {img.description}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-[11px] italic text-zinc-400 dark:text-zinc-600">
+                    {t("referenceNoDescription")}
+                  </p>
+                )}
+              </HoverCardContent>
+            </HoverCard>
           );
         })}
       </div>

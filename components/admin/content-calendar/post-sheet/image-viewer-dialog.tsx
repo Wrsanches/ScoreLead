@@ -33,7 +33,10 @@ export function ImageViewerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 max-w-3xl">
+      <DialogContent
+        showCloseButton={false}
+        className="p-0 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 max-w-3xl"
+      >
         <VisuallyHidden.Root>
           <DialogTitle>{currentImage?.headline || t("postImage")}</DialogTitle>
           <DialogDescription>{t("imageHint")}</DialogDescription>

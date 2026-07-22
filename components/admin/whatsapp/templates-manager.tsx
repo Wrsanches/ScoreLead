@@ -303,6 +303,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
       : ""
 
   return (
+    <div className="flex-1 overflow-y-auto">
     <ContentWrapper>
       <PageHeader
         variant="hero"
@@ -378,11 +379,12 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
                   <p className="mt-1.5 text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
                     {bodyOf(row)}
                   </p>
-                  {row.rejectionReason && (
-                    <p className="mt-1.5 text-[11px] text-red-600 dark:text-red-400">
-                      {t("tplRejectedReason", { reason: row.rejectionReason })}
-                    </p>
-                  )}
+                  {row.rejectionReason &&
+                    row.rejectionReason.toUpperCase() !== "NONE" && (
+                      <p className="mt-1.5 text-[11px] text-red-600 dark:text-red-400">
+                        {t("tplRejectedReason", { reason: row.rejectionReason })}
+                      </p>
+                    )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
@@ -676,5 +678,6 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
         </AlertDialogContent>
       </AlertDialog>
     </ContentWrapper>
+    </div>
   )
 }

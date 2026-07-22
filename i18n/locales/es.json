@@ -262,7 +262,8 @@
     "leadsFound": "leads encontrados",
     "jobCreated": "Creado",
     "businessPage": "Negocio",
-    "integrations": "Integraciones"
+    "integrations": "Integraciones",
+    "support": "Soporte"
   },
   "settings": {
     "title": "Configuración",
@@ -325,7 +326,27 @@
     "deleteAccountConfirmPlaceholder": "Escribe tu correo",
     "deleteAccountConfirm": "Sí, eliminar mi cuenta",
     "deleteAccountCancel": "Cancelar",
-    "deleteAccountFailed": "No se pudo eliminar la cuenta"
+    "deleteAccountFailed": "No se pudo eliminar la cuenta",
+    "support": "Soporte",
+    "supportDescription": "Necesitas ayuda? Envianos un mensaje y te responderemos.",
+    "supportEmailLabel": "Escribenos directamente",
+    "supportSubject": "Asunto",
+    "supportSubjectPlaceholder": "En que podemos ayudarte?",
+    "supportMessage": "Mensaje",
+    "supportMessagePlaceholder": "Describe tu problema o pregunta en detalle...",
+    "supportReplyTo": "Responderemos a {email}",
+    "supportSend": "Enviar mensaje",
+    "supportSending": "Enviando...",
+    "supportSent": "Mensaje enviado - te contactaremos pronto.",
+    "supportFailed": "No se pudo enviar tu mensaje. Intenta de nuevo o escribenos directamente.",
+    "supportFormTitle": "Envianos un mensaje",
+    "supportTopicsLabel": "De que se trata?",
+    "supportTopicBilling": "Facturacion y planes",
+    "supportTopicBug": "Algo no funciona",
+    "supportTopicFeature": "Sugerencia de funcion",
+    "supportTopicOther": "Otra cosa",
+    "supportResponseTitle": "Tiempo de respuesta",
+    "supportResponseBody": "Normalmente respondemos en un dia habil."
   },
   "business": {
     "title": "Negocio",
@@ -384,7 +405,8 @@
     "addProductImage": "Agregar imagen",
     "removeProductImage": "Quitar imagen",
     "productImagesMax": "Maximo de 6 imagenes",
-    "productImageDescribeNudge": "Agrega una descripcion para que la IA sepa cuando usarla"
+    "productImageDescribeNudge": "Agrega una descripcion para que la IA sepa cuando usarla",
+    "productImagesEmpty": "Aun no hay imagenes de producto"
   },
   "outreach": {
     "title": "Mensajes de acercamiento",
@@ -458,7 +480,7 @@
     "saveError": "No se pudieron guardar las protecciones de envío",
     "savedToast": "Protecciones de envío guardadas",
     "approvedTemplates": "Plantillas aprobadas",
-    "templateHelp": "Crea plantillas de Marketing en el Administrador de WhatsApp y sincronízalas aquí.",
+    "templateHelp": "Solo las plantillas de Marketing aprobadas con formato compatible pueden enviarse en mensajes automatizados; las de Utilidad o con botones/medios no compatibles siguen contando como aprobadas.",
     "syncTemplates": "Sincronizar plantillas",
     "syncError": "No se pudieron sincronizar las plantillas",
     "syncToast": "{count} plantillas aprobadas sincronizadas",
@@ -563,7 +585,18 @@
     "tplRejectedReason": "Rechazada: {reason}",
     "tplEditPendingBlocked": "Las plantillas en revision aun no se pueden editar",
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "templatesSendable": "{count} utilizables en mensajes automatizados",
+    "sendNowTitle": "Enviar un solo mensaje",
+    "sendNowDescription": "Envia una plantilla aprobada ahora. Respeta tu ventana de envio y limite diario.",
+    "sendNowButton": "Enviar ahora",
+    "sending": "Enviando...",
+    "sendNowCancel": "Cancelar",
+    "sendNowConfirmTitle": "Enviar este mensaje?",
+    "sendNowConfirmBody": "Enviar \"{template}\" a {phone}? Saldra dentro de tu ventana de envio y limite diario.",
+    "sendNowQueued": "Mensaje en cola - se enviara dentro de tu ventana de envio y limite diario.",
+    "sendNowError": "No se pudo enviar el mensaje.",
+    "orScheduleSequence": "o programa una secuencia"
   },
   "waitlist": {
     "badge": "Habla con nosotros",
@@ -959,6 +992,13 @@
     "referenceImage": "Referencia de producto",
     "referenceAuto": "Auto",
     "referenceNone": "Ninguna",
-    "referenceImageHint": "Que foto de producto debe usar la IA como referencia para la imagen de esta publicacion."
+    "referenceImageHint": "Que foto de producto debe usar la IA como referencia para la imagen de esta publicacion.",
+    "statusLabel": "Estado",
+    "previewImageEmpty": "Genera una imagen para verla aqui",
+    "previewCaptionEmpty": "Escribe una leyenda para verla aqui",
+    "previewMore": "mas",
+    "previewLess": "menos",
+    "previewScheduledFor": "Programado para {date}",
+    "referenceNoDescription": "Sin descripcion"
   }
 }

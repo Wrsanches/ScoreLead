@@ -15,6 +15,7 @@ import {
   X,
   User,
   LogOut,
+  LifeBuoy,
   Settings,
   Building2,
   Check,
@@ -499,6 +500,15 @@ export function AdminSidebar({
               <Link href="/admin/settings">
                 <Settings className="w-4 h-4" />
                 {t("settings")}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              asChild
+              className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
+            >
+              <Link href="/admin/support">
+                <LifeBuoy className="w-4 h-4" />
+                {t("support")}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />

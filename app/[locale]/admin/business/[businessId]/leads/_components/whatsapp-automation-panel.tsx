@@ -21,6 +21,16 @@ import { Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { usePlan } from "@/components/admin/plan-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
@@ -115,11 +125,21 @@ export function WhatsAppAutomationPanel({
   const [previewing, setPreviewing] = useState(false)
   const [approving, setApproving] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const [sendTemplateId, setSendTemplateId] = useState("")
+  const [sending, setSending] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const activeSequence = useMemo(
     () => sequences.find((sequence) => ["draft", "scheduled", "paused"].includes(sequence.status)) ?? null,
     [sequences],
   )
+
+  const sendNowTemplate = useMemo(
+    () => templates.find((tpl) => tpl.id === sendTemplateId) ?? null,
+    [templates, sendTemplateId],
+  )
+  const sendNowBody =
+    sendNowTemplate?.components.find((c) => c.type.toUpperCase() === "BODY")?.text ?? ""
 
   const load = useCallback(async (quiet = false) => {
     if (!integrationEnabled) {
@@ -259,6 +279,28 @@ export function WhatsAppAutomationPanel({
       toast.error(error instanceof Error ? error.message : t("cancelSequenceError"))
     } finally {
       setCancelling(false)
+    }
+  }
+
+  async function sendNow() {
+    if (!sendTemplateId) return
+    setSending(true)
+    try {
+      const response = await fetch(`/api/leads/${leadId}/whatsapp/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ templateId: sendTemplateId }),
+      })
+      const body = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(body.error || t("sendNowError"))
+      setConfirmOpen(false)
+      setSendTemplateId("")
+      await load(true)
+      toast.success(t("sendNowQueued"))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("sendNowError"))
+    } finally {
+      setSending(false)
     }
   }
 
@@ -404,7 +446,47 @@ export function WhatsAppAutomationPanel({
           </Button>
         </Notice>
       ) : (
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 space-y-6">
+          {/* Send a single message now */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Send className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h4 className="text-sm font-medium text-zinc-900 dark:text-white">{t("sendNowTitle")}</h4>
+            </div>
+            <p className="text-xs text-zinc-500 mb-3">{t("sendNowDescription")}</p>
+            <select
+              value={sendTemplateId}
+              onChange={(event) => setSendTemplateId(event.target.value)}
+              className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+            >
+              <option value="">{t("chooseTemplate")}</option>
+              {templates.map((template) => (
+                <option key={template.id} value={template.id}>{template.name} · {template.language}</option>
+              ))}
+            </select>
+            {sendNowBody && (
+              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+                {sendNowBody}
+              </p>
+            )}
+            <Button
+              size="sm"
+              className="mt-3"
+              onClick={() => setConfirmOpen(true)}
+              disabled={!sendTemplateId || sending}
+            >
+              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {sending ? t("sending") : t("sendNowButton")}
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            {t("orScheduleSequence")}
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+
+          <div className="space-y-3">
           {draftSteps.map((step, index) => (
             <div key={index} className="grid gap-3 border-b border-zinc-200 py-4 first:pt-0 last:border-0 dark:border-zinc-800 sm:grid-cols-[2rem_minmax(0,1fr)_6rem_7rem] sm:items-end">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
@@ -452,6 +534,34 @@ export function WhatsAppAutomationPanel({
             {previewing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarClock className="h-4 w-4" />}
             {previewing ? t("creatingPreview") : t("previewSequence")}
           </Button>
+          </div>
+
+          <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("sendNowConfirmTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("sendNowConfirmBody", {
+                    template: sendNowTemplate?.name ?? "",
+                    phone: consent?.phoneE164 ?? "",
+                  })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("sendNowCancel")}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(event) => {
+                    event.preventDefault()
+                    sendNow()
+                  }}
+                  disabled={sending}
+                >
+                  {sending && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {t("sendNowButton")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </section>

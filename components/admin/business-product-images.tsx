@@ -88,7 +88,7 @@ export function BusinessProductImages({
                 src={img.url}
                 alt={img.description || ""}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="160px"
                 unoptimized
               />

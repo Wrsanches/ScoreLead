@@ -29,7 +29,7 @@ export const PLAN_LIMITS = {
     outreachMessages: 3,
     contentPlans: 1,
     aiImages: 1, // lifetime
-    freeLeadsPerJob: 25,
+    freeLeadsPerJob: 10,
   },
   pro: {
     businesses: Infinity,

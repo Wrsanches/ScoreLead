@@ -15,6 +15,7 @@ import {
   Target,
   Pencil,
   ExternalLink,
+  ImageIcon,
   RefreshCw,
   AlertCircle,
 } from "lucide-react"
@@ -115,6 +116,21 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
         {label}
       </p>
       <div className="text-sm text-zinc-800 dark:text-zinc-200">{children}</div>
+    </div>
+  )
+}
+
+function ChipList({ items }: { items: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <span
+          key={item}
+          className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-lg"
+        >
+          {item}
+        </span>
+      ))}
     </div>
   )
 }
@@ -270,6 +286,8 @@ export default function BusinessDetailPage({
     .toUpperCase()
 
   const tags = parseTags(data?.tags || null)
+  const servicesList = parseTags(data?.services || null)
+  const competitorsList = parseTags(data?.competitors || null)
   const hasBrandColors = !!(data?.brandColors && data.brandColors.length > 0)
   const hasBrandFonts = !!(data?.brandFonts && data.brandFonts.length > 0)
   const hasBrandStyle = !!data?.brandStyle
@@ -482,6 +500,75 @@ export default function BusinessDetailPage({
                 )}
               </SectionCard>
 
+              {/* Product images */}
+              <SectionCard
+                title={t("groupProductImages")}
+                actions={
+                  data.productImages && data.productImages.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setEditOpen(true)}
+                      className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors px-2.5 py-1.5 rounded-md hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      {t("edit")}
+                    </button>
+                  ) : undefined
+                }
+              >
+                {data.productImages && data.productImages.length > 0 ? (
+                  <div className="space-y-4">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-600 leading-relaxed">
+                      {t("productImagesHint")}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {data.productImages.map((img) => (
+                        <div
+                          key={img.id}
+                          className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 overflow-hidden"
+                        >
+                          <div className="relative aspect-square bg-zinc-100 dark:bg-zinc-900">
+                            <Image
+                              src={img.url}
+                              alt={img.description || ""}
+                              fill
+                              sizes="200px"
+                              className="object-contain"
+                              unoptimized
+                            />
+                          </div>
+                          {img.description.trim() && (
+                            <p className="px-2.5 py-2 text-[11px] text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                              {img.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center mb-3">
+                      <ImageIcon className="w-5 h-5 text-zinc-500 dark:text-zinc-600" />
+                    </div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      {t("productImagesEmpty")}
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1 max-w-sm">
+                      {t("productImagesHint")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setEditOpen(true)}
+                      className="mt-4 inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-lg transition-colors"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      {t("addProductImage")}
+                    </button>
+                  </div>
+                )}
+              </SectionCard>
+
               {/* Links */}
               {socials.length > 0 && (
                 <SectionCard title={t("links")}>
@@ -494,14 +581,15 @@ export default function BusinessDetailPage({
               )}
 
               {/* Discovery */}
-              {(data.services || data.serviceArea || data.competitors || (data.suggestedKeywords && data.suggestedKeywords.length > 0)) && (
+              {(servicesList.length > 0 ||
+                data.serviceArea ||
+                competitorsList.length > 0 ||
+                (data.suggestedKeywords && data.suggestedKeywords.length > 0)) && (
                 <SectionCard title={t("discovery")}>
                   <div className="space-y-4">
-                    {data.services && (
+                    {servicesList.length > 0 && (
                       <Field label={t("services")}>
-                        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
-                          {data.services}
-                        </p>
+                        <ChipList items={servicesList} />
                       </Field>
                     )}
                     {data.serviceArea && (
@@ -509,25 +597,14 @@ export default function BusinessDetailPage({
                         <p className="text-sm text-zinc-700 dark:text-zinc-300">{data.serviceArea}</p>
                       </Field>
                     )}
-                    {data.competitors && (
+                    {competitorsList.length > 0 && (
                       <Field label={t("competitors")}>
-                        <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
-                          {data.competitors}
-                        </p>
+                        <ChipList items={competitorsList} />
                       </Field>
                     )}
                     {data.suggestedKeywords && data.suggestedKeywords.length > 0 && (
                       <Field label={t("suggestedKeywords")}>
-                        <div className="flex flex-wrap gap-2">
-                          {data.suggestedKeywords.map((kw) => (
-                            <span
-                              key={kw}
-                              className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-lg"
-                            >
-                              {kw}
-                            </span>
-                          ))}
-                        </div>
+                        <ChipList items={data.suggestedKeywords} />
                       </Field>
                     )}
                   </div>

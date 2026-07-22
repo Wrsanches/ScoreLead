@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Check, AlertCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { TagsInput } from "@/components/admin/tags-input";
 import { PILLARS, POST_TYPES, getPillar } from "@/lib/content-pillars";
@@ -29,9 +29,7 @@ function FieldLabel({
   className?: string;
 }) {
   return (
-    <label className={`block ${microLabelClass} ${className}`}>
-      {children}
-    </label>
+    <label className={`block ${microLabelClass} ${className}`}>{children}</label>
   );
 }
 
@@ -48,11 +46,17 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
 
   const hookLine = values.caption.split("\n")[0] ?? "";
   const hookLen = hookLine.length;
-  const hookGood = hookLen > 0 && hookLen <= 80;
+  const hookPct = Math.min((hookLen / 80) * 100, 100);
+  const hookColor =
+    hookLen === 0
+      ? "bg-zinc-300 dark:bg-zinc-700"
+      : hookLen <= 80
+        ? "bg-emerald-500"
+        : "bg-amber-500";
   const pillarMeta = getPillar(values.pillar);
 
-  // Reel is no longer offered (static images only), but legacy posts may
-  // still carry it - keep it selectable only while it is the current value.
+  // Reel is no longer offered (static images only) but legacy posts may carry
+  // it - keep it selectable only while it is the current value.
   const postTypes =
     values.postType === "reel"
       ? [...POST_TYPES, { key: "reel" as const, label: "Reel" }]
@@ -62,11 +66,11 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
     <div className="space-y-5">
       <SectionTitle>{t("sectionPost")}</SectionTitle>
 
-      {/* Post type */}
+      {/* Post type - segmented control */}
       <div>
         <FieldLabel className="mb-2">{t("postTypeLabel")}</FieldLabel>
         <div
-          className={`grid gap-1.5 ${postTypes.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}
+          className={`grid gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 ${postTypes.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}
         >
           {postTypes.map((pt) => {
             const Icon = POST_TYPE_ICON[pt.key];
@@ -76,10 +80,10 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
                 key={pt.key}
                 type="button"
                 onClick={() => onChange({ postType: pt.key })}
-                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border transition-all duration-150 ${
+                className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all duration-150 ${
                   active
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                    : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    ? "bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white"
+                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -115,9 +119,7 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
                   key={p.key}
                   type="button"
                   onClick={() =>
-                    onChange({
-                      pillar: values.pillar === p.key ? null : p.key,
-                    })
+                    onChange({ pillar: values.pillar === p.key ? null : p.key })
                   }
                   title={p.label}
                   className={`h-10 rounded-lg border flex items-center justify-center transition-all duration-150 ${
@@ -160,32 +162,36 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
         <textarea
           value={values.caption}
           onChange={(e) => onChange({ caption: e.target.value.slice(0, 2200) })}
-          rows={8}
+          rows={7}
           className={`${fieldClass} py-3 resize-none`}
           placeholder={
             "Hook that stops the scroll...\n\nYour value or story\n\nSave this if it helped"
           }
         />
-        <div className="mt-1.5 flex items-center gap-1.5 text-[10px]">
-          {hookGood ? (
-            <>
-              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-emerald-600 dark:text-emerald-400">
-                {t("hookGood")} ({hookLen}/80)
-              </span>
-            </>
-          ) : hookLen > 80 ? (
-            <>
-              <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-              <span className="text-amber-600 dark:text-amber-400">
-                {t("hookTooLong")} ({hookLen}/80)
-              </span>
-            </>
-          ) : (
-            <span className="text-zinc-500 dark:text-zinc-600">
-              {t("captionHint")}
-            </span>
-          )}
+        {/* Live hook-strength meter (first line is the scroll-stopping hook) */}
+        <div className="mt-2">
+          <div className="h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-200 ${hookColor}`}
+              style={{ width: `${hookPct}%` }}
+            />
+          </div>
+          <p
+            className={`mt-1 text-[10px] flex items-center gap-1 ${
+              hookLen === 0
+                ? "text-zinc-500 dark:text-zinc-600"
+                : hookLen <= 80
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-amber-600 dark:text-amber-400"
+            }`}
+          >
+            {hookLen > 0 && hookLen <= 80 && <Check className="w-3 h-3" />}
+            {hookLen === 0
+              ? t("captionHint")
+              : hookLen <= 80
+                ? `${t("hookGood")} (${hookLen}/80)`
+                : `${t("hookTooLong")} (${hookLen}/80)`}
+          </p>
         </div>
       </div>
 
@@ -202,8 +208,8 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
           maxTags={15}
           stripHashPrefix
           inputClassName={fieldClass}
-          chipClassName="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300/50 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium"
-          chipRemoveClassName="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+          chipClassName="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-300 text-[11px] font-medium"
+          chipRemoveClassName="text-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors"
         />
         <p className="text-[10px] text-zinc-500 dark:text-zinc-600 mt-1.5">
           {t("hashtagsHint")}
@@ -216,7 +222,7 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
         <textarea
           value={values.visualIdea}
           onChange={(e) => onChange({ visualIdea: e.target.value })}
-          rows={4}
+          rows={3}
           className={`${fieldClass} py-3 resize-none`}
           placeholder={t("visualIdeaHint")}
         />
@@ -234,29 +240,32 @@ export function PostFormFields({ values, onChange }: PostFormFieldsProps) {
         />
       </div>
 
-      {/* Status toggle */}
-      <button
-        type="button"
-        onClick={() =>
-          onChange({
-            status: values.status === "approved" ? "draft" : "approved",
-          })
-        }
-        className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold transition-all duration-150 ${
-          values.status === "approved"
-            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-            : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-        }`}
-      >
-        {values.status === "approved" ? (
-          <>
-            <Check className="w-3.5 h-3.5" />
-            {t("statusApproved")}
-          </>
-        ) : (
-          t("statusDraft")
-        )}
-      </button>
+      {/* Status - segmented control */}
+      <div>
+        <FieldLabel className="mb-2">{t("statusLabel")}</FieldLabel>
+        <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
+          {(["draft", "approved"] as const).map((status) => {
+            const active = values.status === status;
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => onChange({ status })}
+                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                  active
+                    ? status === "approved"
+                      ? "bg-emerald-500 text-zinc-950 shadow-sm"
+                      : "bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white"
+                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                }`}
+              >
+                {status === "approved" && active && <Check className="w-3.5 h-3.5" />}
+                {status === "approved" ? t("statusApproved") : t("statusDraft")}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

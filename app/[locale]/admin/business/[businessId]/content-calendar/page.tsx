@@ -495,6 +495,7 @@ export default function ContentCalendarPage() {
       <PostSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
+        businessId={businessId}
         post={editingPost}
         draftDate={draftDate}
         onSave={handleSave}

@@ -96,11 +96,32 @@ export default function IntegrationsPage({
   const [saving, setSaving] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [templateCount, setTemplateCount] = useState(0)
+  const [sendableCount, setSendableCount] = useState(0)
   const [disconnectOpen, setDisconnectOpen] = useState(false)
   const signupConfig = useRef<SignupConfig | null>(null)
   const signupCode = useRef<string | null>(null)
   const signupResult = useRef<SignupResult | null>(null)
   const completing = useRef(false)
+
+  // Pull every template so we can show the accurate approved total (matching
+  // the manage-templates page) alongside how many are actually sendable in
+  // sequences (approved + supported marketing).
+  const refreshTemplateCounts = useCallback(async () => {
+    const res = await fetch(
+      `/api/businesses/${businessId}/whatsapp/templates?scope=all`,
+    )
+    if (!res.ok) return
+    const body = await res.json()
+    const templates = (body.templates ?? []) as Array<{
+      status: string
+      supported: boolean
+    }>
+    const approved = templates.filter(
+      (tpl) => tpl.status?.toUpperCase() === "APPROVED",
+    )
+    setTemplateCount(approved.length)
+    setSendableCount(approved.filter((tpl) => tpl.supported).length)
+  }, [businessId])
 
   const load = useCallback(async () => {
     if (!integrationEnabled) {
@@ -115,18 +136,14 @@ export default function IntegrationsPage({
       if (!response.ok) throw new Error(body.error || t("loadError"))
       setConnection(body.connection)
       if (body.connection?.status === "connected" && isPro) {
-        const templates = await fetch(`/api/businesses/${businessId}/whatsapp/templates`)
-        if (templates.ok) {
-          const templateBody = await templates.json()
-          setTemplateCount(templateBody.templates?.length ?? 0)
-        }
+        await refreshTemplateCounts()
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("loadError"))
     } finally {
       setLoading(false)
     }
-  }, [businessId, integrationEnabled, isPro, t])
+  }, [businessId, integrationEnabled, isPro, t, refreshTemplateCounts])
 
   useEffect(() => {
     load()
@@ -156,8 +173,7 @@ export default function IntegrationsPage({
       toast.success(t("connectedToast"))
       const sync = await fetch(`/api/businesses/${businessId}/whatsapp/templates/sync`, { method: "POST" })
       if (sync.ok) {
-        const syncBody = await sync.json()
-        setTemplateCount(syncBody.templates?.length ?? 0)
+        await refreshTemplateCounts()
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("connectError"))
@@ -168,7 +184,7 @@ export default function IntegrationsPage({
       signupCode.current = null
       signupResult.current = null
     }
-  }, [businessId, t])
+  }, [businessId, t, refreshTemplateCounts])
 
   useEffect(() => {
     if (!integrationEnabled) return
@@ -293,7 +309,7 @@ export default function IntegrationsPage({
       const response = await fetch(`/api/businesses/${businessId}/whatsapp/templates/sync`, { method: "POST" })
       const body = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(body.error || t("syncError"))
-      setTemplateCount(body.templates?.length ?? 0)
+      await refreshTemplateCounts()
       setConnection((current) => current ? { ...current, lastTemplateSyncAt: new Date().toISOString() } : current)
       toast.success(t("syncToast", { count: body.templates?.length ?? 0 }))
     } catch (error) {
@@ -312,6 +328,7 @@ export default function IntegrationsPage({
       }
       setConnection(null)
       setTemplateCount(0)
+      setSendableCount(0)
       toast.success(t("disconnectedToast"))
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("disconnectError"))
@@ -504,6 +521,7 @@ export default function IntegrationsPage({
               <aside className="border-t border-zinc-200 pt-6 dark:border-zinc-800 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("approvedTemplates")}</p>
                 <p className="mt-2 text-3xl font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">{templateCount}</p>
+                <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{t("templatesSendable", { count: sendableCount })}</p>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">{t("templateHelp")}</p>
                 <Button asChild className="mt-5 w-full">
                   <Link href={`/admin/business/${businessId}/integrations/whatsapp-templates`}>

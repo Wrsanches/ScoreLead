@@ -262,7 +262,8 @@
     "leadsFound": "leads found",
     "jobCreated": "Created",
     "businessPage": "Business",
-    "integrations": "Integrations"
+    "integrations": "Integrations",
+    "support": "Support"
   },
   "settings": {
     "title": "Settings",
@@ -325,7 +326,27 @@
     "deleteAccountConfirmPlaceholder": "Type your email",
     "deleteAccountConfirm": "Yes, delete my account",
     "deleteAccountCancel": "Cancel",
-    "deleteAccountFailed": "Could not delete account"
+    "deleteAccountFailed": "Could not delete account",
+    "support": "Support",
+    "supportDescription": "Need a hand? Send us a message and we'll get back to you.",
+    "supportEmailLabel": "Email us directly",
+    "supportSubject": "Subject",
+    "supportSubjectPlaceholder": "How can we help?",
+    "supportMessage": "Message",
+    "supportMessagePlaceholder": "Describe your issue or question in detail...",
+    "supportReplyTo": "We'll reply to {email}",
+    "supportSend": "Send message",
+    "supportSending": "Sending...",
+    "supportSent": "Message sent - we'll be in touch soon.",
+    "supportFailed": "Could not send your message. Try again or email us directly.",
+    "supportFormTitle": "Send us a message",
+    "supportTopicsLabel": "What's this about?",
+    "supportTopicBilling": "Billing & plans",
+    "supportTopicBug": "Something's broken",
+    "supportTopicFeature": "Feature request",
+    "supportTopicOther": "Something else",
+    "supportResponseTitle": "Response time",
+    "supportResponseBody": "We usually reply within one business day."
   },
   "business": {
     "title": "Business",
@@ -384,7 +405,8 @@
     "addProductImage": "Add image",
     "removeProductImage": "Remove image",
     "productImagesMax": "Maximum of 6 images",
-    "productImageDescribeNudge": "Add a description so AI knows when to use it"
+    "productImageDescribeNudge": "Add a description so AI knows when to use it",
+    "productImagesEmpty": "No product images yet"
   },
   "outreach": {
     "title": "Outreach messages",
@@ -458,7 +480,7 @@
     "saveError": "Could not save sending guardrails",
     "savedToast": "Sending guardrails saved",
     "approvedTemplates": "Approved templates",
-    "templateHelp": "Create Marketing templates in WhatsApp Manager, then sync them here.",
+    "templateHelp": "Only approved Marketing templates with supported formatting can be sent in automated outreach - Utility templates and ones with unsupported buttons or media still count as approved.",
     "syncTemplates": "Sync templates",
     "syncError": "Could not sync templates",
     "syncToast": "{count} approved templates synced",
@@ -563,7 +585,18 @@
     "tplRejectedReason": "Rejected: {reason}",
     "tplEditPendingBlocked": "Templates under review can't be edited yet",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "templatesSendable": "{count} usable in automated outreach",
+    "sendNowTitle": "Send a single message",
+    "sendNowDescription": "Send one approved template now. It respects your send window and daily limit.",
+    "sendNowButton": "Send now",
+    "sending": "Sending...",
+    "sendNowCancel": "Cancel",
+    "sendNowConfirmTitle": "Send this message?",
+    "sendNowConfirmBody": "Send \"{template}\" to {phone}? It will go out within your send window and daily limit.",
+    "sendNowQueued": "Message queued - it'll send within your send window and daily limit.",
+    "sendNowError": "Could not send the message.",
+    "orScheduleSequence": "or schedule a sequence"
   },
   "waitlist": {
     "badge": "Talk to us",
@@ -959,6 +992,13 @@
     "referenceImage": "Product reference",
     "referenceAuto": "Auto",
     "referenceNone": "None",
-    "referenceImageHint": "Which product photo AI should reference for this post's image."
+    "referenceImageHint": "Which product photo AI should reference for this post's image.",
+    "statusLabel": "Status",
+    "previewImageEmpty": "Generate an image to see it here",
+    "previewCaptionEmpty": "Write a caption to see it here",
+    "previewMore": "more",
+    "previewLess": "less",
+    "previewScheduledFor": "Scheduled for {date}",
+    "referenceNoDescription": "No description added"
   }
 }
