@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete"
+import usePlacesAutocomplete from "use-places-autocomplete"
 import { MapPin } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 
