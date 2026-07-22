@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { usePlan } from "@/components/admin/plan-context"
+import { authClient } from "@/lib/auth-client"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 
 type Consent = {
   id: string
@@ -90,6 +92,10 @@ export function WhatsAppAutomationPanel({
 }) {
   const t = useTranslations("whatsapp")
   const { isPro, openUpgrade } = usePlan()
+  const { data: session } = authClient.useSession()
+  const integrationEnabled =
+    process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
+    hasWhatsAppEarlyAccess(session?.user.email)
   const [loading, setLoading] = useState(true)
   const [connected, setConnected] = useState(false)
   const [consent, setConsent] = useState<Consent | null>(null)
@@ -116,6 +122,10 @@ export function WhatsAppAutomationPanel({
   )
 
   const load = useCallback(async (quiet = false) => {
+    if (!integrationEnabled) {
+      if (!quiet) setLoading(false)
+      return
+    }
     try {
       const [connectionResponse, consentResponse, sequenceResponse] = await Promise.all([
         fetch(`/api/businesses/${businessId}/whatsapp/connection`),
@@ -141,7 +151,7 @@ export function WhatsAppAutomationPanel({
     } finally {
       if (!quiet) setLoading(false)
     }
-  }, [businessId, isPro, leadId, t])
+  }, [businessId, integrationEnabled, isPro, leadId, t])
 
   useEffect(() => {
     load()
@@ -256,6 +266,27 @@ export function WhatsAppAutomationPanel({
     setDraftSteps((current) => current.map((step, stepIndex) =>
       stepIndex === index ? { ...step, ...patch } : step,
     ))
+  }
+
+  if (!integrationEnabled) {
+    return (
+      <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800">
+            <Clock3 className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{t("automationTitle")}</h4>
+              <span className="rounded-full border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                {t("comingSoonBadge")}
+              </span>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">{t("comingSoonDescription")}</p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   if (loading) {

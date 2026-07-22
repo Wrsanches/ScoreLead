@@ -2,6 +2,7 @@ import { and, count, eq, gte, inArray, lt, or, sql } from "drizzle-orm"
 import { db } from "@/lib/db"
 import {
   business,
+  user,
   whatsappConnection,
   whatsappInboundMessage,
   whatsappSequence,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/db/schema"
 import { getUserPlan } from "@/lib/plan"
 import { getLatestWhatsAppConsent } from "@/lib/whatsapp/data"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { MetaGraphError, sendTemplateMessage } from "@/lib/whatsapp/meta"
 import { decryptWhatsAppToken } from "@/lib/whatsapp/security"
 import {
@@ -101,15 +103,21 @@ async function executeStep(stepId: string) {
       sequence: whatsappSequence,
       connection: whatsappConnection,
       ownerId: business.userId,
+      ownerEmail: user.email,
     })
     .from(whatsappSequenceStep)
     .innerJoin(whatsappSequence, eq(whatsappSequenceStep.sequenceId, whatsappSequence.id))
     .innerJoin(whatsappConnection, eq(whatsappSequence.connectionId, whatsappConnection.id))
     .innerJoin(business, eq(whatsappSequence.businessId, business.id))
+    .innerJoin(user, eq(business.userId, user.id))
     .where(eq(whatsappSequenceStep.id, stepId))
   if (!row || row.step.status !== "sending" || row.sequence.status !== "scheduled") return
 
   const { step, sequence, connection } = row
+  if (!hasWhatsAppEarlyAccess(row.ownerEmail)) {
+    await blockStep(step.id, sequence.id, "feature_not_available")
+    return
+  }
   if (await getUserPlan(row.ownerId) !== "pro") {
     await blockStep(step.id, sequence.id, "plan_inactive")
     return

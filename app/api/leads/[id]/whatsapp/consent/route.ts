@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappConsentEvent } from "@/lib/db/schema"
 import { getOwnedLead } from "@/lib/whatsapp/data"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { isE164 } from "@/lib/whatsapp/security"
 import { WHATSAPP_CONSENT_SOURCES } from "@/lib/whatsapp/types"
 
@@ -25,6 +26,12 @@ export async function GET(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+    return NextResponse.json(
+      { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
+      { status: 403 },
+    )
+  }
   const { id } = await params
   if (!(await getOwnedLead(id, session.user.id))) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 })
@@ -44,6 +51,12 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+    return NextResponse.json(
+      { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
+      { status: 403 },
+    )
+  }
   const { id } = await params
   const ownedLead = await getOwnedLead(id, session.user.id)
   if (!ownedLead) return NextResponse.json({ error: "Lead not found" }, { status: 404 })

@@ -6,7 +6,13 @@ import { AdminSidebar } from "./admin-sidebar"
 import { SearchProvider } from "./search-overlay"
 import { PlanProvider } from "@/components/admin/plan-context"
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  userEmail,
+}: {
+  children: React.ReactNode
+  userEmail?: string | null
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarPreferenceLoaded, setSidebarPreferenceLoaded] = useState(false)
@@ -42,9 +48,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
           animateLayout={sidebarTransitionsReady}
+          userEmail={userEmail}
         />
 
-        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-2 lg:p-3">
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-2 lg:p-3 lg:pl-0">
           <div className="relative flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/50 shadow-[0_1px_2px_0_rgba(0,0,0,0.04),0_1px_0_0_rgba(255,255,255,1)_inset] dark:shadow-[0_0_0_1px_rgba(0,0,0,0.45),0_1px_0_0_rgba(255,255,255,0.04)_inset]">
             {/* Ambient emerald glow - dark only; on white it reads as a sickly tint */}
             <div

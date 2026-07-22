@@ -14,6 +14,7 @@ import {
 } from "@/lib/db/schema"
 import { getUserPlan } from "@/lib/plan"
 import { getOwnedBusiness, getWhatsAppConnection, publicConnection } from "@/lib/whatsapp/data"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import {
   exchangeEmbeddedSignupCode,
   getWabaPhoneNumber,
@@ -43,6 +44,14 @@ const settingsSchema = z.object({
 async function sessionAndBusiness(id: string) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }
+  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+    return {
+      error: NextResponse.json(
+        { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
+        { status: 403 },
+      ),
+    }
+  }
   const owned = await getOwnedBusiness(id, session.user.id)
   if (!owned) return { error: NextResponse.json({ error: "Business not found" }, { status: 404 }) }
   return { session, owned }

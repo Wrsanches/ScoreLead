@@ -15,6 +15,7 @@ import {
   getOwnedLead,
   getWhatsAppConnection,
 } from "@/lib/whatsapp/data"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { partsInTimezone } from "@/lib/whatsapp/schedule"
 
 function databaseErrorCode(error: unknown): string | null {
@@ -33,6 +34,12 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+    return NextResponse.json(
+      { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
+      { status: 403 },
+    )
+  }
   if (await getUserPlan(session.user.id) !== "pro") {
     return NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 })
   }

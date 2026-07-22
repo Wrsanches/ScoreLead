@@ -30,6 +30,7 @@ import { authClient } from "@/lib/auth-client";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
 import { usePlan } from "@/components/admin/plan-context";
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,23 +68,26 @@ export function AdminSidebar({
   collapsed,
   onCollapsedChange,
   animateLayout,
+  userEmail: serverUserEmail,
 }: {
   open: boolean;
   onClose: () => void;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
   animateLayout: boolean;
+  userEmail?: string | null;
 }) {
   const t = useTranslations("dashboard");
   const tb = useTranslations("billing");
   const tw = useTranslations("whatsapp");
-  const { isPro, openUpgrade } = usePlan();
+  const { isPro, openUpgrade, loading: planLoading } = usePlan();
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
 
   const { open: openSearch } = useSearch();
   const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [businessesLoading, setBusinessesLoading] = useState(true);
 
   // The active business is read from the URL (/admin/business/[businessId]).
   // On non-business routes (e.g. /admin/settings) fall back to the first one.
@@ -92,8 +96,11 @@ export function AdminSidebar({
   const businessId = businessIdFromPath ?? businesses[0]?.id ?? null;
 
   const userName = session?.user?.name || "";
-  const userEmail = session?.user?.email || "";
+  const userEmail = serverUserEmail || session?.user?.email || "";
   const userImage = session?.user?.image;
+  const whatsappAvailable =
+    process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
+    hasWhatsAppEarlyAccess(userEmail);
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
@@ -105,7 +112,8 @@ export function AdminSidebar({
     fetch("/api/businesses")
       .then((res) => res.json())
       .then((data: Business[]) => setBusinesses(data))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setBusinessesLoading(false));
   }, []);
 
   const selectedBusiness = useMemo(
@@ -142,7 +150,7 @@ export function AdminSidebar({
       }`}
     >
       <div
-        className={`px-4 pt-4 pb-3 flex items-center justify-between ${collapsed ? "lg:px-3 lg:justify-center" : ""}`}
+        className={`px-4 pt-4 pb-3 flex items-center justify-between ${collapsed ? "lg:px-2 lg:justify-center" : ""}`}
       >
         <button
           type="button"
@@ -183,7 +191,10 @@ export function AdminSidebar({
         </button>
       </div>
 
-      <div className="p-3 space-y-2">
+      <div className={`p-3 space-y-2 ${collapsed ? "lg:px-2" : ""}`}>
+        {businessesLoading ? (
+          <SidebarBizSkeleton collapsed={collapsed} />
+        ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -191,7 +202,9 @@ export function AdminSidebar({
               title={selectedBusiness?.name || t("noBusiness")}
             >
               {getBusinessLogo(selectedBusiness) ? (
-                <span className="relative w-6 h-6 rounded-md overflow-hidden shrink-0 block">
+                <span
+                  className={`relative w-6 h-6 rounded-md overflow-hidden shrink-0 block ${collapsed ? "lg:mx-auto" : ""}`}
+                >
                   <Image
                     src={getBusinessLogo(selectedBusiness)!}
                     alt=""
@@ -202,7 +215,9 @@ export function AdminSidebar({
                   />
                 </span>
               ) : (
-                <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                <div
+                  className={`w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
+                >
                   <Building2 className="w-3.5 h-3.5 text-zinc-500" />
                 </div>
               )}
@@ -272,13 +287,14 @@ export function AdminSidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        )}
 
         <button
           onClick={openSearch}
           className={`w-full flex items-center gap-2.5 px-3 py-2 bg-zinc-200/40 dark:bg-zinc-800/40 rounded-lg text-zinc-500 text-sm cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-800 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-300 dark:focus-within:ring-zinc-700 transition-all duration-150 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
           title={t("searchLeads")}
         >
-          <Search className="w-4 h-4" />
+          <Search className={`w-4 h-4 shrink-0 ${collapsed ? "lg:mx-auto" : ""}`} />
           <span className={collapsed ? "lg:hidden" : ""}>
             {t("searchLeads")}
           </span>
@@ -290,8 +306,12 @@ export function AdminSidebar({
         </button>
       </div>
 
+      {!businessId && businessesLoading && (
+        <SidebarNavSkeleton collapsed={collapsed} />
+      )}
+
       {businessId && (
-        <div className="px-3 space-y-0.5">
+        <div className={`px-3 space-y-0.5 ${collapsed ? "lg:px-2" : ""}`}>
           <NavItem
             icon={LayoutDashboard}
             label={t("dashboard")}
@@ -330,7 +350,7 @@ export function AdminSidebar({
           <NavItem
             icon={MessageCircle}
             label={t("integrations")}
-            badge={tw("comingSoonBadge")}
+            badge={whatsappAvailable ? undefined : tw("comingSoonBadge")}
             href={`/admin/business/${businessId}/integrations`}
             active={isActive("/integrations")}
             collapsed={collapsed}
@@ -339,7 +359,7 @@ export function AdminSidebar({
       )}
 
       {businessId && (
-        <div className="mt-8 px-3">
+        <div className={`mt-8 px-3 ${collapsed ? "lg:px-2" : ""}`}>
           <div
             className={`px-2.5 py-1 mb-2 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest ${collapsed ? "lg:hidden" : ""}`}
           >
@@ -364,15 +384,15 @@ export function AdminSidebar({
         </div>
       )}
 
-      <div className="mt-auto p-3">
-        {!isPro && (
+      <div className={`mt-auto p-3 ${collapsed ? "lg:px-2" : ""}`}>
+        {!planLoading && !isPro && (
           <button
             type="button"
             onClick={openUpgrade}
             title={tb("upgradeCta")}
             className={`group w-full mb-2 flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/10 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/40 ${collapsed ? "lg:justify-center lg:px-0 lg:py-2 px-3 py-2.5" : "px-3 py-2.5"}`}
           >
-            <span className="shrink-0 w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+            <span className={`shrink-0 w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center ${collapsed ? "lg:mx-auto" : ""}`}>
               <Zap className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
             </span>
             <span className={`flex-1 min-w-0 text-left ${collapsed ? "lg:hidden" : ""}`}>
@@ -385,6 +405,9 @@ export function AdminSidebar({
             </span>
           </button>
         )}
+        {sessionPending ? (
+          <SidebarAccountSkeleton collapsed={collapsed} />
+        ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -397,11 +420,11 @@ export function AdminSidebar({
                   alt=""
                   width={28}
                   height={28}
-                  className="w-7 h-7 rounded-full shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200 object-cover"
+                  className={`w-7 h-7 rounded-full shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200 object-cover ${collapsed ? "lg:mx-auto" : ""}`}
                   unoptimized
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-linear-to-br from-zinc-400 dark:from-zinc-600 to-zinc-500 dark:to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200">
+                <div className={`w-7 h-7 rounded-full bg-linear-to-br from-zinc-400 dark:from-zinc-600 to-zinc-500 dark:to-zinc-700 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-600/50 group-hover:ring-zinc-400/60 dark:group-hover:ring-zinc-500/50 transition-all duration-200 ${collapsed ? "lg:mx-auto" : ""}`}>
                   {userInitials ? (
                     <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                       {userInitials}
@@ -491,8 +514,76 @@ export function AdminSidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        )}
       </div>
     </aside>
+  );
+}
+
+// ── Loading skeletons (shown on initial data load, e.g. a hard refresh) ──
+// Each mirrors the real row's box so the layout doesn't shift, and collapses
+// to a centered icon placeholder just like the real items.
+
+function SkeletonBar({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`rounded bg-zinc-200 dark:bg-zinc-800 animate-pulse ${className}`}
+    />
+  );
+}
+
+function SidebarBizSkeleton({ collapsed }: { collapsed?: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+    >
+      <div
+        className={`w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
+      />
+      <SkeletonBar
+        className={`h-3.5 flex-1 max-w-32 ${collapsed ? "lg:hidden" : ""}`}
+      />
+    </div>
+  );
+}
+
+function SidebarNavSkeleton({ collapsed }: { collapsed?: boolean }) {
+  const widths = ["w-20", "w-24", "w-16", "w-28", "w-20", "w-24"];
+  return (
+    <div
+      aria-hidden="true"
+      className={`px-3 space-y-0.5 ${collapsed ? "lg:px-2" : ""}`}
+    >
+      {widths.map((w, i) => (
+        <div
+          key={i}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+        >
+          <div
+            className={`w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
+          />
+          <SkeletonBar className={`h-3 ${w} ${collapsed ? "lg:hidden" : ""}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SidebarAccountSkeleton({ collapsed }: { collapsed?: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+    >
+      <div
+        className={`w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
+      />
+      <div className={`flex-1 space-y-1.5 ${collapsed ? "lg:hidden" : ""}`}>
+        <SkeletonBar className="h-3 w-24" />
+        <SkeletonBar className="h-2.5 w-32" />
+      </div>
+    </div>
   );
 }
 
@@ -515,6 +606,8 @@ function NavItem({
     <>
       <Icon
         className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+          collapsed ? "lg:mx-auto" : ""
+        } ${
           active
             ? "text-emerald-600 dark:text-emerald-400"
             : "text-zinc-500 group-hover:text-emerald-700 dark:group-hover:text-emerald-300"
@@ -533,7 +626,7 @@ function NavItem({
     </>
   );
 
-  const className = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 group ${
+  const className = `w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 group ${
     active
       ? "bg-emerald-500/8 text-zinc-900 dark:text-white"
       : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/40 hover:text-zinc-800 dark:hover:text-zinc-200"

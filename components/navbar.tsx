@@ -26,7 +26,7 @@ function UserAvatar({ name }: { name: string }) {
 export function Navbar() {
   const t = useTranslations("nav")
   const [open, setOpen] = useState(false)
-  const { data: session } = authClient.useSession()
+  const { data: session, isPending: sessionPending } = authClient.useSession()
 
   useEffect(() => {
     if (!open) return
@@ -64,7 +64,9 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            {isLoggedIn ? (
+            {sessionPending ? (
+              <div className="w-24 h-8 rounded-lg bg-zinc-800/80 animate-pulse" aria-hidden="true" />
+            ) : isLoggedIn ? (
               <Link
                 href="/admin"
                 className="flex items-center gap-2.5 text-sm text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800/50"
@@ -116,7 +118,9 @@ export function Navbar() {
             ))}
             <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
               <LanguageSwitcher />
-              {isLoggedIn ? (
+              {sessionPending ? (
+                <div className="w-28 h-8 rounded-lg bg-zinc-800/80 animate-pulse" aria-hidden="true" />
+              ) : isLoggedIn ? (
                 <Link
                   href="/admin"
                   onClick={() => setOpen(false)}

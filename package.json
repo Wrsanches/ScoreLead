@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:cleanup": "bun run scripts/cleanup-db.ts"
+    "db:cleanup": "bun run scripts/cleanup-db.ts",
+    "slack:preview": "bun --env-file=.env.local run scripts/preview-slack-alerts.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1057.0",

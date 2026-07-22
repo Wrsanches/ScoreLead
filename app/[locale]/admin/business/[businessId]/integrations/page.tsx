@@ -30,6 +30,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { usePlan } from "@/components/admin/plan-context"
+import { authClient } from "@/lib/auth-client"
+import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 
 declare global {
   interface Window {
@@ -72,7 +74,7 @@ const META_MESSAGE_ORIGINS = new Set([
   "https://business.facebook.com",
 ])
 
-const WHATSAPP_INTEGRATION_ENABLED =
+const WHATSAPP_INTEGRATION_CONFIGURED =
   process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true"
 
 export default function IntegrationsPage({
@@ -84,6 +86,9 @@ export default function IntegrationsPage({
   const t = useTranslations("whatsapp")
   const td = useTranslations("dashboard")
   const { isPro, openUpgrade } = usePlan()
+  const { data: session } = authClient.useSession()
+  const integrationEnabled =
+    WHATSAPP_INTEGRATION_CONFIGURED && hasWhatsAppEarlyAccess(session?.user.email)
   const [connection, setConnection] = useState<Connection | null>(null)
   const [loading, setLoading] = useState(true)
   const [sdkReady, setSdkReady] = useState(false)
@@ -98,11 +103,12 @@ export default function IntegrationsPage({
   const completing = useRef(false)
 
   const load = useCallback(async () => {
-    if (!WHATSAPP_INTEGRATION_ENABLED) {
+    if (!integrationEnabled) {
       setLoading(false)
       return
     }
 
+    setLoading(true)
     try {
       const response = await fetch(`/api/businesses/${businessId}/whatsapp/connection`)
       const body = await response.json()
@@ -120,7 +126,7 @@ export default function IntegrationsPage({
     } finally {
       setLoading(false)
     }
-  }, [businessId, isPro, t])
+  }, [businessId, integrationEnabled, isPro, t])
 
   useEffect(() => {
     load()
@@ -165,7 +171,7 @@ export default function IntegrationsPage({
   }, [businessId, t])
 
   useEffect(() => {
-    if (!WHATSAPP_INTEGRATION_ENABLED) return
+    if (!integrationEnabled) return
 
     const onMessage = (event: MessageEvent) => {
       if (!META_MESSAGE_ORIGINS.has(event.origin)) return
@@ -204,10 +210,10 @@ export default function IntegrationsPage({
     }
     window.addEventListener("message", onMessage)
     return () => window.removeEventListener("message", onMessage)
-  }, [finishConnection, t])
+  }, [finishConnection, integrationEnabled, t])
 
   async function connect() {
-    if (!WHATSAPP_INTEGRATION_ENABLED) return
+    if (!integrationEnabled) return
 
     if (!isPro) {
       openUpgrade()
@@ -328,22 +334,22 @@ export default function IntegrationsPage({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {WHATSAPP_INTEGRATION_ENABLED && (
+      {integrationEnabled ? (
         <Script
           src="https://connect.facebook.net/en_US/sdk.js"
           strategy="afterInteractive"
           onLoad={() => setSdkReady(true)}
         />
-      )}
+      ) : null}
       <ContentWrapper>
         <PageHeader
           variant="hero"
           title={t("title")}
-          description={WHATSAPP_INTEGRATION_ENABLED ? t("description") : t("comingSoonPageDescription")}
+          description={integrationEnabled ? t("description") : t("comingSoonPageDescription")}
           breadcrumbs={[{ label: td("businessPage"), href: `/admin/business/${businessId}/profile` }, { label: t("title") }]}
         />
 
-        {!WHATSAPP_INTEGRATION_ENABLED ? (
+        {!integrationEnabled ? (
           <section
             className="grid gap-8 border-y border-zinc-200 py-8 dark:border-zinc-800 lg:grid-cols-[minmax(0,1fr)_22rem]"
             aria-labelledby="whatsapp-coming-soon-title"

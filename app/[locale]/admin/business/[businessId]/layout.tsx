@@ -45,7 +45,7 @@ export default async function BusinessLayout({
 
   return (
     <BusinessProvider businessId={businessId}>
-      <AdminShell>{children}</AdminShell>
+      <AdminShell userEmail={session?.user.email}>{children}</AdminShell>
     </BusinessProvider>
   )
 }
