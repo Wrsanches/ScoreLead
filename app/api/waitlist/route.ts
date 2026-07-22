@@ -1,6 +1,9 @@
+import { createElement } from "react"
+import { render } from "@react-email/render"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { escapeHtml, sendEmail } from "@/lib/email"
+import { sendEmail } from "@/lib/email"
+import { WaitlistNotification } from "@/lib/emails/waitlist-notification"
 
 const waitlistSchema = z.object({
   email: z.email(),
@@ -26,11 +29,12 @@ export async function POST(request: Request) {
     await sendEmail({
       to: notifyEmail,
       subject: "New ScoreLead waitlist signup",
-      html: `
-        <h2>New waitlist signup</h2>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Date:</strong> ${new Date().toISOString()}</p>
-      `,
+      html: await render(
+        createElement(WaitlistNotification, {
+          signupEmail: email,
+          date: new Date().toISOString(),
+        }),
+      ),
     })
 
     return NextResponse.json({ success: true })

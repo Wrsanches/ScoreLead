@@ -6,7 +6,6 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
 import { BusinessProvider } from "@/components/admin/business-context"
-import { AdminShell } from "@/components/admin-shell"
 import { generatePageMetadata } from "@/lib/seo"
 
 // Title for the business home (dashboard) and a fallback for any nested route
@@ -43,9 +42,7 @@ export default async function BusinessLayout({
 
   if (!owned) notFound()
 
-  return (
-    <BusinessProvider businessId={businessId}>
-      <AdminShell userEmail={session?.user.email}>{children}</AdminShell>
-    </BusinessProvider>
-  )
+  // AdminShell (sidebar/chrome) is rendered once by the parent admin layout, so
+  // it persists across navigation; this layout only scopes the active business.
+  return <BusinessProvider businessId={businessId}>{children}</BusinessProvider>
 }

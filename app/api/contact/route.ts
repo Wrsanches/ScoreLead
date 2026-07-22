@@ -1,5 +1,8 @@
+import { createElement } from "react"
+import { render } from "@react-email/render"
 import { NextResponse } from "next/server"
-import { escapeHtml, sendEmail } from "@/lib/email"
+import { sendEmail } from "@/lib/email"
+import { ContactNotification } from "@/lib/emails/contact-notification"
 import { rateLimit } from "@/lib/rate-limit"
 import { contactSchema, type ContactSubmission } from "@/lib/validations/contact"
 
@@ -31,8 +34,8 @@ function isSameOrigin(request: Request) {
   }
 }
 
-function contactEmailHtml(data: ContactSubmission) {
-  const rows = [
+async function contactEmailHtml(data: ContactSubmission) {
+  const rows: [string, string][] = [
     ["Name", data.name],
     ["Email", data.email],
     ["Company", data.company || "Not provided"],
@@ -40,39 +43,14 @@ function contactEmailHtml(data: ContactSubmission) {
     ["Subject", data.subject],
   ]
 
-  return `
-<!DOCTYPE html>
-<html>
-  <body style="margin:0;padding:24px;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#18181b;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
-            <tr>
-              <td style="padding:24px 28px;border-bottom:1px solid #e4e4e7;">
-                <p style="margin:0 0 6px;color:#059669;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ScoreLead contact form</p>
-                <h1 style="margin:0;font-size:22px;line-height:1.3;">${escapeHtml(data.subject)}</h1>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:24px 28px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  ${rows.map(([label, value]) => `
-                    <tr>
-                      <td style="width:110px;padding:7px 12px 7px 0;color:#71717a;font-size:13px;vertical-align:top;">${label}</td>
-                      <td style="padding:7px 0;color:#27272a;font-size:14px;">${escapeHtml(value)}</td>
-                    </tr>
-                  `).join("")}
-                </table>
-                <div style="margin-top:20px;padding:18px;background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;white-space:pre-wrap;font-size:14px;line-height:1.65;">${escapeHtml(data.message)}</div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`
+  return render(
+    createElement(ContactNotification, {
+      subject: data.subject,
+      inquiryLabel: inquiryLabels[data.inquiryType],
+      rows,
+      message: data.message,
+    }),
+  )
 }
 
 export async function POST(request: Request) {
@@ -120,7 +98,7 @@ export async function POST(request: Request) {
       to: CONTACT_EMAIL,
       replyTo: data.email,
       subject: `[${inquiryLabels[data.inquiryType]}] ${data.subject}`,
-      html: contactEmailHtml(data),
+      html: await contactEmailHtml(data),
       tags: [
         { name: "category", value: "contact_form" },
         { name: "inquiry_type", value: data.inquiryType },

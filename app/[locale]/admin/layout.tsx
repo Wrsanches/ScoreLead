@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
 import { requireAuth } from "@/lib/auth-guard"
+import { AdminShell } from "@/components/admin-shell"
 
 export const metadata: Metadata = {
   robots: {
@@ -18,15 +19,15 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
-  await requireAuth(locale)
+  const session = await requireAuth(locale)
 
-  // The sidebar/chrome (AdminShell) is rendered by the business and settings
-  // layouts below - NOT here - so the bare `/admin` index can redirect to the
-  // active business without first painting the shell (which caused a visible
-  // flash + client-side reload).
+  // The sidebar/chrome is rendered ONCE here so it persists across every admin
+  // route (business, settings, support) - navigating between them no longer
+  // remounts the sidebar. The bare `/admin` page does a server-side redirect,
+  // so it returns before this shell ever paints (no flash on the redirect).
   return (
     <div className="h-screen w-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
-      {children}
+      <AdminShell userEmail={session.user.email}>{children}</AdminShell>
     </div>
   )
 }
