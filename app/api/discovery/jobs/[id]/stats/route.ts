@@ -4,9 +4,10 @@ import { discoveryJob, lead } from "@/lib/db/schema"
 import { eq, and, avg, count, gte, lt, isNotNull } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth.api.getSession({
@@ -19,18 +20,21 @@ export async function GET(
 
   const { id } = await params
 
-  // Verify job belongs to user
   const [job] = await db
-    .select({ id: discoveryJob.id })
+    .select({ id: discoveryJob.id, businessId: discoveryJob.businessId })
     .from(discoveryJob)
-    .where(
-      and(
-        eq(discoveryJob.id, id),
-        eq(discoveryJob.userId, session.user.id),
-      ),
-    )
+    .where(eq(discoveryJob.id, id))
+    .limit(1)
 
-  if (!job) {
+  const access = job
+    ? await getBusinessAccess(session.user.id, job.businessId)
+    : null
+  const requestedBusinessId = new URL(request.url).searchParams.get("businessId")
+  if (
+    !job ||
+    !access ||
+    (requestedBusinessId && requestedBusinessId !== job.businessId)
+  ) {
     return NextResponse.json({ error: "Job not found" }, { status: 404 })
   }
 

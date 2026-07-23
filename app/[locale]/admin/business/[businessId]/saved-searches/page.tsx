@@ -12,7 +12,10 @@ import {
   EmptyState,
 } from "@/components/admin"
 import { formatRelativeDate } from "@/lib/admin-utils"
-import { useBusinessId } from "@/components/admin/business-context"
+import {
+  useBusinessAccess,
+  useBusinessId,
+} from "@/components/admin/business-context"
 
 interface SavedSearch {
   id: string
@@ -28,6 +31,7 @@ interface SavedSearch {
 export default function SavedSearchesPage() {
   const t = useTranslations("dashboard")
   const businessId = useBusinessId()
+  const { readOnly } = useBusinessAccess()
   const [searches, setSearches] = useState<SavedSearch[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -69,7 +73,7 @@ export default function SavedSearchesPage() {
           title={t("savedSearches")}
           description="Reuse your search configurations to quickly launch new discovery jobs."
           breadcrumbs={[{ label: t("discovery") }]}
-          actions={
+          actions={!readOnly ? (
             <Link
               href={`/admin/business/${businessId}/discovery-jobs/new`}
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
@@ -77,7 +81,7 @@ export default function SavedSearchesPage() {
               {t("createJob")}
               <ChevronRight className="w-4 h-4" />
             </Link>
-          }
+          ) : undefined}
         />
 
         {loading ? (
@@ -123,6 +127,7 @@ export default function SavedSearchesPage() {
 
                 <p className="text-zinc-500 dark:text-zinc-600 text-sm text-right">{formatRelativeDate(search.createdAt)}</p>
 
+                {!readOnly && (
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Link
                     href={`/admin/business/${businessId}/discovery-jobs/new?savedSearchId=${search.id}`}
@@ -144,6 +149,7 @@ export default function SavedSearchesPage() {
                     )}
                   </button>
                 </div>
+                )}
               </div>
             ))}
           </div>

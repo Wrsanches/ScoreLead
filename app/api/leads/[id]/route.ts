@@ -5,6 +5,7 @@ import { eq, and, inArray } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { getBusinessAccess } from "@/lib/business-access"
 
 /** Allowed lead statuses. Must match STATUS_CONFIG on the client. */
 export const LEAD_STATUSES = [
@@ -46,7 +47,7 @@ async function assertLeadOwnership(leadId: string, userId: string) {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth.api.getSession({
@@ -58,8 +59,25 @@ export async function GET(
   }
 
   const { id } = await params
-  const row = await assertLeadOwnership(id, session.user.id)
-  if (!row) {
+  const requestedBusinessId = new URL(request.url).searchParams.get("businessId")
+  if (!requestedBusinessId) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 })
+  }
+
+  const [row] = await db
+    .select()
+    .from(lead)
+    .where(
+      and(
+        eq(lead.id, id),
+        eq(lead.businessId, requestedBusinessId),
+      ),
+    )
+    .limit(1)
+  const access = row
+    ? await getBusinessAccess(session.user.id, row.businessId)
+    : null
+  if (!row || !access) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 

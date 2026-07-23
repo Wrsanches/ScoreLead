@@ -11,6 +11,7 @@ import {
   type OutreachSender,
 } from "@/lib/services/outreach-messages"
 import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export const maxDuration = 60
 
@@ -49,8 +50,11 @@ export async function GET(
   }
 
   const { id } = await params
-  const row = await assertLeadOwnership(id, session.user.id)
-  if (!row) {
+  const [row] = await db.select().from(lead).where(eq(lead.id, id)).limit(1)
+  const access = row
+    ? await getBusinessAccess(session.user.id, row.businessId)
+    : null
+  if (!row || !access) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
 

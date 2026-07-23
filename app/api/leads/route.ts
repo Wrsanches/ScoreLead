@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { lead, discoveryJob } from "@/lib/db/schema"
+import { lead } from "@/lib/db/schema"
 import { and, eq, desc, count } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { resolveBusinessId } from "@/lib/active-business"
+import { resolveViewableBusiness } from "@/lib/active-business"
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({
@@ -33,36 +33,21 @@ export async function GET(request: Request) {
 
   // Scope to the business from the URL (?businessId=), validated for ownership.
   // If none is provided/owned, the response is empty.
-  const activeBusinessId = await resolveBusinessId(
+  const access = await resolveViewableBusiness(
     session.user.id,
     url.searchParams.get("businessId"),
   )
-  if (!activeBusinessId) {
-    return NextResponse.json({ leads: [], total: 0, page, totalPages: 0 })
+  if (!access) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
-
-  const userJobs = await db
-    .select({ id: discoveryJob.id })
-    .from(discoveryJob)
-    .where(
-      and(
-        eq(discoveryJob.userId, session.user.id),
-        eq(discoveryJob.businessId, activeBusinessId),
-      ),
-    )
-
-  if (userJobs.length === 0) {
-    return NextResponse.json({ leads: [], total: 0, page, totalPages: 0 })
-  }
-
-  const jobIds = userJobs.map((j) => j.id)
-
-  const { inArray } = await import("drizzle-orm")
 
   const whereClause =
     statusFilter && statusFilter !== "all"
-      ? and(inArray(lead.jobId, jobIds), eq(lead.status, statusFilter))
-      : inArray(lead.jobId, jobIds)
+      ? and(
+          eq(lead.businessId, access.businessId),
+          eq(lead.status, statusFilter),
+        )
+      : eq(lead.businessId, access.businessId)
 
   const [leads, [total]] = await Promise.all([
     db

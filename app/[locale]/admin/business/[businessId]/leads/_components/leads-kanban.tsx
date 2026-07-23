@@ -30,12 +30,14 @@ interface LeadsKanbanProps {
   leads: Lead[];
   onStatusChange: (leadId: string, status: LeadStatus) => void;
   onCardClick?: (leadId: string) => void;
+  readOnly?: boolean;
 }
 
 export function LeadsKanban({
   leads,
   onStatusChange,
   onCardClick,
+  readOnly = false,
 }: LeadsKanbanProps) {
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
 
@@ -106,6 +108,7 @@ export function LeadsKanban({
               status={key}
               items={grouped[key]}
               onCardClick={onCardClick}
+              readOnly={readOnly}
             />
           ))}
         </div>
@@ -127,13 +130,18 @@ function KanbanColumn({
   status,
   items,
   onCardClick,
+  readOnly,
 }: {
   status: LeadStatus;
   items: Lead[];
   onCardClick?: (leadId: string) => void;
+  readOnly: boolean;
 }) {
   const cfg = STATUS_CONFIG[status];
-  const { isOver, setNodeRef } = useDroppable({ id: status });
+  const { isOver, setNodeRef } = useDroppable({
+    id: status,
+    disabled: readOnly,
+  });
 
   return (
     <div
@@ -164,7 +172,12 @@ function KanbanColumn({
           </div>
         ) : (
           items.map((lead) => (
-            <KanbanCard key={lead.id} lead={lead} onCardClick={onCardClick} />
+            <KanbanCard
+              key={lead.id}
+              lead={lead}
+              onCardClick={onCardClick}
+              readOnly={readOnly}
+            />
           ))
         )}
       </div>
@@ -177,13 +190,16 @@ function KanbanColumn({
 function KanbanCard({
   lead,
   onCardClick,
+  readOnly,
 }: {
   lead: Lead;
   onCardClick?: (leadId: string) => void;
+  readOnly: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: lead.id,
+      disabled: readOnly,
     });
 
   const style = {
@@ -200,10 +216,12 @@ function KanbanCard({
       onClick={() => {
         if (!isDragging) onCardClick?.(lead.id);
       }}
-      className="group relative cursor-grab active:cursor-grabbing select-none rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-900/60 p-2.5 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+      className={`group relative select-none rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-900/60 p-2.5 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
+        readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
+      }`}
     >
       {/* Drag handle glyph shown on hover */}
-      <div className="absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+      <div className={`absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none ${readOnly ? "" : "group-hover:opacity-100"}`}>
         <GripVertical className="w-3 h-3 text-zinc-500 dark:text-zinc-600" />
       </div>
       <CardContent lead={lead} />

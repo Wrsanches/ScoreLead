@@ -16,6 +16,7 @@ import { generateWhatsAppTemplateValues } from "@/lib/services/whatsapp-template
 import {
   getLatestWhatsAppConsent,
   getOwnedLead,
+  getViewableLead,
   getWhatsAppConnection,
 } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
@@ -42,15 +43,19 @@ export async function GET(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id } = await params
+  const viewable = await getViewableLead(id, session.user.id)
+  if (!viewable) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+  if (
+    !viewable.access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(viewable.access.ownerEmail)
+  ) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
-  }
-  const { id } = await params
-  if (!(await getOwnedLead(id, session.user.id))) {
-    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
   return NextResponse.json({ sequences: await listWhatsAppSequences(id) })
 }

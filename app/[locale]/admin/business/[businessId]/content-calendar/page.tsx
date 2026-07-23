@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useBusinessId } from "@/components/admin/business-context";
+import {
+  useBusinessAccess,
+  useBusinessId,
+} from "@/components/admin/business-context";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -38,6 +41,7 @@ export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
   const locale = useLocale();
   const businessId = useBusinessId();
+  const { readOnly } = useBusinessAccess();
   const { openUpgrade } = usePlan();
   const weekStartsOn: 0 | 1 = locale === "en" ? 0 : 1;
   const [cursor, setCursor] = useState<Date>(() => monthStartUtc(new Date()));
@@ -420,7 +424,7 @@ export default function ContentCalendarPage() {
                 <AtSign className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                 {t("provider")}
               </div>
-              {posts.length > 0 && (
+              {posts.length > 0 && !readOnly && (
                 <button
                   type="button"
                   onClick={handleGenerate}
@@ -449,7 +453,7 @@ export default function ContentCalendarPage() {
           )}
 
           <AnimatePresence>
-            {recentGenerationIds && recentGenerationIds.length > 0 && (
+            {!readOnly && recentGenerationIds && recentGenerationIds.length > 0 && (
               <div className="mb-4">
                 <GenerateBanner
                   count={recentGenerationIds.length}
@@ -467,6 +471,7 @@ export default function ContentCalendarPage() {
             <CalendarEmptyState
               onGenerate={handleGenerate}
               isGenerating={generating}
+              readOnly={readOnly}
             />
           ) : (
             <motion.div
@@ -486,6 +491,7 @@ export default function ContentCalendarPage() {
                 onReschedule={handleReschedule}
                 weekdayLabels={weekdayLabels}
                 weekStartsOn={weekStartsOn}
+                readOnly={readOnly}
               />
             </motion.div>
           )}
@@ -503,6 +509,7 @@ export default function ContentCalendarPage() {
         onGenerateImage={handleGenerateImage}
         onRegenerateSlide={handleRegenerateSlide}
         onUploadSlide={handleUploadSlide}
+        readOnly={readOnly}
       />
     </>
   );

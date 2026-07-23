@@ -16,6 +16,7 @@ import {
 import { usePlan } from "@/components/admin/plan-context"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
 import { DiscoveryRunningPanel } from "@/components/admin/discovery-running-panel"
+import { useBusinessAccess } from "@/components/admin/business-context"
 
 interface Job {
   id: string
@@ -59,6 +60,7 @@ export default function DiscoveryJobDetailPage({
   const t = useTranslations("dashboard")
   const router = useRouter()
   const { openUpgrade } = usePlan()
+  const { readOnly } = useBusinessAccess()
   const [job, setJob] = useState<Job | null>(null)
   const [stats, setStats] = useState<JobStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -102,8 +104,12 @@ export default function DiscoveryJobDetailPage({
 
     async function load() {
       const [j, s] = await Promise.all([
-        fetch(`/api/discovery/jobs/${id}`).then((r) => (r.ok ? r.json() : null)),
-        fetch(`/api/discovery/jobs/${id}/stats`).then((r) => (r.ok ? r.json() : null)),
+        fetch(`/api/discovery/jobs/${id}?businessId=${businessId}`).then((r) =>
+          r.ok ? r.json() : null,
+        ),
+        fetch(`/api/discovery/jobs/${id}/stats?businessId=${businessId}`).then(
+          (r) => (r.ok ? r.json() : null),
+        ),
       ]).catch(() => [null, null])
       if (cancelled) return
       if (j) setJob(j)
@@ -121,7 +127,7 @@ export default function DiscoveryJobDetailPage({
       cancelled = true
       stop()
     }
-  }, [id, pollKey])
+  }, [businessId, id, pollKey])
 
   const keywords = job ? parseKeywords(job.keywords) : []
 
@@ -150,7 +156,7 @@ export default function DiscoveryJobDetailPage({
                       </span>
                     )}
                   </div>
-                  {(job.status === "partial" ||
+                  {!readOnly && (job.status === "partial" ||
                     (job.status === "completed" && !job.exhausted)) && (
                     <button
                       onClick={handleContinue}

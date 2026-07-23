@@ -15,6 +15,7 @@ interface DayCellProps {
   onSelectPost: (id: string) => void
   onAdd: (date: Date) => void
   animationIndex: number
+  readOnly?: boolean
 }
 
 const MAX_VISIBLE_CHIPS = 3
@@ -28,10 +29,12 @@ export function DayCell({
   onSelectPost,
   onAdd,
   animationIndex,
+  readOnly = false,
 }: DayCellProps) {
   const { isOver, setNodeRef } = useDroppable({
     id: `day-${date.toISOString().slice(0, 10)}`,
     data: { date },
+    disabled: readOnly,
   })
 
   const visible = posts.slice(0, MAX_VISIBLE_CHIPS)
@@ -54,7 +57,7 @@ export function DayCell({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: Math.min(animationIndex, 30) * 0.01 }}
       className={`${base} ${state} ${isPast && inMonth ? "opacity-75" : ""} ${!inMonth ? "opacity-40" : ""}`}
-      onClick={() => inMonth && onAdd(date)}
+      onClick={() => !readOnly && inMonth && onAdd(date)}
     >
       <div className="flex items-center justify-between mb-1.5">
         <span
@@ -70,7 +73,7 @@ export function DayCell({
         >
           {date.getUTCDate()}
         </span>
-        {inMonth && (
+        {inMonth && !readOnly && (
           <button
             type="button"
             onClick={(e) => {
@@ -87,7 +90,12 @@ export function DayCell({
 
       <div className="flex-1 flex flex-col gap-1 min-h-0 overflow-hidden">
         {visible.map((p) => (
-          <PostChip key={p.id} post={p} onSelect={onSelectPost} />
+          <PostChip
+            key={p.id}
+            post={p}
+            onSelect={onSelectPost}
+            draggable={!readOnly}
+          />
         ))}
         {hidden > 0 && (
           <button

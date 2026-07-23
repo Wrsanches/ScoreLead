@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { lead, discoveryJob } from "@/lib/db/schema"
-import { eq, desc, ilike, or, inArray, and } from "drizzle-orm"
+import { lead } from "@/lib/db/schema"
+import { eq, desc, ilike, or, and } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { resolveBusinessId } from "@/lib/active-business"
+import { resolveViewableBusiness } from "@/lib/active-business"
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({
@@ -23,29 +23,13 @@ export async function GET(request: Request) {
   }
 
   // Scope the search to the current business (from the URL).
-  const businessId = await resolveBusinessId(
+  const access = await resolveViewableBusiness(
     session.user.id,
     url.searchParams.get("businessId"),
   )
-  if (!businessId) {
+  if (!access) {
     return NextResponse.json({ results: [] })
   }
-
-  const userJobs = await db
-    .select({ id: discoveryJob.id })
-    .from(discoveryJob)
-    .where(
-      and(
-        eq(discoveryJob.userId, session.user.id),
-        eq(discoveryJob.businessId, businessId),
-      ),
-    )
-
-  if (userJobs.length === 0) {
-    return NextResponse.json({ results: [] })
-  }
-
-  const jobIds = userJobs.map((j) => j.id)
   const pattern = `%${q}%`
 
   const results = await db
@@ -63,7 +47,7 @@ export async function GET(request: Request) {
     .from(lead)
     .where(
       and(
-        inArray(lead.jobId, jobIds),
+        eq(lead.businessId, access.businessId),
         or(
           ilike(lead.name, pattern),
           ilike(lead.city, pattern),

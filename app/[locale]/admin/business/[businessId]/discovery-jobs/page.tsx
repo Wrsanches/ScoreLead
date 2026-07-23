@@ -15,7 +15,10 @@ import {
   StatNumber,
 } from "@/components/admin"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
-import { useBusinessId } from "@/components/admin/business-context"
+import {
+  useBusinessAccess,
+  useBusinessId,
+} from "@/components/admin/business-context"
 import { usePlan } from "@/components/admin/plan-context"
 
 interface DiscoveryJob {
@@ -37,6 +40,7 @@ interface DiscoveryJob {
 export default function DiscoveryJobsPage() {
   const t = useTranslations("dashboard")
   const businessId = useBusinessId()
+  const { readOnly } = useBusinessAccess()
   const { openUpgrade } = usePlan()
   const [jobs, setJobs] = useState<DiscoveryJob[]>([])
   const [loading, setLoading] = useState(true)
@@ -130,7 +134,7 @@ export default function DiscoveryJobsPage() {
           title={t("discoveryJobsTitle")}
           description={t("discoveryJobsDesc")}
           breadcrumbs={[{ label: t("discovery") }]}
-          actions={
+          actions={!readOnly ? (
             <Link
               href={`/admin/business/${businessId}/discovery-jobs/new`}
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
@@ -138,7 +142,7 @@ export default function DiscoveryJobsPage() {
               {t("createJob")}
               <ChevronRight className="w-4 h-4" />
             </Link>
-          }
+          ) : undefined}
         />
 
         {/* Stats */}
@@ -213,7 +217,7 @@ export default function DiscoveryJobsPage() {
                           value={formatRelativeDate(job.createdAt)}
                           className="text-zinc-500 dark:text-zinc-600 text-xs"
                         />
-                        {isActive ? (
+                        {!readOnly && isActive ? (
                           <button
                             onClick={(e) => handleCancel(job.id, e)}
                             className="p-1 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
@@ -221,7 +225,7 @@ export default function DiscoveryJobsPage() {
                           >
                             <XCircle className="w-4 h-4" />
                           </button>
-                        ) : isContinuable ? (
+                        ) : !readOnly && isContinuable ? (
                           <button
                             onClick={(e) => handleContinue(job.id, e)}
                             disabled={continuingId === job.id}

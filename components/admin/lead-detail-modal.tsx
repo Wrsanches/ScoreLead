@@ -42,6 +42,7 @@ interface LeadDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onStatusChange: (leadId: string, next: LeadStatus) => void
+  readOnly?: boolean
 }
 
 const SCORE_CATEGORIES = [
@@ -58,6 +59,7 @@ export function LeadDetailModal({
   open,
   onOpenChange,
   onStatusChange,
+  readOnly = false,
 }: LeadDetailModalProps) {
   const businessId = useBusinessId()
   const t = useTranslations("dashboard")
@@ -109,11 +111,12 @@ export function LeadDetailModal({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
+                      disabled={readOnly}
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${status.bg} ${status.text} ring-1 ${status.ring} hover:brightness-110 transition`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                       {status.label}
-                      <ChevronDown className="w-3 h-3 opacity-60" />
+                      {!readOnly && <ChevronDown className="w-3 h-3 opacity-60" />}
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-44">

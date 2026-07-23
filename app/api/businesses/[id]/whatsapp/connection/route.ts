@@ -13,8 +13,9 @@ import {
   whatsappTemplate,
 } from "@/lib/db/schema"
 import { getUserPlan } from "@/lib/plan"
-import { getOwnedBusiness, getWhatsAppConnection, publicConnection } from "@/lib/whatsapp/data"
+import { getWhatsAppConnection, publicConnection } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
+import { getBusinessAccess } from "@/lib/business-access"
 import {
   exchangeEmbeddedSignupCode,
   getWabaPhoneNumber,
@@ -41,10 +42,20 @@ const settingsSchema = z.object({
   sendWindowEnd: z.string(),
 })
 
-async function sessionAndBusiness(id: string) {
+async function sessionAndBusiness(
+  id: string,
+  mode: "view" | "manage" = "manage",
+) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const access = await getBusinessAccess(session.user.id, id)
+  if (!access || (mode === "manage" && access.readOnly)) {
+    return { error: NextResponse.json({ error: "Business not found" }, { status: 404 }) }
+  }
+  if (
+    !access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(access.ownerEmail)
+  ) {
     return {
       error: NextResponse.json(
         { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
@@ -52,9 +63,7 @@ async function sessionAndBusiness(id: string) {
       ),
     }
   }
-  const owned = await getOwnedBusiness(id, session.user.id)
-  if (!owned) return { error: NextResponse.json({ error: "Business not found" }, { status: 404 }) }
-  return { session, owned }
+  return { session, access }
 }
 
 export async function GET(
@@ -62,11 +71,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const scope = await sessionAndBusiness(id)
+  const scope = await sessionAndBusiness(id, "view")
   if (scope.error) return scope.error
   const connection = await getWhatsAppConnection(id)
   return NextResponse.json({
-    plan: await getUserPlan(scope.session.user.id),
+    plan: await getUserPlan(scope.access.ownerUserId),
     connection: connection ? publicConnection(connection) : null,
   })
 }

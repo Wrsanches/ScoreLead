@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
-import { getActiveBusinessIdForUser } from "@/lib/active-business"
+import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
 
 /**
  * Bare `/admin` has no business in the URL. Resolve the user's active business
@@ -20,7 +20,7 @@ export default async function AdminIndexPage({
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect(`${prefix}/login`)
 
-  const businessId = await getActiveBusinessIdForUser(session.user.id)
+  const businessId = await getActiveViewableBusinessIdForUser(session.user.id)
   if (!businessId) redirect(`${prefix}/onboarding`)
 
   redirect(`${prefix}/admin/business/${businessId}`)

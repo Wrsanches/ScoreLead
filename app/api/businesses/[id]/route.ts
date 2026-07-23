@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function GET(
   _request: Request,
@@ -21,16 +22,15 @@ export async function GET(
   }
 
   const { id } = await params
+  const access = await getBusinessAccess(session.user.id, id)
+  if (!access) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
 
   const [row] = await db
     .select()
     .from(business)
-    .where(
-      and(
-        eq(business.id, id),
-        eq(business.userId, session.user.id),
-      ),
-    )
+    .where(eq(business.id, id))
 
   if (!row) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 })

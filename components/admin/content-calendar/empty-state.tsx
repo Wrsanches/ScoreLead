@@ -9,6 +9,7 @@ import { AiOrb, type OrbState } from "@/components/ai-orb";
 interface CalendarEmptyStateProps {
   onGenerate: () => void;
   isGenerating: boolean;
+  readOnly?: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ type GenStatus = "reading" | "pillars" | "drafting" | "placing";
 export function CalendarEmptyState({
   onGenerate,
   isGenerating,
+  readOnly = false,
 }: CalendarEmptyStateProps) {
   const t = useTranslations("contentCalendar");
 
@@ -199,7 +201,7 @@ export function CalendarEmptyState({
               );
             })}
           </motion.div>
-        ) : (
+        ) : !readOnly ? (
           <motion.button
             {...fadeUp}
             transition={{ duration: 0.5, delay: 0.35 }}
@@ -211,7 +213,7 @@ export function CalendarEmptyState({
           >
             {t("generateWithAi")}
           </motion.button>
-        )}
+        ) : null}
       </div>
     </div>
   );

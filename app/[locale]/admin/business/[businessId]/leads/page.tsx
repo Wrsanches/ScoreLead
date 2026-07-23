@@ -8,7 +8,10 @@ import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useSearch } from "@/components/search-overlay";
-import { useBusinessId } from "@/components/admin/business-context";
+import {
+  useBusinessAccess,
+  useBusinessId,
+} from "@/components/admin/business-context";
 import {
   Mail,
   MoreHorizontal,
@@ -64,6 +67,7 @@ export default function LeadsPage() {
   const t = useTranslations("dashboard");
   const { selectedLeadId, setSelectedLead, clearSelectedLead } = useSearch();
   const businessId = useBusinessId();
+  const { readOnly } = useBusinessAccess();
   const searchParams = useSearchParams();
 
   // Hydrate the search context from the ?focus=<id> query param - used when
@@ -115,6 +119,7 @@ export default function LeadsPage() {
   }
 
   async function updateLeadStatus(leadId: string, nextStatus: LeadStatus) {
+    if (readOnly) return;
     // Optimistic update
     const previous = leads;
     setLeads((prev) =>
@@ -178,7 +183,9 @@ export default function LeadsPage() {
       clearSelectedLead();
     } else {
       // Lead not on current page - fetch it directly and prepend
-      fetch(`/api/leads/${selectedLeadId}`)
+      fetch(
+        `/api/leads/${selectedLeadId}?businessId=${encodeURIComponent(businessId)}`,
+      )
         .then((res) => (res.ok ? res.json() : null))
         .then((targetLead) => {
           if (targetLead) {
@@ -190,7 +197,7 @@ export default function LeadsPage() {
         })
         .catch(() => clearSelectedLead());
     }
-  }, [selectedLeadId, leads, clearSelectedLead]);
+  }, [selectedLeadId, leads, businessId, clearSelectedLead]);
 
   const lead = leads[selectedIndex] || null;
 
@@ -643,6 +650,7 @@ export default function LeadsPage() {
                               <DropdownMenuTrigger asChild>
                                 <button
                                   type="button"
+                                  disabled={readOnly}
                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ring-1 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.ring}`}
                                   aria-label="Change lead status"
                                 >
@@ -650,7 +658,9 @@ export default function LeadsPage() {
                                     className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`}
                                   />
                                   {statusCfg.label}
-                                  <ChevronDown className="w-3 h-3 opacity-60" />
+                                  {!readOnly && (
+                                    <ChevronDown className="w-3 h-3 opacity-60" />
+                                  )}
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
@@ -1082,6 +1092,7 @@ export default function LeadsPage() {
                   businessId={businessId}
                   initialMessages={lead.outreachMessages}
                   contact={{ email: lead.email, phone: lead.phone }}
+                  readOnly={readOnly}
                   onMessagesChange={(msgs) => {
                     setLeads((prev) =>
                       prev.map((l) =>

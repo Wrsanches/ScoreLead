@@ -32,6 +32,7 @@ import {
   type BusinessEditValues,
 } from "@/components/admin/business-edit-sheet"
 import type { ProductImage } from "@/lib/product-images"
+import { useBusinessAccess } from "@/components/admin/business-context"
 
 interface Business {
   id: string
@@ -141,6 +142,7 @@ export default function BusinessDetailPage({
   params: Promise<{ businessId: string; locale: string }>
 }) {
   const { businessId: id } = use(params)
+  const { readOnly } = useBusinessAccess()
   const t = useTranslations("business")
   const tOnb = useTranslations("onboarding")
   const [data, setData] = useState<Business | null>(null)
@@ -367,14 +369,16 @@ export default function BusinessDetailPage({
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setEditOpen(true)}
-                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  {t("edit")}
-                </button>
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => setEditOpen(true)}
+                    className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    {t("edit")}
+                  </button>
+                )}
               </div>
 
               {/* Description + Tags */}
@@ -427,7 +431,7 @@ export default function BusinessDetailPage({
                 title={t("brand")}
                 accent="emerald"
                 actions={
-                  data.website ? (
+                  data.website && !readOnly ? (
                     <button
                       type="button"
                       onClick={refreshBrand}
@@ -456,6 +460,7 @@ export default function BusinessDetailPage({
                           colors={data.brandColors!}
                           primary={data.brandColorPrimary}
                           secondary={data.brandColorSecondary}
+                          readOnly={readOnly}
                           onPrimaryChange={(color) =>
                             updateBrandColors({ brandColorPrimary: color })
                           }
@@ -504,7 +509,7 @@ export default function BusinessDetailPage({
               <SectionCard
                 title={t("groupProductImages")}
                 actions={
-                  data.productImages && data.productImages.length > 0 ? (
+                  !readOnly && data.productImages && data.productImages.length > 0 ? (
                     <button
                       type="button"
                       onClick={() => setEditOpen(true)}
@@ -557,14 +562,16 @@ export default function BusinessDetailPage({
                     <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1 max-w-sm">
                       {t("productImagesHint")}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => setEditOpen(true)}
-                      className="mt-4 inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-lg transition-colors"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      {t("addProductImage")}
-                    </button>
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => setEditOpen(true)}
+                        className="mt-4 inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-lg transition-colors"
+                      >
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        {t("addProductImage")}
+                      </button>
+                    )}
                   </div>
                 )}
               </SectionCard>
@@ -615,7 +622,7 @@ export default function BusinessDetailPage({
         </ContentWrapper>
       </div>
 
-      {data && (
+      {data && !readOnly && (
         <BusinessEditSheet
           open={editOpen}
           onOpenChange={setEditOpen}

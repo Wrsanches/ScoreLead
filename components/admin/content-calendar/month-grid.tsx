@@ -27,6 +27,7 @@ interface MonthGridProps {
   weekdayLabels: string[]
   /** 0 = Sunday, 1 = Monday. Defaults to 1 (Monday). */
   weekStartsOn?: 0 | 1
+  readOnly?: boolean
 }
 
 function isoDay(d: Date): string {
@@ -58,6 +59,7 @@ export function MonthGrid({
   onReschedule,
   weekdayLabels,
   weekStartsOn = 1,
+  readOnly = false,
 }: MonthGridProps) {
   const [activePost, setActivePost] = useState<ContentPostRow | null>(null)
 
@@ -172,6 +174,7 @@ export function MonthGrid({
               onSelectPost={onSelectPost}
               onAdd={onAddPost}
               animationIndex={i}
+              readOnly={readOnly}
             />
           )
         })}

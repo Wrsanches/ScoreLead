@@ -16,6 +16,7 @@ interface BrandColorPickerProps {
   secondary: string | null
   onPrimaryChange: (color: string | null) => void
   onSecondaryChange: (color: string | null) => void
+  readOnly?: boolean
 }
 
 function normalize(value: string | null) {
@@ -29,6 +30,7 @@ function Slot({
   icon: Icon,
   accent,
   onClear,
+  readOnly,
 }: {
   label: string
   value: string | null
@@ -36,6 +38,7 @@ function Slot({
   icon: typeof Star
   accent: "emerald" | "sky"
   onClear: () => void
+  readOnly: boolean
 }) {
   const ring =
     accent === "emerald"
@@ -74,7 +77,7 @@ function Slot({
           <p className="text-sm text-zinc-500 dark:text-zinc-600 italic">{emptyLabel}</p>
         )}
       </div>
-      {value && (
+      {value && !readOnly && (
         <button
           type="button"
           onClick={onClear}
@@ -94,6 +97,7 @@ export function BrandColorPicker({
   secondary,
   onPrimaryChange,
   onSecondaryChange,
+  readOnly = false,
 }: BrandColorPickerProps) {
   const t = useTranslations("business")
   const primaryNorm = normalize(primary)
@@ -113,6 +117,7 @@ export function BrandColorPicker({
           icon={Star}
           accent="emerald"
           onClear={() => onPrimaryChange(null)}
+          readOnly={readOnly}
         />
         <Slot
           label={t("secondaryColor")}
@@ -121,6 +126,7 @@ export function BrandColorPicker({
           icon={Sparkles}
           accent="sky"
           onClear={() => onSecondaryChange(null)}
+          readOnly={readOnly}
         />
       </div>
 
@@ -139,6 +145,7 @@ export function BrandColorPicker({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
+                  disabled={readOnly}
                   className={`group flex items-center gap-2.5 p-2 pr-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-all duration-150 text-left ${ringClass}`}
                 >
                   <div

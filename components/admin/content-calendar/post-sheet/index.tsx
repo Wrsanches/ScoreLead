@@ -39,6 +39,7 @@ interface PostSheetProps {
     file: File,
     headline: string,
   ) => Promise<void>;
+  readOnly?: boolean;
 }
 
 export function PostSheet({ open, onOpenChange, ...rest }: PostSheetProps) {
@@ -69,6 +70,7 @@ function PostSheetBody({
   onGenerateImage,
   onRegenerateSlide,
   onUploadSlide,
+  readOnly = false,
 }: Omit<PostSheetProps, "open" | "onOpenChange">) {
   const t = useTranslations("contentCalendar");
   const [saving, setSaving] = useState(false);
@@ -114,7 +116,7 @@ function PostSheetBody({
       <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[26rem_1fr]">
         {/* Left: live Instagram preview */}
         <div className="border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/20 px-5 py-6 lg:h-full lg:min-h-0 lg:overflow-y-auto">
-          {post && onGenerateImage ? (
+          {post && onGenerateImage && !readOnly ? (
             <ImagePane
               post={post}
               businessId={businessId}
@@ -137,7 +139,7 @@ function PostSheetBody({
             <div className="space-y-3">
               <InstagramPreview
                 businessId={businessId}
-                images={[]}
+                images={post?.images ?? []}
                 index={0}
                 onIndexChange={() => {}}
                 caption={values.caption}
@@ -149,22 +151,27 @@ function PostSheetBody({
                 imageFailures={[]}
                 onExpand={() => {}}
               />
-              <p className="mx-auto w-full max-w-sm text-center text-[11px] text-zinc-500 dark:text-zinc-600">
-                {t("imageAfterSaveHint")}
-              </p>
+              {!readOnly && (
+                <p className="mx-auto w-full max-w-sm text-center text-[11px] text-zinc-500 dark:text-zinc-600">
+                  {t("imageAfterSaveHint")}
+                </p>
+              )}
             </div>
           )}
         </div>
 
         {/* Right: compose controls */}
         <div className="px-5 py-6 lg:h-full lg:min-h-0 lg:overflow-y-auto">
-          <PostFormFields
-            values={values}
-            onChange={(patch) => setValues((v) => ({ ...v, ...patch }))}
-          />
+          <fieldset disabled={readOnly}>
+            <PostFormFields
+              values={values}
+              onChange={(patch) => setValues((v) => ({ ...v, ...patch }))}
+            />
+          </fieldset>
         </div>
       </div>
 
+      {!readOnly && (
       <div className="border-t border-zinc-200 dark:border-zinc-800 px-5 py-3 flex items-center gap-2">
         {!isNew && onDelete && (
           <button
@@ -195,6 +202,7 @@ function PostSheetBody({
           {t("save")}
         </button>
       </div>
+      )}
     </>
   );
 }

@@ -4,6 +4,7 @@ import { use } from "react"
 import { WhatsAppTemplatesManager } from "@/components/admin/whatsapp/templates-manager"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
+import { useBusinessAccess } from "@/components/admin/business-context"
 
 export default function WhatsAppTemplatesPage({
   params,
@@ -11,10 +12,11 @@ export default function WhatsAppTemplatesPage({
   params: Promise<{ businessId: string }>
 }) {
   const { businessId } = use(params)
+  const { readOnly } = useBusinessAccess()
   const { data: session } = authClient.useSession()
   const integrationEnabled =
     process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
-    hasWhatsAppEarlyAccess(session?.user.email)
+    (readOnly || hasWhatsAppEarlyAccess(session?.user.email))
 
   if (!integrationEnabled) {
     return (

@@ -5,7 +5,10 @@ import { and, eq, gte, lt } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { resolveBusinessId } from "@/lib/active-business"
+import {
+  resolveBusinessId,
+  resolveViewableBusiness,
+} from "@/lib/active-business"
 
 function monthRange(monthParam: string | null): { start: Date; end: Date } {
   const now = new Date()
@@ -27,11 +30,11 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url)
   const { start, end } = monthRange(url.searchParams.get("month"))
-  const businessId = await resolveBusinessId(
+  const access = await resolveViewableBusiness(
     session.user.id,
     url.searchParams.get("businessId"),
   )
-  if (!businessId) {
+  if (!access) {
     return NextResponse.json({ posts: [], businessId: null })
   }
 
@@ -40,8 +43,7 @@ export async function GET(request: Request) {
     .from(contentPost)
     .where(
       and(
-        eq(contentPost.userId, session.user.id),
-        eq(contentPost.businessId, businessId),
+        eq(contentPost.businessId, access.businessId),
         gte(contentPost.scheduledFor, start),
         lt(contentPost.scheduledFor, end),
       ),
@@ -49,7 +51,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     posts: rows,
-    businessId,
+    businessId: access.businessId,
     monthStart: start.toISOString(),
     monthEnd: end.toISOString(),
   })

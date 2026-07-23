@@ -32,6 +32,7 @@ import {
 import { usePlan } from "@/components/admin/plan-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
+import { useBusinessAccess } from "@/components/admin/business-context"
 
 declare global {
   interface Window {
@@ -86,9 +87,13 @@ export default function IntegrationsPage({
   const t = useTranslations("whatsapp")
   const td = useTranslations("dashboard")
   const { isPro, openUpgrade } = usePlan()
+  const { readOnly } = useBusinessAccess()
   const { data: session } = authClient.useSession()
   const integrationEnabled =
-    WHATSAPP_INTEGRATION_CONFIGURED && hasWhatsAppEarlyAccess(session?.user.email)
+    WHATSAPP_INTEGRATION_CONFIGURED &&
+    (readOnly || hasWhatsAppEarlyAccess(session?.user.email))
+  const [targetPlan, setTargetPlan] = useState<"free" | "pro" | null>(null)
+  const effectiveIsPro = readOnly ? targetPlan === "pro" : isPro
   const [connection, setConnection] = useState<Connection | null>(null)
   const [loading, setLoading] = useState(true)
   const [sdkReady, setSdkReady] = useState(false)
@@ -134,8 +139,9 @@ export default function IntegrationsPage({
       const response = await fetch(`/api/businesses/${businessId}/whatsapp/connection`)
       const body = await response.json()
       if (!response.ok) throw new Error(body.error || t("loadError"))
+      setTargetPlan(body.plan === "pro" ? "pro" : "free")
       setConnection(body.connection)
-      if (body.connection?.status === "connected" && isPro) {
+      if (body.connection?.status === "connected" && body.plan === "pro") {
         await refreshTemplateCounts()
       }
     } catch (error) {
@@ -143,7 +149,7 @@ export default function IntegrationsPage({
     } finally {
       setLoading(false)
     }
-  }, [businessId, integrationEnabled, isPro, t, refreshTemplateCounts])
+  }, [businessId, integrationEnabled, t, refreshTemplateCounts])
 
   useEffect(() => {
     load()
@@ -229,9 +235,10 @@ export default function IntegrationsPage({
   }, [finishConnection, integrationEnabled, t])
 
   async function connect() {
+    if (readOnly) return
     if (!integrationEnabled) return
 
-    if (!isPro) {
+    if (!effectiveIsPro) {
       openUpgrade()
       return
     }
@@ -351,7 +358,7 @@ export default function IntegrationsPage({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {integrationEnabled ? (
+      {integrationEnabled && !readOnly ? (
         <Script
           src="https://connect.facebook.net/en_US/sdk.js"
           strategy="afterInteractive"
@@ -405,10 +412,12 @@ export default function IntegrationsPage({
               </div>
               <h2 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">{t("connectTitle")}</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">{t("connectDescription")}</p>
-              <Button className="mt-6" onClick={connect} disabled={connecting}>
-                {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
-                {connecting ? t("connecting") : isPro ? t("connectButton") : t("upgradeButton")}
-              </Button>
+              {!readOnly && (
+                <Button className="mt-6" onClick={connect} disabled={connecting}>
+                  {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
+                  {connecting ? t("connecting") : effectiveIsPro ? t("connectButton") : t("upgradeButton")}
+                </Button>
+              )}
             </div>
             <div className="space-y-4 border-t border-zinc-200 pt-6 dark:border-zinc-800 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
               <InfoRow icon={ShieldCheck} title={t("consentTitle")} text={t("consentDescription")} />
@@ -435,10 +444,12 @@ export default function IntegrationsPage({
                   <p className="mt-1 text-sm text-zinc-500">{connection.displayPhoneNumber || t("numberUnavailable")}</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => setDisconnectOpen(true)}>
-                <Unplug className="h-4 w-4" />
-                {t("disconnect")}
-              </Button>
+              {!readOnly && (
+                <Button variant="outline" onClick={() => setDisconnectOpen(true)}>
+                  <Unplug className="h-4 w-4" />
+                  {t("disconnect")}
+                </Button>
+              )}
             </section>
 
             <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
@@ -452,6 +463,7 @@ export default function IntegrationsPage({
                       id="wa-timezone"
                       className="mt-2"
                       value={connection.timezone}
+                      disabled={readOnly}
                       onChange={(event) => setConnection({ ...connection, timezone: event.target.value })}
                       placeholder="America/Sao_Paulo"
                     />
@@ -463,6 +475,7 @@ export default function IntegrationsPage({
                       type="time"
                       className="mt-2"
                       value={connection.sendWindowStart}
+                      disabled={readOnly}
                       onChange={(event) => setConnection({ ...connection, sendWindowStart: event.target.value })}
                     />
                   </div>
@@ -473,6 +486,7 @@ export default function IntegrationsPage({
                       type="time"
                       className="mt-2"
                       value={connection.sendWindowEnd}
+                      disabled={readOnly}
                       onChange={(event) => setConnection({ ...connection, sendWindowEnd: event.target.value })}
                     />
                   </div>
@@ -485,6 +499,7 @@ export default function IntegrationsPage({
                       max={100}
                       className="mt-2"
                       value={connection.dailyLimit}
+                      disabled={readOnly}
                       onChange={(event) => setConnection({ ...connection, dailyLimit: Number(event.target.value) })}
                     />
                   </div>
@@ -498,6 +513,7 @@ export default function IntegrationsPage({
                             key={day}
                             type="button"
                             aria-pressed={active}
+                            disabled={readOnly}
                             onClick={() => toggleWeekday(day)}
                             className={`h-9 min-w-11 rounded-lg border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
                               active
@@ -512,10 +528,12 @@ export default function IntegrationsPage({
                     </div>
                   </div>
                 </div>
-                <Button className="mt-6" onClick={saveSettings} disabled={saving}>
-                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {t("saveSettings")}
-                </Button>
+                {!readOnly && (
+                  <Button className="mt-6" onClick={saveSettings} disabled={saving}>
+                    {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {t("saveSettings")}
+                  </Button>
+                )}
               </div>
 
               <aside className="border-t border-zinc-200 pt-6 dark:border-zinc-800 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
@@ -528,17 +546,19 @@ export default function IntegrationsPage({
                     {t("manageTemplates")}
                   </Link>
                 </Button>
-                <Button variant="outline" className="mt-2 w-full" onClick={syncTemplates} disabled={syncing}>
-                  {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                  {t("syncTemplates")}
-                </Button>
+                {!readOnly && (
+                  <Button variant="outline" className="mt-2 w-full" onClick={syncTemplates} disabled={syncing}>
+                    {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    {t("syncTemplates")}
+                  </Button>
+                )}
               </aside>
             </section>
           </div>
         )}
       </ContentWrapper>
 
-      <AlertDialog open={disconnectOpen} onOpenChange={setDisconnectOpen}>
+      <AlertDialog open={!readOnly && disconnectOpen} onOpenChange={setDisconnectOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("disconnectTitle")}</AlertDialogTitle>

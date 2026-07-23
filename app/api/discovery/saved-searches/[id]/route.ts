@@ -4,6 +4,7 @@ import { savedSearch } from "@/lib/db/schema"
 import { eq, and } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function GET(
   _request: Request,
@@ -22,14 +23,13 @@ export async function GET(
   const [search] = await db
     .select()
     .from(savedSearch)
-    .where(
-      and(
-        eq(savedSearch.id, id),
-        eq(savedSearch.userId, session.user.id),
-      ),
-    )
+    .where(eq(savedSearch.id, id))
+    .limit(1)
 
-  if (!search) {
+  const access = search
+    ? await getBusinessAccess(session.user.id, search.businessId)
+    : null
+  if (!search || !access) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 

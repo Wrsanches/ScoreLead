@@ -9,13 +9,17 @@ import {
   EmptyState,
 } from "@/components/admin"
 import { LeadDetailModal } from "@/components/admin/lead-detail-modal"
-import { useBusinessId } from "@/components/admin/business-context"
+import {
+  useBusinessAccess,
+  useBusinessId,
+} from "@/components/admin/business-context"
 import { LeadsKanban } from "../_components/leads-kanban"
 import type { Lead, LeadStatus } from "../_shared"
 
 export default function LeadsKanbanPage() {
   const t = useTranslations("dashboard")
   const businessId = useBusinessId()
+  const { readOnly } = useBusinessAccess()
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
@@ -43,6 +47,7 @@ export default function LeadsKanbanPage() {
   }, [businessId])
 
   async function handleStatusChange(leadId: string, nextStatus: LeadStatus) {
+    if (readOnly) return
     // Optimistic update with rollback on failure
     const previous = leads
     setLeads((prev) =>
@@ -88,6 +93,7 @@ export default function LeadsKanbanPage() {
           leads={leads}
           onStatusChange={handleStatusChange}
           onCardClick={handleCardClick}
+          readOnly={readOnly}
         />
       )}
 
@@ -98,6 +104,7 @@ export default function LeadsKanbanPage() {
           if (!open) setSelectedLeadId(null)
         }}
         onStatusChange={handleStatusChange}
+        readOnly={readOnly}
       />
     </div>
   )

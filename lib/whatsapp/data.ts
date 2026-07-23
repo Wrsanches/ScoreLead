@@ -15,6 +15,7 @@ import {
   listMessageTemplates,
 } from "@/lib/whatsapp/meta"
 import { isSupportedMarketingTemplate } from "@/lib/whatsapp/templates"
+import { getBusinessAccess } from "@/lib/business-access"
 import {
   buildTemplateComponents,
   type TemplateFormInput,
@@ -47,6 +48,18 @@ export async function getOwnedLead(leadId: string, userId: string) {
     .innerJoin(business, eq(lead.businessId, business.id))
     .where(and(eq(lead.id, leadId), eq(business.userId, userId)))
   return row?.lead ?? null
+}
+
+export async function getViewableLead(leadId: string, actorUserId: string) {
+  const [row] = await db
+    .select()
+    .from(lead)
+    .where(eq(lead.id, leadId))
+    .limit(1)
+  if (!row) return null
+
+  const access = await getBusinessAccess(actorUserId, row.businessId)
+  return access ? { lead: row, access } : null
 }
 
 export async function getWhatsAppConnection(businessId: string) {

@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { discoveryJob, lead } from "@/lib/db/schema"
-import { eq, and, count, avg, gte, desc, sql, inArray } from "drizzle-orm"
+import { eq, and, count, avg, gte, desc, sql } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { resolveBusinessId } from "@/lib/active-business"
+import { resolveViewableBusiness } from "@/lib/active-business"
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({
@@ -15,30 +15,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const userId = session.user.id
   const url = new URL(request.url)
-  const activeBusinessId = await resolveBusinessId(
-    userId,
+  const access = await resolveViewableBusiness(
+    session.user.id,
     url.searchParams.get("businessId"),
   )
-  const businessScope = activeBusinessId
-    ? and(
-        eq(discoveryJob.userId, userId),
-        eq(discoveryJob.businessId, activeBusinessId),
-      )
-    : eq(discoveryJob.userId, userId)
+  if (!access) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
+  const businessScope = eq(discoveryJob.businessId, access.businessId)
 
   // Get jobs for the active business
-  const userJobs = activeBusinessId
-    ? await db
-        .select({ id: discoveryJob.id })
-        .from(discoveryJob)
-        .where(businessScope)
-    : []
-
-  const jobIds = userJobs.map((j) => j.id)
-  const hasJobs = jobIds.length > 0
-  const jobCondition = hasJobs ? inArray(lead.jobId, jobIds) : sql`false`
+  const leadScope = eq(lead.businessId, access.businessId)
 
   const [
     [jobTotals],
@@ -72,30 +60,30 @@ export async function GET(request: Request) {
         avgRating: avg(lead.googleRating),
       })
       .from(lead)
-      .where(jobCondition),
+      .where(leadScope),
     // High score leads
     db
       .select({ count: count() })
       .from(lead)
-      .where(and(jobCondition, gte(lead.score, 4))),
+      .where(and(leadScope, gte(lead.score, 4))),
     // Contact availability
     db
       .select({ count: count() })
       .from(lead)
-      .where(and(jobCondition, sql`${lead.website} IS NOT NULL`)),
+      .where(and(leadScope, sql`${lead.website} IS NOT NULL`)),
     db
       .select({ count: count() })
       .from(lead)
-      .where(and(jobCondition, sql`${lead.email} IS NOT NULL`)),
+      .where(and(leadScope, sql`${lead.email} IS NOT NULL`)),
     db
       .select({ count: count() })
       .from(lead)
-      .where(and(jobCondition, sql`${lead.phone} IS NOT NULL`)),
+      .where(and(leadScope, sql`${lead.phone} IS NOT NULL`)),
     // Enriched
     db
       .select({ count: count() })
       .from(lead)
-      .where(and(jobCondition, eq(lead.firecrawlEnriched, true))),
+      .where(and(leadScope, eq(lead.firecrawlEnriched, true))),
     // Score distribution for chart
     db
       .select({
@@ -112,7 +100,7 @@ export async function GET(request: Request) {
         count: count(),
       })
       .from(lead)
-      .where(jobCondition)
+      .where(leadScope)
       .groupBy(sql`1`)
       .orderBy(sql`1`),
     // Source breakdown for chart
@@ -122,7 +110,7 @@ export async function GET(request: Request) {
         count: count(),
       })
       .from(lead)
-      .where(jobCondition)
+      .where(leadScope)
       .groupBy(lead.source),
     // Recent leads
     db
@@ -136,7 +124,7 @@ export async function GET(request: Request) {
         createdAt: lead.createdAt,
       })
       .from(lead)
-      .where(jobCondition)
+      .where(leadScope)
       .orderBy(desc(lead.createdAt))
       .limit(5),
     // Recent jobs
@@ -160,7 +148,7 @@ export async function GET(request: Request) {
       })
       .from(lead)
       .where(and(
-        jobCondition,
+        leadScope,
         gte(lead.createdAt, sql`NOW() - INTERVAL '7 days'`),
       ))
       .groupBy(sql`1`)

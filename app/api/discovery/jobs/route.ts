@@ -2,10 +2,10 @@ import { after } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { discoveryJob } from "@/lib/db/schema"
-import { and, eq, desc } from "drizzle-orm"
+import { eq, desc } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { resolveBusinessId } from "@/lib/active-business"
+import { resolveViewableBusiness } from "@/lib/active-business"
 import { pumpQueueIfDue } from "@/lib/jobs/discovery-queue"
 
 export async function GET(request: Request) {
@@ -18,23 +18,18 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url)
-  const activeBusinessId = await resolveBusinessId(
+  const access = await resolveViewableBusiness(
     session.user.id,
     url.searchParams.get("businessId"),
   )
-  if (!activeBusinessId) {
+  if (!access) {
     return NextResponse.json([])
   }
 
   const jobs = await db
     .select()
     .from(discoveryJob)
-    .where(
-      and(
-        eq(discoveryJob.userId, session.user.id),
-        eq(discoveryJob.businessId, activeBusinessId),
-      ),
-    )
+    .where(eq(discoveryJob.businessId, access.businessId))
     .orderBy(desc(discoveryJob.createdAt))
 
   // The UI polls this route while a job runs; opportunistically recover

@@ -18,13 +18,26 @@ function writeLastViewedCookie(id: string) {
   document.cookie = `${ACTIVE_BUSINESS_COOKIE}=${encodeURIComponent(id)}; Path=/; Max-Age=31536000; SameSite=Lax`
 }
 
-const BusinessIdContext = createContext<string | null>(null)
+type BusinessContextValue = {
+  businessId: string
+  readOnly: boolean
+  ownerName: string | null
+  ownerEmail: string | null
+}
+
+const BusinessContext = createContext<BusinessContextValue | null>(null)
 
 export function BusinessProvider({
   businessId,
+  readOnly = false,
+  ownerName = null,
+  ownerEmail = null,
   children,
 }: {
   businessId: string
+  readOnly?: boolean
+  ownerName?: string | null
+  ownerEmail?: string | null
   children: React.ReactNode
 }) {
   // Remember the most recently viewed business for the `/admin` redirect.
@@ -33,18 +46,28 @@ export function BusinessProvider({
   }, [businessId])
 
   return (
-    <BusinessIdContext.Provider value={businessId}>
+    <BusinessContext.Provider
+      value={{ businessId, readOnly, ownerName, ownerEmail }}
+    >
       {children}
-    </BusinessIdContext.Provider>
+    </BusinessContext.Provider>
   )
 }
 
 /** The active business id from the URL. Guaranteed non-null inside the
  * `/admin/business/[businessId]` segment (the layout validates it). */
 export function useBusinessId(): string {
-  const id = useContext(BusinessIdContext)
-  if (!id) {
+  const context = useContext(BusinessContext)
+  if (!context) {
     throw new Error("useBusinessId must be used within a BusinessProvider")
   }
-  return id
+  return context.businessId
+}
+
+export function useBusinessAccess(): BusinessContextValue {
+  const context = useContext(BusinessContext)
+  if (!context) {
+    throw new Error("useBusinessAccess must be used within a BusinessProvider")
+  }
+  return context
 }

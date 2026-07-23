@@ -27,7 +27,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const scoped = await scopeWhatsAppRoute(id)
+  const scoped = await scopeWhatsAppRoute(id, "view")
   if ("error" in scoped) return scoped.error
 
   // ?scope=all returns every template (management view); the default returns

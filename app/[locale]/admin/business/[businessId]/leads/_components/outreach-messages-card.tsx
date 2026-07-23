@@ -41,6 +41,7 @@ interface OutreachMessagesCardProps {
     email?: string | null
     phone?: string | null
   }
+  readOnly?: boolean
 }
 
 // A cohesive 3-beat cadence: greet -> give value -> ask. One emerald accent
@@ -53,6 +54,7 @@ export function OutreachMessagesCard({
   initialMessages,
   onMessagesChange,
   contact,
+  readOnly = false,
 }: OutreachMessagesCardProps) {
   const t = useTranslations("outreach")
   const { openUpgrade } = usePlan()
@@ -207,26 +209,28 @@ export function OutreachMessagesCard({
               <Copy className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t("copyAll")}</span>
             </button>
-            <button
-              type="button"
-              onClick={generate}
-              disabled={loading}
-              className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="w-3.5 h-3.5" />
-              )}
-              {loading ? t("generating") : t("regenerate")}
-            </button>
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={generate}
+                disabled={loading}
+                className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3.5 h-3.5" />
+                )}
+                {loading ? t("generating") : t("regenerate")}
+              </button>
+            )}
           </div>
         )}
       </OutreachHeader>
 
       <div className="p-5">
         {/* Empty state */}
-        {!hasMessages && !loading && (
+        {!hasMessages && !loading && !readOnly && (
           <EmptyState
             title={t("emptyTitle")}
             description={t("emptyDescription")}
@@ -290,12 +294,14 @@ export function OutreachMessagesCard({
                         <div className="flex items-center gap-0.5 shrink-0">
                           {isEditing ? null : (
                             <>
-                              <IconButton
-                                icon={FileText}
-                                label={t("edit")}
-                                onClick={() => startEditing(idx)}
-                                hoverReveal
-                              />
+                              {!readOnly && (
+                                <IconButton
+                                  icon={FileText}
+                                  label={t("edit")}
+                                  onClick={() => startEditing(idx)}
+                                  hoverReveal
+                                />
+                              )}
                               <IconButton
                                 icon={isCopied ? Check : Copy}
                                 label={isCopied ? t("copied") : t("copy")}
@@ -381,11 +387,13 @@ export function OutreachMessagesCard({
                           </p>
 
                           {/* Footer: char count + quick send */}
-                          <SendActions
-                            body={msg.body}
-                            contact={contact}
-                            charCount={msg.body.length}
-                          />
+                          {!readOnly && (
+                            <SendActions
+                              body={msg.body}
+                              contact={contact}
+                              charCount={msg.body.length}
+                            />
+                          )}
                         </>
                       )}
                     </div>
@@ -395,11 +403,13 @@ export function OutreachMessagesCard({
             </AnimatePresence>
           </div>
         )}
-        <WhatsAppAutomationPanel
-          businessId={businessId}
-          leadId={leadId}
-          phone={contact?.phone}
-        />
+        {!readOnly && (
+          <WhatsAppAutomationPanel
+            businessId={businessId}
+            leadId={leadId}
+            phone={contact?.phone}
+          />
+        )}
       </div>
     </div>
   )

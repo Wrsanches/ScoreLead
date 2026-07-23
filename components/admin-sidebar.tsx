@@ -47,6 +47,9 @@ type Business = {
   logo: string | null;
   field: string | null;
   website: string | null;
+  ownerName?: string | null;
+  ownerEmail?: string | null;
+  readOnly?: boolean;
 };
 
 function getBusinessLogo(b: Business | undefined): string | null {
@@ -70,6 +73,7 @@ export function AdminSidebar({
   onCollapsedChange,
   animateLayout,
   userEmail: serverUserEmail,
+  isPlatformAdmin = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -77,6 +81,7 @@ export function AdminSidebar({
   onCollapsedChange: (collapsed: boolean) => void;
   animateLayout: boolean;
   userEmail?: string | null;
+  isPlatformAdmin?: boolean;
 }) {
   const t = useTranslations("dashboard");
   const tb = useTranslations("billing");
@@ -101,7 +106,7 @@ export function AdminSidebar({
   const userImage = session?.user?.image;
   const whatsappAvailable =
     process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
-    hasWhatsAppEarlyAccess(userEmail);
+    (isPlatformAdmin || hasWhatsAppEarlyAccess(userEmail));
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
@@ -125,8 +130,17 @@ export function AdminSidebar({
   // Switch business by rewriting the [businessId] segment of the current path
   // (preserving the sub-page); from a non-business route, land on its dashboard.
   const switchBusiness = (id: string) => {
-    const next = pathname.match(/\/admin\/business\/[^/]+/)
-      ? pathname.replace(/\/admin\/business\/[^/]+/, `/admin/business/${id}`)
+    const businessPath = pathname.match(/\/admin\/business\/[^/]+/);
+    const currentSection = businessPath
+      ? pathname.slice((businessPath.index ?? 0) + businessPath[0].length)
+      : "";
+    // A resource id belongs to the previous business, so switching from a job
+    // detail returns to the destination business's job list.
+    const nextSection = currentSection.startsWith("/discovery-jobs/")
+      ? "/discovery-jobs"
+      : currentSection;
+    const next = businessPath
+      ? `/admin/business/${id}${nextSection}`
       : `/admin/business/${id}`;
     router.push(next);
   };
@@ -236,7 +250,7 @@ export function AdminSidebar({
             side="bottom"
             align="start"
             sideOffset={4}
-            className="w-54 bg-zinc-50 dark:bg-zinc-900 border-zinc-300/60 dark:border-zinc-700/60 shadow-xl shadow-black/40"
+            className="w-72 max-h-[70vh] overflow-y-auto bg-zinc-50 dark:bg-zinc-900 border-zinc-300/60 dark:border-zinc-700/60 shadow-xl shadow-black/40"
           >
             <DropdownMenuLabel className="px-3 py-1.5 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
               {t("businesses")}
@@ -266,11 +280,16 @@ export function AdminSidebar({
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm truncate">{b.name || "Unnamed"}</p>
-                    {b.field && (
+                    {isPlatformAdmin && b.ownerEmail ? (
+                      <p className="text-xs text-zinc-500 truncate">
+                        {b.ownerName ? `${b.ownerName} · ` : ""}
+                        {b.ownerEmail}
+                      </p>
+                    ) : b.field ? (
                       <p className="text-xs text-zinc-500 truncate">
                         {b.field}
                       </p>
-                    )}
+                    ) : null}
                   </div>
                   {b.id === businessId && (
                     <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -278,14 +297,18 @@ export function AdminSidebar({
                 </div>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
-            <DropdownMenuItem
-              onClick={() => router.push("/onboarding?new=true")}
-              className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              {t("addBusiness")}
-            </DropdownMenuItem>
+            {!isPlatformAdmin && (
+              <>
+                <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
+                <DropdownMenuItem
+                  onClick={() => router.push("/onboarding?new=true")}
+                  className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-zinc-100 dark:focus:bg-zinc-800/60 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("addBusiness")}
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         )}
@@ -386,7 +409,7 @@ export function AdminSidebar({
       )}
 
       <div className={`mt-auto p-3 ${collapsed ? "lg:px-2" : ""}`}>
-        {!planLoading && !isPro && (
+        {!isPlatformAdmin && !planLoading && !isPro && (
           <button
             type="button"
             onClick={openUpgrade}

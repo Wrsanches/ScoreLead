@@ -9,9 +9,11 @@ import { PlanProvider } from "@/components/admin/plan-context"
 export function AdminShell({
   children,
   userEmail,
+  isPlatformAdmin = false,
 }: {
   children: React.ReactNode
   userEmail?: string | null
+  isPlatformAdmin?: boolean
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -49,6 +51,7 @@ export function AdminShell({
           onCollapsedChange={setSidebarCollapsed}
           animateLayout={sidebarTransitionsReady}
           userEmail={userEmail}
+          isPlatformAdmin={isPlatformAdmin}
         />
 
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-2 lg:p-3 lg:pl-0">

@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { countBodyVariables } from "@/lib/whatsapp/template-form"
+import { useBusinessAccess } from "@/components/admin/business-context"
 
 type TemplateComponent = {
   type: string
@@ -150,6 +151,7 @@ function statusBadgeClass(status: string): string {
 
 export function WhatsAppTemplatesManager({ businessId }: { businessId: string }) {
   const t = useTranslations("whatsapp")
+  const { readOnly } = useBusinessAccess()
   const [templates, setTemplates] = useState<TemplateRow[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -313,7 +315,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
           { label: t("title"), href: `/admin/business/${businessId}/integrations` },
           { label: t("manageTemplates") },
         ]}
-        actions={
+        actions={!readOnly ? (
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={sync} disabled={syncing}>
               {syncing ? (
@@ -328,7 +330,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
               {t("newTemplate")}
             </Button>
           </div>
-        }
+        ) : undefined}
       />
 
       <Link
@@ -349,10 +351,12 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
             {t("tplEmptyTitle")}
           </p>
           <p className="mt-1 text-xs text-zinc-500">{t("tplEmptyBody")}</p>
-          <Button className="mt-5" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            {t("newTemplate")}
-          </Button>
+          {!readOnly && (
+            <Button className="mt-5" onClick={openCreate}>
+              <Plus className="h-4 w-4" />
+              {t("newTemplate")}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="mt-6 space-y-2.5">
@@ -386,6 +390,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
                       </p>
                     )}
                 </div>
+                {!readOnly && (
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
                     variant="ghost"
@@ -409,6 +414,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
+                )}
               </div>
             </div>
           ))}
