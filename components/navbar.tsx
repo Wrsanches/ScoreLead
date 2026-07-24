@@ -37,11 +37,11 @@ export function Navbar() {
   }, [open])
 
   const links = [
-    { href: "/case-studies/ceramik" as const, label: t("results") },
-    { href: "/features/ai-lead-discovery" as const, label: t("features") },
-    { href: "/features/lead-enrichment" as const, label: t("ai") },
-    { href: "/features/sales-pipeline" as const, label: t("pipeline") },
-    { href: "/pricing" as const, label: t("pricing") },
+    { href: "/#customers" as const, label: t("results") },
+    { href: "/#features" as const, label: t("features") },
+    { href: "/#ai" as const, label: t("ai") },
+    { href: "/#pipeline" as const, label: t("pipeline") },
+    { href: "/#pricing" as const, label: t("pricing") },
   ]
 
   const isLoggedIn = !!session?.user
