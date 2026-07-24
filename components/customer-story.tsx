@@ -2,8 +2,9 @@
 
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
-import { ChevronRight, Quote, ArrowUpRight } from "lucide-react"
+import { ChevronRight, Quote, ArrowRight } from "lucide-react"
 import Image from "next/image"
+import { Link } from "@/i18n/routing"
 
 export function CustomerStory() {
   const t = useTranslations("customerStory")
@@ -99,10 +100,10 @@ export function CustomerStory() {
                   </div>
                 </div>
 
-                <a href="https://ceramik.app" target="_blank" rel="noopener noreferrer" className="mt-10 flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
+                <Link href="/case-studies/ceramik" className="mt-10 flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
                   {t("readMore")}
-                  <ArrowUpRight className="w-4 h-4" />
-                </a>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
           </motion.div>

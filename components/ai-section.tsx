@@ -124,7 +124,7 @@ export function AISection() {
             className="mb-16"
           >
             <Link
-              href="/signup"
+              href="/features/lead-enrichment"
               className="px-5 py-2.5 bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-colors text-sm inline-flex items-center gap-2"
             >
               {t("cta")}

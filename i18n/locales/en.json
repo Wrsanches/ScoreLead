@@ -56,7 +56,8 @@
     "login": "Sign in",
     "signUp": "Get started",
     "dashboard": "Dashboard",
-    "language": "Language"
+    "language": "Language",
+    "blog": "Blog"
   },
   "hero": {
     "heading": "Discover, score, and convert your next best B2B customers",
@@ -77,7 +78,7 @@
     "stat2Label": "Pipeline growth in the first month",
     "stat3": "85%",
     "stat3Label": "Less time spent on manual research",
-    "readMore": "Visit Ceramik"
+    "readMore": "Read the case study"
   },
   "features": {
     "heading": "Built for B2B teams that need more pipeline",
@@ -646,8 +647,22 @@
     "dpa": "DPA",
     "contactUs": "Contact us",
     "twitter": "X (Twitter)",
-    "linkedin": "LinkedIn",
     "github": "GitHub"
+    ,
+    "leadDiscovery": "AI lead discovery",
+    "leadScoring": "Lead scoring",
+    "leadEnrichment": "Lead enrichment",
+    "outreachAutomation": "Outreach automation",
+    "useCases": "Use cases",
+    "agencies": "Agencies",
+    "salesTeams": "B2B sales teams",
+    "startups": "B2B startups",
+    "b2bCompanies": "B2B companies",
+    "icpWorksheet": "ICP worksheet",
+    "scoringCalculator": "Scoring calculator",
+    "enrichmentChecklist": "Enrichment checklist",
+    "roiCalculator": "Research ROI calculator",
+    "editorialPolicy": "Editorial policy"
   },
   "contact": {
     "eyebrow": "Talk to the team",

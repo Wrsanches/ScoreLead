@@ -34,6 +34,7 @@ import {
   X,
 } from "lucide-react";
 import { MobileMenuButton } from "@/components/admin-shell";
+import { trackMarketingEvent } from "@/lib/analytics-events";
 import {
   SectionCard,
   StatNumber,
@@ -132,6 +133,11 @@ export default function LeadsPage() {
         body: JSON.stringify({ status: nextStatus }),
       });
       if (!res.ok) throw new Error("Failed");
+      if (nextStatus === "interested") {
+        trackMarketingEvent("qualified_account", { pipeline_status: nextStatus });
+      } else if (nextStatus === "customer") {
+        trackMarketingEvent("customer_conversion", { pipeline_status: nextStatus });
+      }
     } catch {
       // Revert on failure
       setLeads(previous);

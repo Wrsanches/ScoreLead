@@ -18,7 +18,7 @@ import { WaitlistSection } from "./waitlist-section"
 import { WaitlistFooter } from "./waitlist-footer"
 import { PricingSection } from "./pricing-section"
 import { CookieConsent } from "./cookie-consent"
-import { Link } from "@/i18n/routing"
+import { TrackedLink } from "./tracked-link"
 
 export function LandingPage() {
   const t = useTranslations("hero")
@@ -91,9 +91,14 @@ export function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20"
               >
-                <Link href="/signup" className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm">
+                <TrackedLink
+                  href="/signup"
+                  eventName="signup_start"
+                  eventParams={{ placement: "homepage_hero" }}
+                  className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm"
+                >
                   {t("cta")}
-                </Link>
+                </TrackedLink>
                 <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
                   {t("secondary")}
                   <span aria-hidden="true">→</span>

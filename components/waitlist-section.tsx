@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
 import { Mail, Send } from "lucide-react"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 type ContactForm = {
   email: string
@@ -27,6 +28,7 @@ export function WaitlistSection() {
         body: JSON.stringify({ email: data.email }),
       })
       if (!res.ok) throw new Error("Failed")
+      trackMarketingEvent("lead_capture_completed", { form: "homepage_sales" })
       setSubmitted(true)
     } catch {
       setError(t("error"))

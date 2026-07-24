@@ -7,13 +7,14 @@ import { ScoreLeadLogo } from "./scorelead-logo"
 export function Footer() {
   const t = useTranslations("footer")
   const contactLabel = t("contactUs")
+  const blogLabel = t("blog")
 
   const footerLinks = {
     [t("product")]: [t("features"), t("pricing"), t("changelog"), t("integrations"), t("security")],
     [t("resources")]: [t("documentation"), t("apiReference"), t("guides"), t("status")],
     [t("company")]: [t("about"), t("blog"), t("careers"), t("customers")],
     [t("legal")]: [t("privacy"), t("terms"), t("dpa"), t("security")],
-    [t("connect")]: [t("contactUs"), t("twitter"), t("linkedin"), t("github")],
+    [t("connect")]: [t("contactUs"), t("twitter"), t("github")],
   }
 
   return (
@@ -39,8 +40,11 @@ export function Footer() {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
-                    {link === contactLabel ? (
-                      <Link href="/contact" className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm">
+                    {link === contactLabel || link === blogLabel ? (
+                      <Link
+                        href={link === blogLabel ? "/blog" : "/contact"}
+                        className="text-zinc-500 hover:text-zinc-300 transition-colors text-sm"
+                      >
                         {link}
                       </Link>
                     ) : (

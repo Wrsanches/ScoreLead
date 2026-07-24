@@ -64,7 +64,7 @@ export function CongratsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="relative overflow-hidden bg-zinc-950 border-emerald-500/30 text-zinc-100 sm:max-w-md">
+      <DialogContent className="overflow-hidden bg-zinc-950 border-emerald-500/30 text-zinc-100 sm:max-w-md">
         {open && <Confetti />}
         <DialogHeader>
           <motion.div

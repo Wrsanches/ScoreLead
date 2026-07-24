@@ -11,27 +11,46 @@ export function WaitlistFooter() {
     {
       title: t("product"),
       links: [
-        { href: "/#customers" as const, label: t("results") },
-        { href: "/#features" as const, label: t("features") },
-        { href: "/#ai" as const, label: t("ai") },
-        { href: "/#pipeline" as const, label: t("pipeline") },
-        { href: "/#pricing" as const, label: t("pricing") },
+        { href: "/features/ai-lead-discovery" as const, label: t("leadDiscovery") },
+        { href: "/features/lead-scoring" as const, label: t("leadScoring") },
+        { href: "/features/lead-enrichment" as const, label: t("leadEnrichment") },
+        { href: "/features/outreach-automation" as const, label: t("outreachAutomation") },
+        { href: "/features/sales-pipeline" as const, label: t("pipeline") },
       ],
     },
     {
-      title: t("account"),
+      title: t("useCases"),
       links: [
-        { href: "/signup" as const, label: t("createAccount") },
-        { href: "/login" as const, label: t("signIn") },
+        { href: "/use-cases/agencies" as const, label: t("agencies") },
+        { href: "/use-cases/b2b-sales-teams" as const, label: t("salesTeams") },
+        { href: "/use-cases/b2b-startups" as const, label: t("startups") },
+        { href: "/use-cases/b2b-companies" as const, label: t("b2bCompanies") },
       ],
     },
     {
-      title: t("support"),
-      links: [{ href: "/contact" as const, label: t("contactUs") }],
+      title: t("resources"),
+      links: [
+        { href: "/blog" as const, label: t("blog") },
+        { href: "/tools/icp-worksheet" as const, label: t("icpWorksheet") },
+        { href: "/tools/lead-scoring-calculator" as const, label: t("scoringCalculator") },
+        { href: "/tools/enrichment-checklist" as const, label: t("enrichmentChecklist") },
+        { href: "/tools/lead-research-roi-calculator" as const, label: t("roiCalculator") },
+      ],
+    },
+    {
+      title: t("company"),
+      links: [
+        { href: "/case-studies/ceramik" as const, label: t("customers") },
+        { href: "/about" as const, label: t("about") },
+        { href: "/pricing" as const, label: t("pricing") },
+        { href: "/security" as const, label: t("security") },
+        { href: "/editorial-policy" as const, label: t("editorialPolicy") },
+      ],
     },
     {
       title: t("legal"),
       links: [
+        { href: "/contact" as const, label: t("contactUs") },
         { href: "/privacy" as const, label: t("privacy") },
         { href: "/terms" as const, label: t("terms") },
         { href: "/data-deletion" as const, label: t("dataDeletion") },
@@ -60,7 +79,7 @@ export function WaitlistFooter() {
             </a>
           </div>
 
-          <nav aria-label={t("navigation")} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:col-span-8">
+          <nav aria-label={t("navigation")} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-5">
             {linkGroups.map((group) => (
               <div key={group.title}>
                 <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-300">

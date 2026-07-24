@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { ChevronRight } from "lucide-react"
+import { Link } from "@/i18n/routing"
 
 const featureCards = [
   {
@@ -40,6 +41,11 @@ const featureCards = [
 ]
 
 const cardKeys = ["card1", "card2", "card3"] as const
+const cardHrefs = [
+  "/features/ai-lead-discovery",
+  "/features/lead-scoring",
+  "/features/outreach-automation",
+] as const
 
 function OutreachIllustration() {
   const t = useTranslations("features")
@@ -140,8 +146,13 @@ export function FeatureCardsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                className="bg-zinc-900/50 border border-zinc-800 overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-80 lg:min-h-90"
+                className="group bg-zinc-900/50 border border-zinc-800 overflow-hidden relative flex flex-col justify-end rounded-[30px] isolate min-h-80 lg:min-h-90"
               >
+                <Link
+                  href={cardHrefs[index]}
+                  aria-label={t(cardKeys[index])}
+                  className="absolute inset-0 z-20 rounded-[30px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                />
                 <div
                   className="absolute top-0 left-0 w-full flex"
                   style={{
@@ -162,7 +173,7 @@ export function FeatureCardsSection() {
                   style={{ padding: "0 24px 28px", gap: "16px" }}
                 >
                   <h3 className="text-white font-medium text-base md:text-lg leading-tight">{t(cardKeys[index])}</h3>
-                  <ChevronRight className="w-5 h-5 text-zinc-600 shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-zinc-600 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-zinc-300" />
                 </div>
               </motion.div>
             ))}

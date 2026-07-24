@@ -1,12 +1,22 @@
 import type { Metadata, Viewport } from "next"
 
+const verifiedSocialProfiles = [
+  process.env.NEXT_PUBLIC_SCORELEAD_X_URL,
+].filter((value): value is string => Boolean(value?.startsWith("https://")))
+
 export const siteConfig = {
   name: "ScoreLead",
   url: "https://scorelead.io",
   email: "hello@scorelead.io",
   creator: "ScoreLead",
-  authors: [{ name: "ScoreLead", url: "https://scorelead.io" }],
-} as const
+  authors: [
+    {
+      name: "ScoreLead Editorial",
+      url: "https://scorelead.io/authors/scorelead-editorial",
+    },
+  ],
+  sameAs: verifiedSocialProfiles,
+}
 
 export const localeConfig = {
   en: {
@@ -542,6 +552,15 @@ export function generateJsonLd(locale: string) {
         },
         image: `${siteConfig.url}/images/scorelead-logo-1024.png`,
         email: siteConfig.email,
+        ...(siteConfig.sameAs.length ? { sameAs: siteConfig.sameAs } : {}),
+        knowsAbout: [
+          "B2B lead generation",
+          "AI account discovery",
+          "Lead scoring",
+          "Lead enrichment",
+          "Sales prospecting",
+          "Sales outreach",
+        ],
         contactPoint: [
           {
             "@type": "ContactPoint",

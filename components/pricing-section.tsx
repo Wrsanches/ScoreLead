@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
 import { Check, Zap } from "lucide-react"
-import { Link } from "@/i18n/routing"
+import { TrackedLink } from "./tracked-link"
 
 export function PricingSection() {
   const t = useTranslations("billing")
@@ -53,12 +53,14 @@ export function PricingSection() {
                 </li>
               ))}
             </ul>
-            <Link
+            <TrackedLink
               href="/signup"
+              eventName="signup_start"
+              eventParams={{ placement: "homepage_pricing_free" }}
               className="mt-7 block w-full text-center px-5 py-2.5 rounded-lg border border-zinc-700 text-zinc-100 font-medium hover:bg-zinc-800/60 transition-colors text-sm"
             >
               {t("ctaStartFree")}
-            </Link>
+            </TrackedLink>
           </div>
 
           {/* Pro */}
@@ -81,12 +83,14 @@ export function PricingSection() {
                 </li>
               ))}
             </ul>
-            <Link
+            <TrackedLink
               href="/signup"
+              eventName="signup_start"
+              eventParams={{ placement: "homepage_pricing_pro" }}
               className="mt-7 block w-full text-center px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors text-sm"
             >
               {t("ctaGetPro")}
-            </Link>
+            </TrackedLink>
           </div>
         </div>
       </div>

@@ -60,17 +60,17 @@ export default async function LocaleLayout({
         >
           Skip to content
         </a>
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            forcedTheme="dark"
-            disableTransitionOnChange
-            storageKey="scorelead:theme"
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          forcedTheme="dark"
+          disableTransitionOnChange
+          storageKey="scorelead:theme"
+        >
+          <NextIntlClientProvider messages={messages}>
             {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
         <ConsentGatedAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>
     </html>

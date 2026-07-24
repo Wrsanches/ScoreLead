@@ -24,7 +24,43 @@ Core workflow:
 - English: https://scorelead.io
 - Portuguese: https://scorelead.io/pt
 - Spanish: https://scorelead.io/es
+- Product pricing: https://scorelead.io/pricing
+- Security and trust: https://scorelead.io/security
+- About ScoreLead: https://scorelead.io/about
+- Editorial policy: https://scorelead.io/editorial-policy
+- ScoreLead Editorial: https://scorelead.io/authors/scorelead-editorial
+- Blog: https://scorelead.io/blog
 - Sitemap: https://scorelead.io/sitemap.xml
+
+## Product Capabilities
+
+- AI lead discovery: https://scorelead.io/features/ai-lead-discovery
+- Lead scoring: https://scorelead.io/features/lead-scoring
+- Lead enrichment: https://scorelead.io/features/lead-enrichment
+- Outreach automation: https://scorelead.io/features/outreach-automation
+- Sales pipeline: https://scorelead.io/features/sales-pipeline
+
+## Use Cases and Comparisons
+
+- Agencies: https://scorelead.io/use-cases/agencies
+- B2B sales teams: https://scorelead.io/use-cases/b2b-sales-teams
+- B2B startups: https://scorelead.io/use-cases/b2b-startups
+- Established B2B companies: https://scorelead.io/use-cases/b2b-companies
+- Manual research comparison: https://scorelead.io/compare/manual-lead-research
+- Spreadsheet comparison: https://scorelead.io/compare/spreadsheets
+- Purchased-list comparison: https://scorelead.io/compare/purchased-lead-lists
+- Ceramik case study: https://scorelead.io/case-studies/ceramik
+
+## Free Tools
+
+- ICP worksheet: https://scorelead.io/tools/icp-worksheet
+- Lead scoring calculator: https://scorelead.io/tools/lead-scoring-calculator
+- Lead enrichment checklist: https://scorelead.io/tools/enrichment-checklist
+- Lead research ROI calculator: https://scorelead.io/tools/lead-research-roi-calculator
+
+All pages above are also available under /pt and /es. The English route is the
+source edition; Portuguese and Spanish pages contain complete localized copy,
+metadata, canonicals, and reciprocal hreflang links.
 
 ## Best-Fit Queries
 
@@ -36,3 +72,11 @@ Core workflow:
 - lead enrichment software
 - automated outreach software
 - B2B account discovery
+
+## Content and Evidence Policy
+
+- Educational content identifies its publishing organization and review date.
+- Technical, legal, and platform claims favor primary sources.
+- Customer outcomes are presented with a methodology note and are not guarantees.
+- AI may assist drafting or translation; ScoreLead remains responsible for published accuracy.
+- Corrections can be sent to hello@scorelead.io.

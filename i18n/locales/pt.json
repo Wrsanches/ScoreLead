@@ -56,7 +56,8 @@
     "login": "Entrar",
     "signUp": "Começar",
     "dashboard": "Painel",
-    "language": "Idioma"
+    "language": "Idioma",
+    "blog": "Blog"
   },
   "hero": {
     "heading": "Descubra, pontue e converta seus melhores clientes B2B",
@@ -77,7 +78,7 @@
     "stat2Label": "Crescimento do pipeline no primeiro mês",
     "stat3": "85%",
     "stat3Label": "Menos tempo gasto em pesquisa manual",
-    "readMore": "Visite a Ceramik"
+    "readMore": "Ler o estudo de caso"
   },
   "features": {
     "heading": "Feito para times B2B que precisam de mais pipeline",
@@ -646,8 +647,22 @@
     "dpa": "DPA",
     "contactUs": "Fale conosco",
     "twitter": "X (Twitter)",
-    "linkedin": "LinkedIn",
     "github": "GitHub"
+    ,
+    "leadDiscovery": "Descoberta de leads com IA",
+    "leadScoring": "Lead scoring",
+    "leadEnrichment": "Enriquecimento de leads",
+    "outreachAutomation": "Automação de outreach",
+    "useCases": "Casos de uso",
+    "agencies": "Agências",
+    "salesTeams": "Times de vendas B2B",
+    "startups": "Startups B2B",
+    "b2bCompanies": "Empresas B2B",
+    "icpWorksheet": "Worksheet de ICP",
+    "scoringCalculator": "Calculadora de score",
+    "enrichmentChecklist": "Checklist de enriquecimento",
+    "roiCalculator": "Calculadora de ROI",
+    "editorialPolicy": "Política editorial"
   },
   "contact": {
     "eyebrow": "Fale com a equipe",

@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AuthLayout, GoogleButton, OrDivider } from "@/components/auth-layout"
 import { authClient } from "@/lib/auth-client"
 import { signUpSchema, type SignUpValues } from "@/lib/validations/auth"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 function PasswordStrength({ password }: { password: string }) {
   const strength = useMemo(() => {
@@ -87,10 +88,12 @@ export default function SignUpPage() {
 
     // Email verification is required, so there's no session yet. Show the
     // check-your-inbox state instead of redirecting.
+    trackMarketingEvent("signup_completed", { signup_method: "email" })
     setVerificationSentTo(data.email)
   }
 
   function handleGoogleSignIn() {
+    trackMarketingEvent("signup_start", { signup_method: "google" })
     authClient.signIn.social({
       provider: "google",
       callbackURL: "/onboarding",

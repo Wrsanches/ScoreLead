@@ -6,11 +6,13 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
+    "test:seo": "bun test lib/marketing/marketing.test.ts",
     "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:cleanup": "bun run scripts/cleanup-db.ts",
+    "seo:indexnow": "bun --env-file=.env.local run scripts/submit-indexnow.ts",
     "slack:preview": "bun --env-file=.env.local run scripts/preview-slack-alerts.ts"
   },
   "dependencies": {

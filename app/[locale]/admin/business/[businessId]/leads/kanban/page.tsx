@@ -15,6 +15,7 @@ import {
 } from "@/components/admin/business-context"
 import { LeadsKanban } from "../_components/leads-kanban"
 import type { Lead, LeadStatus } from "../_shared"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 export default function LeadsKanbanPage() {
   const t = useTranslations("dashboard")
@@ -60,6 +61,11 @@ export default function LeadsKanbanPage() {
         body: JSON.stringify({ status: nextStatus }),
       })
       if (!res.ok) throw new Error("Failed")
+      if (nextStatus === "interested") {
+        trackMarketingEvent("qualified_account", { pipeline_status: nextStatus })
+      } else if (nextStatus === "customer") {
+        trackMarketingEvent("customer_conversion", { pipeline_status: nextStatus })
+      }
     } catch {
       setLeads(previous)
     }

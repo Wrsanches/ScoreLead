@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/next"
 import { GoogleAnalytics } from "@next/third-parties/google"
+import { AcquisitionTracker } from "./marketing-analytics"
 
 export function ConsentGatedAnalytics({ gaId }: { gaId: string }) {
   const [consent, setConsent] = useState(false)
@@ -37,6 +38,7 @@ export function ConsentGatedAnalytics({ gaId }: { gaId: string }) {
     <>
       <Analytics />
       <GoogleAnalytics gaId={gaId} />
+      <AcquisitionTracker />
     </>
   )
 }

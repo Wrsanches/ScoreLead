@@ -7,6 +7,7 @@ import { ScoreLeadLogo } from "./scorelead-logo"
 import { LanguageSwitcher } from "./language-switcher"
 import { Link } from "@/i18n/routing"
 import { authClient } from "@/lib/auth-client"
+import { TrackedLink } from "./tracked-link"
 
 function UserAvatar({ name }: { name: string }) {
   const initials = name
@@ -36,11 +37,11 @@ export function Navbar() {
   }, [open])
 
   const links = [
-    { id: "customers", label: t("results") },
-    { id: "features", label: t("features") },
-    { id: "ai", label: t("ai") },
-    { id: "pipeline", label: t("pipeline") },
-    { id: "pricing", label: t("pricing") },
+    { href: "/case-studies/ceramik" as const, label: t("results") },
+    { href: "/features/ai-lead-discovery" as const, label: t("features") },
+    { href: "/features/lead-enrichment" as const, label: t("ai") },
+    { href: "/features/sales-pipeline" as const, label: t("pipeline") },
+    { href: "/pricing" as const, label: t("pricing") },
   ]
 
   const isLoggedIn = !!session?.user
@@ -56,7 +57,7 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-8">
             {links.map((link) => (
-              <Link key={link.id} href={`/#${link.id}`} className="text-sm text-zinc-400 hover:text-white transition-colors">
+              <Link key={link.href} href={link.href} className="text-sm text-zinc-400 hover:text-white transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -82,12 +83,14 @@ export function Navbar() {
                 >
                   {t("login")}
                 </Link>
-                <Link
+                <TrackedLink
                   href="/signup"
+                  eventName="signup_start"
+                  eventParams={{ placement: "navbar_desktop" }}
                   className="text-sm bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-3.5 py-1.5 rounded-md transition-colors font-medium"
                 >
                   {t("signUp")}
-                </Link>
+                </TrackedLink>
               </>
             )}
           </div>
@@ -108,8 +111,8 @@ export function Navbar() {
           <div className="flex flex-col gap-4">
             {links.map((link) => (
               <Link
-                key={link.id}
-                href={`/#${link.id}`}
+                key={link.href}
+                href={link.href}
                 onClick={() => setOpen(false)}
                 className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
@@ -138,13 +141,15 @@ export function Navbar() {
                   >
                     {t("login")}
                   </Link>
-                  <Link
+                  <TrackedLink
                     href="/signup"
+                    eventName="signup_start"
+                    eventParams={{ placement: "navbar_mobile" }}
                     onClick={() => setOpen(false)}
                     className="text-sm bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-3.5 py-1.5 rounded-md transition-colors font-medium"
                   >
                     {t("signUp")}
-                  </Link>
+                  </TrackedLink>
                 </div>
               )}
             </div>
