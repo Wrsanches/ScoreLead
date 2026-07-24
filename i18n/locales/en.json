@@ -63,15 +63,16 @@
     "heading": "Discover, score, and convert your next best B2B customers",
     "subtitle": "ScoreLead uses AI to find and qualify companies, enrich them with account data, score their revenue potential, and generate personalized B2B outreach automatically.",
     "cta": "Get started for free",
-    "secondary": "See how it works"
+    "secondary": "See how it works",
+    "demoDisclosure": "Product preview with illustrative company and contact data."
   },
   "customerStory": {
     "label": "Customer story",
-    "heading": "See how Ceramik grew their pipeline 10x",
+    "heading": "See how Ceramik reported 10x pipeline growth",
     "quote": "ScoreLead transformed how we find and reach pottery studios. We went from manually searching for leads to discovering hundreds of qualified prospects in minutes. Our pipeline grew 10x in the first month.",
     "company": "Ceramik",
     "companyDesc": "All-in-one app for pottery teachers to manage their studios",
-    "statsLabel": "Results after 30 days with ScoreLead",
+    "statsLabel": "Customer-reported results after 30 days with ScoreLead",
     "stat1": "2,450",
     "stat1Label": "Leads discovered automatically",
     "stat2": "10x",
@@ -89,7 +90,13 @@
     "card3": "Outreach Automation",
     "introduction": "Introduction",
     "followUp": "Follow-up",
-    "valueProp": "Value prop"
+    "valueProp": "Value prop",
+    "outreachPreview1": "Hi, I noticed your studio offers yoga and pilates...",
+    "outreachPreview2": "Teams can reduce repetitive research before outreach...",
+    "outreachPreview3": "With your 4.7 rating and growing demand...",
+    "day1": "Day 1",
+    "day3": "Day 3",
+    "day7": "Day 7"
   },
   "ai": {
     "label": "Artificial intelligence",
@@ -116,7 +123,7 @@
     "outreachStep1Body": "Hi, I noticed your studio offers yoga, pilates, and meditation classes in SF...",
     "outreachStep2Label": "Follow-up - Day 3",
     "outreachStep2Subject": "Quick follow-up",
-    "outreachStep2Body": "Just wanted to share how studios like yours are saving 10+ hours/week...",
+    "outreachStep2Body": "I wanted to share how teams can reduce repetitive lead research before outreach...",
     "outreachStep3Label": "Value prop - Day 7",
     "outreachStep3Subject": "Your 128 five-star reviews say it all",
     "outreachStep3Body": "With your 4.7 rating and growing waitlist, here's how we can help scale...",
@@ -136,7 +143,8 @@
     "serviceYoga": "Yoga",
     "servicePilates": "Pilates",
     "serviceMeditation": "Meditation",
-    "serviceWorkshops": "Workshops"
+    "serviceWorkshops": "Workshops",
+    "demoDisclosure": "Illustrative product demo. Company, contact, score, and message details are sample data."
   },
   "pipeline": {
     "label": "Workflow and pipeline",
@@ -172,7 +180,8 @@
     "feature3": "CSV Export",
     "feature3Desc": "Export filtered leads with all enriched data.",
     "feature4": "Multi-language",
-    "feature4Desc": "AI outreach in multiple languages to reach leads anywhere in the world."
+    "feature4Desc": "AI outreach in multiple languages to reach leads anywhere in the world.",
+    "demoDisclosure": "Illustrative workflow. Stage totals are sample data, not customer results."
   },
   "dashboard": {
     "searchLeads": "Search leads...",
@@ -647,6 +656,7 @@
     "dpa": "DPA",
     "contactUs": "Contact us",
     "twitter": "X (Twitter)",
+    "instagram": "Instagram",
     "github": "GitHub",
     "leadDiscovery": "AI lead discovery",
     "leadScoring": "Lead scoring",

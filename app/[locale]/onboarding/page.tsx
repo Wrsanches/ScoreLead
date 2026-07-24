@@ -16,6 +16,7 @@ import { StepLocation } from "./_components/step-location"
 import { StepTargeting, type TargetingValues } from "./_components/step-targeting"
 import { StepProcessing, type ProcessingStatus } from "./_components/step-processing"
 import { StepReview, type ReviewValues } from "./_components/step-review"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 type Step = "welcome" | "primaryLinks" | "moreLinks" | "location" | "targeting" | "processing" | "review"
 
@@ -58,6 +59,7 @@ export default function OnboardingPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isAddingNew = searchParams.get("new") === "true"
+  const signupMethod = searchParams.get("signup")
   const { data: session } = authClient.useSession()
 
   const [step, setStep] = useState<Step>(isAddingNew ? "primaryLinks" : "welcome")
@@ -90,6 +92,27 @@ export default function OnboardingPage() {
   })
 
   const userName = session?.user?.name || ""
+
+  useEffect(() => {
+    if (
+      isAddingNew ||
+      (signupMethod !== "email" && signupMethod !== "google")
+    ) {
+      return
+    }
+
+    const completionKey = `scorelead:signup-completed:${signupMethod}`
+    if (sessionStorage.getItem(completionKey)) return
+
+    trackMarketingEvent("signup_completed", {
+      signup_method: signupMethod,
+    })
+    sessionStorage.setItem(completionKey, "true")
+
+    const url = new URL(window.location.href)
+    url.searchParams.delete("signup")
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`)
+  }, [isAddingNew, signupMethod])
 
   useEffect(() => {
     if (isAddingNew) {

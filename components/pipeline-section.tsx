@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { useTranslations } from "next-intl"
-import { ChevronRight, Radar, BarChart3, FileDown, Languages } from "lucide-react"
+import { useTranslations } from "next-intl";
+import {
+  ChevronRight,
+  Radar,
+  BarChart3,
+  FileDown,
+  Languages,
+} from "lucide-react";
 
 export function PipelineSection() {
-  const t = useTranslations("pipeline")
+  const t = useTranslations("pipeline");
 
   return (
     <section id="pipeline" className="relative py-40 px-6 md:px-12 lg:px-24">
@@ -12,7 +18,8 @@ export function PipelineSection() {
         className="absolute inset-x-0 top-0 pointer-events-none"
         style={{
           height: "20%",
-          background: "linear-gradient(to bottom, rgba(255,255,255,0.05), transparent 100%)",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.05), transparent 100%)",
         }}
       />
 
@@ -35,7 +42,7 @@ export function PipelineSection() {
           {t("heading")}
         </h2>
 
-        <p className="text-zinc-400 text-lg max-w-md mb-16">
+        <p className="mb-4 max-w-md text-lg text-zinc-400">
           {t("description")}
         </p>
 
@@ -80,10 +87,16 @@ export function PipelineSection() {
                 </div>
               </div>
 
-              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "5%", top: "55px" }}>
+              <div
+                className="absolute text-zinc-500 text-[10px] sm:text-sm"
+                style={{ left: "5%", top: "55px" }}
+              >
                 {t("stageDiscovery")}
               </div>
-              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "20%", top: "35px" }}>
+              <div
+                className="absolute text-zinc-500 text-[10px] sm:text-sm"
+                style={{ left: "20%", top: "35px" }}
+              >
                 {t("stageEnrichment")}
               </div>
               <div
@@ -92,10 +105,16 @@ export function PipelineSection() {
               >
                 {t("stageScored")}
               </div>
-              <div className="absolute text-zinc-500 text-[10px] sm:text-sm" style={{ left: "62%", top: "-5px" }}>
+              <div
+                className="absolute text-zinc-500 text-[10px] sm:text-sm"
+                style={{ left: "62%", top: "-5px" }}
+              >
                 {t("stageOutreach")}
               </div>
-              <div className="absolute text-zinc-500/50 text-[10px] sm:text-sm" style={{ left: "82%", top: "-25px" }}>
+              <div
+                className="absolute text-zinc-500/50 text-[10px] sm:text-sm"
+                style={{ left: "82%", top: "-25px" }}
+              >
                 {t("stageConverted")}
               </div>
 
@@ -108,8 +127,12 @@ export function PipelineSection() {
                   height: "48px",
                 }}
               >
-                <span className="text-emerald-400 text-[11px] sm:text-sm font-medium truncate">{t("discovered")}</span>
-                <span className="text-emerald-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">2,450</span>
+                <span className="text-emerald-400 text-[11px] sm:text-sm font-medium truncate">
+                  {t("discovered")}
+                </span>
+                <span className="text-emerald-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">
+                  2,450
+                </span>
               </div>
 
               <div
@@ -121,8 +144,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-blue-400 text-[11px] sm:text-sm truncate">{t("enriched")}</span>
-                <span className="text-blue-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">1,830</span>
+                <span className="text-blue-400 text-[11px] sm:text-sm truncate">
+                  {t("enriched")}
+                </span>
+                <span className="text-blue-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">
+                  1,830
+                </span>
               </div>
 
               <div
@@ -134,8 +161,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-amber-400 text-[11px] sm:text-sm truncate">{t("scored3plus")}</span>
-                <span className="text-amber-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">1,240</span>
+                <span className="text-amber-400 text-[11px] sm:text-sm truncate">
+                  {t("scored3plus")}
+                </span>
+                <span className="text-amber-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">
+                  1,240
+                </span>
               </div>
 
               <div
@@ -147,8 +178,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-purple-400 text-[11px] sm:text-sm truncate">{t("outreachSent")}</span>
-                <span className="text-purple-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">680</span>
+                <span className="text-purple-400 text-[11px] sm:text-sm truncate">
+                  {t("outreachSent")}
+                </span>
+                <span className="text-purple-400/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">
+                  680
+                </span>
               </div>
 
               <div
@@ -160,8 +195,12 @@ export function PipelineSection() {
                   height: "44px",
                 }}
               >
-                <span className="text-emerald-300 text-[11px] sm:text-sm font-medium truncate">{t("customers")}</span>
-                <span className="text-emerald-300/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">180</span>
+                <span className="text-emerald-300 text-[11px] sm:text-sm font-medium truncate">
+                  {t("customers")}
+                </span>
+                <span className="text-emerald-300/70 text-[11px] sm:text-sm font-mono shrink-0 ml-1">
+                  180
+                </span>
               </div>
             </div>
           </div>
@@ -169,19 +208,28 @@ export function PipelineSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="border-t border-b md:border-r border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
-            <h3 className="text-xl font-medium text-zinc-200 mb-3">{t("discoveryTitle")}</h3>
+            <h3 className="text-xl font-medium text-zinc-200 mb-3">
+              {t("discoveryTitle")}
+            </h3>
             <p className="text-zinc-500 text-base leading-relaxed mb-8">
               {t("discoveryDesc")}
             </p>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-medium text-zinc-200">San Francisco, CA - Yoga Studios</h4>
-                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{t("inProgress")}</span>
+                <h4 className="text-sm font-medium text-zinc-200">
+                  San Francisco, CA - Yoga Studios
+                </h4>
+                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">
+                  {t("inProgress")}
+                </span>
               </div>
 
               <div className="w-full h-2 bg-zinc-800 rounded-full mb-3 overflow-hidden">
-                <div className="h-full bg-blue-500 rounded-full" style={{ width: "73%" }} />
+                <div
+                  className="h-full bg-blue-500 rounded-full"
+                  style={{ width: "73%" }}
+                />
               </div>
               <span className="text-zinc-500 text-xs">{t("complete")}</span>
 
@@ -192,7 +240,9 @@ export function PipelineSection() {
                 </div>
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">104</p>
-                  <p className="text-zinc-500 text-[10px]">{t("enrichedStat")}</p>
+                  <p className="text-zinc-500 text-[10px]">
+                    {t("enrichedStat")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">98</p>
@@ -203,7 +253,9 @@ export function PipelineSection() {
           </div>
 
           <div className="border-b md:border-t border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
-            <h3 className="text-xl font-medium text-zinc-200 mb-3">{t("deduplicationTitle")}</h3>
+            <h3 className="text-xl font-medium text-zinc-200 mb-3">
+              {t("deduplicationTitle")}
+            </h3>
             <p className="text-zinc-500 text-base leading-relaxed mb-8">
               {t("deduplicationDesc")}
             </p>
@@ -216,7 +268,9 @@ export function PipelineSection() {
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                   <span className="text-zinc-500 text-sm">Sunset Yoga SF</span>
-                  <span className="text-zinc-600 text-xs ml-auto">sunsetyoga.com</span>
+                  <span className="text-zinc-600 text-xs ml-auto">
+                    sunsetyoga.com
+                  </span>
                 </div>
               </div>
 
@@ -226,8 +280,12 @@ export function PipelineSection() {
               >
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <span className="text-zinc-400 text-sm">Sunset Yoga Studio</span>
-                  <span className="text-zinc-600 text-xs ml-auto">sunsetyoga.com</span>
+                  <span className="text-zinc-400 text-sm">
+                    Sunset Yoga Studio
+                  </span>
+                  <span className="text-zinc-600 text-xs ml-auto">
+                    sunsetyoga.com
+                  </span>
                 </div>
               </div>
 
@@ -237,17 +295,29 @@ export function PipelineSection() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 16 16" fill="currentColor">
+                    <svg
+                      className="w-3 h-3 text-emerald-500"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                    >
                       <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
                     </svg>
                   </span>
-                  <span className="text-emerald-400 font-medium text-sm">{t("merged")}</span>
+                  <span className="text-emerald-400 font-medium text-sm">
+                    {t("merged")}
+                  </span>
                 </div>
                 <p className="text-zinc-300 text-sm mb-2">Sunset Yoga Studio</p>
                 <div className="flex items-center gap-2 text-[10px]">
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("sameWebsite")}</span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("similarName")}</span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">{t("sameLocation")}</span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                    {t("sameWebsite")}
+                  </span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                    {t("similarName")}
+                  </span>
+                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                    {t("sameLocation")}
+                  </span>
                 </div>
               </div>
             </div>
@@ -260,7 +330,9 @@ export function PipelineSection() {
               <Radar className="w-5 h-5 text-zinc-400" />
               <span className="text-zinc-200 font-medium">{t("feature1")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature1Desc")}</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              {t("feature1Desc")}
+            </p>
           </div>
 
           <div>
@@ -268,7 +340,9 @@ export function PipelineSection() {
               <BarChart3 className="w-5 h-5 text-zinc-400" />
               <span className="text-zinc-200 font-medium">{t("feature2")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature2Desc")}</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              {t("feature2Desc")}
+            </p>
           </div>
 
           <div>
@@ -276,7 +350,9 @@ export function PipelineSection() {
               <FileDown className="w-5 h-5 text-zinc-400" />
               <span className="text-zinc-200 font-medium">{t("feature3")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature3Desc")}</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              {t("feature3Desc")}
+            </p>
           </div>
 
           <div>
@@ -284,10 +360,12 @@ export function PipelineSection() {
               <Languages className="w-5 h-5 text-zinc-400" />
               <span className="text-zinc-200 font-medium">{t("feature4")}</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed">{t("feature4Desc")}</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              {t("feature4Desc")}
+            </p>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

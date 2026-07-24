@@ -1,33 +1,33 @@
-import type { Metadata } from "next"
-import { ArrowLeft, ArrowRight, Clock3 } from "lucide-react"
-import { notFound } from "next/navigation"
-import { setRequestLocale } from "next-intl/server"
-import { BlogCard, BlogVisual } from "@/components/blog-card"
-import { JsonLd } from "@/components/json-ld"
-import { Navbar } from "@/components/navbar"
-import { TrackedLink } from "@/components/tracked-link"
-import { WaitlistFooter } from "@/components/waitlist-footer"
-import { Link } from "@/i18n/routing"
+import type { Metadata } from "next";
+import { ArrowLeft, ArrowRight, Clock3 } from "lucide-react";
+import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
+import { BlogCard, BlogVisual } from "@/components/blog-card";
+import { JsonLd } from "@/components/json-ld";
+import { Navbar } from "@/components/navbar";
+import { TrackedLink } from "@/components/tracked-link";
+import { WaitlistFooter } from "@/components/waitlist-footer";
+import { Link } from "@/i18n/routing";
 import {
   blogPosts,
   getBlogPost,
   getBlogTranslation,
   getBlogUi,
-} from "@/lib/blog"
+} from "@/lib/blog";
 import {
   getLanguageAlternates,
   getLocaleConfig,
   getLocalizedUrl,
   normalizeLocale,
   siteConfig,
-} from "@/lib/seo"
+} from "@/lib/seo";
 
-type PageParams = Promise<{ locale: string; slug: string }>
+type PageParams = Promise<{ locale: string; slug: string }>;
 
-export const dynamicParams = false
+export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }))
+  return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
 function formatDate(date: string, locale: string) {
@@ -36,27 +36,27 @@ function formatDate(date: string, locale: string) {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${date}T12:00:00Z`))
+  }).format(new Date(`${date}T12:00:00Z`));
 }
 
 function firstSentence(value: string) {
-  const match = value.match(/^.*?[.!?](?:\s|$)/)
-  return match?.[0]?.trim() ?? value
+  const match = value.match(/^.*?[.!?](?:\s|$)/);
+  return match?.[0]?.trim() ?? value;
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: PageParams
+  params: PageParams;
 }): Promise<Metadata> {
-  const { locale, slug } = await params
-  const post = getBlogPost(slug)
-  if (!post) notFound()
+  const { locale, slug } = await params;
+  const post = getBlogPost(slug);
+  if (!post) notFound();
 
-  const normalizedLocale = normalizeLocale(locale)
-  const translation = getBlogTranslation(post, normalizedLocale)
-  const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`)
-  const image = `${siteConfig.url}/images/blog-og.png`
+  const normalizedLocale = normalizeLocale(locale);
+  const translation = getBlogTranslation(post, normalizedLocale);
+  const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
+  const image = `${siteConfig.url}/images/blog-og.png`;
 
   return {
     title: translation.title,
@@ -83,9 +83,13 @@ export async function generateMetadata({
       description: translation.description,
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
-      authors: [getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial")],
+      authors: [
+        getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
+      ],
       tags: translation.keywords,
-      images: [{ url: image, width: 1200, height: 630, alt: translation.title }],
+      images: [
+        { url: image, width: 1200, height: 630, alt: translation.title },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -94,27 +98,27 @@ export async function generateMetadata({
       images: [image],
     },
     robots: { index: true, follow: true },
-  }
+  };
 }
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: PageParams
-}) {
-  const { locale, slug } = await params
-  const post = getBlogPost(slug)
-  if (!post) notFound()
+export default async function BlogPostPage({ params }: { params: PageParams }) {
+  const { locale, slug } = await params;
+  const post = getBlogPost(slug);
+  if (!post) notFound();
 
-  const normalizedLocale = normalizeLocale(locale)
-  setRequestLocale(normalizedLocale)
+  const normalizedLocale = normalizeLocale(locale);
+  setRequestLocale(normalizedLocale);
 
-  const translation = getBlogTranslation(post, normalizedLocale)
-  const ui = getBlogUi(normalizedLocale)
-  const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`)
-  const image = `${siteConfig.url}/images/blog-og.png`
-  const related = blogPosts.filter((candidate) => candidate.slug !== post.slug).slice(0, 3)
-  const checklist = translation.sections.flatMap((section) => section.points ?? [])
+  const translation = getBlogTranslation(post, normalizedLocale);
+  const ui = getBlogUi(normalizedLocale);
+  const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
+  const image = `${siteConfig.url}/images/blog-og.png`;
+  const related = blogPosts
+    .filter((candidate) => candidate.slug !== post.slug)
+    .slice(0, 3);
+  const checklist = translation.sections.flatMap(
+    (section) => section.points ?? [],
+  );
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -133,6 +137,12 @@ export default async function BlogPostPage({
           "@id": `${siteConfig.url}/#organization`,
           name: "ScoreLead Editorial",
           url: getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
+        },
+        editor: {
+          "@type": "Organization",
+          "@id": `${siteConfig.url}/#product-team`,
+          name: ui.reviewerName,
+          url: getLocalizedUrl(normalizedLocale, "editorial-policy"),
         },
         publisher: {
           "@type": "Organization",
@@ -171,7 +181,7 @@ export default async function BlogPostPage({
         ],
       },
     ],
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#09090B] text-zinc-100">
@@ -229,6 +239,16 @@ export default async function BlogPostPage({
                         ScoreLead Editorial
                       </Link>
                     </span>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                      {ui.reviewedBy}{" "}
+                      <Link
+                        href="/editorial-policy"
+                        className="rounded-sm text-zinc-300 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                      >
+                        {ui.reviewerName}
+                      </Link>
+                    </span>
                   </div>
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-zinc-800">
@@ -242,12 +262,14 @@ export default async function BlogPostPage({
             <div className="mx-auto max-w-3xl">
               <section
                 aria-labelledby="quick-answer"
-                className="mb-12 border-y border-emerald-500/20 bg-emerald-500/[0.04] px-5 py-6 sm:px-7"
+                className="mb-12 border-y border-emerald-500/20 bg-emerald-500/4 px-5 py-6 sm:px-7"
               >
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
                   {ui.quickAnswer}
                 </p>
-                <h2 id="quick-answer" className="sr-only">{ui.quickAnswer}</h2>
+                <h2 id="quick-answer" className="sr-only">
+                  {ui.quickAnswer}
+                </h2>
                 <p className="mt-3 text-lg leading-8 text-zinc-200">
                   {post.quickAnswers[normalizedLocale]}
                 </p>
@@ -267,17 +289,24 @@ export default async function BlogPostPage({
                   {ui.decisionTable}
                 </h2>
                 <div className="mt-6 overflow-x-auto border-y border-zinc-800">
-                  <table className="w-full min-w-[620px] border-collapse text-left">
+                  <table className="w-full min-w-155 border-collapse text-left">
                     <thead>
                       <tr className="border-b border-zinc-800 text-xs uppercase tracking-[0.14em] text-zinc-500">
-                        <th scope="col" className="w-2/5 px-4 py-4 font-medium">{ui.decision}</th>
-                        <th scope="col" className="px-4 py-4 font-medium">{ui.whatToCheck}</th>
+                        <th scope="col" className="w-2/5 px-4 py-4 font-medium">
+                          {ui.decision}
+                        </th>
+                        <th scope="col" className="px-4 py-4 font-medium">
+                          {ui.whatToCheck}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800">
                       {translation.sections.map((section) => (
                         <tr key={section.heading}>
-                          <th scope="row" className="px-4 py-5 align-top text-sm font-medium text-zinc-200">
+                          <th
+                            scope="row"
+                            className="px-4 py-5 align-top text-sm font-medium text-zinc-200"
+                          >
                             {section.heading}
                           </th>
                           <td className="px-4 py-5 text-sm leading-6 text-zinc-400">
@@ -292,7 +321,10 @@ export default async function BlogPostPage({
 
               <div className="mt-14 space-y-14">
                 {translation.sections.map((section, sectionIndex) => (
-                  <section key={section.heading} aria-labelledby={`section-${sectionIndex}`}>
+                  <section
+                    key={section.heading}
+                    aria-labelledby={`section-${sectionIndex}`}
+                  >
                     <div className="mb-5 flex items-center gap-4">
                       <span className="font-mono text-xs text-emerald-400">
                         {String(sectionIndex + 1).padStart(2, "0")}
@@ -317,7 +349,10 @@ export default async function BlogPostPage({
                             key={point}
                             className="flex gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-300"
                           >
-                            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true" />
+                            <span
+                              className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald-400"
+                              aria-hidden="true"
+                            />
                             {point}
                           </li>
                         ))}
@@ -328,7 +363,10 @@ export default async function BlogPostPage({
               </div>
 
               {checklist.length ? (
-                <section className="mt-16" aria-labelledby="practical-checklist">
+                <section
+                  className="mt-16"
+                  aria-labelledby="practical-checklist"
+                >
                   <h2
                     id="practical-checklist"
                     className="text-2xl font-medium tracking-tight text-white sm:text-3xl"
@@ -337,7 +375,10 @@ export default async function BlogPostPage({
                   </h2>
                   <ul className="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
                     {checklist.map((point, index) => (
-                      <li key={point} className="grid gap-3 py-4 text-sm leading-6 text-zinc-300 sm:grid-cols-[38px_1fr]">
+                      <li
+                        key={point}
+                        className="grid gap-3 py-4 text-sm leading-6 text-zinc-300 sm:grid-cols-[38px_1fr]"
+                      >
                         <span className="font-mono text-xs text-emerald-400">
                           {String(index + 1).padStart(2, "0")}
                         </span>
@@ -348,7 +389,22 @@ export default async function BlogPostPage({
                 </section>
               ) : null}
 
-              <section className="mt-16 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-7 sm:p-9">
+              <section
+                className="mt-16 border-y border-zinc-800 py-7"
+                aria-labelledby="first-party-product-note"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
+                  {ui.fieldNote}
+                </p>
+                <h2 id="first-party-product-note" className="sr-only">
+                  {ui.fieldNote}
+                </h2>
+                <p className="mt-4 text-base leading-8 text-zinc-300 sm:text-[1.05rem]">
+                  {post.fieldNotes[normalizedLocale]}
+                </p>
+              </section>
+
+              <section className="mt-16 rounded-2xl border border-emerald-500/20 bg-emerald-500/6 p-7 sm:p-9">
                 <p className="font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
                   {ui.takeaway}
                 </p>
@@ -369,14 +425,25 @@ export default async function BlogPostPage({
                 </Link>
               </section>
 
-              <section className="mt-16 border-t border-zinc-800 pt-9" aria-labelledby="article-sources">
-                <h2 id="article-sources" className="text-2xl font-medium tracking-tight text-white">
+              <section
+                className="mt-16 border-t border-zinc-800 pt-9"
+                aria-labelledby="article-sources"
+              >
+                <h2
+                  id="article-sources"
+                  className="text-2xl font-medium tracking-tight text-white"
+                >
                   {ui.sources}
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-zinc-500">{ui.sourcesDescription}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-500">
+                  {ui.sourcesDescription}
+                </p>
                 <ol className="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
                   {post.sources.map((source, index) => (
-                    <li key={source.url} className="grid gap-2 py-5 sm:grid-cols-[38px_1fr]">
+                    <li
+                      key={source.url}
+                      className="grid gap-2 py-5 sm:grid-cols-[38px_1fr]"
+                    >
                       <span className="font-mono text-xs text-zinc-600">
                         {String(index + 1).padStart(2, "0")}
                       </span>
@@ -389,7 +456,9 @@ export default async function BlogPostPage({
                         <span className="block text-sm font-medium text-zinc-200 transition-colors group-hover:text-white">
                           {source.title}
                         </span>
-                        <span className="mt-1 block text-xs text-zinc-600">{source.publisher}</span>
+                        <span className="mt-1 block text-xs text-zinc-600">
+                          {source.publisher}
+                        </span>
                       </a>
                     </li>
                   ))}
@@ -406,9 +475,15 @@ export default async function BlogPostPage({
           </div>
         </article>
 
-        <section className="border-y border-zinc-800/70 px-6 py-16 sm:py-20" aria-labelledby="related-heading">
+        <section
+          className="border-y border-zinc-800/70 px-6 py-16 sm:py-20"
+          aria-labelledby="related-heading"
+        >
           <div className="mx-auto max-w-6xl">
-            <h2 id="related-heading" className="text-3xl font-medium tracking-tight text-white">
+            <h2
+              id="related-heading"
+              className="text-3xl font-medium tracking-tight text-white"
+            >
               {ui.relatedTitle}
             </h2>
             <p className="mt-3 text-zinc-500">{ui.relatedDescription}</p>
@@ -417,8 +492,14 @@ export default async function BlogPostPage({
                 <BlogCard
                   key={relatedPost.slug}
                   post={relatedPost}
-                  translation={getBlogTranslation(relatedPost, normalizedLocale)}
-                  dateLabel={formatDate(relatedPost.publishedAt, normalizedLocale)}
+                  translation={getBlogTranslation(
+                    relatedPost,
+                    normalizedLocale,
+                  )}
+                  dateLabel={formatDate(
+                    relatedPost.publishedAt,
+                    normalizedLocale,
+                  )}
                   readLabel={ui.minRead}
                   readArticleLabel={ui.readArticle}
                 />
@@ -435,7 +516,9 @@ export default async function BlogPostPage({
             <h2 className="mt-4 text-balance text-3xl font-medium tracking-tight text-white sm:text-5xl">
               {ui.ctaTitle}
             </h2>
-            <p className="mt-5 max-w-2xl leading-7 text-zinc-400">{ui.ctaDescription}</p>
+            <p className="mt-5 max-w-2xl leading-7 text-zinc-400">
+              {ui.ctaDescription}
+            </p>
             <TrackedLink
               href="/signup"
               eventName="article_cta_click"
@@ -451,5 +534,5 @@ export default async function BlogPostPage({
 
       <WaitlistFooter />
     </div>
-  )
+  );
 }

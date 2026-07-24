@@ -59,8 +59,8 @@ function OutreachIllustration() {
           </div>
           <div className="pb-3 flex-1 min-w-0">
             <p className="text-[11px] text-zinc-300 font-medium mb-0.5">{t("introduction")}</p>
-            <p className="text-[10px] text-zinc-600 leading-snug">Hi, I noticed your studio offers yoga and pilates...</p>
-            <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 1</span>
+            <p className="text-[10px] text-zinc-600 leading-snug">{t("outreachPreview1")}</p>
+            <span className="text-[9px] text-zinc-700 mt-1 inline-block">{t("day1")}</span>
           </div>
         </div>
         <div className="flex gap-3">
@@ -70,8 +70,8 @@ function OutreachIllustration() {
           </div>
           <div className="pb-3 flex-1 min-w-0">
             <p className="text-[11px] text-zinc-300 font-medium mb-0.5">{t("followUp")}</p>
-            <p className="text-[10px] text-zinc-600 leading-snug">Studios like yours are saving 10+ hours a week...</p>
-            <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 3</span>
+            <p className="text-[10px] text-zinc-600 leading-snug">{t("outreachPreview2")}</p>
+            <span className="text-[9px] text-zinc-700 mt-1 inline-block">{t("day3")}</span>
           </div>
         </div>
         <div className="flex gap-3">
@@ -80,8 +80,8 @@ function OutreachIllustration() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-zinc-300 font-medium mb-0.5">{t("valueProp")}</p>
-            <p className="text-[10px] text-zinc-600 leading-snug">With your 4.7 rating and growing demand...</p>
-            <span className="text-[9px] text-zinc-700 mt-1 inline-block">Day 7</span>
+            <p className="text-[10px] text-zinc-600 leading-snug">{t("outreachPreview3")}</p>
+            <span className="text-[9px] text-zinc-700 mt-1 inline-block">{t("day7")}</span>
           </div>
         </div>
         <div className="flex gap-1.5 mt-3 ml-10">

@@ -2,7 +2,13 @@
 
 import { useEffect } from "react"
 import { useReportWebVitals } from "next/web-vitals"
-import { trackMarketingEvent } from "@/lib/analytics-events"
+import {
+  flushQueuedMarketingEvents,
+  getStoredAttributionUserProperties,
+  persistAcquisitionTouch,
+  trackMarketingEvent,
+  type AcquisitionChannel,
+} from "@/lib/analytics-events"
 
 const aiHosts: Record<string, string> = {
   "chatgpt.com": "chatgpt",
@@ -11,6 +17,8 @@ const aiHosts: Record<string, string> = {
   "claude.ai": "claude",
   "copilot.microsoft.com": "copilot",
   "gemini.google.com": "gemini",
+  "meta.ai": "meta_ai",
+  "you.com": "you",
 }
 
 const searchHosts: Record<string, string> = {
@@ -28,11 +36,23 @@ function matchKnownHost(hostname: string, hosts: Record<string, string>) {
   return key ? hosts[key] : undefined
 }
 
-function classifyAcquisition() {
+function getReferrerHost() {
+  if (!document.referrer) return ""
+
+  try {
+    return new URL(document.referrer).hostname.toLowerCase()
+  } catch {
+    return ""
+  }
+}
+
+function classifyAcquisition(): {
+  channel: AcquisitionChannel
+  source: string
+} {
   const url = new URL(window.location.href)
   const utmSource = url.searchParams.get("utm_source")?.toLowerCase()
-  const referrer = document.referrer ? new URL(document.referrer) : null
-  const referrerHost = referrer?.hostname.toLowerCase() ?? ""
+  const referrerHost = getReferrerHost()
 
   const aiSource =
     (utmSource && matchKnownHost(utmSource, aiHosts)) ||
@@ -56,24 +76,36 @@ export function AcquisitionTracker() {
     if (sessionStorage.getItem(sessionKey)) return
 
     const acquisition = classifyAcquisition()
+    persistAcquisitionTouch({
+      ...acquisition,
+      landingPath: window.location.pathname,
+      capturedAt: new Date().toISOString(),
+    })
     sessionStorage.setItem(sessionKey, "true")
-    localStorage.setItem(
-      "scorelead:first-touch",
-      JSON.stringify({
-        ...acquisition,
-        landingPath: window.location.pathname,
-        capturedAt: new Date().toISOString(),
-      }),
-    )
 
     window.gtag?.("set", "user_properties", {
-      acquisition_channel: acquisition.channel,
-      acquisition_source: acquisition.source,
+      ...getStoredAttributionUserProperties(),
     })
     trackMarketingEvent("acquisition_landing", {
       acquisition_channel: acquisition.channel,
       acquisition_source: acquisition.source,
     })
+
+    let attempts = 0
+    const flushTimer = window.setInterval(() => {
+      attempts += 1
+      if (window.gtag) {
+        window.gtag("set", "user_properties", {
+          ...getStoredAttributionUserProperties(),
+        })
+        flushQueuedMarketingEvents()
+        window.clearInterval(flushTimer)
+      } else if (attempts >= 40) {
+        window.clearInterval(flushTimer)
+      }
+    }, 250)
+
+    return () => window.clearInterval(flushTimer)
   }, [])
 
   useReportWebVitals((metric) => {

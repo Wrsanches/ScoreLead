@@ -9,6 +9,24 @@ export default function robots(): MetadataRoute.Robots {
     "/onboarding/",
     "/*/onboarding/",
   ]
+  const searchCrawlers = [
+    "Googlebot",
+    "Bingbot",
+    "DuckDuckBot",
+    "OAI-SearchBot",
+    "Claude-SearchBot",
+    "PerplexityBot",
+    "Applebot",
+  ]
+  const userInitiatedCrawlers = [
+    "ChatGPT-User",
+    "Claude-User",
+    "Perplexity-User",
+  ]
+  // Training access is a separate policy choice from search visibility.
+  // Keep these agents in their own group so that choice can be changed without
+  // accidentally blocking search or user-requested retrieval.
+  const trainingCrawlers = ["GPTBot", "ClaudeBot", "Applebot-Extended"]
 
   return {
     rules: [
@@ -18,19 +36,17 @@ export default function robots(): MetadataRoute.Robots {
         disallow: privateRoutes,
       },
       {
-        userAgent: [
-          "Googlebot",
-          "Bingbot",
-          "DuckDuckBot",
-          "OAI-SearchBot",
-          "GPTBot",
-          "ChatGPT-User",
-          "ClaudeBot",
-          "Claude-Web",
-          "PerplexityBot",
-          "Applebot",
-          "Applebot-Extended",
-        ],
+        userAgent: searchCrawlers,
+        allow: ["/"],
+        disallow: privateRoutes,
+      },
+      {
+        userAgent: userInitiatedCrawlers,
+        allow: ["/"],
+        disallow: privateRoutes,
+      },
+      {
+        userAgent: trainingCrawlers,
         allow: ["/"],
         disallow: privateRoutes,
       },

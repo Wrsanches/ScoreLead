@@ -171,7 +171,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "case-studies",
     slug: "ceramik",
     pathname: "case-studies/ceramik",
-    updatedAt: UPDATED_AT,
+    updatedAt: "2026-07-24",
     keywords: [
       "Ceramik ScoreLead case study",
       "B2B lead generation case study",

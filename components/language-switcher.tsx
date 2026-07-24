@@ -23,9 +23,9 @@ function Flag({ src }: { src: string }) {
   return (
     <span
       aria-hidden="true"
-      className="relative h-[15px] w-5 shrink-0 overflow-hidden rounded-[3px] bg-zinc-800 ring-1 ring-white/20 shadow-sm shadow-black/50"
+      className="relative size-4 shrink-0 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/20 shadow-sm shadow-black/50"
     >
-      <Image src={src} alt="" fill sizes="20px" className="object-cover" />
+      <Image src={src} alt="" fill sizes="16px" className="object-cover" />
     </span>
   )
 }

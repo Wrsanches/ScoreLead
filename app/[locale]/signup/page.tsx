@@ -72,13 +72,19 @@ export default function SignUpPage() {
 
   async function onSubmit(data: SignUpValues) {
     setServerError("")
+    trackMarketingEvent("signup_start", {
+      signup_method: "email",
+      placement: "signup_form",
+    })
+    const onboardingPath =
+      locale === "en" ? "/onboarding" : `/${locale}/onboarding`
 
     const { error } = await authClient.signUp.email({
       name: data.name,
       email: data.email,
       password: data.password,
       // Where the email verification link lands after verifying.
-      callbackURL: locale === "en" ? "/onboarding" : `/${locale}/onboarding`,
+      callbackURL: `${onboardingPath}?signup=email`,
     })
 
     if (error) {
@@ -88,15 +94,17 @@ export default function SignUpPage() {
 
     // Email verification is required, so there's no session yet. Show the
     // check-your-inbox state instead of redirecting.
-    trackMarketingEvent("signup_completed", { signup_method: "email" })
+    trackMarketingEvent("signup_submitted", { signup_method: "email" })
     setVerificationSentTo(data.email)
   }
 
   function handleGoogleSignIn() {
     trackMarketingEvent("signup_start", { signup_method: "google" })
+    const onboardingPath =
+      locale === "en" ? "/onboarding" : `/${locale}/onboarding`
     authClient.signIn.social({
       provider: "google",
-      callbackURL: "/onboarding",
+      callbackURL: `${onboardingPath}?signup=google`,
     })
   }
 

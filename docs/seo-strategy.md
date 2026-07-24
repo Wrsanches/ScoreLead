@@ -1,71 +1,124 @@
-# ScoreLead SEO Strategy
+# ScoreLead SEO and GEO Strategy
 
-Updated: 2026-06-01
+Updated: 2026-07-24
 
 ## Positioning
 
-ScoreLead should compete as AI lead generation software for B2B companies that need qualified account pipeline, not as a generic CRM, consumer lead finder, or email outreach tool. The strongest discoverability angle is: find companies in a target market, enrich them with useful account data, score fit, and generate personalized B2B outreach.
+ScoreLead competes as AI lead generation software for B2B teams that need a
+reviewable path from target market to qualified account pipeline. It should not
+present itself as a generic CRM, consumer lead finder, purchased-list vendor,
+or autonomous message sender.
 
-## Primary Search Themes
+The core category story is:
 
-- AI lead generation software
-- B2B lead generation software
-- lead discovery software
-- lead scoring software
-- sales prospecting tool
-- sales intelligence software
-- lead enrichment software
-- automated outreach software
-- B2B account discovery
-- CRM-ready qualified leads
+1. define a target market;
+2. discover companies;
+3. retain useful public account context;
+4. score fit transparently;
+5. review outreach;
+6. track accepted accounts and customers.
 
-## Content Surfaces To Build Next
+## Published Search Cluster
 
-1. Use-case pages:
-   - `/lead-generation/agencies`
-   - `/lead-generation/b2b-sales-teams`
-   - `/lead-generation/b2b-startups`
-   - `/lead-generation/b2b-companies`
+- Features:
+  - `/features/ai-lead-discovery`
+  - `/features/lead-scoring`
+  - `/features/lead-enrichment`
+  - `/features/outreach-automation`
+  - `/features/sales-pipeline`
+- Use cases:
+  - `/use-cases/agencies`
+  - `/use-cases/b2b-sales-teams`
+  - `/use-cases/b2b-startups`
+  - `/use-cases/b2b-companies`
+- Comparisons:
+  - `/compare/manual-lead-research`
+  - `/compare/spreadsheets`
+  - `/compare/purchased-lead-lists`
+- Trust and conversion:
+  - `/pricing`
+  - `/security`
+  - `/about`
+  - `/editorial-policy`
+  - `/authors/scorelead-editorial`
+  - `/case-studies/ceramik`
+- Linkable tools:
+  - `/tools/icp-worksheet`
+  - `/tools/lead-scoring-calculator`
+  - `/tools/enrichment-checklist`
+  - `/tools/lead-research-roi-calculator`
 
-2. Feature pages:
-   - `/features/ai-lead-discovery`
-   - `/features/lead-scoring`
-   - `/features/lead-enrichment`
-   - `/features/outreach-automation`
-   - `/features/sales-pipeline`
+Every route above ships in English, Portuguese, and Spanish with localized
+copy, metadata, canonicals, and reciprocal hreflang annotations.
 
-3. Programmatic SEO pages with strict quality controls:
-   - Pattern: `/b2b-leads/[industry]`
-   - Pattern: `/b2b-leads/[industry]/[region]`
-   - Only index pages with unique, useful copy, real B2B account examples, localized search intent, and a clear product workflow.
-   - Start with high-intent B2B verticals: agencies, SaaS companies, law firms, dental clinics, real estate brokerages, accounting firms, logistics companies, manufacturers.
+## GEO Principles
 
-4. Comparison pages:
-   - `/compare/manual-lead-research`
-   - `/compare/spreadsheets`
-   - `/compare/lead-lists`
-   - Keep these factual and product-led. Do not make competitor claims unless sourced.
+- Optimize for ordinary crawlability, indexing, usefulness, and evidence.
+  `llms.txt` is a convenience index, not a substitute for those fundamentals.
+- Put the direct answer in visible server-rendered text near the top.
+- Make product mechanics, definitions, limitations, and update dates explicit.
+- Keep external claims tied to current primary or first-party sources.
+- Label illustrative product data so it cannot be mistaken for customer
+  performance.
+- Publish customer metrics only with the source, window, baseline, definition,
+  limitations, and approval status recorded.
+- Use an organization byline until a real person supplies a publishable
+  biography and consents to a named profile.
 
-## Landing Page Rules
+## Authority Priorities
 
-- Keep one clear H1 focused on the category and outcome.
-- Match page copy to the actual B2B workflow: discover target companies, enrich accounts, score fit, outreach, pipeline.
-- Avoid hidden text, keyword stuffing, fake reviews, fake aggregate ratings, or FAQ schema that is not visible and eligible.
-- Use localized page titles, descriptions, canonical URLs, and `hreflang` alternates for every public localized page.
+Do not expand into programmatic industry or region pages yet. The next content
+investment is original evidence:
 
-## Technical SEO Priorities
+1. strengthen the Ceramik case study when underlying counts or time records are
+   supplied;
+2. publish anonymized discovery or scoring benchmarks only when the sample,
+   date range, exclusions, and calculation can be disclosed;
+3. turn verified product workflows into firsthand field notes and screenshots;
+4. earn links from customers, partners, relevant SaaS directories, and
+   promotion of the free tools;
+5. keep the ScoreLead name, description, logo, website, and X profile
+   consistent.
 
-- Public marketing pages should be indexable and included in the sitemap.
-- Private app routes, onboarding, and auth surfaces should stay out of the index.
-- Every indexable page needs one absolute canonical URL.
-- Structured data must describe visible, accurate product information.
-- Social preview images should be explicit in metadata for each locale.
-- Keep Core Web Vitals healthy by avoiding heavy above-the-fold scripts and lazy-loading only below-the-fold media.
+## Content Truth Rules
+
+- Use the real first-publication date for every page.
+- Change `dateModified` only after a material review or correction.
+- Never invent a person, credential, review, benchmark, baseline, or customer
+  result.
+- Do not describe demo values as outcomes. Place a visible disclosure next to
+  every illustrative dashboard, score, contact, message, or pipeline.
+- Keep factual comparison pages neutral and sourced.
+- Check outbound sources before every production content release:
+
+  ```sh
+  bun run seo:check-sources
+  ```
+
+## Technical Requirements
+
+- Public pages return 200 and expose important content without client-side
+  JavaScript.
+- Private API, admin, and onboarding routes remain excluded from crawling.
+- Every indexable URL appears in the sitemap with its actual modification date,
+  a self-canonical, and reciprocal locale alternates.
+- Structured data must match visible content and use real entity identifiers.
+- Search, user-requested retrieval, and training crawlers remain separate
+  policy groups in `robots.txt`.
+- Submit created, materially updated, and removed URLs through IndexNow after
+  deployment.
 
 ## Measurement
 
-- Track Google Search Console queries by locale and page template.
-- Watch impressions for category terms before optimizing for clicks.
-- Split branded and non-branded queries.
-- Review pages with impressions but low CTR every two weeks and tighten title/meta descriptions.
-- Use conversion events from organic sessions: signup starts, onboarding completions, discovery job starts, and Pro upgrades.
+The primary outcome is qualified signups, not raw traffic or mentions.
+
+- Preserve immutable first-touch and latest non-direct attribution.
+- Track article and commercial CTA clicks, signup starts, signup submissions,
+  completed signups, qualified accounts, and customer conversions.
+- Create GA4 custom dimensions for acquisition, locale, landing page, page
+  group, article, placement, and pipeline status.
+- Review Google Search Console, Bing index coverage, and Bing AI Performance
+  weekly.
+- Record the first 14 complete production days as the baseline, then compare
+  rolling 28-day high-intent impressions, AI referrals, qualified signups, and
+  conversion rate.

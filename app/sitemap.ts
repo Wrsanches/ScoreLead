@@ -5,9 +5,9 @@ import { getLanguageAlternates, getLocalizedUrl, supportedLocales } from "@/lib/
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
-    { pathname: "", lastModified: "2026-07-23", changeFrequency: "weekly" as const, priority: 1 },
+    { pathname: "", lastModified: "2026-07-24", changeFrequency: "weekly" as const, priority: 1 },
     { pathname: "contact", lastModified: "2026-07-22", changeFrequency: "monthly" as const, priority: 0.7 },
-    { pathname: "blog", lastModified: "2026-07-23", changeFrequency: "weekly" as const, priority: 0.8 },
+    { pathname: "blog", lastModified: "2026-07-24", changeFrequency: "weekly" as const, priority: 0.8 },
     { pathname: "privacy", lastModified: "2026-07-22", changeFrequency: "yearly" as const, priority: 0.4 },
     { pathname: "terms", lastModified: "2026-07-22", changeFrequency: "yearly" as const, priority: 0.4 },
     { pathname: "data-deletion", lastModified: "2026-07-22", changeFrequency: "yearly" as const, priority: 0.4 },

@@ -6,13 +6,14 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "test:seo": "bun test lib/marketing/marketing.test.ts",
+    "test:seo": "bun test lib/marketing/marketing.test.ts lib/analytics-events.test.ts",
     "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:cleanup": "bun run scripts/cleanup-db.ts",
     "seo:indexnow": "bun --env-file=.env.local run scripts/submit-indexnow.ts",
+    "seo:check-sources": "bun run scripts/check-seo-sources.ts",
     "slack:preview": "bun --env-file=.env.local run scripts/preview-slack-alerts.ts"
   },
   "dependencies": {
@@ -93,6 +94,7 @@
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.2",
     "@tailwindcss/postcss": "^4.2.2",
+    "@types/bun": "^1.3.14",
     "@types/node": "^25",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",

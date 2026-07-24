@@ -37,7 +37,10 @@ describe("Slack notifications", () => {
   test("posts a structured new-account alert and escapes Slack markup", async () => {
     process.env.SLACK_WEBHOOK_URL =
       "https://hooks.slack.com/services/T00000000/B00000000/test-token"
-    const fetchMock = mock(async () => new Response("ok", { status: 200 }))
+    const fetchMock = mock(
+      async (_input: URL | RequestInfo, _init?: RequestInit) =>
+        new Response("ok", { status: 200 }),
+    )
     globalThis.fetch = fetchMock as unknown as typeof fetch
 
     const delivered = await notifySlackAccountCreated({
@@ -60,7 +63,10 @@ describe("Slack notifications", () => {
   test("posts plan and billing details for a new subscription", async () => {
     process.env.SLACK_WEBHOOK_URL =
       "https://hooks.slack.com/services/T00000000/B00000000/test-token"
-    const fetchMock = mock(async () => new Response("ok", { status: 200 }))
+    const fetchMock = mock(
+      async (_input: URL | RequestInfo, _init?: RequestInit) =>
+        new Response("ok", { status: 200 }),
+    )
     globalThis.fetch = fetchMock as unknown as typeof fetch
 
     const delivered = await notifySlackSubscriptionCreated({

@@ -487,11 +487,11 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     description:
       "Un relato transparente de cómo Ceramik usó ScoreLead para descubrir estudios de cerámica, reducir investigación manual y ampliar su pipeline en 30 días.",
     answer:
-      "Ceramik usó ScoreLead para buscar estudios, organizar evidencia pública y priorizar outreach. El relato publicado atribuye 2.450 leads descubiertos, crecimiento de 10× y 85% menos tiempo de investigación a los primeros 30 días.",
+      "En una comparación reportada por el cliente con su flujo manual anterior, Ceramik atribuye 2.450 leads de empresas descubiertos, un crecimiento de 10× en el pipeline y 85% menos tiempo de investigación a sus primeros 30 días con ScoreLead. Son datos direccionales del cliente, no mediciones auditadas.",
     highlights: [
-      "2.450 leads de empresas reportados como descubiertos.",
-      "10× de crecimiento reportado en el primer mes.",
-      "85% menos tiempo reportado en investigación manual.",
+      "Reporte del cliente: 2.450 leads de empresas descubiertos en los primeros 30 días.",
+      "Reporte del cliente: crecimiento relativo de 10× en el pipeline durante el mismo periodo.",
+      "Estimación del cliente: 85% menos tiempo dedicado a investigación manual.",
     ],
     sections: [
       {
@@ -508,15 +508,28 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
         points: ["Definición", "Descubrimiento", "Revisión", "Priorización"],
       },
       {
+        heading: "Ventana de medición y definiciones",
+        paragraphs: [
+          "La comparación publicada cubre los primeros 30 días de uso de ScoreLead frente al proceso manual anterior de Ceramik. Leads descubiertos significa registros de empresas encontrados por el flujo; no significa contactos, oportunidades o clientes verificados de forma independiente.",
+          "El crecimiento de 10× y la reducción de 85% son estimaciones direccionales de Ceramik. No se proporcionaron los conteos iniciales y finales del pipeline, tasas de aceptación, conversiones ni registros de horas para una revisión independiente, por lo que no se presentan como benchmarks auditados.",
+        ],
+        points: [
+          "Ventana: primeros 30 días",
+          "Baseline: flujo manual anterior",
+          "Fuente: reporte del cliente",
+          "Auditoría independiente: no realizada",
+        ],
+      },
+      {
         heading: "Cómo interpretar el resultado",
         paragraphs: [
-          "Las cifras son resultados reportados por el cliente en un periodo específico. No son un benchmark independiente, experimento controlado ni garantía.",
+          "Usa las cifras como el relato direccional de un cliente sobre un flujo inicial. Los resultados dependen del mercado, criterios de aceptación, evidencia disponible, revisión y ejecución del outreach; no son un experimento controlado ni una garantía.",
         ],
       },
     ],
     proofLabel: "Metodología y divulgación",
     proof:
-      "Las cifras coinciden con la historia ya publicada y deben actualizarse si Ceramik ofrece una nueva ventana, baseline o verificación.",
+      "ScoreLead publica estas cifras como evidencia reportada por el cliente, con ventana, baseline, definiciones y límites visibles. Cualquier revisión futura debe conservar la fuente y el historial de actualización.",
     ctaTitle: "Crea un flujo para tu propio mercado.",
     ctaDescription: "Define el objetivo, conserva evidencia y mide cuentas aceptadas.",
     ctaLabel: "Iniciar tu flujo",

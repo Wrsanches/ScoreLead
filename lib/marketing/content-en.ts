@@ -487,11 +487,11 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     description:
       "A transparent account of how Ceramik used ScoreLead to discover pottery studios, reduce manual research, and expand its pipeline during an initial 30-day period.",
     answer:
-      "Ceramik used ScoreLead to search for pottery studios, organize public company evidence, and prioritize outreach. The existing customer report attributes 2,450 discovered leads, 10× pipeline growth, and 85% less time spent on manual research to the first 30 days of the workflow.",
+      "In a customer-reported comparison with its previous manual workflow, Ceramik attributes 2,450 discovered company leads, 10× pipeline growth, and 85% less research time to its first 30 days using ScoreLead. These figures are directional customer evidence, not independently audited performance measurements.",
     highlights: [
-      "2,450 company leads reported as discovered automatically.",
-      "10× pipeline growth reported during the first month.",
-      "85% less time reportedly spent on manual research.",
+      "Customer-reported: 2,450 company leads discovered during the first 30 days.",
+      "Customer-reported: 10× relative pipeline growth during the same period.",
+      "Customer-estimated: 85% less time spent on manual research.",
     ],
     sections: [
       {
@@ -508,15 +508,28 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
         points: ["Market definition", "Studio discovery", "Evidence review", "Pipeline prioritization"],
       },
       {
+        heading: "Measurement window and definitions",
+        paragraphs: [
+          "The published comparison covers the first 30 days of ScoreLead use against Ceramik’s previous manual research process. Discovered leads means company records surfaced by the discovery workflow; it does not mean independently verified contacts, opportunities, or customers.",
+          "The 10× pipeline figure and 85% time reduction are Ceramik’s directional estimates. Starting and ending pipeline counts, accepted-account rates, conversion counts, and time sheets were not supplied for independent review, so this page does not present those figures as audited benchmarks.",
+        ],
+        points: [
+          "Window: first 30 days",
+          "Baseline: previous manual workflow",
+          "Source: customer report",
+          "Independent audit: not performed",
+        ],
+      },
+      {
         heading: "How to interpret the result",
         paragraphs: [
-          "These figures are a customer-reported outcome from a specific early workflow and period. They are not an independent benchmark, controlled experiment, or guarantee of results for another company.",
+          "Use the figures as one customer’s directional account of an early workflow. Results depend on the target market, acceptance criteria, available public evidence, review process, and outreach execution; they are not a controlled experiment or a guarantee.",
         ],
       },
     ],
     proofLabel: "Methodology and disclosure",
     proof:
-      "The figures shown match ScoreLead’s existing published customer-story copy. They should be updated if Ceramik provides a revised measurement window, baseline, or independent verification.",
+      "ScoreLead publishes these figures as customer-reported evidence with the known window, baseline, definitions, and limitations visible. Any future revision must preserve the original source and update history rather than silently replacing the numbers.",
     ctaTitle: "Build a prospecting workflow around your own market.",
     ctaDescription: "Define the target, keep the evidence, and measure accepted accounts.",
     ctaLabel: "Start your workflow",

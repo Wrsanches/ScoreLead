@@ -1,45 +1,48 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { useTranslations } from "next-intl"
-import dynamic from "next/dynamic"
-import { motion } from "framer-motion"
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 
 const DashboardPreview = dynamic(
-  () => import("./dashboard-preview").then((m) => ({ default: m.DashboardPreview })),
-  { ssr: true }
-)
-import { Navbar } from "./navbar"
-import { CustomerStory } from "./customer-story"
-import { FeatureCardsSection } from "./feature-cards-section"
-import { AISection } from "./ai-section"
-import { PipelineSection } from "./pipeline-section"
-import { WaitlistSection } from "./waitlist-section"
-import { WaitlistFooter } from "./waitlist-footer"
-import { PricingSection } from "./pricing-section"
-import { CookieConsent } from "./cookie-consent"
-import { TrackedLink } from "./tracked-link"
+  () =>
+    import("./dashboard-preview").then((m) => ({
+      default: m.DashboardPreview,
+    })),
+  { ssr: true },
+);
+import { Navbar } from "./navbar";
+import { CustomerStory } from "./customer-story";
+import { FeatureCardsSection } from "./feature-cards-section";
+import { AISection } from "./ai-section";
+import { PipelineSection } from "./pipeline-section";
+import { WaitlistSection } from "./waitlist-section";
+import { WaitlistFooter } from "./waitlist-footer";
+import { PricingSection } from "./pricing-section";
+import { CookieConsent } from "./cookie-consent";
+import { TrackedLink } from "./tracked-link";
 
 export function LandingPage() {
-  const t = useTranslations("hero")
-  const [yOffset, setYOffset] = useState(0)
-  const rafRef = useRef(0)
+  const t = useTranslations("hero");
+  const [yOffset, setYOffset] = useState(0);
+  const rafRef = useRef(0);
 
   const handleScroll = useCallback(() => {
-    cancelAnimationFrame(rafRef.current)
+    cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
-      const offset = Math.min(window.scrollY / 300, 1) * -20
-      setYOffset(offset)
-    })
-  }, [])
+      const offset = Math.min(window.scrollY / 300, 1) * -20;
+      setYOffset(offset);
+    });
+  }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-      cancelAnimationFrame(rafRef.current)
-    }
-  }, [handleScroll])
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
 
   const baseTransform = {
     translateX: 2,
@@ -47,11 +50,15 @@ export function LandingPage() {
     rotateX: 47,
     rotateY: 31,
     rotateZ: 324,
-  }
+  };
 
   return (
     <>
-      <section id="hero" className="relative min-h-screen overflow-hidden" style={{ backgroundColor: "#09090B" }}>
+      <section
+        id="hero"
+        className="relative min-h-screen overflow-hidden"
+        style={{ backgroundColor: "#09090B" }}
+      >
         <Navbar />
 
         <div
@@ -62,7 +69,8 @@ export function LandingPage() {
             transform: "translate(-50%, -30%)",
             width: "1200px",
             height: "800px",
-            background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)",
+            background:
+              "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)",
           }}
         />
 
@@ -99,7 +107,10 @@ export function LandingPage() {
                 >
                   {t("cta")}
                 </TrackedLink>
-                <a href="#features" className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm">
+                <a
+                  href="#features"
+                  className="text-zinc-300 font-medium hover:text-white transition-colors flex items-center gap-2 text-sm"
+                >
                   {t("secondary")}
                   <span aria-hidden="true">→</span>
                 </a>
@@ -123,7 +134,8 @@ export function LandingPage() {
             <div
               className="absolute bottom-0 left-0 right-0 h-72 z-10 pointer-events-none"
               style={{
-                background: "linear-gradient(to top, #09090B 20%, transparent 100%)",
+                background:
+                  "linear-gradient(to top, #09090B 20%, transparent 100%)",
               }}
             />
 
@@ -148,7 +160,7 @@ export function LandingPage() {
                   duration: 1,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="max-sm:[margin-top:180px] sm:[margin-top:280px]"
+                className="max-sm:mt-45 sm:mt-72"
                 style={{
                   backgroundColor: "#09090B",
                   transformOrigin: "0 0",
@@ -185,5 +197,5 @@ export function LandingPage() {
       </section>
       <CookieConsent />
     </>
-  )
+  );
 }

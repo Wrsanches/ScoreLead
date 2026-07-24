@@ -28,6 +28,7 @@ export type BlogPost = {
   readingMinutes: number
   accent: BlogAccent
   quickAnswers: Record<BlogLocale, string>
+  fieldNotes: Record<BlogLocale, string>
   relatedMarketingPath: string
   sources: BlogSource[]
   translations: Record<BlogLocale, BlogTranslation>
@@ -53,8 +54,10 @@ export type BlogUi = {
   updated: string
   authoredBy: string
   reviewedBy: string
+  reviewerName: string
   backToBlog: string
   quickAnswer: string
+  fieldNote: string
   decisionTable: string
   decision: string
   whatToCheck: string

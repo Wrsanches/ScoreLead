@@ -1,9 +1,5 @@
 import type { Metadata, Viewport } from "next"
 
-const verifiedSocialProfiles = [
-  process.env.NEXT_PUBLIC_SCORELEAD_X_URL,
-].filter((value): value is string => Boolean(value?.startsWith("https://")))
-
 export const siteConfig = {
   name: "ScoreLead",
   url: "https://scorelead.io",
@@ -15,7 +11,10 @@ export const siteConfig = {
       url: "https://scorelead.io/authors/scorelead-editorial",
     },
   ],
-  sameAs: verifiedSocialProfiles,
+  sameAs: [
+    "https://x.com/scorelead_",
+    "https://www.instagram.com/scorelead.io/",
+  ],
 }
 
 export const localeConfig = {

@@ -63,15 +63,16 @@
     "heading": "Descubra, pontue e converta seus melhores clientes B2B",
     "subtitle": "ScoreLead usa IA para encontrar e qualificar empresas, enriquecer com dados de conta, pontuar potencial de receita e gerar outreach B2B personalizado automaticamente.",
     "cta": "Comece grátis",
-    "secondary": "Veja como funciona"
+    "secondary": "Veja como funciona",
+    "demoDisclosure": "Prévia do produto com dados ilustrativos de empresas e contatos."
   },
   "customerStory": {
     "label": "História de sucesso",
-    "heading": "Veja como a Ceramik cresceu seu pipeline 10x",
+    "heading": "Veja como a Ceramik relatou crescimento de 10x no pipeline",
     "quote": "ScoreLead transformou como encontramos e alcançamos estúdios de cerâmica. Passamos de buscar leads manualmente para descobrir centenas de prospects qualificados em minutos. Nosso pipeline cresceu 10x no primeiro mês.",
     "company": "Ceramik",
     "companyDesc": "App completo para professores de cerâmica gerenciarem seus estúdios",
-    "statsLabel": "Resultados após 30 dias com ScoreLead",
+    "statsLabel": "Resultados relatados pelo cliente após 30 dias com ScoreLead",
     "stat1": "2.450",
     "stat1Label": "Leads descobertos automaticamente",
     "stat2": "10x",
@@ -89,7 +90,13 @@
     "card3": "Outreach Automatizado",
     "introduction": "Introdução",
     "followUp": "Acompanhamento",
-    "valueProp": "Proposta de valor"
+    "valueProp": "Proposta de valor",
+    "outreachPreview1": "Olá, notei que seu estúdio oferece yoga e pilates...",
+    "outreachPreview2": "Equipes podem reduzir pesquisas repetitivas antes do outreach...",
+    "outreachPreview3": "Com sua nota 4,7 e a demanda crescente...",
+    "day1": "Dia 1",
+    "day3": "Dia 3",
+    "day7": "Dia 7"
   },
   "ai": {
     "label": "Inteligência artificial",
@@ -116,7 +123,7 @@
     "outreachStep1Body": "Oi, percebi que seu estúdio oferece aulas de yoga, pilates e meditação em SF...",
     "outreachStep2Label": "Acompanhamento - Dia 3",
     "outreachStep2Subject": "Rápido acompanhamento",
-    "outreachStep2Body": "Queria compartilhar como estúdios como o seu estão economizando 10+ horas/semana...",
+    "outreachStep2Body": "Queria mostrar como times podem reduzir a pesquisa repetitiva antes do outreach...",
     "outreachStep3Label": "Proposta de valor - Dia 7",
     "outreachStep3Subject": "Suas 128 avaliações cinco estrelas dizem tudo",
     "outreachStep3Body": "Com sua nota 4.7 e lista de espera crescente, veja como podemos ajudar a escalar...",
@@ -136,7 +143,8 @@
     "serviceYoga": "Yoga",
     "servicePilates": "Pilates",
     "serviceMeditation": "Meditação",
-    "serviceWorkshops": "Workshops"
+    "serviceWorkshops": "Workshops",
+    "demoDisclosure": "Demo ilustrativo do produto. Empresa, contato, score e mensagens usam dados de exemplo."
   },
   "pipeline": {
     "label": "Fluxo de trabalho e pipeline",
@@ -172,7 +180,8 @@
     "feature3": "Exportação CSV",
     "feature3Desc": "Exporte leads filtrados com todos os dados enriquecidos.",
     "feature4": "Multi-idiomas",
-    "feature4Desc": "Outreach com IA em múltiplos idiomas para alcançar leads em qualquer lugar do mundo."
+    "feature4Desc": "Outreach com IA em múltiplos idiomas para alcançar leads em qualquer lugar do mundo.",
+    "demoDisclosure": "Fluxo ilustrativo. Os totais das etapas são dados de exemplo, não resultados de clientes."
   },
   "dashboard": {
     "searchLeads": "Buscar leads...",
@@ -647,6 +656,7 @@
     "dpa": "DPA",
     "contactUs": "Fale conosco",
     "twitter": "X (Twitter)",
+    "instagram": "Instagram",
     "github": "GitHub",
     "leadDiscovery": "Descoberta de leads com IA",
     "leadScoring": "Lead scoring",
