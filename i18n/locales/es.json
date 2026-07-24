@@ -38,7 +38,7 @@
     "perkImages": "30 imágenes de IA / mes, máximo 10 / día",
     "perkOutreach": "Mensajes de IA ilimitados",
     "freeFeatBusiness": "1 negocio",
-    "freeFeatDiscovery": "1 búsqueda de descubrimiento (~25 leads)",
+    "freeFeatDiscovery": "1 búsqueda de descubrimiento (~10 leads)",
     "freeFeatContent": "1 plan de contenido",
     "freeFeatImages": "1 imagen de IA"
   },
@@ -647,8 +647,7 @@
     "dpa": "DPA",
     "contactUs": "Contáctanos",
     "twitter": "X (Twitter)",
-    "github": "GitHub"
-    ,
+    "github": "GitHub",
     "leadDiscovery": "Descubrimiento con IA",
     "leadScoring": "Lead scoring",
     "leadEnrichment": "Enriquecimiento de leads",

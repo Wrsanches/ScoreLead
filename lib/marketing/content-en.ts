@@ -527,7 +527,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     description:
       "Use ScoreLead’s core workflow on the Free plan, then move to Pro for higher limits across discovery, businesses, content, images, and outreach.",
     answer:
-      "The Free plan costs $0 and includes one business, one discovery run of approximately 25 leads, one content plan, and one AI image. The Pro plan is listed at $49 per month and unlocks the limits described below.",
+      "The Free plan costs $0 and includes one business, one discovery run of up to 10 leads, one content plan, and one AI image. The Pro plan is listed at $49 per month and unlocks the limits shown on this page.",
     highlights: ["Free: $0 per month", "Pro: $49 per month", "No credit card required to start"],
     sections: [
       {

@@ -527,7 +527,7 @@ export const marketingContentPt: Record<string, MarketingPageTranslation> = {
     description:
       "Use o fluxo principal no plano Free e migre para o Pro quando precisar de limites maiores em descoberta, negócios, conteúdo, imagens e outreach.",
     answer:
-      "O plano Free custa US$ 0 e inclui um negócio, uma descoberta de aproximadamente 25 leads, um plano de conteúdo e uma imagem com IA. O Pro é anunciado por US$ 49 por mês.",
+      "O plano Free custa US$ 0 e inclui um negócio, uma descoberta com até 10 leads, um plano de conteúdo e uma imagem com IA. O Pro é anunciado por US$ 49 por mês.",
     highlights: ["Free: US$ 0 por mês", "Pro: US$ 49 por mês", "Sem cartão para começar"],
     sections: [
       {

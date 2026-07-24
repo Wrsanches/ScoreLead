@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
-import { MarketingPageView } from "@/components/marketing-page"
+import { PricingPageView } from "@/components/pricing-page"
 import { generateMarketingMetadata, getMarketingPage } from "@/lib/marketing"
 import { normalizeLocale } from "@/lib/seo"
 
@@ -16,5 +16,5 @@ export default async function PricingPage({ params }: { params: PageParams }) {
   const { locale } = await params
   const normalizedLocale = normalizeLocale(locale)
   setRequestLocale(normalizedLocale)
-  return <MarketingPageView page={page} locale={normalizedLocale} />
+  return <PricingPageView page={page} locale={normalizedLocale} />
 }
