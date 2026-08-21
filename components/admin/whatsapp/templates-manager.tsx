@@ -8,6 +8,7 @@ import {
   Loader2,
   Plus,
   RefreshCw,
+  Sparkles,
   Trash2,
   X,
 } from "lucide-react"
@@ -69,6 +70,11 @@ type FormState = {
   footerText: string
   buttons: ButtonInput[]
 }
+
+type GeneratedTemplateDraft = Pick<
+  FormState,
+  "name" | "headerText" | "body" | "bodyExamples" | "footerText"
+>
 
 const INPUT =
   "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-60"
@@ -158,6 +164,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editing, setEditing] = useState<TemplateRow | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
+  const [generating, setGenerating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<TemplateRow | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -226,6 +233,54 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
 
   function patch(update: Partial<FormState>) {
     setForm((f) => ({ ...f, ...update }))
+  }
+
+  async function generateDraft() {
+    if (generating || submitting) return
+    setGenerating(true)
+    try {
+      const response = await fetch(
+        `/api/businesses/${businessId}/whatsapp/templates/generate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            language: form.language,
+            category: form.category,
+            currentDraft: {
+              name: form.name,
+              headerText: form.headerText,
+              body: form.body,
+              footerText: form.footerText,
+            },
+          }),
+        },
+      )
+      const body = await response.json().catch(() => null)
+      if (!response.ok) {
+        throw new Error(body?.error ?? t("tplAiFailed"))
+      }
+
+      const draft = body?.template as GeneratedTemplateDraft | undefined
+      if (
+        !draft ||
+        typeof draft.name !== "string" ||
+        typeof draft.headerText !== "string" ||
+        typeof draft.body !== "string" ||
+        !Array.isArray(draft.bodyExamples) ||
+        !draft.bodyExamples.every((value) => typeof value === "string") ||
+        typeof draft.footerText !== "string"
+      ) {
+        throw new Error(t("tplAiFailed"))
+      }
+
+      setForm((current) => ({ ...current, ...draft }))
+      toast.success(t("tplAiGenerated"))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("tplAiFailed"))
+    } finally {
+      setGenerating(false)
+    }
   }
 
   async function submit() {
@@ -437,6 +492,37 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+            {!editing && (
+              <div className="flex flex-col gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                    {t("tplAiTitle")}
+                  </p>
+                  <p id="whatsapp-ai-template-description" className="mt-0.5 text-xs leading-5 text-zinc-500">
+                    {t("tplAiDescription")}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={generateDraft}
+                  disabled={generating || submitting}
+                  aria-describedby="whatsapp-ai-template-description"
+                >
+                  {generating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {generating ? t("tplAiGenerating") : t("tplAiButton")}
+                </Button>
+                <span className="sr-only" aria-live="polite">
+                  {generating ? t("tplAiGenerating") : ""}
+                </span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs uppercase tracking-wider text-zinc-500">
@@ -648,7 +734,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
             <Button variant="ghost" onClick={() => setSheetOpen(false)}>
               {t("cancel")}
             </Button>
-            <Button onClick={submit} disabled={submitting}>
+            <Button onClick={submit} disabled={submitting || generating}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {editing ? t("tplResubmit") : t("tplSubmit")}
             </Button>

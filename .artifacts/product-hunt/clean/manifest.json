@@ -1,0 +1,21 @@
+{
+  "product": "ScoreLead",
+  "platform": "Product Hunt",
+  "dimensions": {
+    "width": 1270,
+    "height": 760
+  },
+  "style": "Minimal, product-first",
+  "outputs": [
+    "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/clean/scorelead-product-hunt-clean-01-hero.png",
+    "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/clean/scorelead-product-hunt-clean-02-discovery.png",
+    "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/clean/scorelead-product-hunt-clean-03-scoring.png",
+    "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/clean/scorelead-product-hunt-clean-04-pipeline.png",
+    "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/clean/scorelead-product-hunt-clean-05-dashboard.png"
+  ],
+  "notes": [
+    "Hero uses the user-captured ScoreLead landing page.",
+    "Feature cards preserve populated product-demo screenshots.",
+    "No generated product UI, invented copy, or customer claims."
+  ]
+}

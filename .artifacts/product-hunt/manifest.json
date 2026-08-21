@@ -1,0 +1,41 @@
+{
+  "product": "ScoreLead",
+  "platform": "Product Hunt",
+  "dimensions": {
+    "width": 1270,
+    "height": 760
+  },
+  "generatedAt": "2026-07-27T19:59:53.876Z",
+  "outputs": [
+    {
+      "order": 1,
+      "path": "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/scorelead-product-hunt-01-hero.png",
+      "source": "/Users/wrsanches/Developer/scorelead/public/images/platform/ceramik-dashboard.webp"
+    },
+    {
+      "order": 2,
+      "path": "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/scorelead-product-hunt-02-discovery.png",
+      "source": "/Users/wrsanches/Developer/scorelead/public/images/platform/ceramik-discovery.webp"
+    },
+    {
+      "order": 3,
+      "path": "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/scorelead-product-hunt-03-scoring.png",
+      "source": "/Users/wrsanches/Developer/scorelead/public/images/platform/ceramik-leads.webp"
+    },
+    {
+      "order": 4,
+      "path": "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/scorelead-product-hunt-04-pipeline.png",
+      "source": "/Users/wrsanches/Developer/scorelead/public/images/platform/ceramik-pipeline.webp"
+    },
+    {
+      "order": 5,
+      "path": "/Users/wrsanches/Developer/scorelead/.artifacts/product-hunt/scorelead-product-hunt-05-proof.png",
+      "source": "/Users/wrsanches/Developer/scorelead/public/images/platform/ceramik-case-study.webp"
+    }
+  ],
+  "notes": [
+    "Exact ScoreLead screenshots and logo preserved through deterministic composition.",
+    "Proof metrics are customer-reported claims already published in the ScoreLead marketing content.",
+    "All files exported at Product Hunt's recommended 1270x760 gallery size."
+  ]
+}

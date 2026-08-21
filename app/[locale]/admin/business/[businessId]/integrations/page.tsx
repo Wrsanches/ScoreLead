@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl"
 import {
   Check,
   Clock3,
+  CreditCard,
+  ExternalLink,
   Link2,
   Loader2,
   MessageCircle,
@@ -77,6 +79,9 @@ const META_MESSAGE_ORIGINS = new Set([
 
 const WHATSAPP_INTEGRATION_CONFIGURED =
   process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true"
+
+const META_WHATSAPP_PAYMENT_METHODS_URL =
+  "https://business.facebook.com/wa/manage/payment-methods/"
 
 export default function IntegrationsPage({
   params,
@@ -552,6 +557,25 @@ export default function IntegrationsPage({
                     {t("syncTemplates")}
                   </Button>
                 )}
+                <div className="mt-6 border-t border-zinc-200 pt-5 dark:border-zinc-800">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                    {t("metaBillingTitle")}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-zinc-500">
+                    {t("metaBillingDescription")}
+                  </p>
+                  <Button asChild variant="outline" className="mt-4 w-full">
+                    <a
+                      href={META_WHATSAPP_PAYMENT_METHODS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <CreditCard className="h-4 w-4" aria-hidden="true" />
+                      {t("manageMetaBilling")}
+                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    </a>
+                  </Button>
+                </div>
               </aside>
             </section>
           </div>

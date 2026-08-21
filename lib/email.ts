@@ -1,7 +1,7 @@
-import { createElement } from "react"
-import { render } from "@react-email/render"
-import { Resend, type CreateEmailOptions } from "resend"
-import { ActionEmail } from "./emails/action-email"
+import { createElement } from "react";
+import { render } from "@react-email/render";
+import { Resend, type CreateEmailOptions } from "resend";
+import { ActionEmail } from "./emails/action-email";
 
 /**
  * Transactional email sender (Resend). Auth emails must not silently fail:
@@ -9,23 +9,23 @@ import { ActionEmail } from "./emails/action-email"
  * errors as a 500 on the triggering request).
  */
 
-const DEFAULT_FROM = "ScoreLead <hello@uspostage.io>"
-const DEFAULT_REPLY_TO = "hello@uspostage.io"
+const DEFAULT_FROM = "ScoreLead <hello@scorelead.io>";
+const DEFAULT_REPLY_TO = "hello@scorelead.io";
 
 type EmailOptionsWithDefaults<T> = T extends unknown
   ? Omit<T, "from" | "replyTo"> & {
-      from?: string
-      replyTo?: string | string[]
+      from?: string;
+      replyTo?: string | string[];
     }
-  : never
+  : never;
 
-type SendEmailOptions = EmailOptionsWithDefaults<CreateEmailOptions>
+type SendEmailOptions = EmailOptionsWithDefaults<CreateEmailOptions>;
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not configured")
+    throw new Error("RESEND_API_KEY is not configured");
   }
-  return new Resend(process.env.RESEND_API_KEY)
+  return new Resend(process.env.RESEND_API_KEY);
 }
 
 /**
@@ -38,13 +38,13 @@ export async function sendEmail(options: SendEmailOptions) {
     ...options,
     from: options.from ?? process.env.EMAIL_FROM ?? DEFAULT_FROM,
     replyTo: options.replyTo ?? process.env.EMAIL_REPLY_TO ?? DEFAULT_REPLY_TO,
-  } as CreateEmailOptions)
+  } as CreateEmailOptions);
 
   if (error) {
-    throw new Error(`Resend email failed: ${error.message}`, { cause: error })
+    throw new Error(`Resend email failed: ${error.message}`, { cause: error });
   }
 
-  return data
+  return data;
 }
 
 export function escapeHtml(str: string) {
@@ -52,15 +52,15 @@ export function escapeHtml(str: string) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/"/g, "&quot;");
 }
 
 export async function sendVerificationEmail(opts: {
-  to: string
-  name: string | null
-  url: string
+  to: string;
+  name: string | null;
+  url: string;
 }) {
-  const firstName = opts.name?.split(" ")[0]
+  const firstName = opts.name?.split(" ")[0];
   const element = createElement(ActionEmail, {
     preview: "Confirm your email to activate your ScoreLead account.",
     heading: firstName ? `Welcome, ${firstName}!` : "Welcome!",
@@ -69,19 +69,19 @@ export async function sendVerificationEmail(opts: {
     ctaLabel: "Verify email",
     url: opts.url,
     note: "This link expires in 1 hour. If you didn't create a ScoreLead account, you can safely ignore this email.",
-  })
+  });
   await sendEmail({
     to: opts.to,
     subject: "Verify your email - ScoreLead",
     html: await render(element),
     text: await render(element, { plainText: true }),
-  })
+  });
 }
 
 export async function sendPasswordResetEmail(opts: {
-  to: string
-  name: string | null
-  url: string
+  to: string;
+  name: string | null;
+  url: string;
 }) {
   const element = createElement(ActionEmail, {
     preview: "Reset your ScoreLead password.",
@@ -91,11 +91,11 @@ export async function sendPasswordResetEmail(opts: {
     ctaLabel: "Reset password",
     url: opts.url,
     note: "This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email - your password won't change.",
-  })
+  });
   await sendEmail({
     to: opts.to,
     subject: "Reset your password - ScoreLead",
     html: await render(element),
     text: await render(element, { plainText: true }),
-  })
+  });
 }

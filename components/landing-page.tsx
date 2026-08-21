@@ -13,10 +13,10 @@ const DashboardPreview = dynamic(
   { ssr: true },
 );
 import { Navbar } from "./navbar";
-import { CustomerStory } from "./customer-story";
 import { FeatureCardsSection } from "./feature-cards-section";
 import { AISection } from "./ai-section";
 import { PipelineSection } from "./pipeline-section";
+import { TestimonialsSection } from "./testimonials-section";
 import { WaitlistSection } from "./waitlist-section";
 import { WaitlistFooter } from "./waitlist-footer";
 import { PricingSection } from "./pricing-section";
@@ -186,10 +186,10 @@ export function LandingPage() {
             </div>
           </div>
 
-          <CustomerStory />
           <FeatureCardsSection />
           <AISection />
           <PipelineSection />
+          <TestimonialsSection />
           <PricingSection />
           <WaitlistSection />
           <WaitlistFooter />
