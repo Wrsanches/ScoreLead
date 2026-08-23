@@ -358,6 +358,40 @@ export type WhatsAppTemplateParameter = {
   text: string
 }
 
+/** Auditable, rate-limited sends from the connected-account test form. */
+export const whatsappTestMessage = pgTable("whatsapp_test_message", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId")
+    .notNull()
+    .references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  templateId: text("templateId")
+    .references(() => whatsappTemplate.id, { onDelete: "set null" }),
+  sentByUserId: text("sentByUserId")
+    .references(() => user.id, { onDelete: "set null" }),
+  recipientPhone: text("recipientPhone").notNull(),
+  templateName: text("templateName").notNull(),
+  templateLanguage: text("templateLanguage").notNull(),
+  templateParameters: jsonb("templateParameters")
+    .$type<WhatsAppTemplateParameter[]>()
+    .notNull(),
+  renderedBody: text("renderedBody").notNull(),
+  consentConfirmedAt: timestamp("consentConfirmedAt").notNull(),
+  status: text("status").notNull().default("sending"),
+  metaMessageId: text("metaMessageId"),
+  acceptedAt: timestamp("acceptedAt"),
+  failedAt: timestamp("failedAt"),
+  errorCode: text("errorCode"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  index("whatsapp_test_message_business_created_idx").on(table.businessId, table.createdAt),
+  uniqueIndex("whatsapp_test_message_meta_uidx").on(table.metaMessageId),
+])
+
 export type WhatsAppConsentSnapshot = {
   eventId: string
   status: "granted"

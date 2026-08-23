@@ -33,6 +33,7 @@ import { usePlan } from "@/components/admin/plan-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { useBusinessAccess } from "@/components/admin/business-context"
+import { WhatsAppTestMessageForm } from "@/components/admin/whatsapp/test-message-form"
 
 declare global {
   interface Window {
@@ -526,6 +527,7 @@ export default function IntegrationsPage({
                         )
                       })}
                     </div>
+                    <p className="mt-2 text-xs text-zinc-500">{t("weekdaysHelp")}</p>
                   </div>
                 </div>
                 {!readOnly && (
@@ -562,6 +564,7 @@ export default function IntegrationsPage({
                 </div>
               </aside>
             </section>
+            {!readOnly && <WhatsAppTestMessageForm businessId={businessId} />}
           </div>
         )}
       </ContentWrapper>
