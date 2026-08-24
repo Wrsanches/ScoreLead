@@ -64,6 +64,7 @@ export async function generateWhatsAppTemplateValues(
           "Return JSON only: {\"steps\":[{\"position\":1,\"values\":[\"...\"]}]}.",
           "Return exactly one value per variable, in the provided order.",
           "Use only facts in the sender and lead context. Never invent claims, prices, relationships, consent, or personal facts.",
+          "When a variable represents the recipient's name, use lead.ownerName; if it is missing, use the lead's business name.",
           "Keep each value concise, natural, and in the template language.",
           "Do not repeat or rewrite the fixed template body. Do not include markdown.",
         ].join("\n"),
