@@ -33,3 +33,10 @@ export function getLocalizedAppUrl(pathname: string, locale = "en") {
   const localePrefix = locale === "en" ? "" : `/${locale}`
   return `${appSiteUrl}${localePrefix}${normalizedPath}`
 }
+
+export function getLocalizedPublicUrl(pathname: string, locale = "en") {
+  const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`
+  const localePrefix = locale === "en" ? "" : `/${locale}`
+  const path = normalizedPath === "/" ? "" : normalizedPath
+  return `${publicSiteUrl}${localePrefix}${path}`
+}

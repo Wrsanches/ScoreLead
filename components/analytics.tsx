@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Analytics } from "@vercel/analytics/next"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { AcquisitionTracker } from "./marketing-analytics"
 import {
@@ -26,7 +25,6 @@ export function ConsentGatedAnalytics({ gaId }: { gaId: string }) {
 
   return (
     <>
-      <Analytics />
       <GoogleAnalytics gaId={gaId} />
       <AcquisitionTracker />
     </>

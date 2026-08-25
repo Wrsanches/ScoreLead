@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
-import { Link } from "@/i18n/routing";
+import { PublicSiteLink } from "@/components/public-site-link";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -54,12 +54,12 @@ function BrandingSide({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link href="/" className="flex items-center gap-3 mb-10">
+          <PublicSiteLink href="/" className="flex items-center gap-3 mb-10">
             <ScoreLeadLogo className="w-10 h-10 text-white" />
             <span className="text-white font-semibold text-2xl tracking-tight">
               ScoreLead
             </span>
-          </Link>
+          </PublicSiteLink>
 
           <h2 className="text-3xl font-semibold text-white tracking-tight leading-tight mb-4 whitespace-pre-line">
             {heading}
@@ -184,12 +184,12 @@ export function AuthLayout({
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <Link href="/" className="flex items-center gap-2.5 mb-2">
+            <PublicSiteLink href="/" className="flex items-center gap-2.5 mb-2">
               <ScoreLeadLogo className="w-8 h-8 text-white" />
               <span className="text-white font-semibold text-xl tracking-tight">
                 ScoreLead
               </span>
-            </Link>
+            </PublicSiteLink>
           </div>
 
           {children}

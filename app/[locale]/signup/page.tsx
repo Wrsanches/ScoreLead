@@ -8,6 +8,7 @@ import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AuthLayout, GoogleButton, OrDivider } from "@/components/auth-layout"
+import { PublicSiteLink } from "@/components/public-site-link"
 import { authClient } from "@/lib/auth-client"
 import { signUpSchema, type SignUpValues } from "@/lib/validations/auth"
 import { trackMarketingEvent } from "@/lib/analytics-events"
@@ -262,22 +263,24 @@ export default function SignUpPage() {
                 <span className="text-xs text-zinc-500">
                   {t.rich("agreeTerms", {
                     terms: (chunks) => (
-                      <Link
+                      <PublicSiteLink
                         href="/terms"
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-sm text-zinc-400 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
                       >
                         {chunks}
-                      </Link>
+                      </PublicSiteLink>
                     ),
                     privacy: (chunks) => (
-                      <Link
+                      <PublicSiteLink
                         href="/privacy"
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-sm text-zinc-400 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
                       >
                         {chunks}
-                      </Link>
+                      </PublicSiteLink>
                     ),
                   })}
                 </span>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Cookie } from "lucide-react"
-import { Link } from "@/i18n/routing"
+import { PublicSiteLink } from "@/components/public-site-link"
 import {
   getAnalyticsConsent,
   setAnalyticsConsent,
@@ -46,12 +46,12 @@ export function CookieConsent() {
           </div>
           <div>
             <p className="text-sm font-medium text-white">{t("message")}</p>
-            <Link
+            <PublicSiteLink
               href="/privacy#cookies"
               className="mt-1 inline-block rounded-sm text-xs text-zinc-500 underline decoration-zinc-700 underline-offset-2 transition-colors hover:text-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
             >
               {t("learnMore")}
-            </Link>
+            </PublicSiteLink>
           </div>
         </div>
         <div className="flex items-center gap-2">

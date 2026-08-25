@@ -1,5 +1,8 @@
 import { describe, expect, it } from "bun:test"
-import { isProductionAnalyticsHostname } from "./site-urls"
+import {
+  getLocalizedPublicUrl,
+  isProductionAnalyticsHostname,
+} from "./site-urls"
 
 describe("site URLs", () => {
   it("limits analytics to the public and application production hosts", () => {
@@ -9,5 +12,15 @@ describe("site URLs", () => {
     expect(isProductionAnalyticsHostname("scorelead-testing.up.railway.app")).toBe(
       false,
     )
+  })
+
+  it("builds absolute localized public-site links", () => {
+    expect(getLocalizedPublicUrl("/privacy#cookies", "en")).toBe(
+      "https://scorelead.io/privacy#cookies",
+    )
+    expect(getLocalizedPublicUrl("/terms", "pt")).toBe(
+      "https://scorelead.io/pt/terms",
+    )
+    expect(getLocalizedPublicUrl("/", "es")).toBe("https://scorelead.io/es")
   })
 })
