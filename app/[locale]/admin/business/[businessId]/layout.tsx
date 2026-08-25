@@ -1,12 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import { eq } from "drizzle-orm"
 import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { business } from "@/lib/db/schema"
 import { BusinessProvider } from "@/components/admin/business-context"
-import { AdminViewBanner } from "@/components/admin/admin-view-banner"
 import { generatePageMetadata } from "@/lib/seo"
 import { getBusinessAccess } from "@/lib/business-access"
 
@@ -36,14 +32,8 @@ export default async function BusinessLayout({
     : null
   if (!access) notFound()
 
-  const [selectedBusiness] = await db
-    .select({ name: business.name })
-    .from(business)
-    .where(eq(business.id, businessId))
-    .limit(1)
-
-  // AdminShell (sidebar/chrome) is rendered once by the parent admin layout, so
-  // it persists across navigation; this layout only scopes the active business.
+  // Keep old bookmarks valid long enough for BusinessProvider to persist this
+  // validated selection and replace the legacy UUID path with its clean route.
   return (
     <BusinessProvider
       businessId={businessId}
@@ -51,13 +41,6 @@ export default async function BusinessLayout({
       ownerName={access.ownerName}
       ownerEmail={access.ownerEmail}
     >
-      {access.readOnly && (
-        <AdminViewBanner
-          businessName={selectedBusiness?.name ?? null}
-          ownerName={access.ownerName}
-          ownerEmail={access.ownerEmail}
-        />
-      )}
       {children}
     </BusinessProvider>
   )

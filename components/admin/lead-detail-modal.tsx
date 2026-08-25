@@ -35,7 +35,6 @@ import {
   type Lead,
   type LeadStatus,
 } from "@/app/[locale]/admin/business/[businessId]/leads/_shared"
-import { useBusinessId } from "@/components/admin/business-context"
 
 interface LeadDetailModalProps {
   lead: Lead | null
@@ -61,7 +60,6 @@ export function LeadDetailModal({
   onStatusChange,
   readOnly = false,
 }: LeadDetailModalProps) {
-  const businessId = useBusinessId()
   const t = useTranslations("dashboard")
 
   if (!lead) {
@@ -295,7 +293,7 @@ export function LeadDetailModal({
             )}
           </span>
           <Link
-            href={`/admin/business/${businessId}/leads?focus=${lead.id}`}
+            href={`/admin/leads?focus=${lead.id}`}
             onClick={() => onOpenChange(false)}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200 transition-colors"
           >

@@ -41,11 +41,10 @@ export async function getActiveBusinessIdForUser(
 }
 
 /**
- * Resolves a business id for a request that carries one explicitly (now the
- * primary path: the id lives in the URL and is passed to scoped APIs as
- * `?businessId=`). Validates ownership. An explicit id that is not owned never
- * falls back to another business; only callers that omit the id use the active
- * business fallback.
+ * Resolves a business id for an explicitly scoped API request. Browser routes
+ * use the validated active-business cookie, while APIs may still pass an id in
+ * a query string or request body. An inaccessible explicit id never falls back
+ * to another business.
  */
 export async function resolveBusinessId(
   userId: string,

@@ -367,7 +367,7 @@ export function WhatsAppAutomationPanel({
       ) : !connected ? (
         <Notice icon={ExternalLink} text={t("connectionRequired")}>
           <Button size="sm" variant="outline" asChild>
-            <Link href={`/admin/business/${businessId}/integrations`}>{t("openIntegrations")}</Link>
+            <Link href="/admin/integrations">{t("openIntegrations")}</Link>
           </Button>
         </Notice>
       ) : consent?.status !== "granted" ? (
@@ -443,7 +443,7 @@ export function WhatsAppAutomationPanel({
       ) : templates.length === 0 ? (
         <Notice icon={AlertCircle} text={t("noTemplates")}>
           <Button size="sm" variant="outline" asChild>
-            <Link href={`/admin/business/${businessId}/integrations`}>{t("syncTemplates")}</Link>
+            <Link href="/admin/integrations">{t("syncTemplates")}</Link>
           </Button>
         </Notice>
       ) : (

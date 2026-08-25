@@ -63,8 +63,10 @@ export async function POST(request: Request) {
     .where(eq(business.userId, session.user.id))
 
   const inProgress = existing.find(b => !b.onboardingCompleted)
+  let completedBusinessId: string
 
   if (inProgress) {
+    completedBusinessId = inProgress.id
     await db
       .update(business)
       .set({
@@ -91,8 +93,9 @@ export async function POST(request: Request) {
       }
       throw e
     }
+    completedBusinessId = crypto.randomUUID()
     await db.insert(business).values({
-      id: crypto.randomUUID(),
+      id: completedBusinessId,
       userId: session.user.id,
       ...data,
       onboardingCompleted: true,
@@ -100,5 +103,5 @@ export async function POST(request: Request) {
     })
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, businessId: completedBusinessId })
 }

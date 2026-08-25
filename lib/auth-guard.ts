@@ -66,8 +66,6 @@ export async function redirectIfAuthenticated(locale: string) {
     redirect(`${prefix}/onboarding`)
   }
 
-  // Land directly on the active business so we skip the bare `/admin` resolver
-  // (which would meta-refresh redirect and flash an interstitial).
   const businessId = await getActiveViewableBusinessIdForUser(session.user.id)
-  redirect(businessId ? `${prefix}/admin/business/${businessId}` : `${prefix}/admin`)
+  redirect(businessId ? `${prefix}/admin` : `${prefix}/onboarding`)
 }

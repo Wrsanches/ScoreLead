@@ -137,7 +137,7 @@ export default function DiscoveryJobsPage() {
           breadcrumbs={[{ label: t("discovery") }]}
           actions={!readOnly ? (
             <Link
-              href={`/admin/business/${businessId}/discovery-jobs/new`}
+              href="/admin/discovery-jobs/new"
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
             >
               {t("createJob")}
@@ -194,7 +194,7 @@ export default function DiscoveryJobsPage() {
               return (
                 <Link
                   key={job.id}
-                  href={`/admin/business/${businessId}/discovery-jobs/${job.id}`}
+                  href={`/admin/discovery-jobs/${job.id}`}
                   className={`block rounded-xl border transition-all duration-200 group ${
                     isActive
                       ? "border-emerald-500/20 hover:border-emerald-500/30 hover:bg-emerald-500/[0.02]"

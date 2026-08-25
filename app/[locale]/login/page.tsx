@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react"
-import { Link } from "@/i18n/routing"
+import { getPathname, Link } from "@/i18n/routing"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -13,6 +13,7 @@ import { loginSchema, type LoginValues } from "@/lib/validations/auth"
 
 export default function LoginPage() {
   const t = useTranslations("auth")
+  const locale = useLocale()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState("")
   const [unverifiedNotice, setUnverifiedNotice] = useState(false)
@@ -45,24 +46,13 @@ export default function LoginPage() {
       return
     }
 
-    // Navigate straight to the active business. Going through the bare `/admin`
-    // resolver would render an interstitial and meta-refresh redirect (a visible
-    // flash + reload), since the redirect happens after the document streams.
-    try {
-      const res = await fetch("/api/businesses")
-      const list = res.ok ? await res.json() : []
-      window.location.href = list[0]?.id
-        ? `/admin/business/${list[0].id}`
-        : "/onboarding"
-    } catch {
-      window.location.href = "/admin"
-    }
+    window.location.href = getPathname({ locale, href: "/admin" })
   }
 
   function handleGoogleSignIn() {
     authClient.signIn.social({
       provider: "google",
-      callbackURL: "/admin",
+      callbackURL: getPathname({ locale, href: "/admin" }),
     })
   }
 

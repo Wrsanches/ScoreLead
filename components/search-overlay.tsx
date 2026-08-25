@@ -10,9 +10,10 @@ import {
 } from "react";
 import Image from "next/image";
 import { Search, X } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOrb } from "@/components/ai-orb";
+import { useOptionalBusinessId } from "@/components/admin/business-context";
 
 interface SearchResult {
   id: string;
@@ -95,9 +96,7 @@ function SearchOverlay({
   onSelectLead: (id: string) => void;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
-  // Current business from the URL (search is scoped to it).
-  const businessId = pathname.match(/\/admin\/business\/([^/]+)/)?.[1] ?? null;
+  const businessId = useOptionalBusinessId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -155,7 +154,7 @@ function SearchOverlay({
   function navigateToLead(id: string) {
     onClose();
     onSelectLead(id);
-    router.push(businessId ? `/admin/business/${businessId}/leads` : "/admin");
+    router.push(businessId ? "/admin/leads" : "/admin");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {

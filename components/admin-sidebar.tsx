@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useEffect, useState, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Users,
@@ -28,11 +28,16 @@ import {
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
 import { authClient } from "@/lib/auth-client";
-import { Link, useRouter, usePathname } from "@/i18n/routing";
+import { getPathname, Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
 import { usePlan } from "@/components/admin/plan-context";
 import { suggestedPlan } from "@/lib/plan-tiers";
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access";
+import { getBusinessSwitchDestination } from "@/lib/admin-routes";
+import {
+  selectActiveBusiness,
+  useOptionalBusinessId,
+} from "@/components/admin/business-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,17 +95,13 @@ export function AdminSidebar({
   const { plan, isPro, isPaid, isTrialing, openUpgrade, loading: planLoading } = usePlan();
   const router = useRouter();
   const pathname = usePathname();
+  const locale = useLocale();
   const { data: session, isPending: sessionPending } = authClient.useSession();
 
-  const { open: openSearch } = useSearch();
+  const { open: openSearch, clearSelectedLead } = useSearch();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessesLoading, setBusinessesLoading] = useState(true);
-
-  // The active business is read from the URL (/admin/business/[businessId]).
-  // On non-business routes (e.g. /admin/settings) fall back to the first one.
-  const businessIdFromPath =
-    pathname.match(/\/admin\/business\/([^/]+)/)?.[1] ?? null;
-  const businessId = businessIdFromPath ?? businesses[0]?.id ?? null;
+  const businessId = useOptionalBusinessId() ?? businesses[0]?.id ?? null;
 
   const userName = session?.user?.name || "";
   const userEmail = serverUserEmail || session?.user?.email || "";
@@ -128,27 +129,21 @@ export function AdminSidebar({
     [businesses, businessId],
   );
 
-  // Switch business by rewriting the [businessId] segment of the current path
-  // (preserving the sub-page); from a non-business route, land on its dashboard.
+  // The selected business is stored outside the URL. Preserve the current
+  // section when possible; resource detail pages return to their collection
+  // because their ids belong to the previous business.
   const switchBusiness = (id: string) => {
-    const businessPath = pathname.match(/\/admin\/business\/[^/]+/);
-    const currentSection = businessPath
-      ? pathname.slice((businessPath.index ?? 0) + businessPath[0].length)
-      : "";
-    // A resource id belongs to the previous business, so switching from a job
-    // detail returns to the destination business's job list.
-    const nextSection = currentSection.startsWith("/discovery-jobs/")
-      ? "/discovery-jobs"
-      : currentSection;
-    const next = businessPath
-      ? `/admin/business/${id}${nextSection}`
-      : `/admin/business/${id}`;
-    router.push(next);
+    selectActiveBusiness(id);
+    clearSelectedLead();
+
+    const next = getBusinessSwitchDestination(pathname);
+
+    // A hard navigation is intentional: changing tenants must remount every
+    // client component so no form, modal, or optimistic state can leak across.
+    window.location.assign(getPathname({ locale, href: next }));
   };
 
-  // Path within the current business (everything after /admin/business/<id>),
-  // used to highlight the active nav item.
-  const section = pathname.replace(/^\/admin\/business\/[^/]+/, "");
+  const section = pathname.replace(/^\/admin/, "");
   const isActive = (sub: string) => {
     if (sub === "") return section === "";
     if (sub === "/leads") {
@@ -340,35 +335,35 @@ export function AdminSidebar({
           <NavItem
             icon={LayoutDashboard}
             label={t("dashboard")}
-            href={`/admin/business/${businessId}`}
+            href="/admin"
             active={isActive("")}
             collapsed={collapsed}
           />
           <NavItem
             icon={Users}
             label={t("allLeads")}
-            href={`/admin/business/${businessId}/leads`}
+            href="/admin/leads"
             active={isActive("/leads")}
             collapsed={collapsed}
           />
           <NavItem
             icon={Columns3}
             label={t("pipeline")}
-            href={`/admin/business/${businessId}/leads/kanban`}
+            href="/admin/leads/kanban"
             active={isActive("/leads/kanban")}
             collapsed={collapsed}
           />
           <NavItem
             icon={CalendarDays}
             label={t("contentCalendar")}
-            href={`/admin/business/${businessId}/content-calendar`}
+            href="/admin/content-calendar"
             active={isActive("/content-calendar")}
             collapsed={collapsed}
           />
           <NavItem
             icon={Building2}
             label={t("businessPage")}
-            href={`/admin/business/${businessId}/profile`}
+            href="/admin/profile"
             active={isActive("/profile")}
             collapsed={collapsed}
           />
@@ -376,7 +371,7 @@ export function AdminSidebar({
             icon={MessageCircle}
             label={t("integrations")}
             badge={whatsappAvailable ? undefined : tw("comingSoonBadge")}
-            href={`/admin/business/${businessId}/integrations`}
+            href="/admin/integrations"
             active={isActive("/integrations")}
             collapsed={collapsed}
           />
@@ -394,14 +389,14 @@ export function AdminSidebar({
             <NavItem
               icon={Radar}
               label={t("discoveryJobs")}
-              href={`/admin/business/${businessId}/discovery-jobs`}
+              href="/admin/discovery-jobs"
               active={isActive("/discovery-jobs")}
               collapsed={collapsed}
             />
             <NavItem
               icon={Bookmark}
               label={t("savedSearches")}
-              href={`/admin/business/${businessId}/saved-searches`}
+              href="/admin/saved-searches"
               active={isActive("/saved-searches")}
               collapsed={collapsed}
             />

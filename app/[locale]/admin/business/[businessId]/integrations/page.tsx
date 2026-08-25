@@ -1,7 +1,7 @@
 "use client"
 
 import Script from "next/script"
-import { use, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import {
   Check,
@@ -79,16 +79,11 @@ const META_MESSAGE_ORIGINS = new Set([
 const WHATSAPP_INTEGRATION_CONFIGURED =
   process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true"
 
-export default function IntegrationsPage({
-  params,
-}: {
-  params: Promise<{ businessId: string }>
-}) {
-  const { businessId } = use(params)
+export default function IntegrationsPage() {
   const t = useTranslations("whatsapp")
   const td = useTranslations("dashboard")
   const { can: planCan, openUpgrade } = usePlan()
-  const { readOnly } = useBusinessAccess()
+  const { businessId, readOnly } = useBusinessAccess()
   const { data: session } = authClient.useSession()
   const integrationEnabled =
     WHATSAPP_INTEGRATION_CONFIGURED &&
@@ -375,7 +370,7 @@ export default function IntegrationsPage({
           variant="hero"
           title={t("title")}
           description={integrationEnabled ? t("description") : t("comingSoonPageDescription")}
-          breadcrumbs={[{ label: td("businessPage"), href: `/admin/business/${businessId}/profile` }, { label: t("title") }]}
+          breadcrumbs={[{ label: td("businessPage"), href: "/admin/profile" }, { label: t("title") }]}
         />
 
         {!integrationEnabled ? (
@@ -548,7 +543,7 @@ export default function IntegrationsPage({
                 <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{t("templatesSendable", { count: sendableCount })}</p>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">{t("templateHelp")}</p>
                 <Button asChild className="mt-5 w-full">
-                  <Link href={`/admin/business/${businessId}/integrations/whatsapp-templates`}>
+                  <Link href="/admin/integrations/whatsapp-templates">
                     {t("manageTemplates")}
                   </Link>
                 </Button>

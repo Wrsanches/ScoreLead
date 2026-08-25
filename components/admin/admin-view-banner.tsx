@@ -1,4 +1,8 @@
+"use client"
+
 import { Eye, ShieldCheck } from "lucide-react"
+import { usePathname } from "@/i18n/routing"
+import { isAccountAdminPath } from "@/lib/admin-routes"
 
 export function AdminViewBanner({
   businessName,
@@ -9,6 +13,9 @@ export function AdminViewBanner({
   ownerName: string
   ownerEmail: string
 }) {
+  const pathname = usePathname()
+  if (isAccountAdminPath(pathname)) return null
+
   return (
     <div className="shrink-0 border-b border-amber-300/70 bg-amber-50 px-4 py-2 text-amber-950 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-100">
       <div className="mx-auto flex max-w-7xl items-center gap-3 text-xs sm:text-sm">

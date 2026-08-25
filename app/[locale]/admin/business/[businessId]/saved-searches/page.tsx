@@ -75,7 +75,7 @@ export default function SavedSearchesPage() {
           breadcrumbs={[{ label: t("discovery") }]}
           actions={!readOnly ? (
             <Link
-              href={`/admin/business/${businessId}/discovery-jobs/new`}
+              href="/admin/discovery-jobs/new"
               className="px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
             >
               {t("createJob")}
@@ -130,7 +130,7 @@ export default function SavedSearchesPage() {
                 {!readOnly && (
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Link
-                    href={`/admin/business/${businessId}/discovery-jobs/new?savedSearchId=${search.id}`}
+                    href={`/admin/discovery-jobs/new?savedSearchId=${search.id}`}
                     className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
                     title="Run this search"
                   >

@@ -17,6 +17,7 @@ import { StepTargeting, type TargetingValues } from "./_components/step-targetin
 import { StepProcessing, type ProcessingStatus } from "./_components/step-processing"
 import { StepReview, type ReviewValues } from "./_components/step-review"
 import { trackMarketingEvent } from "@/lib/analytics-events"
+import { selectActiveBusiness } from "@/components/admin/business-context"
 
 type Step = "welcome" | "primaryLinks" | "moreLinks" | "location" | "targeting" | "processing" | "review"
 
@@ -300,9 +301,9 @@ export default function OnboardingPage() {
         }),
       })
 
+      const result = await response.json().catch(() => ({}))
       if (!response.ok) {
-        const { error: apiError } = await response.json()
-        throw new Error(apiError || "Failed to save")
+        throw new Error(result.error || "Failed to save")
       }
 
       if (!isAddingNew) {
@@ -311,6 +312,7 @@ export default function OnboardingPage() {
           has_website: Boolean(primaryLinks.website),
         })
       }
+      if (result.businessId) selectActiveBusiness(result.businessId)
       router.push("/admin")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")

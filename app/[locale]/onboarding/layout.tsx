@@ -31,7 +31,7 @@ export default async function OnboardingLayout({
     const businessId = await getActiveViewableBusinessIdForUser(session.user.id)
     if (businessId) {
       const prefix = locale === "en" ? "" : `/${locale}`
-      redirect(`${prefix}/admin/business/${businessId}`)
+      redirect(`${prefix}/admin`)
     }
   }
 

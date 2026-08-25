@@ -367,7 +367,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
         title={t("templatesManagerTitle")}
         description={t("templatesManagerDescription")}
         breadcrumbs={[
-          { label: t("title"), href: `/admin/business/${businessId}/integrations` },
+          { label: t("title"), href: "/admin/integrations" },
           { label: t("manageTemplates") },
         ]}
         actions={!readOnly ? (
@@ -389,7 +389,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
       />
 
       <Link
-        href={`/admin/business/${businessId}/integrations`}
+        href="/admin/integrations"
         className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />

@@ -459,7 +459,7 @@ export default function LeadsPage() {
                   Run a discovery job to find leads.
                 </p>
                 <Link
-                  href={`/admin/business/${businessId}/discovery-jobs`}
+                  href="/admin/discovery-jobs"
                   className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
                 >
                   <Radar className="w-4 h-4" />
@@ -579,7 +579,7 @@ export default function LeadsPage() {
                     this business.
                   </p>
                   <Link
-                    href={`/admin/business/${businessId}/discovery-jobs`}
+                    href="/admin/discovery-jobs"
                     className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
                   >
                     <Radar className="w-4 h-4" />

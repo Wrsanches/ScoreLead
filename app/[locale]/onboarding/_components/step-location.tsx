@@ -7,6 +7,7 @@ import { MapPin, ArrowRight, ArrowLeft } from "lucide-react"
 import { Country, State, City } from "country-state-city"
 import type { ICountry, IState, ICity } from "country-state-city"
 import { SearchableSelect, type SelectOption } from "@/components/searchable-select"
+import { parseLocationSelection } from "@/lib/onboarding-location"
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
@@ -19,9 +20,10 @@ interface StepLocationProps {
 export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocationProps) {
   const t = useTranslations("onboarding")
 
-  const [countryCode, setCountryCode] = useState("")
-  const [stateCode, setStateCode] = useState("")
-  const [cityName, setCityName] = useState("")
+  const [initialLocation] = useState(() => parseLocationSelection(defaultLocation))
+  const [countryCode, setCountryCode] = useState(initialLocation.countryCode)
+  const [stateCode, setStateCode] = useState(initialLocation.stateCode)
+  const [cityName, setCityName] = useState(initialLocation.cityName)
 
   // Build country options
   const countryOptions: SelectOption[] = useMemo(() => {

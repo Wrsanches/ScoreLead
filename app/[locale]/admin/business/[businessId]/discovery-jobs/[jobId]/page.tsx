@@ -55,13 +55,13 @@ interface JobStats {
 export default function DiscoveryJobDetailPage({
   params,
 }: {
-  params: Promise<{ businessId: string; jobId: string; locale: string }>
+  params: Promise<{ jobId: string; locale: string }>
 }) {
-  const { businessId, jobId: id } = use(params)
+  const { jobId: id } = use(params)
   const t = useTranslations("dashboard")
   const router = useRouter()
   const { openUpgrade } = usePlan()
-  const { readOnly } = useBusinessAccess()
+  const { businessId, readOnly } = useBusinessAccess()
   const [job, setJob] = useState<Job | null>(null)
   const [stats, setStats] = useState<JobStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -152,7 +152,7 @@ export default function DiscoveryJobDetailPage({
     <>
       <PageHeader
         title={job?.name || "..."}
-        backHref={`/admin/business/${businessId}/discovery-jobs`}
+        backHref="/admin/discovery-jobs"
         breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
       />
 
@@ -241,7 +241,7 @@ export default function DiscoveryJobDetailPage({
                   <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Statistics</p>
                   {stats && stats.totalLeads > 0 && (
                     <button
-                      onClick={() => router.push(`/admin/business/${businessId}/leads?jobId=${id}`)}
+                      onClick={() => router.push(`/admin/leads?jobId=${id}`)}
                       className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
                       View all leads

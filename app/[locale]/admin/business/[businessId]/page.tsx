@@ -189,7 +189,7 @@ export default function AdminPage() {
                 value={stats.leads.total}
                 icon={Users}
                 sub={`${stats.leads.highScore} high score`}
-                href={`/admin/business/${businessId}/leads`}
+                href="/admin/leads"
                 accent="emerald"
               />
               <StatCard
@@ -204,7 +204,7 @@ export default function AdminPage() {
                 value={stats.jobs.total}
                 icon={Radar}
                 sub={`${stats.jobs.completed} completed`}
-                href={`/admin/business/${businessId}/discovery-jobs`}
+                href="/admin/discovery-jobs"
                 accent="sky"
               />
               <StatCard
@@ -451,7 +451,7 @@ export default function AdminPage() {
                 title="Recent Jobs"
                 actions={
                   <Link
-                    href={`/admin/business/${businessId}/discovery-jobs`}
+                    href="/admin/discovery-jobs"
                     className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                   >
                     View all <ArrowRight className="w-3 h-3" />
@@ -463,7 +463,7 @@ export default function AdminPage() {
                     {stats.recentJobs.map((job) => (
                       <Link
                         key={job.id}
-                        href={`/admin/business/${businessId}/discovery-jobs/${job.id}`}
+                        href={`/admin/discovery-jobs/${job.id}`}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors group"
                       >
                         <div className="flex-1 min-w-0">
@@ -489,7 +489,7 @@ export default function AdminPage() {
               title="Recent Leads"
               actions={
                 <Link
-                  href={`/admin/business/${businessId}/leads`}
+                  href="/admin/leads"
                   className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                 >
                   View all <ArrowRight className="w-3 h-3" />

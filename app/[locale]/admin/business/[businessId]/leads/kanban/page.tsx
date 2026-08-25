@@ -82,7 +82,7 @@ export default function LeadsKanbanPage() {
           variant="hero"
           title={t("pipeline")}
           description="Drag cards between columns to move leads through your pipeline."
-          breadcrumbs={[{ label: t("allLeads"), href: `/admin/business/${businessId}/leads` }, { label: t("pipeline") }]}
+          breadcrumbs={[{ label: t("allLeads"), href: "/admin/leads" }, { label: t("pipeline") }]}
         />
       </div>
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import {
@@ -136,13 +136,8 @@ function ChipList({ items }: { items: string[] }) {
   )
 }
 
-export default function BusinessDetailPage({
-  params,
-}: {
-  params: Promise<{ businessId: string; locale: string }>
-}) {
-  const { businessId: id } = use(params)
-  const { readOnly } = useBusinessAccess()
+export default function BusinessDetailPage() {
+  const { businessId: id, readOnly } = useBusinessAccess()
   const t = useTranslations("business")
   const tOnb = useTranslations("onboarding")
   const [data, setData] = useState<Business | null>(null)
@@ -306,7 +301,7 @@ export default function BusinessDetailPage({
     <>
       <PageHeader
         title={data?.name || t("title")}
-        backHref={`/admin/business/${id}`}
+        backHref="/admin"
         breadcrumbs={[{ label: t("title") }]}
       />
 

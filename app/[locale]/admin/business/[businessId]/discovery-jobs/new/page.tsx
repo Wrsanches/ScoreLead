@@ -27,7 +27,7 @@ export default function NewDiscoveryJobPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const savedSearchId = searchParams.get("savedSearchId")
-  // The business is fixed by the URL - this form always creates a job under it.
+  // The form always creates a job under the server-validated active business.
   const businessId = useBusinessId()
   const { openUpgrade, limits, can, loading: planLoading } = usePlan()
 
@@ -278,7 +278,7 @@ export default function NewDiscoveryJobPage() {
       }
 
       toast.success("Discovery job started! Redirecting...")
-      router.push(`/admin/business/${businessId}/discovery-jobs`)
+      router.push("/admin/discovery-jobs")
     } catch {
       toast.error("Failed to start discovery")
       setIsSubmitting(false)
@@ -289,7 +289,7 @@ export default function NewDiscoveryJobPage() {
     <>
       <PageHeader
         title={t("createJob")}
-        backHref={`/admin/business/${businessId}/discovery-jobs`}
+        backHref="/admin/discovery-jobs"
         breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
       />
 

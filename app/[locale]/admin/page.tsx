@@ -1,13 +1,23 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
+import DashboardPage from "./business/[businessId]/page"
+import { generatePageMetadata } from "@/lib/seo"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return generatePageMetadata(locale, "dashboard")
+}
 
 /**
- * Bare `/admin` has no business in the URL. Resolve the user's active business
- * (validated cookie, else their first business) and redirect into the
- * business-scoped dashboard. The admin layout's requireAuth has already
- * guaranteed a completed business exists.
+ * The dashboard keeps its clean `/admin` URL. The parent layout resolves and
+ * validates the active business from the selection cookie.
  */
 export default async function AdminIndexPage({
   params,
@@ -20,8 +30,8 @@ export default async function AdminIndexPage({
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect(`${prefix}/login`)
 
-  const businessId = await getActiveViewableBusinessIdForUser(session.user.id)
-  if (!businessId) redirect(`${prefix}/onboarding`)
+  const activeBusinessId = await getActiveViewableBusinessIdForUser(session.user.id)
+  if (!activeBusinessId) redirect(`${prefix}/onboarding`)
 
-  redirect(`${prefix}/admin/business/${businessId}`)
+  return <DashboardPage />
 }
