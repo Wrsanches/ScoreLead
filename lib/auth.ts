@@ -10,6 +10,7 @@ import {
   notifySlackAccountCreated,
   notifySlackSubscriptionCreated,
 } from "@/lib/slack"
+import { trustedAuthOrigins } from "@/lib/auth-origins"
 
 async function notifyNewSubscription(opts: {
   referenceId: string
@@ -112,13 +113,7 @@ if (process.env.STRIPE_SECRET_KEY) {
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: [
-    process.env.BETTER_AUTH_URL,
-    process.env.SCORELEAD_PUBLIC_URL,
-    process.env.SCORELEAD_APP_URL,
-    process.env.NEXT_PUBLIC_SCORELEAD_PUBLIC_URL,
-    process.env.NEXT_PUBLIC_SCORELEAD_APP_URL,
-  ].filter((origin): origin is string => Boolean(origin)),
+  trustedOrigins: trustedAuthOrigins,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
