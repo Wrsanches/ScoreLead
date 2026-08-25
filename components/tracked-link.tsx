@@ -8,7 +8,7 @@ import {
   type MarketingEventName,
 } from "@/lib/analytics-events"
 import { isAppPath } from "@/lib/host-routing"
-import { getLocalizedAppUrl } from "@/lib/site-urls"
+import { getLocalizedAppPath } from "@/lib/site-urls"
 
 type TrackedLinkProps = ComponentProps<typeof Link> & {
   eventName: MarketingEventName
@@ -43,7 +43,7 @@ export function TrackedLink({
     return (
       <a
         {...(anchorProps as ComponentProps<"a">)}
-        href={getLocalizedAppUrl(props.href, locale)}
+        href={getLocalizedAppPath(props.href, locale)}
         onClick={handleClick}
       />
     )

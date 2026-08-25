@@ -9,6 +9,7 @@ import { routing } from '@/i18n/routing'
 import { getLocaleConfig, siteConfig, siteViewport } from '@/lib/seo'
 import { ThemeProvider } from '@/components/theme-provider'
 import { CookieConsent } from '@/components/cookie-consent'
+import NextTopLoader from 'nextjs-toploader'
 import '../globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
@@ -55,6 +56,14 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased bg-[#09090B]">
+        <NextTopLoader
+          color="#34d399"
+          height={3}
+          showSpinner={false}
+          shadow="0 0 10px rgba(52, 211, 153, 0.6)"
+          zIndex={2000}
+          showForHashAnchor={false}
+        />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:px-4 focus:py-2 focus:bg-white focus:text-zinc-900 focus:rounded-lg focus:text-sm focus:font-medium"

@@ -8,7 +8,7 @@ import { LanguageSwitcher } from "./language-switcher"
 import { Link } from "@/i18n/routing"
 import { authClient } from "@/lib/auth-client"
 import { TrackedLink } from "./tracked-link"
-import { getLocalizedAppUrl } from "@/lib/site-urls"
+import { getLocalizedAppPath } from "@/lib/site-urls"
 
 function UserAvatar({ name }: { name: string }) {
   const initials = name
@@ -70,21 +70,21 @@ export function Navbar() {
             {sessionPending ? (
               <div className="w-24 h-8 rounded-lg bg-zinc-800/80 animate-pulse" aria-hidden="true" />
             ) : isLoggedIn ? (
-              <Link
-                href={getLocalizedAppUrl("/admin", locale)}
+              <a
+                href={getLocalizedAppPath("/admin", locale)}
                 className="flex items-center gap-2.5 text-sm text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800/50"
               >
                 <UserAvatar name={session.user.name || ""} />
                 <span className="font-medium">{t("dashboard")}</span>
-              </Link>
+              </a>
             ) : (
               <>
-                <Link
-                  href={getLocalizedAppUrl("/login", locale)}
+                <a
+                  href={getLocalizedAppPath("/login", locale)}
                   className="text-sm text-zinc-400 hover:text-white transition-colors"
                 >
                   {t("login")}
-                </Link>
+                </a>
                 <TrackedLink
                   href="/signup"
                   eventName="signup_start"
@@ -126,23 +126,23 @@ export function Navbar() {
               {sessionPending ? (
                 <div className="w-28 h-8 rounded-lg bg-zinc-800/80 animate-pulse" aria-hidden="true" />
               ) : isLoggedIn ? (
-                <Link
-                  href={getLocalizedAppUrl("/admin", locale)}
+                <a
+                  href={getLocalizedAppPath("/admin", locale)}
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-2.5 text-sm text-zinc-300 hover:text-white transition-colors"
                 >
                   <UserAvatar name={session.user.name || ""} />
                   <span className="font-medium">{t("dashboard")}</span>
-                </Link>
+                </a>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link
-                    href={getLocalizedAppUrl("/login", locale)}
+                  <a
+                    href={getLocalizedAppPath("/login", locale)}
                     onClick={() => setOpen(false)}
                     className="text-sm text-zinc-400 hover:text-white transition-colors"
                   >
                     {t("login")}
-                  </Link>
+                  </a>
                   <TrackedLink
                     href="/signup"
                     eventName="signup_start"

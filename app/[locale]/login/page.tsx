@@ -49,11 +49,16 @@ export default function LoginPage() {
     window.location.href = getPathname({ locale, href: "/admin" })
   }
 
-  function handleGoogleSignIn() {
-    authClient.signIn.social({
+  async function handleGoogleSignIn() {
+    setServerError("")
+    const loginPath = getPathname({ locale, href: "/login" })
+    const { error } = await authClient.signIn.social({
       provider: "google",
       callbackURL: getPathname({ locale, href: "/admin" }),
+      errorCallbackURL: loginPath,
     })
+
+    if (error) setServerError(error.message || t("loginError"))
   }
 
   return (

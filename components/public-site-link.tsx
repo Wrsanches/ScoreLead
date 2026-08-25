@@ -1,11 +1,23 @@
 "use client"
 
-import type { ComponentPropsWithoutRef } from "react"
+import { useSyncExternalStore, type ComponentPropsWithoutRef } from "react"
 import { useLocale } from "next-intl"
-import { getLocalizedPublicUrl } from "@/lib/site-urls"
+import { getPublicSiteLinkHref } from "@/lib/site-urls"
 
 type PublicSiteLinkProps = Omit<ComponentPropsWithoutRef<"a">, "href"> & {
   href: string
+}
+
+function subscribeToOrigin() {
+  return () => {}
+}
+
+function getBrowserOrigin() {
+  return window.location.origin
+}
+
+function getServerOrigin() {
+  return ""
 }
 
 /**
@@ -15,5 +27,16 @@ type PublicSiteLinkProps = Omit<ComponentPropsWithoutRef<"a">, "href"> & {
  */
 export function PublicSiteLink({ href, ...props }: PublicSiteLinkProps) {
   const locale = useLocale()
-  return <a {...props} href={getLocalizedPublicUrl(href, locale)} />
+  const currentOrigin = useSyncExternalStore(
+    subscribeToOrigin,
+    getBrowserOrigin,
+    getServerOrigin,
+  )
+
+  return (
+    <a
+      {...props}
+      href={getPublicSiteLinkHref(href, locale, currentOrigin)}
+    />
+  )
 }

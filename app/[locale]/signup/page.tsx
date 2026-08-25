@@ -99,14 +99,19 @@ export default function SignUpPage() {
     setVerificationSentTo(data.email)
   }
 
-  function handleGoogleSignIn() {
+  async function handleGoogleSignIn() {
+    setServerError("")
     trackMarketingEvent("signup_start", { signup_method: "google" })
     const onboardingPath =
       locale === "en" ? "/onboarding" : `/${locale}/onboarding`
-    authClient.signIn.social({
+    const signupPath = locale === "en" ? "/signup" : `/${locale}/signup`
+    const { error } = await authClient.signIn.social({
       provider: "google",
       callbackURL: `${onboardingPath}?signup=google`,
+      errorCallbackURL: signupPath,
     })
+
+    if (error) setServerError(error.message || t("signUpError"))
   }
 
   if (verificationSentTo) {
