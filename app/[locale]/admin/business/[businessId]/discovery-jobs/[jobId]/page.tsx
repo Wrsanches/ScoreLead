@@ -17,6 +17,7 @@ import { usePlan } from "@/components/admin/plan-context"
 import { formatRelativeDate, parseKeywords } from "@/lib/admin-utils"
 import { DiscoveryRunningPanel } from "@/components/admin/discovery-running-panel"
 import { useBusinessAccess } from "@/components/admin/business-context"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 interface Job {
   id: string
@@ -115,6 +116,21 @@ export default function DiscoveryJobDetailPage({
       if (cancelled) return
       if (j) setJob(j)
       if (s) setStats(s)
+      if (
+        j?.completedAt &&
+        ["partial", "completed", "exhausted"].includes(j.status)
+      ) {
+        const eventKey = `scorelead:discovery-completed:${j.id}:${j.runs}`
+        if (!window.sessionStorage.getItem(eventKey)) {
+          trackMarketingEvent("discovery_completed", {
+            job_id: j.id,
+            run_number: j.runs + 1,
+            leads_found: j.insertedLeads,
+            status: j.status,
+          })
+          window.sessionStorage.setItem(eventKey, "1")
+        }
+      }
       setLoading(false)
       // Keep polling only while the job is still working.
       if (!j || (j.status !== "running" && j.status !== "queued" && j.status !== "pending")) {

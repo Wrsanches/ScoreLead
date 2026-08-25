@@ -20,7 +20,6 @@ import { TestimonialsSection } from "./testimonials-section";
 import { WaitlistSection } from "./waitlist-section";
 import { WaitlistFooter } from "./waitlist-footer";
 import { PricingSection } from "./pricing-section";
-import { CookieConsent } from "./cookie-consent";
 import { TrackedLink } from "./tracked-link";
 
 export function LandingPage() {
@@ -77,28 +76,13 @@ export function LandingPage() {
         <div className="relative z-10 pt-20 sm:pt-28 flex flex-col">
           <div className="w-full flex justify-center px-6 mt-6 sm:mt-16">
             <div className="w-full max-w-4xl">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-3xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance"
-              >
+              <h1 className="text-3xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance">
                 {t("heading")}
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-400"
-              >
+              </h1>
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-400">
                 {t("subtitle")}
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20"
-              >
+              </p>
+              <div className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20">
                 <TrackedLink
                   href="/signup"
                   eventName="signup_start"
@@ -114,7 +98,7 @@ export function LandingPage() {
                   {t("secondary")}
                   <span aria-hidden="true">→</span>
                 </a>
-              </motion.div>
+              </div>
             </div>
           </div>
 
@@ -195,7 +179,6 @@ export function LandingPage() {
           <WaitlistFooter />
         </div>
       </section>
-      <CookieConsent />
     </>
   );
 }

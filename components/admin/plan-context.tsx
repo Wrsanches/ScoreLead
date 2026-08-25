@@ -11,6 +11,7 @@ import {
 import { UpgradeDialog } from "@/components/admin/upgrade-dialog"
 import { CongratsModal } from "@/components/admin/congrats-modal"
 import { planRank, type PlanId } from "@/lib/plan-tiers"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 
 export type Plan = PlanId
 
@@ -87,6 +88,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     const params = new URLSearchParams(window.location.search)
     if (params.get("upgraded") !== "1") return
 
+    window.sessionStorage.setItem("scorelead:subscription-started-pending", "1")
     setCongratsOpen(true)
     refresh()
     const timers = [1500, 4000, 8000].map((ms) => setTimeout(refresh, ms))
@@ -100,6 +102,18 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     )
     return () => timers.forEach(clearTimeout)
   }, [refresh])
+
+  useEffect(() => {
+    if (!status || planRank(status.plan) === 0) return
+    const key = "scorelead:subscription-started-pending"
+    if (window.sessionStorage.getItem(key) !== "1") return
+
+    trackMarketingEvent("subscription_started", {
+      plan: status.plan,
+      is_trialing: status.isTrialing,
+    })
+    window.sessionStorage.removeItem(key)
+  }, [status])
 
   const openUpgrade = useCallback((action?: string | null) => {
     setUpgradeAction(action ?? null)

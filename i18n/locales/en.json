@@ -768,6 +768,10 @@
     "scoringCalculator": "Scoring calculator",
     "enrichmentChecklist": "Enrichment checklist",
     "roiCalculator": "Research ROI calculator",
+    "compare": "Compare",
+    "manualResearch": "Manual research",
+    "spreadsheets": "Spreadsheets",
+    "purchasedLeadLists": "Purchased lead lists",
     "editorialPolicy": "Editorial policy"
   },
   "contact": {

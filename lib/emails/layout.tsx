@@ -8,8 +8,9 @@ import {
   Section,
 } from "@react-email/components"
 
-export const APP_URL = "https://scorelead.io"
-const LOGO_URL = `${APP_URL}/apple-icon.png`
+export const APP_URL = process.env.SCORELEAD_APP_URL ?? "https://app.scorelead.io"
+const PUBLIC_URL = process.env.SCORELEAD_PUBLIC_URL ?? "https://scorelead.io"
+const LOGO_URL = `${PUBLIC_URL}/apple-icon.png`
 
 // Shared inline styles (email clients require inline styles, light theme only).
 export const email = {

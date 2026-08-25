@@ -111,6 +111,11 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    process.env.SCORELEAD_PUBLIC_URL,
+    process.env.SCORELEAD_APP_URL,
+  ].filter((origin): origin is string => Boolean(origin)),
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,

@@ -305,6 +305,12 @@ export default function OnboardingPage() {
         throw new Error(apiError || "Failed to save")
       }
 
+      if (!isAddingNew) {
+        trackMarketingEvent("onboarding_completed", {
+          business_model: "b2b",
+          has_website: Boolean(primaryLinks.website),
+        })
+      }
       router.push("/admin")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")

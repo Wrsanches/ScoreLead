@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { getLocaleConfig, siteConfig, siteViewport } from '@/lib/seo'
 import { ThemeProvider } from '@/components/theme-provider'
+import { CookieConsent } from '@/components/cookie-consent'
 import '../globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
@@ -69,6 +70,7 @@ export default async function LocaleLayout({
         >
           <NextIntlClientProvider messages={messages}>
             {children}
+            <CookieConsent />
           </NextIntlClientProvider>
         </ThemeProvider>
         <ConsentGatedAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />

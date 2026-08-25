@@ -4,32 +4,22 @@ import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/next"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { AcquisitionTracker } from "./marketing-analytics"
+import {
+  getAnalyticsConsent,
+  subscribeToAnalyticsConsent,
+} from "@/lib/browser-storage"
+import { isProductionAnalyticsHostname } from "@/lib/site-urls"
 
 export function ConsentGatedAnalytics({ gaId }: { gaId: string }) {
   const [consent, setConsent] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem("cookie-consent")
-    if (stored === "accepted") {
-      setConsent(true)
-    }
+    if (!isProductionAnalyticsHostname(window.location.hostname)) return
 
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "cookie-consent") {
-        setConsent(e.newValue === "accepted")
-      }
-    }
-    window.addEventListener("storage", handleStorage)
-    return () => window.removeEventListener("storage", handleStorage)
-  }, [])
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const stored = localStorage.getItem("cookie-consent")
-      setConsent(stored === "accepted")
+    setConsent(getAnalyticsConsent() === "accepted")
+    return subscribeToAnalyticsConsent((value) => {
+      setConsent(value === "accepted")
     })
-    observer.observe(document.documentElement, { subtree: true, childList: true })
-    return () => observer.disconnect()
   }, [])
 
   if (!consent) return null

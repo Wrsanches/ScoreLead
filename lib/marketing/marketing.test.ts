@@ -10,6 +10,7 @@ import {
   marketingPages,
 } from "@/lib/marketing";
 import { getLanguageAlternates, siteConfig, supportedLocales } from "@/lib/seo";
+import { routing } from "@/i18n/routing";
 
 describe("localized SEO content registry", () => {
   it("keeps every commercial page substantive in every supported locale", () => {
@@ -65,6 +66,8 @@ describe("localized SEO content registry", () => {
   });
 
   it("publishes reciprocal language alternates for every commercial path", () => {
+    expect(routing.alternateLinks).toBe(false);
+
     for (const page of marketingPages) {
       const alternates = getLanguageAlternates(page.pathname);
       expect(Object.keys(alternates)).toEqual([

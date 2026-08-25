@@ -768,6 +768,10 @@
     "scoringCalculator": "Calculadora de score",
     "enrichmentChecklist": "Checklist de enriquecimento",
     "roiCalculator": "Calculadora de ROI",
+    "compare": "Comparar",
+    "manualResearch": "Pesquisa manual",
+    "spreadsheets": "Planilhas",
+    "purchasedLeadLists": "Listas compradas",
     "editorialPolicy": "Política editorial"
   },
   "contact": {

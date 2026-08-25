@@ -57,6 +57,23 @@ export function WaitlistFooter() {
       ],
     },
     {
+      title: t("compare"),
+      links: [
+        {
+          href: "/compare/manual-lead-research" as const,
+          label: t("manualResearch"),
+        },
+        {
+          href: "/compare/spreadsheets" as const,
+          label: t("spreadsheets"),
+        },
+        {
+          href: "/compare/purchased-lead-lists" as const,
+          label: t("purchasedLeadLists"),
+        },
+      ],
+    },
+    {
       title: t("company"),
       links: [
         { href: "/case-studies/ceramik" as const, label: t("customers") },
@@ -128,7 +145,7 @@ export function WaitlistFooter() {
 
           <nav
             aria-label={t("navigation")}
-            className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-5"
+            className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:col-span-8 xl:grid-cols-6"
           >
             {linkGroups.map((group) => (
               <div key={group.title}>

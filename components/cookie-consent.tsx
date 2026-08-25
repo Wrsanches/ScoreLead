@@ -4,13 +4,17 @@ import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Cookie } from "lucide-react"
 import { Link } from "@/i18n/routing"
+import {
+  getAnalyticsConsent,
+  setAnalyticsConsent,
+} from "@/lib/browser-storage"
 
 export function CookieConsent() {
   const t = useTranslations("cookies")
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const consent = localStorage.getItem("cookie-consent")
+    const consent = getAnalyticsConsent()
     if (!consent) {
       const timer = setTimeout(() => setVisible(true), 1500)
       return () => clearTimeout(timer)
@@ -18,12 +22,12 @@ export function CookieConsent() {
   }, [])
 
   function handleAccept() {
-    localStorage.setItem("cookie-consent", "accepted")
+    setAnalyticsConsent("accepted")
     setVisible(false)
   }
 
   function handleDecline() {
-    localStorage.setItem("cookie-consent", "declined")
+    setAnalyticsConsent("declined")
     setVisible(false)
   }
 

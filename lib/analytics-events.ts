@@ -1,5 +1,11 @@
 "use client"
 
+import {
+  getAnalyticsConsent,
+  readSharedCookie,
+  writeSharedCookie,
+} from "@/lib/browser-storage"
+
 export type MarketingEventName =
   | "acquisition_landing"
   | "article_cta_click"
@@ -7,6 +13,9 @@ export type MarketingEventName =
   | "signup_start"
   | "signup_submitted"
   | "signup_completed"
+  | "onboarding_completed"
+  | "discovery_completed"
+  | "subscription_started"
   | "lead_capture_completed"
   | "qualified_account"
   | "customer_conversion"
@@ -32,6 +41,8 @@ export type AcquisitionTouch = {
 const FIRST_TOUCH_KEY = "scorelead:first-touch"
 const LAST_TOUCH_KEY = "scorelead:last-touch"
 const EVENT_QUEUE_KEY = "scorelead:analytics-event-queue"
+const SHARED_FIRST_TOUCH_KEY = "scorelead-first-touch"
+const SHARED_LAST_TOUCH_KEY = "scorelead-last-touch"
 
 type QueuedMarketingEvent = {
   eventName: MarketingEventName
@@ -49,15 +60,18 @@ declare global {
 }
 
 function hasAnalyticsConsent() {
-  if (typeof window === "undefined") return false
-  return window.localStorage.getItem("cookie-consent") === "accepted"
+  return getAnalyticsConsent() === "accepted"
 }
 
 function readAcquisitionTouch(key: string) {
   if (typeof window === "undefined") return null
 
   try {
-    const value = JSON.parse(window.localStorage.getItem(key) ?? "null")
+    const sharedKey =
+      key === FIRST_TOUCH_KEY ? SHARED_FIRST_TOUCH_KEY : SHARED_LAST_TOUCH_KEY
+    const serialized =
+      readSharedCookie(sharedKey) ?? window.localStorage.getItem(key) ?? "null"
+    const value = JSON.parse(serialized)
     if (
       value &&
       typeof value.channel === "string" &&
@@ -78,11 +92,13 @@ export function persistAcquisitionTouch(touch: AcquisitionTouch) {
   const firstTouch = readAcquisitionTouch(FIRST_TOUCH_KEY)
   if (!firstTouch) {
     window.localStorage.setItem(FIRST_TOUCH_KEY, JSON.stringify(touch))
+    writeSharedCookie(SHARED_FIRST_TOUCH_KEY, JSON.stringify(touch))
   }
 
   const lastTouch = readAcquisitionTouch(LAST_TOUCH_KEY)
   if (touch.channel !== "direct" || !lastTouch) {
     window.localStorage.setItem(LAST_TOUCH_KEY, JSON.stringify(touch))
+    writeSharedCookie(SHARED_LAST_TOUCH_KEY, JSON.stringify(touch))
   }
 
   return {
@@ -166,6 +182,7 @@ export function trackMarketingEvent(
     ...getStoredAttributionParams(),
     ...params,
     page_path: window.location.pathname,
+    page_hostname: window.location.hostname,
   }
 
   if (!window.gtag) {

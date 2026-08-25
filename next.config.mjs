@@ -36,6 +36,13 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        has: [{ type: "host", value: "app\\.scorelead\\.io" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
