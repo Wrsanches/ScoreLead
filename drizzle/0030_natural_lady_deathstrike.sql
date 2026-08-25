@@ -1,0 +1,1 @@
+ALTER TABLE "content_plan_job" ADD COLUMN "nextAttemptAt" timestamp;

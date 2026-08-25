@@ -538,23 +538,41 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     eyebrow: "Pricing",
     title: "Start free. Upgrade when the workflow proves useful.",
     description:
-      "Use ScoreLead’s core workflow on the Free plan, then move to Pro for higher limits across discovery, businesses, content, images, and outreach.",
+      "Use ScoreLead’s core workflow on the Free plan, try Starter for $2.95, then move up as discovery, outreach, and automation volume grows.",
     answer:
-      "The Free plan costs $0 and includes one business, one discovery run of up to 10 leads, one content plan, and one AI image. The Pro plan is listed at $49 per month and unlocks the limits shown on this page.",
-    highlights: ["Free: $0 per month", "Pro: $49 per month", "No credit card required to start"],
+      "The Free plan costs $0 and includes one business and one discovery run of up to 10 leads, scored and enriched. Starter is $2.95 for the first 7 days and $19.95 per month after that, Growth is $29.95 per month, and Pro is $59.95 per month. Every paid allowance resets monthly.",
+    highlights: [
+      "Free: $0 per month, no credit card",
+      "Starter: $2.95 for 7 days, then $19.95 per month",
+      "Growth: $29.95 per month · Pro: $59.95 per month",
+    ],
     sections: [
       {
         heading: "Free plan",
         paragraphs: [
-          "Use one business workspace, run an initial discovery job, create one content plan, and generate one AI image to evaluate the workflow.",
+          "Use one business workspace and run an initial discovery job to evaluate the workflow end to end: scoring, web enrichment, and AI outreach copy. Free limits are one-time totals rather than monthly allowances.",
         ],
+      },
+      {
+        heading: "Starter plan",
+        paragraphs: [
+          "Starter starts at $2.95 for seven days and then bills $19.95 per month unless cancelled. It covers one business with 10 discovery runs a month of up to 25 leads each, 50 AI outreach messages, and CSV export of every enriched lead.",
+        ],
+        points: ["10 discovery runs per month", "Up to 25 leads per run", "50 AI outreach messages", "CSV export", "Scoring and web enrichment"],
+      },
+      {
+        heading: "Growth plan",
+        paragraphs: [
+          "Growth adds the outreach side: WhatsApp sequences on the official Meta Business Platform, Apollo contact enrichment on the top leads of each run, the AI content calendar with generated post images, three business workspaces, and the ability to continue a discovery run deeper into the same area.",
+        ],
+        points: ["WhatsApp automation", "150 contact enrichments per month", "AI content calendar and images", "3 businesses", "30 discovery runs of up to 50 leads"],
       },
       {
         heading: "Pro plan",
         paragraphs: [
-          "Pro supports multiple businesses, unlimited discovery runs, unlimited content plans, up to 30 AI images per month with a daily cap, and unlimited AI outreach generation.",
+          "Pro is the agency tier: unlimited businesses, unlimited discovery runs with no per-run lead cap, unlimited content plans and AI outreach, 500 contact enrichments a month, and named decision-maker contacts on enriched leads.",
         ],
-        points: ["Multiple businesses", "Unlimited discovery", "Unlimited content plans", "30 AI images per month", "Unlimited outreach"],
+        points: ["Unlimited businesses", "Unlimited discovery and outreach", "Decision-maker contacts", "500 contact enrichments per month", "30 AI images per month"],
       },
       {
         heading: "Usage and third-party terms",

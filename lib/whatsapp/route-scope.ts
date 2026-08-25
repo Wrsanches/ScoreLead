@@ -1,14 +1,15 @@
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 import { getWhatsAppConnection } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { getBusinessAccess } from "@/lib/business-access"
 
 /**
  * Shared guard for WhatsApp business routes: authenticated session, business
- * ownership, Pro plan, and a connected WhatsApp integration. Returns either an
+ * ownership, a plan that unlocks WhatsApp automation (Growth and up), and a
+ * connected WhatsApp integration. Returns either an
  * `error` NextResponse to return immediately, or the session + connection.
  */
 export async function scopeWhatsAppRoute(
@@ -34,10 +35,14 @@ export async function scopeWhatsAppRoute(
       ),
     } as const
   }
-  if ((await getUserPlan(access.ownerUserId)) !== "pro") {
+  if (!can(await getUserPlan(access.ownerUserId), "whatsappAutomation")) {
     return {
       error: NextResponse.json(
-        { error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" },
+        {
+          error: "WhatsApp automation requires Growth or Pro",
+          code: "PLAN_LIMIT",
+          action: "whatsappAutomation",
+        },
         { status: 402 },
       ),
     } as const

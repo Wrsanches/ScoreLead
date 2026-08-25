@@ -83,7 +83,7 @@ export async function POST(
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
-          error: "You've used your free outreach messages. Upgrade to Pro for unlimited.",
+          error: "You've used your AI outreach messages for this period. Upgrade for more.",
           code: "PLAN_LIMIT",
           action: e.action,
         },

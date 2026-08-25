@@ -1,46 +1,104 @@
 {
   "billing": {
-    "freePlan": "Gratis",
-    "proPlan": "Pro",
-    "freePrice": "$0",
-    "proPrice": "$49",
     "perMonth": "/mes",
+    "perYear": "/año",
     "billingTitle": "Facturación y plan",
-    "freeBlurb": "Estás en el plan Gratis. Pasa a Pro para desbloquear descubrimiento, contenido y mensajes ilimitados.",
-    "proBlurb": "Estás en Pro. ¡Gracias por tu apoyo!",
-    "freeTagline": "Prueba lo esencial",
-    "proTagline": "Para generar pipeline B2B en serio",
-    "upgradeTitle": "Pasar a Pro",
-    "upgradeDescription": "Desbloquea descubrimiento de leads, contenido con IA y mensajes ilimitados.",
-    "upgradeCta": "Pasar a Pro",
+    "currentPlan": "Plan actual",
+    "planName": {
+      "free": "Free",
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    },
+    "planPrice": {
+      "free": "US$ 0",
+      "starter": "US$ 19,95",
+      "growth": "US$ 29,95",
+      "pro": "US$ 59,95"
+    },
+    "planTagline": {
+      "free": "Prueba lo esencial",
+      "starter": "Encuentra, puntúa y escribe - un negocio",
+      "growth": "Alcánzalos: WhatsApp, enriquecimiento, contenido",
+      "pro": "Escala de agencia, sin límites"
+    },
+    "planPerks": {
+      "free": [
+        "1 negocio",
+        "1 descubrimiento (~10 leads)",
+        "Puntuación y enriquecimiento web",
+        "3 mensajes de outreach con IA"
+      ],
+      "starter": [
+        "10 descubrimientos / mes",
+        "Hasta 25 leads por descubrimiento",
+        "50 mensajes de outreach / mes",
+        "Exportación CSV",
+        "Puntuación y enriquecimiento web"
+      ],
+      "growth": [
+        "Automatización de WhatsApp",
+        "Enriquecimiento de contactos, 150 / mes",
+        "Calendario de contenido con IA + imágenes",
+        "3 negocios",
+        "30 descubrimientos, 50 leads cada uno"
+      ],
+      "pro": [
+        "Descubrimiento y outreach sin límites",
+        "Negocios sin límite",
+        "Contactos de decisores",
+        "Enriquecimiento de contactos, 500 / mes",
+        "30 imágenes con IA / mes, máx. 10 / día"
+      ]
+    },
+    "blurb": {
+      "free": "Estás en el plan Free. Sus límites son totales únicos: mejora para tener cupo mensual.",
+      "starter": "Estás en Starter. Pasa a Growth para automatización de WhatsApp y enriquecimiento de contactos.",
+      "growth": "Estás en Growth. Pasa a Pro para volumen sin límites y contactos de decisores.",
+      "pro": "Estás en Pro. ¡Gracias por tu apoyo!"
+    },
+    "trialBadge": "La mejor entrada",
+    "trialPrice": "US$ 2,95",
+    "trialCadence": "por 7 días",
+    "trialNote": "Después US$ 19,95/mes. Cancela cuando quieras.",
+    "trialActive": "Prueba activa",
+    "trialEndsNote": "Tu prueba pasa a US$ 19,95/mes si no cancelas.",
+    "resetsMonthly": "Los cupos se renuevan cada mes.",
+    "resetsLifetime": "Los límites de Free son totales únicos, no cupos mensuales.",
+    "upgradeTitle": "Elige tu plan",
+    "upgradeDescription": "Elige el plan que resuelve el límite que alcanzaste.",
+    "upgradeCta": "Continuar",
+    "changePlan": "Cambiar de plan",
+    "currentBadge": "Actual",
+    "recommendedBadge": "Recomendado",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "annualSave": "2 meses gratis",
     "ctaStartFree": "Empezar gratis",
-    "ctaGetPro": "Obtener Pro",
+    "ctaStartTrial": "Empezar por US$ 2,95",
+    "ctaChoose": "Elegir {plan}",
     "redirecting": "Redirigiendo...",
-    "upgradeFailed": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+    "upgradeFailed": "No se pudo iniciar el checkout. Inténtalo de nuevo.",
     "manageBilling": "Gestionar facturación",
     "portalFailed": "No se pudo abrir el portal de facturación. Inténtalo de nuevo.",
     "pricingHeading": "Precios",
-    "pricingSubtitle": "Empieza gratis. Mejora cuando estés listo para escalar.",
+    "pricingSubtitle": "Empieza gratis. Mejora cuando quieras escalar.",
+    "seeAllPlans": "Comparar todos los planes",
     "usageBusinesses": "Negocios",
-    "usageDiscovery": "Búsquedas de descubrimiento",
-    "usageOutreach": "Mensajes de IA",
+    "usageDiscovery": "Descubrimientos",
+    "usageOutreach": "Mensajes de outreach",
     "usageContent": "Planes de contenido",
-    "usageImages": "Imágenes de IA",
-    "usageImagesMonthly": "Imágenes de IA este mes",
-    "usageImagesDaily": "Imágenes de IA hoy",
-    "unlimited": "Ilimitado",
-    "congratsTitle": "¡Bienvenido a Pro!",
-    "congratsBody": "Tu mejora esta completa. Todos los limites se levantaron - hora de escalar.",
-    "congratsCta": "¡Vamos!",
-    "perkBusinesses": "Varios negocios",
-    "perkDiscovery": "Descubrimiento de leads ilimitado",
-    "perkContent": "Planes de contenido ilimitados",
-    "perkImages": "30 imágenes de IA / mes, máximo 10 / día",
-    "perkOutreach": "Mensajes de IA ilimitados",
-    "freeFeatBusiness": "1 negocio",
-    "freeFeatDiscovery": "1 búsqueda de descubrimiento (~10 leads)",
-    "freeFeatContent": "1 plan de contenido",
-    "freeFeatImages": "1 imagen de IA"
+    "usageImages": "Imágenes con IA",
+    "usageImagesMonthly": "Imágenes con IA este mes",
+    "usageImagesDaily": "Imágenes con IA hoy",
+    "unlimited": "Sin límite",
+    "congratsTitle": "¡Bienvenido a {plan}!",
+    "congratsBody": "Tu mejora está lista: es hora de escalar.",
+    "congratsCta": "Vamos",
+    "exportCsv": "Exportar CSV",
+    "exportFailed": "No se pudieron exportar tus leads. Inténtalo de nuevo.",
+    "contentCalendarLocked": "El calendario de contenido con IA es parte de Growth. Mejora para planificar un mes de posts y generar sus imágenes.",
+    "noCreditCard": "Sin tarjeta de crédito."
   },
   "metadata": {
     "title": "ScoreLead - Descubrimiento y Puntuación de Leads B2B con IA",
@@ -1062,6 +1120,8 @@
     "previewMore": "mas",
     "previewLess": "menos",
     "previewScheduledFor": "Programado para {date}",
-    "referenceNoDescription": "Sin descripcion"
+    "referenceNoDescription": "Sin descripcion",
+    "genSafeToLeave": "Puedes cerrar esta página: seguimos redactando y los posts estarán aquí cuando vuelvas.",
+    "genStillWorking": "Seguimos trabajando. Un mes completo puede tardar unos minutos: puedes salir de esta página."
   }
 }

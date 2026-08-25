@@ -7,7 +7,8 @@ import { getWebsiteDomain, isValidBusinessEmail } from "./lead-utils"
  *
  * Credit-metered: callers gate this behind plan tier and a per-job top-N cap.
  * Decision-maker People Search is a heavier credit cost than org enrichment, so
- * it is off by default and toggled via APOLLO_FETCH_PEOPLE.
+ * it is a Pro-tier unlock the caller opts into via `fetchPeople`, AND-ed with
+ * the APOLLO_FETCH_PEOPLE env var, which stays as a global cost kill-switch.
  */
 
 const APOLLO_BASE = "https://api.apollo.io/api/v1"
@@ -137,6 +138,8 @@ export function mapPerson(person: Record<string, unknown>): DecisionMaker | null
 /** Enrich one company by its website domain. Returns null on miss/failure. */
 export async function enrichByDomain(
   websiteOrDomain: string,
+  /** Pull decision-maker contacts too (Pro-only; heavier credit cost). */
+  fetchPeople = false,
 ): Promise<ApolloEnrichment | null> {
   const apiKey = getApiKey()
   if (!apiKey) return null
@@ -154,8 +157,9 @@ export async function enrichByDomain(
 
   const enrichment = mapOrganization(org)
 
-  // Optional, heavier credit cost: pull a few decision-makers.
-  if (process.env.APOLLO_FETCH_PEOPLE === "true") {
+  // Optional, heavier credit cost: pull a few decision-makers. Requires both
+  // the caller's plan entitlement and the global kill-switch.
+  if (fetchPeople && process.env.APOLLO_FETCH_PEOPLE === "true") {
     const people = await findDecisionMakers(domain, apiKey)
     if (people.length > 0) {
       enrichment.decisionMakers = people

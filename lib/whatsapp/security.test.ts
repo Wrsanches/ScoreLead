@@ -32,7 +32,13 @@ describe("WhatsApp security", () => {
   test("rejects a tampered encrypted token", () => {
     const encrypted = encryptWhatsAppToken("business-token")
     const envelope = JSON.parse(Buffer.from(encrypted, "base64url").toString("utf8"))
-    envelope.ciphertext = `${envelope.ciphertext.slice(0, -1)}A`
+    // Tamper at the byte level. Rewriting the last base64 character is not
+    // enough: the final character of a base64 group carries unused low bits, so
+    // replacing it can decode to the identical bytes and the "tampered" value
+    // then verifies correctly. Flipping a byte always changes the ciphertext.
+    const raw = Buffer.from(envelope.ciphertext, "base64url")
+    raw[0] ^= 0xff
+    envelope.ciphertext = raw.toString("base64url")
     const tampered = Buffer.from(JSON.stringify(envelope)).toString("base64url")
     expect(() => decryptWhatsAppToken(tampered)).toThrow()
   })

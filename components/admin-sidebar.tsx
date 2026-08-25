@@ -31,6 +31,7 @@ import { authClient } from "@/lib/auth-client";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
 import { usePlan } from "@/components/admin/plan-context";
+import { suggestedPlan } from "@/lib/plan-tiers";
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access";
 import {
   DropdownMenu,
@@ -86,7 +87,7 @@ export function AdminSidebar({
   const t = useTranslations("dashboard");
   const tb = useTranslations("billing");
   const tw = useTranslations("whatsapp");
-  const { isPro, openUpgrade, loading: planLoading } = usePlan();
+  const { plan, isPro, isPaid, isTrialing, openUpgrade, loading: planLoading } = usePlan();
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, isPending: sessionPending } = authClient.useSession();
@@ -412,8 +413,8 @@ export function AdminSidebar({
         {!isPlatformAdmin && !planLoading && !isPro && (
           <button
             type="button"
-            onClick={openUpgrade}
-            title={tb("upgradeCta")}
+            onClick={() => openUpgrade()}
+            title={isPaid ? tb("changePlan") : tb("upgradeCta")}
             className={`group w-full mb-2 flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/10 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/40 ${collapsed ? "lg:justify-center lg:px-0 lg:py-2 px-3 py-2.5" : "px-3 py-2.5"}`}
           >
             <span className={`shrink-0 w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center ${collapsed ? "lg:mx-auto" : ""}`}>
@@ -424,7 +425,7 @@ export function AdminSidebar({
                 {tb("upgradeCta")}
               </span>
               <span className="block text-[11px] text-emerald-700/70 dark:text-emerald-400/60 truncate">
-                {tb("proTagline")}
+                {tb(`planTagline.${suggestedPlan(plan)}`)}
               </span>
             </span>
           </button>
@@ -504,13 +505,14 @@ export function AdminSidebar({
                   <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
                   <span
                     className={`mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[10px] font-medium ${
-                      isPro
+                      isPaid
                         ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                         : "bg-zinc-500/10 border-zinc-500/20 text-zinc-500 dark:text-zinc-400"
                     }`}
                   >
-                    {isPro ? <Zap className="w-2.5 h-2.5" /> : null}
-                    {isPro ? tb("proPlan") : tb("freePlan")}
+                    {isPaid ? <Zap className="w-2.5 h-2.5" /> : null}
+                    {tb(`planName.${plan}`)}
+                    {isTrialing ? ` · ${tb("trialActive")}` : null}
                   </span>
                 </div>
               </div>

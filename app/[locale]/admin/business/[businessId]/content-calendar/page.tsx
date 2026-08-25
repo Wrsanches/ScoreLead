@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   useBusinessAccess,
@@ -22,6 +22,7 @@ import {
 import { GenerateBanner } from "@/components/admin/content-calendar/generate-banner";
 import { CalendarEmptyState } from "@/components/admin/content-calendar/empty-state";
 import type { ContentPostRow } from "@/components/admin/content-calendar/types";
+import type { ContentPlanJobView } from "@/lib/jobs/content-plan-queue";
 import { uploadImage } from "@/lib/upload-client";
 import { usePlan } from "@/components/admin/plan-context";
 
@@ -39,19 +40,34 @@ function monthParam(d: Date): string {
 
 export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
+  const tb = useTranslations("billing");
   const locale = useLocale();
   const businessId = useBusinessId();
   const { readOnly } = useBusinessAccess();
-  const { openUpgrade } = usePlan();
+  const { openUpgrade, limits } = usePlan();
+  /**
+   * The content calendar starts at Growth. A cap of 0 means the tier does not
+   * include it at all (an unlimited cap arrives as null, not 0), so the page
+   * still shows any existing posts but swaps generation for an upgrade prompt.
+   */
+  const contentLocked = limits?.contentPlans === 0;
   const weekStartsOn: 0 | 1 = locale === "en" ? 0 : 1;
   const [cursor, setCursor] = useState<Date>(() => monthStartUtc(new Date()));
   const [posts, setPosts] = useState<ContentPostRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recentGenerationIds, setRecentGenerationIds] = useState<
     string[] | null
   >(null);
+  /**
+   * The month's generation job, as reported by the server. This is what makes
+   * generation survive leaving the page: the state lives in the database, not
+   * in this component, so a reload picks the run back up mid-flight.
+   */
+  const [job, setJob] = useState<ContentPlanJobView | null>(null);
+  const generating = job?.status === "queued" || job?.status === "running";
+  /** Job ids we have already surfaced, so the banner fires once per run. */
+  const announcedJobRef = useRef<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<ContentPostRow | null>(null);
   const [draftDate, setDraftDate] = useState<Date | null>(null);
@@ -98,6 +114,23 @@ export default function ContentCalendarPage() {
       } else {
         const body = await res.json();
         setPosts((body.posts as ContentPostRow[]) ?? []);
+        const incoming = (body.job as ContentPlanJobView | null) ?? null;
+        setJob(incoming);
+
+        // A run that finished while we were away (or on another device) still
+        // gets its banner, so the drafts are never dropped in silently.
+        if (
+          incoming &&
+          incoming.status === "completed" &&
+          incoming.postIds.length > 0 &&
+          announcedJobRef.current !== incoming.id
+        ) {
+          announcedJobRef.current = incoming.id;
+          setRecentGenerationIds(incoming.postIds);
+        }
+        if (incoming?.status === "failed") {
+          setError(incoming.errorMessage || "Generation failed");
+        }
       }
     } catch {
       setError("Failed to load");
@@ -111,16 +144,64 @@ export default function ContentCalendarPage() {
     fetchPosts();
   }, [fetchPosts]);
 
+  // While a job is queued or running, poll until it settles. The calendar GET
+  // returns the posts and the job together, so the finished plan lands in the
+  // same response that reports completion.
+  useEffect(() => {
+    if (!generating) return;
+    const id = setInterval(() => {
+      fetch(
+        `/api/content-calendar?businessId=${businessId}&month=${monthParam(cursor)}`,
+      )
+        .then((r) => (r.ok ? r.json() : null))
+        .then((body) => {
+          if (!body) return;
+          setPosts((body.posts as ContentPostRow[]) ?? []);
+          const incoming = (body.job as ContentPlanJobView | null) ?? null;
+          setJob(incoming);
+          if (
+            incoming?.status === "completed" &&
+            incoming.postIds.length > 0 &&
+            announcedJobRef.current !== incoming.id
+          ) {
+            announcedJobRef.current = incoming.id;
+            setRecentGenerationIds(incoming.postIds);
+          }
+          if (incoming?.status === "failed") {
+            setError(incoming.errorMessage || "Generation failed");
+          }
+        })
+        .catch(() => {});
+    }, 3000);
+    return () => clearInterval(id);
+  }, [generating, businessId, cursor]);
+
   async function handleGenerate() {
     if (generating) return;
+    if (contentLocked) {
+      openUpgrade("contentPlan");
+      return;
+    }
     if (posts.length > 0) {
       const ok = window.confirm(
         "This will replace untouched AI drafts for this month. Posts you've edited or that already have images will be kept. Continue?",
       );
       if (!ok) return;
     }
-    setGenerating(true);
     setError(null);
+    // Optimistic in-progress state: the response only carries the queued job,
+    // and the poller below drives it from here.
+    setJob({
+      id: "pending",
+      month: monthParam(cursor),
+      status: "queued",
+      insertedPosts: 0,
+      postIds: [],
+      errorMessage: null,
+      createdAt: new Date().toISOString(),
+      startedAt: null,
+      completedAt: null,
+    });
     try {
       const res = await fetch("/api/content-calendar/generate", {
         method: "POST",
@@ -133,17 +214,17 @@ export default function ContentCalendarPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        if (res.status === 402) openUpgrade();
+        setJob(null);
+        if (res.status === 402) openUpgrade(body?.action);
         else setError(body?.error || "Generation failed");
         return;
       }
-      const fresh = (body.posts as ContentPostRow[]) ?? [];
-      setPosts(fresh);
-      setRecentGenerationIds(fresh.map((p) => p.id));
+      // 202 + the job row. Generation continues server-side even if this tab
+      // goes away; the poller (or the next page load) picks it up.
+      setJob((body.job as ContentPlanJobView | null) ?? null);
     } catch {
+      setJob(null);
       setError("Generation failed");
-    } finally {
-      setGenerating(false);
     }
   }
 
@@ -269,7 +350,8 @@ export default function ContentCalendarPage() {
       method: "POST",
     });
     if (res.status === 402) {
-      openUpgrade();
+      const body = await res.json().catch(() => ({}));
+      openUpgrade(body?.action);
       throw new Error("PLAN_LIMIT");
     }
     if (!res.ok) throw new Error("Failed");
@@ -301,7 +383,8 @@ export default function ContentCalendarPage() {
       },
     );
     if (res.status === 402) {
-      openUpgrade();
+      const body = await res.json().catch(() => ({}));
+      openUpgrade(body?.action);
       throw new Error("PLAN_LIMIT");
     }
     if (!res.ok) throw new Error("Failed");
@@ -427,7 +510,11 @@ export default function ContentCalendarPage() {
               {posts.length > 0 && !readOnly && (
                 <button
                   type="button"
-                  onClick={handleGenerate}
+                  onClick={
+                    contentLocked
+                      ? () => openUpgrade("contentPlan")
+                      : handleGenerate
+                  }
                   disabled={generating}
                   className="inline-flex items-center gap-2 h-10 px-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm rounded-xl shadow-lg shadow-emerald-500/15 transition-colors"
                 >
@@ -438,6 +525,8 @@ export default function ContentCalendarPage() {
                         {t("generating")}
                       </span>
                     </>
+                  ) : contentLocked ? (
+                    tb("upgradeCta")
                   ) : (
                     t("regenerate")
                   )}
@@ -472,6 +561,9 @@ export default function ContentCalendarPage() {
               onGenerate={handleGenerate}
               isGenerating={generating}
               readOnly={readOnly}
+              locked={contentLocked}
+              onUpgrade={() => openUpgrade("contentPlan")}
+              startedAt={job?.startedAt ?? job?.createdAt ?? null}
             />
           ) : (
             <motion.div

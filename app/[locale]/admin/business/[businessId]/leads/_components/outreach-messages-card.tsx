@@ -108,7 +108,8 @@ export function OutreachMessagesCard({
         onMessagesChange?.(data.messages)
         toast.success(t("toastGenerated"))
       } else if (res.status === 402) {
-        openUpgrade()
+        const body = await res.json().catch(() => ({}))
+        openUpgrade(body?.action)
       } else {
         const body = await res.json().catch(() => ({}))
         toast.error(body?.error || t("toastGenerateError"))

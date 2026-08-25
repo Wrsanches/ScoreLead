@@ -79,7 +79,8 @@ export default function DiscoveryJobDetailPage({
         setJob((j) => (j ? { ...j, status: "queued" } : j))
         setPollKey((k) => k + 1)
       } else if (res.status === 402) {
-        openUpgrade()
+        const err = await res.json().catch(() => ({}))
+        openUpgrade(err.action)
       } else {
         const err = await res.json().catch(() => ({}))
         toast.error(err.error || "Could not continue this job")

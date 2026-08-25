@@ -629,7 +629,8 @@ export function generateJsonLd(locale: string) {
           price: 0,
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          description: "Free plan available; Pro plan starts at $49 per month.",
+          description:
+            "Free plan available; paid plans from $19.95 per month, with a $2.95 7-day trial.",
         },
         audience: {
           "@type": "BusinessAudience",

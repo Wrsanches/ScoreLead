@@ -55,6 +55,29 @@ if (process.env.STRIPE_SECRET_KEY) {
       subscription: {
         enabled: true,
         plans: [
+          // The $2.95/7-day paid trial. Better Auth spreads `lineItems` into the
+          // Checkout session's line_items alongside the trial on
+          // subscription_data, so Stripe bills the one-time $2.95 at checkout
+          // and the $19.95 recurring price when the trial ends on day 8.
+          // Entitlement-wise this is Starter (see PLAN_TIER in lib/plan.ts).
+          {
+            name: "starter_trial",
+            priceId: process.env.STRIPE_STARTER_PRICE_ID,
+            freeTrial: { days: 7 },
+            lineItems: process.env.STRIPE_STARTER_TRIAL_FEE_PRICE_ID
+              ? [{ price: process.env.STRIPE_STARTER_TRIAL_FEE_PRICE_ID, quantity: 1 }]
+              : undefined,
+          },
+          {
+            name: "starter",
+            priceId: process.env.STRIPE_STARTER_PRICE_ID,
+            annualDiscountPriceId: process.env.STRIPE_STARTER_ANNUAL_PRICE_ID,
+          },
+          {
+            name: "growth",
+            priceId: process.env.STRIPE_GROWTH_PRICE_ID,
+            annualDiscountPriceId: process.env.STRIPE_GROWTH_ANNUAL_PRICE_ID,
+          },
           {
             name: "pro",
             priceId: process.env.STRIPE_PRO_PRICE_ID,

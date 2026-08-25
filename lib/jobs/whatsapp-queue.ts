@@ -9,7 +9,7 @@ import {
   whatsappSequenceStep,
   whatsappTemplate,
 } from "@/lib/db/schema"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 import { getLatestWhatsAppConsent } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { MetaGraphError, sendTemplateMessage } from "@/lib/whatsapp/meta"
@@ -118,7 +118,7 @@ async function executeStep(stepId: string) {
     await blockStep(step.id, sequence.id, "feature_not_available")
     return
   }
-  if (await getUserPlan(row.ownerId) !== "pro") {
+  if (!can(await getUserPlan(row.ownerId), "whatsappAutomation")) {
     await blockStep(step.id, sequence.id, "plan_inactive")
     return
   }

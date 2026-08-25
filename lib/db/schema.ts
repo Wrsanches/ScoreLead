@@ -527,6 +527,63 @@ export const contentPost = pgTable("content_post", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
 
+/**
+ * Durable job row for AI content-plan generation.
+ *
+ * Generation is a single long LLM call, so it cannot run inside the request:
+ * the user navigates away or closes the tab and the work is lost. Instead the
+ * route enqueues a row here, returns 202, and a worker picks it up (see
+ * lib/jobs/content-plan-queue.ts) - so coming back to the page shows either the
+ * generation still in progress or the finished posts.
+ *
+ * One active job per (business, month) is enforced by a partial unique index,
+ * which is what stops a returning user from starting a second generation on top
+ * of the first.
+ */
+export const contentPlanJob = pgTable("content_plan_job", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId")
+    .notNull()
+    .references(() => business.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  /** Target month as "YYYY-MM" (UTC), matching the calendar's month param. */
+  month: text("month").notNull(),
+  /** null = let the model choose a count tuned to the profile and month. */
+  postCount: integer("postCount"),
+  replaceExisting: boolean("replaceExisting").notNull().default(false),
+  /** queued | running | completed | failed */
+  status: text("status").notNull().default("queued"),
+  /** How many posts the finished run inserted. */
+  insertedPosts: integer("insertedPosts").notNull().default(0),
+  /** Ids of the posts this run created, so Undo survives a page reload. */
+  postIds: jsonb("postIds").$type<string[]>(),
+  errorMessage: text("errorMessage"),
+  // Queue bookkeeping: the worker bumps heartbeatAt on a timer while the LLM
+  // call is in flight, so a killed instance can be detected and requeued.
+  attempts: integer("attempts").notNull().default(0),
+  heartbeatAt: timestamp("heartbeatAt"),
+  /**
+   * Earliest time a requeued job may be claimed again. Without it the pump's
+   * drain loop re-claims a just-failed job in the same pass and burns every
+   * attempt in milliseconds, which makes retrying a transient API outage
+   * pointless.
+   */
+  nextAttemptAt: timestamp("nextAttemptAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  startedAt: timestamp("startedAt"),
+  completedAt: timestamp("completedAt"),
+}, (table) => [
+  index("content_plan_job_status_idx").on(table.status),
+  index("content_plan_job_user_idx").on(table.userId),
+  index("content_plan_job_business_month_idx").on(table.businessId, table.month),
+  // At most one queued/running job per business+month.
+  uniqueIndex("content_plan_job_active_uidx")
+    .on(table.businessId, table.month)
+    .where(sql`${table.status} IN ('queued', 'running')`),
+])
+
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
@@ -558,21 +615,30 @@ export const subscription = pgTable("subscription", {
   stripeScheduleId: text("stripeScheduleId"),
 })
 
-// Custom freemium usage metering. One row per user. Lifetime counters enforce
-// the Free caps; aiImagesMonth/Day(+key) enforce Pro image fair-use caps.
+// Custom tiered usage metering. One row per user. Lifetime counters enforce the
+// Free caps; the month-keyed buckets enforce the monthly windows on Starter,
+// Growth and Pro, plus the AI-image and Apollo fair-use caps.
 export const usage = pgTable("usage", {
   userId: text("userId")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
+  // Lifetime totals enforce the Free caps; the *Month(+Key) pairs enforce the
+  // monthly windows on every paid tier and reset on calendar-month rollover.
   discoveryJobs: integer("discoveryJobs").notNull().default(0),
+  discoveryJobsMonth: integer("discoveryJobsMonth").notNull().default(0),
+  discoveryJobsMonthKey: text("discoveryJobsMonthKey"),
   outreachMessages: integer("outreachMessages").notNull().default(0),
+  outreachMessagesMonth: integer("outreachMessagesMonth").notNull().default(0),
+  outreachMessagesMonthKey: text("outreachMessagesMonthKey"),
   contentPlans: integer("contentPlans").notNull().default(0),
+  contentPlansMonth: integer("contentPlansMonth").notNull().default(0),
+  contentPlansMonthKey: text("contentPlansMonthKey"),
   aiImages: integer("aiImages").notNull().default(0),
   aiImagesMonth: integer("aiImagesMonth").notNull().default(0),
   aiImagesMonthKey: text("aiImagesMonthKey"),
   aiImagesDay: integer("aiImagesDay").notNull().default(0),
   aiImagesDayKey: text("aiImagesDayKey"),
-  // Apollo enrichment fair-use (Pro): lifetime + monthly counters.
+  // Apollo enrichment fair-use (Growth+): lifetime + monthly counters.
   apolloEnrichments: integer("apolloEnrichments").notNull().default(0),
   apolloEnrichmentsMonth: integer("apolloEnrichmentsMonth").notNull().default(0),
   apolloEnrichmentsMonthKey: text("apolloEnrichmentsMonthKey"),

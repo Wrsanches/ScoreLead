@@ -5,6 +5,8 @@ import {
   apolloMonthlyRemaining,
   recordApolloUsage,
   APOLLO_LEADS_PER_JOB,
+  can,
+  getUserPlan,
 } from "@/lib/plan";
 import { enrichByDomain } from "./apollo";
 import { searchBusiness, filterUsefulResults } from "./brave-search";
@@ -376,10 +378,11 @@ async function loadWinningExemplars(
 }
 
 /**
- * Pro-only post-pass: enrich this job's highest-scoring leads with Apollo
- * firmographics + (optionally) decision-makers, then re-score them so the
- * firmographic signals count. Runs only on the top-N by score and is bounded
- * by the user's remaining monthly Apollo budget, to control the paid API cost.
+ * Growth-and-up post-pass: enrich this job's highest-scoring leads with Apollo
+ * firmographics - plus decision-maker contacts on Pro - then re-score them so
+ * the firmographic signals count. Runs only on the top-N by score and is
+ * bounded by the tier's remaining monthly Apollo budget, to control the paid
+ * API cost.
  */
 async function enrichTopLeadsWithApollo(
   jobId: string,
@@ -390,6 +393,9 @@ async function enrichTopLeadsWithApollo(
 
   const budget = await apolloMonthlyRemaining(userId);
   if (budget <= 0) return;
+
+  // Named decision-makers are a Pro unlock - a heavier Apollo credit cost.
+  const fetchPeople = can(await getUserPlan(userId), "decisionMakers");
 
   // Pull this job's best leads; filter to eligible ones (have a domain, not yet
   // Apollo-enriched) in JS, then take the top-N within budget.
@@ -407,7 +413,10 @@ async function enrichTopLeadsWithApollo(
 
   let enriched = 0;
   for (const row of eligible) {
-    const data = await enrichByDomain(String(row.website || row.websiteDomain));
+    const data = await enrichByDomain(
+      String(row.website || row.websiteDomain),
+      fetchPeople,
+    );
     if (!data) continue;
 
     const sources = [...new Set([...(row.enrichmentSources ?? []), "apollo"])];

@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       if (e instanceof PlanLimitError) {
         return NextResponse.json(
           {
-            error: "The Free plan includes 1 business. Upgrade to Pro to add more.",
+            error: "Your plan includes 1 business. Upgrade to Growth to manage more.",
             code: "PLAN_LIMIT",
             action: e.action,
           },

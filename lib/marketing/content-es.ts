@@ -538,23 +538,41 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     eyebrow: "Precios",
     title: "Empieza gratis. Mejora cuando el flujo demuestre valor.",
     description:
-      "Usa el flujo principal con Free y pasa a Pro cuando necesites más capacidad en descubrimiento, negocios, contenido e outreach.",
+      "Usa el flujo principal con Free, prueba Starter por US$2,95 y sube de plan a medida que crece el volumen de descubrimiento, outreach y automatización.",
     answer:
-      "Free cuesta US$0 e incluye un negocio, un descubrimiento de hasta 10 leads, un plan de contenido y una imagen. Pro se publica a US$49 al mes.",
-    highlights: ["Free: US$0 al mes", "Pro: US$49 al mes", "Sin tarjeta para empezar"],
+      "Free cuesta US$0 e incluye un negocio y un descubrimiento de hasta 10 leads, puntuados y enriquecidos. Starter cuesta US$2,95 los primeros 7 días y US$19,95 al mes después, Growth cuesta US$29,95 al mes y Pro cuesta US$59,95 al mes. Los cupos de los planes pagos se renuevan cada mes.",
+    highlights: [
+      "Free: US$0 al mes, sin tarjeta",
+      "Starter: US$2,95 por 7 días, luego US$19,95 al mes",
+      "Growth: US$29,95 al mes · Pro: US$59,95 al mes",
+    ],
     sections: [
       {
         heading: "Plan Free",
         paragraphs: [
-          "Usa un workspace, ejecuta un trabajo inicial, crea un plan de contenido y genera una imagen para evaluar el flujo.",
+          "Usa un workspace y ejecuta un trabajo inicial para evaluar el flujo completo: puntuación, enriquecimiento web y textos de outreach con IA. Los límites de Free son totales únicos, no cupos mensuales.",
         ],
+      },
+      {
+        heading: "Plan Starter",
+        paragraphs: [
+          "Starter empieza en US$2,95 por siete días y pasa a US$19,95 al mes si no se cancela. Cubre un negocio con 10 descubrimientos al mes de hasta 25 leads cada uno, 50 mensajes de outreach con IA y exportación CSV de todos los leads enriquecidos.",
+        ],
+        points: ["10 descubrimientos al mes", "Hasta 25 leads por descubrimiento", "50 mensajes de outreach", "Exportación CSV", "Puntuación y enriquecimiento web"],
+      },
+      {
+        heading: "Plan Growth",
+        paragraphs: [
+          "Growth añade el lado del contacto: secuencias de WhatsApp en la plataforma oficial de Meta, enriquecimiento Apollo en los mejores leads de cada descubrimiento, el calendario de contenido con IA e imágenes generadas, tres workspaces y la opción de continuar un descubrimiento más a fondo en la misma zona.",
+        ],
+        points: ["Automatización de WhatsApp", "150 enriquecimientos al mes", "Calendario de contenido con IA e imágenes", "3 negocios", "30 descubrimientos de hasta 50 leads"],
       },
       {
         heading: "Plan Pro",
         paragraphs: [
-          "Pro ofrece varios negocios, descubrimiento y contenido ilimitados, hasta 30 imágenes al mes con límite diario y outreach ilimitado.",
+          "Pro es el plan de agencia: negocios ilimitados, descubrimientos ilimitados sin tope de leads por ronda, planes de contenido y outreach ilimitados, 500 enriquecimientos al mes y contactos de decisores en los leads enriquecidos.",
         ],
-        points: ["Varios negocios", "Descubrimiento ilimitado", "Contenido ilimitado", "30 imágenes al mes", "Outreach ilimitado"],
+        points: ["Negocios ilimitados", "Descubrimiento y outreach ilimitados", "Contactos de decisores", "500 enriquecimientos al mes", "30 imágenes con IA al mes"],
       },
       {
         heading: "Uso y términos de terceros",

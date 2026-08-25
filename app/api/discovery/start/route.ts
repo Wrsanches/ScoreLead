@@ -12,7 +12,7 @@ import {
   assertCanUse,
   recordUsage,
   getUserPlan,
-  freeLeadCap,
+  leadCap,
   PlanLimitError,
 } from "@/lib/plan"
 
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
-          error: "You've used your free discovery run. Upgrade to Pro for unlimited discovery.",
+          error: "You've used your discovery runs for this period. Upgrade for more.",
           code: "PLAN_LIMIT",
           action: e.action,
         },
@@ -92,9 +92,9 @@ export async function POST(request: Request) {
     throw e
   }
 
-  // Free plans are clamped to a smaller lead cap to protect API costs.
+  // Each tier is clamped to its own per-run lead cap to protect API costs.
   const plan = await getUserPlan(session.user.id)
-  const maxResults = freeLeadCap(plan, data.maxResults)
+  const maxResults = leadCap(plan, data.maxResults)
 
   // Save keywords for next time
   await db

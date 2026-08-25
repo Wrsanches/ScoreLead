@@ -6,12 +6,12 @@ import { eq, and, inArray, sql } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { processDiscoveryQueue } from "@/lib/jobs/discovery-queue"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 
 /**
  * Run the next batch of an existing discovery job ("Continue"). Re-queues the
  * same row so the pipeline pages one level deeper and accumulates new leads.
- * Pro-only; does NOT consume another discoveryJob usage credit.
+ * Growth and up; does NOT consume another discoveryJob usage credit.
  */
 export async function POST(
   _request: Request,
@@ -36,13 +36,14 @@ export async function POST(
     return NextResponse.json({ error: "Job not found" }, { status: 404 })
   }
 
-  // Continuing a batch is a Pro feature.
+  // Continuing a batch unlocks at Growth.
   const plan = await getUserPlan(session.user.id)
-  if (plan !== "pro") {
+  if (!can(plan, "continueJob")) {
     return NextResponse.json(
       {
-        error: "Upgrade to Pro to keep discovering more leads in this area.",
+        error: "Upgrade to Growth to keep discovering more leads in this area.",
         code: "PLAN_LIMIT",
+        action: "continueJob",
       },
       { status: 402 },
     )

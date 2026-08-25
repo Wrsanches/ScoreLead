@@ -1,26 +1,89 @@
 {
   "billing": {
-    "freePlan": "Free",
-    "proPlan": "Pro",
-    "freePrice": "$0",
-    "proPrice": "$49",
     "perMonth": "/mo",
+    "perYear": "/yr",
     "billingTitle": "Billing & plan",
-    "freeBlurb": "You're on the Free plan. Upgrade to Pro to unlock unlimited discovery, content, and outreach.",
-    "proBlurb": "You're on Pro. Thanks for your support!",
-    "freeTagline": "Try the essentials",
-    "proTagline": "For serious B2B pipeline generation",
-    "upgradeTitle": "Upgrade to Pro",
-    "upgradeDescription": "Unlock unlimited lead discovery, AI content, and outreach.",
-    "upgradeCta": "Upgrade to Pro",
+    "currentPlan": "Current plan",
+    "planName": {
+      "free": "Free",
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    },
+    "planPrice": {
+      "free": "$0",
+      "starter": "$19.95",
+      "growth": "$29.95",
+      "pro": "$59.95"
+    },
+    "planTagline": {
+      "free": "Try the essentials",
+      "starter": "Find, score and write - one business",
+      "growth": "Reach them: WhatsApp, enrichment, content",
+      "pro": "Agency scale, unlimited"
+    },
+    "planPerks": {
+      "free": [
+        "1 business",
+        "1 discovery run (~10 leads)",
+        "Lead scoring & web enrichment",
+        "3 AI outreach messages"
+      ],
+      "starter": [
+        "10 discovery runs / month",
+        "Up to 25 leads per run",
+        "50 AI outreach messages / month",
+        "CSV export",
+        "Lead scoring & web enrichment"
+      ],
+      "growth": [
+        "WhatsApp automation",
+        "Contact enrichment, 150 / month",
+        "AI content calendar + images",
+        "3 businesses",
+        "30 discovery runs, 50 leads each"
+      ],
+      "pro": [
+        "Unlimited discovery and outreach",
+        "Unlimited businesses",
+        "Decision-maker contacts",
+        "Contact enrichment, 500 / month",
+        "30 AI images / month, max 10 / day"
+      ]
+    },
+    "blurb": {
+      "free": "You're on the Free plan. Its limits are one-time totals - upgrade for a monthly allowance.",
+      "starter": "You're on Starter. Upgrade to Growth for WhatsApp automation and contact enrichment.",
+      "growth": "You're on Growth. Upgrade to Pro for unlimited volume and decision-maker contacts.",
+      "pro": "You're on Pro. Thanks for your support!"
+    },
+    "trialBadge": "Best way in",
+    "trialPrice": "$2.95",
+    "trialCadence": "for 7 days",
+    "trialNote": "Then $19.95/month. Cancel anytime.",
+    "trialActive": "Trial active",
+    "trialEndsNote": "Your trial converts to $19.95/mo unless you cancel.",
+    "resetsMonthly": "Allowances reset every month.",
+    "resetsLifetime": "Free limits are one-time totals, not monthly allowances.",
+    "upgradeTitle": "Choose your plan",
+    "upgradeDescription": "Pick the plan that clears the limit you just hit.",
+    "upgradeCta": "Continue",
+    "changePlan": "Change plan",
+    "currentBadge": "Current",
+    "recommendedBadge": "Recommended",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "annualSave": "2 months free",
     "ctaStartFree": "Start free",
-    "ctaGetPro": "Get Pro",
+    "ctaStartTrial": "Start for $2.95",
+    "ctaChoose": "Choose {plan}",
     "redirecting": "Redirecting...",
     "upgradeFailed": "Could not start checkout. Please try again.",
     "manageBilling": "Manage billing",
     "portalFailed": "Could not open the billing portal. Please try again.",
     "pricingHeading": "Pricing",
     "pricingSubtitle": "Start free. Upgrade when you're ready to scale.",
+    "seeAllPlans": "Compare all plans",
     "usageBusinesses": "Businesses",
     "usageDiscovery": "Discovery runs",
     "usageOutreach": "AI outreach messages",
@@ -29,18 +92,13 @@
     "usageImagesMonthly": "AI images this month",
     "usageImagesDaily": "AI images today",
     "unlimited": "Unlimited",
-    "congratsTitle": "Welcome to Pro!",
-    "congratsBody": "Your upgrade is complete. Every limit is lifted - time to scale.",
+    "congratsTitle": "Welcome to {plan}!",
+    "congratsBody": "Your upgrade is complete - time to scale.",
     "congratsCta": "Let's go",
-    "perkBusinesses": "Multiple businesses",
-    "perkDiscovery": "Unlimited lead discovery",
-    "perkContent": "Unlimited content plans",
-    "perkImages": "30 AI images / month, max 10 / day",
-    "perkOutreach": "Unlimited AI outreach",
-    "freeFeatBusiness": "1 business",
-    "freeFeatDiscovery": "1 discovery run (~10 leads)",
-    "freeFeatContent": "1 content plan",
-    "freeFeatImages": "1 AI image"
+    "exportCsv": "Export CSV",
+    "exportFailed": "Could not export your leads. Please try again.",
+    "contentCalendarLocked": "The AI content calendar is part of Growth. Upgrade to plan a month of posts and generate their images.",
+    "noCreditCard": "No credit card required."
   },
   "metadata": {
     "title": "ScoreLead - AI B2B Lead Discovery & Scoring",
@@ -1062,6 +1120,8 @@
     "previewMore": "more",
     "previewLess": "less",
     "previewScheduledFor": "Scheduled for {date}",
-    "referenceNoDescription": "No description added"
+    "referenceNoDescription": "No description added",
+    "genSafeToLeave": "You can close this page - we'll keep drafting and the posts will be here when you come back.",
+    "genStillWorking": "Still working. This can take a few minutes for a full month - it's safe to leave this page."
   }
 }

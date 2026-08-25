@@ -10,6 +10,15 @@ interface CalendarEmptyStateProps {
   onGenerate: () => void;
   isGenerating: boolean;
   readOnly?: boolean;
+  /** Tier does not include the content calendar - offer the upgrade instead. */
+  locked?: boolean;
+  onUpgrade?: () => void;
+  /**
+   * When the server-side run actually started, ISO. Generation survives leaving
+   * the page, so on return the phases must reflect elapsed time rather than
+   * restarting from the first step.
+   */
+  startedAt?: string | null;
 }
 
 /**
@@ -21,12 +30,28 @@ interface CalendarEmptyStateProps {
  */
 type GenStatus = "reading" | "pillars" | "drafting" | "placing";
 
+/** Elapsed-seconds thresholds at which each phase begins. */
+const PHASE_AT: { key: GenStatus; afterSeconds: number }[] = [
+  { key: "placing", afterSeconds: 18 },
+  { key: "drafting", afterSeconds: 9 },
+  { key: "pillars", afterSeconds: 3.5 },
+  { key: "reading", afterSeconds: 0 },
+];
+
+function phaseForElapsed(seconds: number): GenStatus {
+  return (PHASE_AT.find((p) => seconds >= p.afterSeconds) ?? PHASE_AT.at(-1)!).key;
+}
+
 export function CalendarEmptyState({
   onGenerate,
   isGenerating,
   readOnly = false,
+  locked = false,
+  onUpgrade,
+  startedAt = null,
 }: CalendarEmptyStateProps) {
   const t = useTranslations("contentCalendar");
+  const tb = useTranslations("billing");
 
   const orbState: OrbState = isGenerating ? "processing" : "idle";
 
@@ -36,24 +61,27 @@ export function CalendarEmptyState({
     animate: { opacity: 1, y: 0 },
   };
 
-  // Time-based status advancement mirrors the onboarding processing flow.
-  // The single OpenAI call behind this is actually atomic, so we simulate
-  // phases to give the user a sense of what's happening.
-  const [genStatus, setGenStatus] = useState<GenStatus>("reading");
+  // Time-based status advancement mirrors the onboarding processing flow. The
+  // single OpenAI call behind this is atomic, so we simulate phases to give the
+  // user a sense of what's happening. Derived from elapsed time (not one-shot
+  // timers) so returning to a run in progress lands on the right phase.
+  const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
     if (!isGenerating) {
-      setGenStatus("reading");
+      setElapsed(0);
       return;
     }
-    const t1 = setTimeout(() => setGenStatus("pillars"), 3500);
-    const t2 = setTimeout(() => setGenStatus("drafting"), 9000);
-    const t3 = setTimeout(() => setGenStatus("placing"), 18000);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [isGenerating]);
+    const since = startedAt ? Date.parse(startedAt) : Date.now();
+    const base = Number.isFinite(since) ? since : Date.now();
+    const tick = () => setElapsed(Math.max(0, (Date.now() - base) / 1000));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [isGenerating, startedAt]);
+
+  const genStatus = phaseForElapsed(elapsed);
+  // Past a minute the phase list stops being informative; reassure instead.
+  const takingAWhile = isGenerating && elapsed > 45;
 
   const genSteps: { key: GenStatus; icon: typeof BookOpen; label: string }[] = [
     { key: "reading", icon: BookOpen, label: t("genStepReading") },
@@ -117,14 +145,22 @@ export function CalendarEmptyState({
           transition={{ duration: 0.5, delay: 0.15 }}
           className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight max-w-md"
         >
-          {isGenerating ? t("genTitle") : t("emptyTitle")}
+          {isGenerating
+            ? t("genTitle")
+            : locked
+              ? tb("planName.growth")
+              : t("emptyTitle")}
         </motion.h2>
         <motion.p
           {...fadeUp}
           transition={{ duration: 0.5, delay: 0.25 }}
           className="text-sm text-zinc-600 dark:text-zinc-400 mt-3 max-w-md leading-relaxed"
         >
-          {isGenerating ? t("genBody") : t("emptyBody")}
+          {isGenerating
+            ? t("genBody")
+            : locked
+              ? tb("contentCalendarLocked")
+              : t("emptyBody")}
         </motion.p>
 
         {/* Status checklist during generation (mirrors the onboarding processing step). */}
@@ -134,6 +170,9 @@ export function CalendarEmptyState({
             transition={{ duration: 0.5, delay: 0.35 }}
             className="w-full max-w-sm space-y-2 mt-8"
           >
+            <p className="pt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-500">
+              {takingAWhile ? t("genStillWorking") : t("genSafeToLeave")}
+            </p>
             {genSteps.map((step, i) => {
               const Icon = step.icon;
               const isActive = i === currentStepIndex;
@@ -206,12 +245,12 @@ export function CalendarEmptyState({
             {...fadeUp}
             transition={{ duration: 0.5, delay: 0.35 }}
             type="button"
-            onClick={onGenerate}
+            onClick={locked ? onUpgrade : onGenerate}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-sm rounded-xl shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] transition-colors"
           >
-            {t("generateWithAi")}
+            {locked ? tb("upgradeCta") : t("generateWithAi")}
           </motion.button>
         ) : null}
       </div>

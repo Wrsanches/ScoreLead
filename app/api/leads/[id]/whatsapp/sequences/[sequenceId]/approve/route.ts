@@ -9,7 +9,7 @@ import {
   whatsappTemplate,
 } from "@/lib/db/schema"
 import { processWhatsAppQueue } from "@/lib/jobs/whatsapp-queue"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 import {
   getLatestWhatsAppConsent,
   getOwnedLead,
@@ -40,8 +40,8 @@ export async function POST(
       { status: 403 },
     )
   }
-  if (await getUserPlan(session.user.id) !== "pro") {
-    return NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 })
+  if (!can(await getUserPlan(session.user.id), "whatsappAutomation")) {
+    return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const { id, sequenceId } = await params
   const ownedLead = await getOwnedLead(id, session.user.id)

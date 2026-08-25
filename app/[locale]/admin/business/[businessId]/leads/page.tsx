@@ -7,6 +7,7 @@ import { ZoomableImage } from "@/components/admin/zoomable-image";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useSearch } from "@/components/search-overlay";
 import {
   useBusinessAccess,
@@ -32,8 +33,10 @@ import {
   ChevronDown,
   Users,
   X,
+  Download,
 } from "lucide-react";
 import { MobileMenuButton } from "@/components/admin-shell";
+import { usePlan } from "@/components/admin/plan-context";
 import { trackMarketingEvent } from "@/lib/analytics-events";
 import {
   SectionCard,
@@ -66,8 +69,10 @@ import { OutreachMessagesCard } from "./_components/outreach-messages-card";
 
 export default function LeadsPage() {
   const t = useTranslations("dashboard");
+  const tb = useTranslations("billing");
   const { selectedLeadId, setSelectedLead, clearSelectedLead } = useSearch();
   const businessId = useBusinessId();
+  const { can: planCan, openUpgrade } = usePlan();
   const { readOnly } = useBusinessAccess();
   const searchParams = useSearchParams();
 
@@ -227,6 +232,43 @@ export default function LeadsPage() {
     [leads.length],
   );
 
+  /**
+   * Download the current filter/sort as CSV. The browser handles the file, so
+   * this navigates rather than fetching - except for the paywall, which has to
+   * be caught before the navigation to show the upgrade dialog instead of a
+   * downloaded error page.
+   */
+  async function handleExport() {
+    if (!planCan("csvExport")) {
+      openUpgrade("csvExport");
+      return;
+    }
+    const params = new URLSearchParams({ businessId, sortBy, sortOrder });
+    if (statusFilter !== "all") params.set("status", statusFilter);
+    const href = `/api/leads/export?${params.toString()}`;
+    try {
+      const res = await fetch(href);
+      if (res.status === 402) {
+        const body = await res.json().catch(() => ({}));
+        openUpgrade(body?.action ?? "csvExport");
+        return;
+      }
+      if (!res.ok) {
+        toast.error(tb("exportFailed"));
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `scorelead-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(tb("exportFailed"));
+    }
+  }
+
   const formatDate = formatRelativeDate;
 
   return (
@@ -337,6 +379,19 @@ export default function LeadsPage() {
                   </DropdownMenuItem>
                 );
               })}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={handleExport}
+                className="cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="flex-1">{tb("exportCsv")}</span>
+                {!planCan("csvExport") && (
+                  <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                    {tb("planName.starter")}
+                  </span>
+                )}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

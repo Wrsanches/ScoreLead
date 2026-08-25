@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappSignupNonce } from "@/lib/db/schema"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 import { getOwnedBusiness } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 
@@ -20,8 +20,8 @@ export async function POST(
       { status: 403 },
     )
   }
-  if (await getUserPlan(session.user.id) !== "pro") {
-    return NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 })
+  if (!can(await getUserPlan(session.user.id), "whatsappAutomation")) {
+    return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const { id } = await params
   if (!(await getOwnedBusiness(id, session.user.id))) {

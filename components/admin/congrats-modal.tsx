@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { planRank, type PlanId } from "@/lib/plan-tiers"
 
 const CONFETTI_COLORS = ["#10b981", "#34d399", "#6ee7b7", "#a7f3d0", "#fbbf24"]
 
@@ -49,18 +50,17 @@ function Confetti() {
 export function CongratsModal({
   open,
   onOpenChange,
+  plan,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** The tier just purchased. May still read "free" for a beat: the Stripe
+   * webhook is async, so plan-context polls and this re-renders when it lands. */
+  plan: PlanId
 }) {
   const t = useTranslations("billing")
-  const perks = [
-    t("perkDiscovery"),
-    t("perkOutreach"),
-    t("perkContent"),
-    t("perkImages"),
-    t("perkBusinesses"),
-  ]
+  const settled = planRank(plan) > 0
+  const perks = settled ? (t.raw(`planPerks.${plan}`) as string[]) : []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,14 +76,16 @@ export function CongratsModal({
             <PartyPopper className="h-7 w-7 text-emerald-400" />
           </motion.div>
           <DialogTitle className="text-center text-xl text-white">
-            {t("congratsTitle")}
+            {t("congratsTitle", {
+              plan: settled ? t(`planName.${plan}`) : "ScoreLead",
+            })}
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-400">
             {t("congratsBody")}
           </DialogDescription>
         </DialogHeader>
 
-        <ul className="space-y-2 py-2">
+        <ul className="space-y-2 py-2 empty:hidden">
           {perks.map((p) => (
             <li key={p} className="flex items-center gap-2 text-sm text-zinc-300">
               <Check className="h-4 w-4 shrink-0 text-emerald-400" />

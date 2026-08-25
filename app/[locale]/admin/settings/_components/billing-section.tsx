@@ -10,9 +10,18 @@ import { authClient } from "@/lib/auth-client"
 
 export function BillingSection() {
   const t = useTranslations("billing")
-  const { plan, usage, limits, loading, openUpgrade } = usePlan()
+  const {
+    plan,
+    usage,
+    limits,
+    loading,
+    openUpgrade,
+    isPaid,
+    isPro,
+    isTrialing,
+    window: quotaWindow,
+  } = usePlan()
   const [portalLoading, setPortalLoading] = useState(false)
-  const isPro = plan === "pro"
 
   async function handleManage() {
     setPortalLoading(true)
@@ -31,20 +40,31 @@ export function BillingSection() {
     }
   }
 
+  // Unlimited caps arrive as null (JSON has no Infinity); normalize so the
+  // "unlimited" branch below is a single check.
+  const cap = (v: number | null | undefined) => (v == null ? Infinity : v)
+
   const usageRows =
     usage && limits
-      ? isPro
-        ? [
-            { label: t("usageImagesMonthly"), used: usage.aiImages, max: limits.aiImages },
-            { label: t("usageImagesDaily"), used: usage.aiImagesToday ?? 0, max: limits.aiImagesPerDay },
-          ]
-        : [
-            { label: t("usageBusinesses"), used: usage.businesses, max: limits.businesses },
-            { label: t("usageDiscovery"), used: usage.discoveryJobs, max: limits.discoveryJobs },
-            { label: t("usageOutreach"), used: usage.outreachMessages, max: limits.outreachMessages },
-            { label: t("usageContent"), used: usage.contentPlans, max: limits.contentPlans },
-            { label: t("usageImages"), used: usage.aiImages, max: limits.aiImages },
-          ]
+      ? [
+          { label: t("usageBusinesses"), used: usage.businesses, max: cap(limits.businesses) },
+          { label: t("usageDiscovery"), used: usage.discoveryJobs, max: cap(limits.discoveryJobs) },
+          { label: t("usageOutreach"), used: usage.outreachMessages, max: cap(limits.outreachMessages) },
+          { label: t("usageContent"), used: usage.contentPlans, max: cap(limits.contentPlans) },
+          {
+            label: quotaWindow === "month" ? t("usageImagesMonthly") : t("usageImages"),
+            used: usage.aiImages,
+            max: cap(limits.aiImages),
+          },
+          {
+            label: t("usageImagesDaily"),
+            used: usage.aiImagesToday ?? 0,
+            max: cap(limits.aiImagesPerDay),
+          },
+          // A cap of 0 means the tier does not include the feature at all, so
+          // it belongs in the pricing table, not as a 0/0 usage bar. Unlimited
+          // caps arrive as Infinity and are filtered out the same way.
+        ].filter((row) => Number.isFinite(row.max) && row.max > 0)
       : []
 
   return (
@@ -53,19 +73,25 @@ export function BillingSection() {
         <div>
           <div
             className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-medium mb-3 ${
-              isPro
+              isPaid
                 ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
                 : "bg-zinc-500/10 border-zinc-500/20 text-zinc-600 dark:text-zinc-400"
             }`}
           >
-            {isPro ? <Zap className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}
-            {isPro ? t("proPlan") : t("freePlan")}
+            {isPaid ? <Zap className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}
+            {t(`planName.${plan}`)}
+            {isTrialing && (
+              <span className="text-zinc-500 dark:text-zinc-400">
+                {" · "}
+                {t("trialActive")}
+              </span>
+            )}
           </div>
           <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">
             {t("billingTitle")}
           </h2>
           <p className="text-sm text-zinc-500 max-w-md">
-            {isPro ? t("proBlurb") : t("freeBlurb")}
+            {isTrialing ? t("trialEndsNote") : t(`blurb.${plan}`)}
           </p>
         </div>
       </div>
@@ -108,21 +134,29 @@ export function BillingSection() {
         </div>
       )}
 
-      <div className="pt-1">
-        {isPro ? (
-          <Button type="button" variant="outline" onClick={handleManage} disabled={portalLoading}>
-            {portalLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {t("manageBilling")}
-          </Button>
-        ) : (
+      {usageRows.length > 0 && (
+        <p className="mb-5 -mt-2 text-xs text-zinc-500 dark:text-zinc-600">
+          {quotaWindow === "month" ? t("resetsMonthly") : t("resetsLifetime")}
+        </p>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        {/* Pro has nothing to upgrade to, so it only gets the portal. */}
+        {!isPro && (
           <Button
             type="button"
-            onClick={openUpgrade}
+            onClick={() => openUpgrade()}
             disabled={loading}
             className="bg-emerald-600 hover:bg-emerald-500 text-white"
           >
             <Zap className="w-4 h-4" />
-            {t("upgradeCta")}
+            {isPaid ? t("changePlan") : t("upgradeCta")}
+          </Button>
+        )}
+        {isPaid && (
+          <Button type="button" variant="outline" onClick={handleManage} disabled={portalLoading}>
+            {portalLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {t("manageBilling")}
           </Button>
         )}
       </div>

@@ -76,7 +76,7 @@ export async function POST(
         {
           error:
             e.plan === "free"
-              ? "Free includes 1 AI image. Upgrade to Pro to generate more."
+              ? "Free includes 1 AI image. Upgrade to generate more."
               : e.reason === "daily"
                 ? "Daily AI image limit reached."
                 : "Monthly AI image limit reached.",

@@ -1,14 +1,18 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { contentPost } from "@/lib/db/schema"
-import { and, eq, gte, lt } from "drizzle-orm"
+import { contentPlanJob, contentPost } from "@/lib/db/schema"
+import { and, desc, eq, gte, lt } from "drizzle-orm"
 import { headers } from "next/headers"
-import { NextResponse } from "next/server"
+import { NextResponse, after } from "next/server"
 import { z } from "zod"
 import {
   resolveBusinessId,
   resolveViewableBusiness,
 } from "@/lib/active-business"
+import {
+  pumpContentPlanQueueIfDue,
+  serializeJob,
+} from "@/lib/jobs/content-plan-queue"
 
 function monthRange(monthParam: string | null): { start: Date; end: Date } {
   const now = new Date()
@@ -29,7 +33,8 @@ export async function GET(request: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const url = new URL(request.url)
-  const { start, end } = monthRange(url.searchParams.get("month"))
+  const monthParam = url.searchParams.get("month")
+  const { start, end } = monthRange(monthParam)
   const access = await resolveViewableBusiness(
     session.user.id,
     url.searchParams.get("businessId"),
@@ -38,19 +43,41 @@ export async function GET(request: Request) {
     return NextResponse.json({ posts: [], businessId: null })
   }
 
-  const rows = await db
-    .select()
-    .from(contentPost)
-    .where(
-      and(
-        eq(contentPost.businessId, access.businessId),
-        gte(contentPost.scheduledFor, start),
-        lt(contentPost.scheduledFor, end),
+  const monthKey = `${start.getUTCFullYear()}-${String(start.getUTCMonth() + 1).padStart(2, "0")}`
+
+  const [rows, jobs] = await Promise.all([
+    db
+      .select()
+      .from(contentPost)
+      .where(
+        and(
+          eq(contentPost.businessId, access.businessId),
+          gte(contentPost.scheduledFor, start),
+          lt(contentPost.scheduledFor, end),
+        ),
       ),
-    )
+    // The latest generation job for this month, so a user returning mid-run
+    // sees progress instead of an empty calendar with a Generate button.
+    db
+      .select()
+      .from(contentPlanJob)
+      .where(
+        and(
+          eq(contentPlanJob.businessId, access.businessId),
+          eq(contentPlanJob.month, monthKey),
+        ),
+      )
+      .orderBy(desc(contentPlanJob.createdAt))
+      .limit(1),
+  ])
+
+  // Recover jobs stranded by a killed instance; throttled, so this costs
+  // nothing on a normal load.
+  after(() => pumpContentPlanQueueIfDue())
 
   return NextResponse.json({
     posts: rows,
+    job: jobs[0] ? serializeJob(jobs[0]) : null,
     businessId: access.businessId,
     monthStart: start.toISOString(),
     monthEnd: end.toISOString(),

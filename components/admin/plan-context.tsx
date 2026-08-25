@@ -10,8 +10,9 @@ import {
 } from "react"
 import { UpgradeDialog } from "@/components/admin/upgrade-dialog"
 import { CongratsModal } from "@/components/admin/congrats-modal"
+import { planRank, type PlanId } from "@/lib/plan-tiers"
 
-export type Plan = "free" | "pro"
+export type Plan = PlanId
 
 interface PlanUsage {
   businesses: number
@@ -22,18 +23,36 @@ interface PlanUsage {
   aiImagesToday?: number
 }
 
+export type PlanCapability =
+  | "continueJob"
+  | "whatsappAutomation"
+  | "csvExport"
+  | "decisionMakers"
+
 interface PlanStatus {
   plan: Plan
+  isTrialing: boolean
+  window: "lifetime" | "month"
+  periodEnd: string | null
   usage: PlanUsage
-  limits: Record<string, number>
+  /** Unlimited caps arrive as null, because JSON cannot carry Infinity. */
+  limits: Record<string, number | null>
+  capabilities: Record<PlanCapability, boolean>
 }
 
 interface PlanContextValue extends Partial<PlanStatus> {
   plan: Plan
   loading: boolean
+  isPaid: boolean
   isPro: boolean
+  isTrialing: boolean
+  /** Whether the current tier unlocks a capability. */
+  can: (capability: PlanCapability) => boolean
   refresh: () => void
-  openUpgrade: () => void
+  /** `action` is the GateAction from a 402, used to preselect a tier. */
+  openUpgrade: (action?: string | null) => void
+  /** The gate action that triggered the currently open upgrade dialog. */
+  upgradeAction: string | null
 }
 
 const PlanContext = createContext<PlanContextValue | null>(null)
@@ -42,6 +61,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<PlanStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
+  const [upgradeAction, setUpgradeAction] = useState<string | null>(null)
   const [congratsOpen, setCongratsOpen] = useState(false)
 
   const refresh = useCallback(() => {
@@ -81,26 +101,48 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     return () => timers.forEach(clearTimeout)
   }, [refresh])
 
-  const openUpgrade = useCallback(() => setUpgradeOpen(true), [])
+  const openUpgrade = useCallback((action?: string | null) => {
+    setUpgradeAction(action ?? null)
+    setUpgradeOpen(true)
+  }, [])
 
-  const value = useMemo<PlanContextValue>(
-    () => ({
-      plan: status?.plan ?? "free",
+  const value = useMemo<PlanContextValue>(() => {
+    const plan = status?.plan ?? "free"
+    const capabilities = status?.capabilities
+    return {
+      plan,
+      isTrialing: status?.isTrialing ?? false,
+      window: status?.window,
+      periodEnd: status?.periodEnd,
       usage: status?.usage,
       limits: status?.limits,
+      capabilities,
       loading,
-      isPro: status?.plan === "pro",
+      isPaid: planRank(plan) > 0,
+      isPro: plan === "pro",
+      // Fall back to closed while the status request is in flight, so a paid
+      // feature never flashes open for a Free user on first paint.
+      can: (capability) => capabilities?.[capability] ?? false,
       refresh,
       openUpgrade,
-    }),
-    [status, loading, refresh, openUpgrade],
-  )
+      upgradeAction,
+    }
+  }, [status, loading, refresh, openUpgrade, upgradeAction])
 
   return (
     <PlanContext.Provider value={value}>
       {children}
-      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
-      <CongratsModal open={congratsOpen} onOpenChange={setCongratsOpen} />
+      <UpgradeDialog
+        open={upgradeOpen}
+        onOpenChange={setUpgradeOpen}
+        currentPlan={status?.plan ?? "free"}
+        action={upgradeAction}
+      />
+      <CongratsModal
+        open={congratsOpen}
+        onOpenChange={setCongratsOpen}
+        plan={status?.plan ?? "free"}
+      />
     </PlanContext.Provider>
   )
 }

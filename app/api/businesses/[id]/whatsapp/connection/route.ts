@@ -12,7 +12,7 @@ import {
   whatsappSignupNonce,
   whatsappTemplate,
 } from "@/lib/db/schema"
-import { getUserPlan } from "@/lib/plan"
+import { can, getUserPlan } from "@/lib/plan"
 import { getWhatsAppConnection, publicConnection } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { getBusinessAccess } from "@/lib/business-access"
@@ -74,8 +74,13 @@ export async function GET(
   const scope = await sessionAndBusiness(id, "view")
   if (scope.error) return scope.error
   const connection = await getWhatsAppConnection(id)
+  // Report the entitlement, not just the tier name: when a platform admin views
+  // someone else's business read-only, the client has no other way to know
+  // whether the *owner* can use WhatsApp.
+  const plan = await getUserPlan(scope.access.ownerUserId)
   return NextResponse.json({
-    plan: await getUserPlan(scope.access.ownerUserId),
+    plan,
+    canUseWhatsApp: can(plan, "whatsappAutomation"),
     connection: connection ? publicConnection(connection) : null,
   })
 }
@@ -87,8 +92,8 @@ export async function POST(
   const { id } = await params
   const scope = await sessionAndBusiness(id)
   if (scope.error) return scope.error
-  if (await getUserPlan(scope.session.user.id) !== "pro") {
-    return NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 })
+  if (!can(await getUserPlan(scope.session.user.id), "whatsappAutomation")) {
+    return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const parsed = connectSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success || !isValidTimezone(parsed.data?.timezone ?? "")) {
@@ -194,8 +199,8 @@ export async function PATCH(
   const { id } = await params
   const scope = await sessionAndBusiness(id)
   if (scope.error) return scope.error
-  if (await getUserPlan(scope.session.user.id) !== "pro") {
-    return NextResponse.json({ error: "WhatsApp automation requires Pro", code: "PLAN_LIMIT" }, { status: 402 })
+  if (!can(await getUserPlan(scope.session.user.id), "whatsappAutomation")) {
+    return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const parsed = settingsSchema.safeParse(await request.json().catch(() => null))
   if (

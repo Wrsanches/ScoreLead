@@ -35,35 +35,28 @@ function formatDate(date: string, locale: string) {
 function PlanCard({
   plan,
   page,
-  planId,
-  values,
+  rows,
   highlighted,
   footnote,
   className,
 }: {
   plan: PricingPlanCopy;
   page: MarketingPage;
-  planId: "free" | "pro";
-  values: Array<{
-    row: PricingRow;
-    value: string;
-    note?: string;
-    muted?: boolean;
-  }>;
+  rows: PricingRow[];
   highlighted?: boolean;
   footnote?: string;
   className?: string;
 }) {
   return (
     <article
-      className={`relative flex flex-col rounded-2xl border p-7 sm:p-9 ${
+      className={`relative flex flex-col rounded-2xl border p-6 sm:p-7 ${
         highlighted
           ? "border-emerald-400/40 bg-emerald-500/4"
           : "border-zinc-800 bg-zinc-900/30"
       }${className ? ` ${className}` : ""}`}
     >
       {plan.badge ? (
-        <p className="absolute -top-3 left-7 rounded-full bg-emerald-400 px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-950 sm:left-9">
+        <p className="absolute -top-3 left-6 rounded-full bg-emerald-400 px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-950 sm:left-7">
           {plan.badge}
         </p>
       ) : null}
@@ -71,41 +64,48 @@ function PlanCard({
       <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
         {plan.name}
       </h3>
-      <p className="mt-4 flex items-baseline gap-2">
-        <span className="text-5xl font-medium tracking-[-0.03em] text-white">
+      <p className="mt-4 flex flex-wrap items-baseline gap-x-2">
+        <span className="text-4xl font-medium tracking-[-0.03em] text-white">
           {plan.price}
         </span>
         <span className="text-sm text-zinc-500">{plan.cadence}</span>
       </p>
-      <p className="mt-4 min-h-0 text-pretty text-sm leading-6 text-zinc-400 lg:min-h-18">
+      {/* Reserve the line on every card so the price rows stay aligned. */}
+      <p className="mt-1 min-h-4 text-xs leading-4 text-emerald-400/90">
+        {plan.priceNote ?? "\u00A0"}
+      </p>
+      <p className="mt-3 text-pretty text-sm leading-6 text-zinc-400 lg:min-h-24">
         {plan.tagline}
       </p>
 
       <dl className="mt-6 divide-y divide-zinc-800/80 border-t border-zinc-800">
-        {values.map(({ row, value, note, muted }) => (
-          <div
-            key={row.label}
-            className="flex items-baseline justify-between gap-6 py-3"
-          >
-            <dt className="text-sm text-zinc-400">{row.label}</dt>
-            <dd className="text-right">
-              <span
-                className={
-                  muted
-                    ? "font-mono text-sm text-zinc-600"
-                    : "font-mono text-sm text-zinc-100"
-                }
-              >
-                {value}
-              </span>
-              {note ? (
-                <span className="block text-[11px] leading-4 text-zinc-500">
-                  {note}
+        {rows.map((row) => {
+          const cell = row.values[plan.id];
+          return (
+            <div
+              key={row.label}
+              className="flex items-baseline justify-between gap-3 py-3"
+            >
+              <dt className="text-xs leading-5 text-zinc-400">{row.label}</dt>
+              <dd className="shrink-0 text-right">
+                <span
+                  className={
+                    cell.muted
+                      ? "font-mono text-xs text-zinc-600"
+                      : "font-mono text-xs text-zinc-100"
+                  }
+                >
+                  {cell.value}
                 </span>
-              ) : null}
-            </dd>
-          </div>
-        ))}
+                {cell.note ? (
+                  <span className="block text-[11px] leading-4 text-zinc-500">
+                    {cell.note}
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+          );
+        })}
       </dl>
 
       {footnote ? (
@@ -119,12 +119,12 @@ function PlanCard({
           eventParams={{
             page_id: page.id,
             page_group: page.group,
-            plan: planId,
+            plan: plan.id,
           }}
           className={
             highlighted
-              ? "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
-              : "inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 px-5 py-3 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+              ? "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+              : "inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 py-3 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
           }
         >
           {plan.cta}
@@ -252,36 +252,25 @@ export function PricingPageView({
           className="px-6 pb-16 pt-14 sm:pb-20"
           aria-label={pricing.plansHeading}
         >
-          <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-            <div className="flex flex-col gap-2">
+          <div className="mx-auto grid max-w-7xl items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {pricing.plans.map((plan) => (
               <PlanCard
-                plan={pricing.free}
+                key={plan.id}
+                plan={plan}
                 page={page}
-                planId="free"
-                values={pricing.rows.map((row) => ({
-                  row,
-                  value: row.free,
-                  muted: row.mutedFree,
-                }))}
-                footnote={pricing.freeMeterNote}
-                className="flex-1"
+                rows={pricing.rows}
+                highlighted={plan.id === "growth"}
+                footnote={
+                  plan.id === "free"
+                    ? pricing.freeMeterNote
+                    : pricing.paidMeterNote
+                }
               />
-              <p className="px-1 text-center text-xs text-zinc-600">
-                {pricing.noCreditCard}
-              </p>
-            </div>
-            <PlanCard
-              plan={pricing.pro}
-              page={page}
-              planId="pro"
-              values={pricing.rows.map((row) => ({
-                row,
-                value: row.pro,
-                note: row.proNote,
-              }))}
-              highlighted
-            />
+            ))}
           </div>
+          <p className="mx-auto mt-5 max-w-7xl text-center text-xs text-zinc-600">
+            {pricing.noCreditCard}
+          </p>
         </section>
 
         <section

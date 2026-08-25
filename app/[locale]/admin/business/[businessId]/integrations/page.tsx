@@ -87,14 +87,18 @@ export default function IntegrationsPage({
   const { businessId } = use(params)
   const t = useTranslations("whatsapp")
   const td = useTranslations("dashboard")
-  const { isPro, openUpgrade } = usePlan()
+  const { can: planCan, openUpgrade } = usePlan()
   const { readOnly } = useBusinessAccess()
   const { data: session } = authClient.useSession()
   const integrationEnabled =
     WHATSAPP_INTEGRATION_CONFIGURED &&
     (readOnly || hasWhatsAppEarlyAccess(session?.user.email))
-  const [targetPlan, setTargetPlan] = useState<"free" | "pro" | null>(null)
-  const effectiveIsPro = readOnly ? targetPlan === "pro" : isPro
+  // When impersonating read-only, entitlement comes from the API (the owner's),
+  // otherwise from the viewer's own plan.
+  const [targetCanUseWhatsApp, setTargetCanUseWhatsApp] = useState(false)
+  const effectiveIsPro = readOnly
+    ? targetCanUseWhatsApp
+    : planCan("whatsappAutomation")
   const [connection, setConnection] = useState<Connection | null>(null)
   const [loading, setLoading] = useState(true)
   const [sdkReady, setSdkReady] = useState(false)
@@ -140,9 +144,9 @@ export default function IntegrationsPage({
       const response = await fetch(`/api/businesses/${businessId}/whatsapp/connection`)
       const body = await response.json()
       if (!response.ok) throw new Error(body.error || t("loadError"))
-      setTargetPlan(body.plan === "pro" ? "pro" : "free")
+      setTargetCanUseWhatsApp(Boolean(body.canUseWhatsApp))
       setConnection(body.connection)
-      if (body.connection?.status === "connected" && body.plan === "pro") {
+      if (body.connection?.status === "connected" && body.canUseWhatsApp) {
         await refreshTemplateCounts()
       }
     } catch (error) {
@@ -240,7 +244,7 @@ export default function IntegrationsPage({
     if (!integrationEnabled) return
 
     if (!effectiveIsPro) {
-      openUpgrade()
+      openUpgrade("whatsappAutomation")
       return
     }
     if (!sdkReady || !window.FB) {

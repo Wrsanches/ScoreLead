@@ -29,7 +29,7 @@ export default function NewDiscoveryJobPage() {
   const savedSearchId = searchParams.get("savedSearchId")
   // The business is fixed by the URL - this form always creates a job under it.
   const businessId = useBusinessId()
-  const { openUpgrade, isPro, loading: planLoading } = usePlan()
+  const { openUpgrade, limits, can, loading: planLoading } = usePlan()
 
   // Form state
   const [jobName, setJobName] = useState("")
@@ -200,14 +200,17 @@ export default function NewDiscoveryJobPage() {
     }
   }
 
-  // Free plans are capped at 10 leads per run and only get the 10 option;
-  // Pro unlocks the larger batches.
-  const isFreePlan = !planLoading && !isPro
-  const batchOptions = isFreePlan ? [10] : [10, 20, 50]
+  // Each tier caps leads per run; offer only the batch sizes it allows. An
+  // unlimited cap arrives as null, because JSON cannot carry Infinity.
+  const leadsPerJob = limits?.leadsPerJob
+  const leadCap = leadsPerJob == null ? Infinity : leadsPerJob
+  const batchOptions = [10, 20, 50].filter((n) => n <= leadCap)
+  const canRaiseCap = !planLoading && Number.isFinite(leadCap) && leadCap < 50
 
   useEffect(() => {
-    if (isFreePlan) setBatchSize(10)
-  }, [isFreePlan])
+    if (planLoading) return
+    setBatchSize((current) => (current > leadCap ? batchOptions.at(-1) ?? 10 : current))
+  }, [planLoading, leadCap])
 
   const canSubmit = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting
   const canSave = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting && !savingSearch
@@ -266,7 +269,7 @@ export default function NewDiscoveryJobPage() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         if (res.status === 402) {
-          openUpgrade()
+          openUpgrade(err.action)
         } else {
           toast.error(err.error || "Failed to start discovery")
         }
@@ -465,10 +468,10 @@ export default function NewDiscoveryJobPage() {
                       {n}
                     </button>
                   ))}
-                  {isFreePlan && (
+                  {canRaiseCap && (
                     <button
                       type="button"
-                      onClick={openUpgrade}
+                      onClick={() => openUpgrade("leadsPerJob")}
                       className="h-10 px-4 text-sm font-medium rounded-xl border border-dashed border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
                     >
                       Upgrade for more
@@ -476,9 +479,11 @@ export default function NewDiscoveryJobPage() {
                   )}
                 </div>
                 <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">
-                  {isFreePlan
-                    ? "Free plan finds up to 10 leads per job. Upgrade to Pro for larger batches and to continue jobs in the same area."
-                    : "Each run finds up to this many new leads. On Pro you can continue the job to discover more in the same area."}
+                  {canRaiseCap
+                    ? `Your plan finds up to ${leadCap} leads per run. Upgrade for larger batches and to continue jobs in the same area.`
+                    : can("continueJob")
+                      ? "Each run finds up to this many new leads. You can continue the job to discover more in the same area."
+                      : "Each run finds up to this many new leads. Upgrade to Growth to continue a job in the same area."}
                 </p>
               </div>
 

@@ -1,20 +1,38 @@
+import { and, desc, eq, inArray } from "drizzle-orm"
+import { headers } from "next/headers"
+import { NextResponse, after } from "next/server"
+import { z } from "zod"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { business, contentPost } from "@/lib/db/schema"
-import { and, eq, gte, isNull, lt, sql } from "drizzle-orm"
-import { headers } from "next/headers"
-import { NextResponse } from "next/server"
-import { z } from "zod"
-import { generateContentPlan } from "@/lib/services/content-calendar-generator"
-import { removePublicImage } from "@/lib/services/content-image-generator"
+import { business, contentPlanJob } from "@/lib/db/schema"
 import { resolveBusinessId } from "@/lib/active-business"
-import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
+import { assertCanUse, recordUsage, releaseUsage, PlanLimitError } from "@/lib/plan"
+import {
+  processContentPlanQueue,
+  serializeJob,
+} from "@/lib/jobs/content-plan-queue"
+
+/**
+ * Start an AI content-plan generation for a month.
+ *
+ * The work runs in a queue rather than in this request: generation is a single
+ * long LLM call, and doing it inline meant closing the tab lost the plan. This
+ * enqueues a job, returns 202, and the client polls
+ * `GET /api/content-calendar` (which carries the job) so leaving and coming back
+ * shows either the run in progress or the finished posts.
+ */
 
 const schema = z.object({
+  businessId: z.string().optional(),
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   postCount: z.number().int().min(4).max(40).optional(),
   replaceExisting: z.boolean().optional(),
 })
+
+function currentMonthKey(): string {
+  const now = new Date()
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`
+}
 
 export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -26,10 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
-  const activeBusinessId = await resolveBusinessId(
-    session.user.id,
-    body?.businessId,
-  )
+  const activeBusinessId = await resolveBusinessId(session.user.id, body?.businessId)
   if (!activeBusinessId) {
     return NextResponse.json(
       { error: "Complete onboarding before planning content." },
@@ -37,29 +52,43 @@ export async function POST(request: Request) {
     )
   }
   const [activeBusiness] = await db
-    .select()
+    .select({ id: business.id })
     .from(business)
     .where(
-      and(
-        eq(business.id, activeBusinessId),
-        eq(business.userId, session.user.id),
-      ),
+      and(eq(business.id, activeBusinessId), eq(business.userId, session.user.id)),
     )
   if (!activeBusiness) {
-    return NextResponse.json(
-      { error: "Active business not found" },
-      { status: 404 },
-    )
+    return NextResponse.json({ error: "Active business not found" }, { status: 404 })
   }
 
-  // Gate: Free allows 1 content plan generation total.
+  const month = parsed.data.month ?? currentMonthKey()
+
+  // Already generating this month? Hand back the running job instead of
+  // starting a second one. This is what makes the button safe to press again
+  // after a reload, and it costs no extra plan credit.
+  const [existing] = await db
+    .select()
+    .from(contentPlanJob)
+    .where(
+      and(
+        eq(contentPlanJob.businessId, activeBusiness.id),
+        eq(contentPlanJob.month, month),
+        inArray(contentPlanJob.status, ["queued", "running"]),
+      ),
+    )
+    .orderBy(desc(contentPlanJob.createdAt))
+  if (existing) {
+    after(() => processContentPlanQueue())
+    return NextResponse.json({ job: serializeJob(existing) }, { status: 202 })
+  }
+
   try {
     await assertCanUse(session.user.id, "contentPlan")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
-          error: "You've used your free content plan. Upgrade to Pro for unlimited plans.",
+          error: "You've used your content plans for this period. Upgrade for more.",
           code: "PLAN_LIMIT",
           action: e.action,
         },
@@ -69,125 +98,52 @@ export async function POST(request: Request) {
     throw e
   }
 
-  const now = new Date()
-  let year = now.getUTCFullYear()
-  let month = now.getUTCMonth()
-  if (parsed.data.month) {
-    const [y, m] = parsed.data.month.split("-").map(Number)
-    year = y
-    month = m - 1
-  }
-  const start = new Date(Date.UTC(year, month, 1, 0, 0, 0))
-  const end = new Date(Date.UTC(year, month + 1, 1, 0, 0, 0))
-
-  // When the caller doesn't pass postCount, pass undefined through so the
-  // model chooses a number tuned to the business profile and month length.
-  const postCount = parsed.data.postCount
-
-  const plan = await generateContentPlan(
-    {
-      name: activeBusiness.name,
-      description: activeBusiness.description,
-      persona: activeBusiness.persona,
-      clientPersona: activeBusiness.clientPersona,
-      field: activeBusiness.field,
-      category: activeBusiness.category,
-      tags: activeBusiness.tags,
-      services: activeBusiness.services,
-      location: activeBusiness.location,
-      language: activeBusiness.language,
-      brandStyle: activeBusiness.brandStyle,
-      brandColorPrimary: activeBusiness.brandColorPrimary,
-      brandColorSecondary: activeBusiness.brandColorSecondary,
-      instagram: activeBusiness.instagram,
-    },
-    start,
-    end,
-    postCount,
-  )
-
-  if (plan.length === 0) {
-    return NextResponse.json(
-      { error: "Content generation failed. Try again." },
-      { status: 502 },
-    )
-  }
-
-  if (parsed.data.replaceExisting) {
-    // Only drop posts that are clearly "untouched AI drafts": aiGenerated,
-    // still draft status, no images attached, and never edited beyond their
-    // original insert (updatedAt within ~30s of createdAt). User-edited posts
-    // stay put even when the user clicks "Regenerate".
-    const stale = await db
-      .select()
-      .from(contentPost)
-      .where(
-        and(
-          eq(contentPost.userId, session.user.id),
-          eq(contentPost.businessId, activeBusiness.id),
-          eq(contentPost.aiGenerated, true),
-          eq(contentPost.status, "draft"),
-          isNull(contentPost.images),
-          gte(contentPost.scheduledFor, start),
-          lt(contentPost.scheduledFor, end),
-          sql`${contentPost.updatedAt} <= ${contentPost.createdAt} + interval '30 seconds'`,
-        ),
-      )
-    if (stale.length > 0) {
-      await Promise.all(
-        stale.flatMap((p) =>
-          (p.images ?? []).map((img) => removePublicImage(img.url)),
-        ),
-      )
-      await db.delete(contentPost).where(
-        and(
-          eq(contentPost.userId, session.user.id),
-          eq(contentPost.businessId, activeBusiness.id),
-          eq(contentPost.aiGenerated, true),
-          eq(contentPost.status, "draft"),
-          isNull(contentPost.images),
-          gte(contentPost.scheduledFor, start),
-          lt(contentPost.scheduledFor, end),
-          sql`${contentPost.updatedAt} <= ${contentPost.createdAt} + interval '30 seconds'`,
-        ),
-      )
-    }
-  }
-
-  const toInsert = plan.map((p) => ({
-    id: crypto.randomUUID(),
-    userId: session.user.id,
-    businessId: activeBusiness.id,
-    provider: "instagram",
-    scheduledFor: p.scheduledFor,
-    postType: p.postType,
-    pillar: p.pillar,
-    caption: p.caption,
-    hashtags: p.hashtags,
-    visualIdea: p.visualIdea,
-    callToAction: p.callToAction,
-    status: "draft",
-    aiGenerated: true,
-  }))
-
-  await db.insert(contentPost).values(toInsert)
+  // Charge on enqueue so concurrent requests can't both slip past the cap; the
+  // worker refunds via releaseUsage if the job ultimately fails.
   await recordUsage(session.user.id, "contentPlan")
 
-  const inserted = await db
-    .select()
-    .from(contentPost)
-    .where(
-      and(
-        eq(contentPost.userId, session.user.id),
-        eq(contentPost.businessId, activeBusiness.id),
-        gte(contentPost.scheduledFor, start),
-        lt(contentPost.scheduledFor, end),
-      ),
-    )
+  const jobId = crypto.randomUUID()
+  try {
+    await db.insert(contentPlanJob).values({
+      id: jobId,
+      businessId: activeBusiness.id,
+      userId: session.user.id,
+      month,
+      postCount: parsed.data.postCount ?? null,
+      replaceExisting: parsed.data.replaceExisting ?? false,
+      status: "queued",
+    })
+  } catch (e) {
+    // Lost a race against a concurrent request: the partial unique index on
+    // (businessId, month) WHERE status IN ('queued','running') rejected us.
+    // Give the credit back and return the job that won.
+    await releaseUsage(session.user.id, "contentPlan").catch(() => {})
+    const [winner] = await db
+      .select()
+      .from(contentPlanJob)
+      .where(
+        and(
+          eq(contentPlanJob.businessId, activeBusiness.id),
+          eq(contentPlanJob.month, month),
+          inArray(contentPlanJob.status, ["queued", "running"]),
+        ),
+      )
+      .orderBy(desc(contentPlanJob.createdAt))
+    if (winner) {
+      after(() => processContentPlanQueue())
+      return NextResponse.json({ job: serializeJob(winner) }, { status: 202 })
+    }
+    throw e
+  }
 
-  return NextResponse.json({
-    posts: inserted,
-    monthStart: start.toISOString(),
-    monthEnd: end.toISOString(),
-  })
+  const [job] = await db
+    .select()
+    .from(contentPlanJob)
+    .where(eq(contentPlanJob.id, jobId))
+
+  // The job is queued; the pump claims and runs it after this response is sent,
+  // so it survives the client navigating away or closing the tab.
+  after(() => processContentPlanQueue())
+
+  return NextResponse.json({ job: serializeJob(job) }, { status: 202 })
 }

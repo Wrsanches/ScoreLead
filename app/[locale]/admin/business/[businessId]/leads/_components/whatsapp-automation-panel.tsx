@@ -101,7 +101,8 @@ export function WhatsAppAutomationPanel({
   phone?: string | null
 }) {
   const t = useTranslations("whatsapp")
-  const { isPro, openUpgrade } = usePlan()
+  const { can: planCan, openUpgrade } = usePlan()
+  const isPro = planCan("whatsappAutomation")
   const { data: session } = authClient.useSession()
   const integrationEnabled =
     process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
@@ -361,7 +362,7 @@ export function WhatsAppAutomationPanel({
 
       {!isPro ? (
         <Notice icon={ShieldCheck} text={t("proRequired")}>
-          <Button size="sm" onClick={openUpgrade}>{t("upgradeButton")}</Button>
+          <Button size="sm" onClick={() => openUpgrade("whatsappAutomation")}>{t("upgradeButton")}</Button>
         </Notice>
       ) : !connected ? (
         <Notice icon={ExternalLink} text={t("connectionRequired")}>

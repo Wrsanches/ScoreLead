@@ -114,7 +114,8 @@ export default function DiscoveryJobsPage() {
         toast.success("Finding more leads...")
         await fetchJobs() // status flips to queued -> polling reactivates
       } else if (res.status === 402) {
-        openUpgrade()
+        const err = await res.json().catch(() => ({}))
+        openUpgrade(err.action)
       } else {
         const err = await res.json().catch(() => ({}))
         toast.error(err.error || "Could not continue this job")
