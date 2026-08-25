@@ -51,6 +51,6 @@ export const config = {
   matcher: [
     "/robots.txt",
     "/sitemap.xml",
-    "/((?!api|_next|_vercel|.*\\..*).*)",
+    "/((?!api|cdn-cgi|_next|_vercel|.*\\..*).*)",
   ],
 }

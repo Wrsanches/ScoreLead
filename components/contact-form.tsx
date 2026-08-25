@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, ArrowRight, Check, ChevronDown, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
+import { trackMarketingEvent } from "@/lib/analytics-events"
 import {
   createContactSchema,
   inquiryTypes,
@@ -94,6 +95,10 @@ export function ContactForm() {
         return
       }
 
+      trackMarketingEvent("generate_lead", {
+        form: "contact",
+        inquiry_type: values.inquiryType,
+      })
       reset(defaultValues)
       setSubmitted(true)
     } catch {
@@ -150,13 +155,7 @@ export function ContactForm() {
         </div>
 
         <div className="mt-8">
-          <a
-            href="mailto:hello@scorelead.io"
-            className="rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-          >
-            hello@scorelead.io
-          </a>
-          <p className="mt-1.5 text-xs text-zinc-600">{t("responseTime")}</p>
+          <p className="text-xs text-zinc-600">{t("responseTime")}</p>
         </div>
       </aside>
 

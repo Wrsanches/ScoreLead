@@ -28,7 +28,7 @@ export function WaitlistSection() {
         body: JSON.stringify({ email: data.email }),
       })
       if (!res.ok) throw new Error("Failed")
-      trackMarketingEvent("lead_capture_completed", { form: "homepage_sales" })
+      trackMarketingEvent("generate_lead", { form: "homepage_sales" })
       setSubmitted(true)
     } catch {
       setError(t("error"))

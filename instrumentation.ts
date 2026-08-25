@@ -26,5 +26,8 @@ export async function register() {
     } catch (error) {
       console.error("[instrumentation] queue pump setup failed:", error)
     }
+
+    const { submitIndexableUrlsOnStartup } = await import("@/lib/indexnow-startup")
+    await submitIndexableUrlsOnStartup()
   }
 }

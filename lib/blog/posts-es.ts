@@ -2,7 +2,7 @@ import type { BlogTranslation } from "./types"
 
 export const spanishPosts: Record<string, BlogTranslation> = {
   "ai-lead-generation-guide": {
-    title: "Generación de Leads con IA: Guía Práctica para Equipos B2B",
+    title: "Guía de Generación de Leads con IA B2B",
     description:
       "Aprende a usar IA para definir un mercado, descubrir cuentas, calificar el ajuste y preparar outreach relevante sin perder el criterio humano.",
     category: "Generación de leads con IA",
@@ -60,7 +60,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-lead-scoring-model": {
-    title: "Cómo Crear un Modelo de Lead Scoring B2B Confiable",
+    title: "Modelo de Lead Scoring B2B: Guía Práctica",
     description:
       "Crea un modelo transparente de lead scoring B2B que combine ICP, evidencia de cuenta, engagement, disposición y feedback de ventas.",
     category: "Lead scoring",
@@ -119,7 +119,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "ideal-customer-profile-guide": {
-    title: "Cómo Definir el Perfil de Cliente Ideal para Prospección B2B",
+    title: "Perfil de Cliente Ideal para Prospección B2B",
     description:
       "Convierte evidencia de clientes en un ICP B2B accionable con criterios de ajuste, descalificadores, segmentos prioritarios y feedback.",
     category: "Estrategia de ICP",
@@ -237,7 +237,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "sales-prospecting-automation": {
-    title: "Automatización de Prospección sin Perder Relevancia",
+    title: "Automatización de Prospección B2B",
     description:
       "Diseña un flujo que escale investigación y priorización manteniendo calificación, personalización y revisión humana.",
     category: "Automatización comercial",
@@ -296,7 +296,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "personalized-b2b-outreach": {
-    title: "Outreach B2B Personalizado: de la Investigación al Mensaje",
+    title: "Outreach B2B Personalizado con Relevancia",
     description:
       "Crea outreach B2B personalizado conectando investigación verificada con un problema específico, valor útil y seguimientos respetuosos.",
     category: "Outreach B2B",
@@ -414,7 +414,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-sales-pipeline-guide": {
-    title: "Cómo Construir un Pipeline B2B del Mercado a la Oportunidad",
+    title: "Pipeline de Ventas B2B: Etapas y Métricas",
     description:
       "Diseña un pipeline B2B medible que conecte cuentas objetivo, calificación, outreach, conversaciones, oportunidades y aprendizaje.",
     category: "Estrategia de pipeline",
@@ -473,7 +473,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "crm-data-quality-guide": {
-    title: "Calidad de Datos en el CRM: Guía para Leads Listos para Ventas",
+    title: "Calidad de Datos del CRM para Ventas",
     description:
       "Mejora la calidad del CRM con responsabilidad clara, validación, deduplicación, fuentes y reglas de actualización.",
     category: "Calidad de datos",
@@ -532,7 +532,7 @@ export const spanishPosts: Record<string, BlogTranslation> = {
     },
   },
   "multilingual-b2b-prospecting": {
-    title: "Prospección B2B Multilingüe: Cómo Entrar en Nuevos Mercados",
+    title: "Prospección B2B Multilingüe para Nuevos Mercados",
     description:
       "Planifica prospección B2B multilingüe con targeting localizado, investigación, mensajes naturales, compliance y resultados comparables.",
     category: "Prospección global",

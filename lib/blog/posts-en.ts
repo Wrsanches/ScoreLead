@@ -2,7 +2,7 @@ import type { BlogTranslation } from "./types"
 
 export const englishPosts: Record<string, BlogTranslation> = {
   "ai-lead-generation-guide": {
-    title: "AI Lead Generation: A Practical Guide for B2B Teams",
+    title: "AI Lead Generation Guide for B2B Teams",
     description:
       "Learn how to use AI lead generation to define a market, discover target accounts, qualify fit, and prepare relevant outreach without losing human judgment.",
     category: "AI lead generation",
@@ -60,7 +60,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-lead-scoring-model": {
-    title: "How to Build a B2B Lead Scoring Model Your Sales Team Trusts",
+    title: "B2B Lead Scoring Model: A Practical Guide",
     description:
       "Build a transparent B2B lead scoring model that combines ideal-customer fit, account evidence, engagement, readiness, and sales feedback.",
     category: "Lead scoring",
@@ -119,7 +119,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "ideal-customer-profile-guide": {
-    title: "How to Define an Ideal Customer Profile for B2B Prospecting",
+    title: "Ideal Customer Profile for B2B Prospecting",
     description:
       "Turn customer evidence into an actionable B2B ideal customer profile with fit criteria, disqualifiers, priority segments, and a feedback loop.",
     category: "ICP strategy",
@@ -178,7 +178,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "lead-enrichment-guide": {
-    title: "B2B Lead Enrichment: What Data Matters and How to Use It",
+    title: "B2B Lead Enrichment: A Practical Guide",
     description:
       "Learn which B2B lead enrichment fields improve qualification and outreach, how to manage source confidence, and how to keep account data useful.",
     category: "Lead enrichment",
@@ -237,7 +237,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "sales-prospecting-automation": {
-    title: "Sales Prospecting Automation Without Losing Relevance",
+    title: "Sales Prospecting Automation: Workflow and Tools",
     description:
       "Design a sales prospecting automation workflow that scales research and prioritization while keeping qualification, personalization, and human review intact.",
     category: "Sales automation",
@@ -296,7 +296,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "personalized-b2b-outreach": {
-    title: "Personalized B2B Outreach: From Account Research to Relevant Messages",
+    title: "Personalized B2B Outreach That Earns Replies",
     description:
       "Create personalized B2B outreach that connects verified account research to a specific problem, useful value proposition, and respectful follow-up.",
     category: "B2B outreach",
@@ -355,7 +355,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "manual-lead-research-vs-automation": {
-    title: "Manual Lead Research vs. Automation: What Should You Automate?",
+    title: "Manual Lead Research vs. Automation",
     description:
       "Compare manual lead research with automated discovery and learn how to divide work across research, enrichment, qualification, and outreach.",
     category: "Workflow design",
@@ -414,7 +414,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-sales-pipeline-guide": {
-    title: "How to Build a B2B Sales Pipeline From Target Market to Opportunity",
+    title: "B2B Sales Pipeline: Stages and Metrics",
     description:
       "Design a measurable B2B sales pipeline that connects target accounts, qualification, outreach, conversations, opportunities, and learning.",
     category: "Pipeline strategy",
@@ -473,7 +473,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "crm-data-quality-guide": {
-    title: "CRM Data Quality: A Practical Guide to Sales-Ready Lead Data",
+    title: "CRM Data Quality for Sales-Ready Leads",
     description:
       "Improve CRM data quality with clear ownership, validation, deduplication, source tracking, freshness rules, and a sales-ready account standard.",
     category: "Data quality",
@@ -532,7 +532,7 @@ export const englishPosts: Record<string, BlogTranslation> = {
     },
   },
   "multilingual-b2b-prospecting": {
-    title: "Multilingual B2B Prospecting: How to Enter New Markets With Relevance",
+    title: "Multilingual B2B Prospecting for New Markets",
     description:
       "Plan multilingual B2B prospecting with localized targeting, market-aware research, natural messaging, compliance checks, and comparable results.",
     category: "Global prospecting",

@@ -26,12 +26,12 @@ export function Footer() {
               <ScoreLeadLogo className="w-5 h-5 text-white" />
               <span className="text-white font-semibold text-sm">ScoreLead</span>
             </div>
-            <a
-              href="mailto:hello@scorelead.io"
+            <Link
+              href="/contact"
               className="mt-4 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-300"
             >
-              hello@scorelead.io
-            </a>
+              {contactLabel}
+            </Link>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (

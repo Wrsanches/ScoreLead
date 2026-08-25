@@ -16,6 +16,7 @@ export type MarketingEventName =
   | "onboarding_completed"
   | "discovery_completed"
   | "subscription_started"
+  | "generate_lead"
   | "lead_capture_completed"
   | "qualified_account"
   | "customer_conversion"

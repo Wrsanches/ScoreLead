@@ -3,7 +3,7 @@ import type { MarketingPageTranslation } from "./types"
 export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   "feature-ai-lead-discovery": {
     eyebrow: "Feature · Account discovery",
-    title: "AI lead discovery built around your actual market",
+    title: "AI Lead Discovery for Your Target Market",
     description:
       "Find B2B companies by market, geography, service, and account profile, then keep the evidence that explains why each company belongs in your pipeline.",
     answer:
@@ -43,11 +43,11 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "feature-lead-scoring": {
     eyebrow: "Feature · Prioritization",
-    title: "Transparent B2B lead scoring your team can challenge",
+    title: "AI Lead Scoring Software for B2B Sales",
     description:
-      "Prioritize accounts across fit, reach, trust, engagement potential, and readiness while preserving the evidence behind every score.",
+      "Prioritize B2B accounts with transparent AI lead scoring software that keeps fit, reach, trust, engagement, readiness, and source evidence visible.",
     answer:
-      "ScoreLead scoring is a prioritization layer, not an automatic verdict. It turns observable account signals into a consistent review queue and keeps each dimension visible so sales can understand, override, and improve the model.",
+      "ScoreLead is B2B lead scoring software for teams that need explainable account prioritization. It turns observable company signals into a consistent review queue while keeping every scoring dimension visible so sales can understand, challenge, and improve the model.",
     highlights: [
       "Separate company fit from timing and readiness.",
       "See dimension-level evidence instead of one opaque number.",
@@ -55,22 +55,23 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ],
     sections: [
       {
-        heading: "Score the signals connected to your offer",
+        heading: "Use lead scoring software around your real ICP",
         paragraphs: [
-          "The model evaluates the dimensions ScoreLead can observe and explain. Teams should treat hard requirements as gates and use softer signals to rank the accounts that remain.",
+          "Start with the company conditions tied to customer value, then separate hard requirements from ranking signals. ScoreLead evaluates the dimensions it can observe and explain instead of treating every available field as predictive.",
         ],
+        points: ["Company fit", "Reach", "Trust", "Engagement potential", "Readiness"],
       },
       {
-        heading: "Keep uncertainty visible",
+        heading: "Keep every AI score explainable",
         paragraphs: [
-          "Missing data should not quietly become a negative score. Unknown fields stay distinguishable from weak evidence so representatives know when an account needs more research.",
+          "Each account keeps dimension-level evidence beside the total. Missing data does not quietly become a negative score, and unknown fields remain distinguishable from weak signals so representatives know when an account needs more research.",
         ],
-        points: ["Market fit", "Online reach", "Trust signals", "Engagement potential", "Readiness"],
+        points: ["Visible dimensions", "Source-aware evidence", "Unknown-value handling", "Human overrides"],
       },
       {
-        heading: "Calibrate against sales outcomes",
+        heading: "Calibrate scoring against sales outcomes",
         paragraphs: [
-          "Compare scores with accepted accounts, replies, opportunities, and rejection reasons. False positives and false negatives are the evidence needed to improve prioritization.",
+          "Compare scores with accepted accounts, replies, opportunities, customers, and rejection reasons. False positives and false negatives reveal whether the model, ICP, or source data needs to change.",
         ],
       },
     ],
@@ -83,11 +84,11 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "feature-lead-enrichment": {
     eyebrow: "Feature · Account intelligence",
-    title: "Lead enrichment that makes account data useful",
+    title: "B2B Lead Enrichment Software",
     description:
-      "Turn a company name and domain into structured, source-aware context for qualification, routing, personalization, and CRM export.",
+      "Turn a company name and domain into sourced B2B lead enrichment for qualification, routing, personalization, CRM export, and account research.",
     answer:
-      "B2B lead enrichment should reduce uncertainty, not maximize field count. ScoreLead organizes identity, fit, problem, reachability, and personalization signals while retaining the source context needed for verification.",
+      "ScoreLead is B2B lead enrichment software designed to reduce uncertainty rather than maximize field count. It organizes identity, fit, problem, reachability, and personalization signals while retaining the source context needed for verification.",
     highlights: [
       "Collect useful company, service, location, and public-contact context.",
       "Normalize fields for filtering without erasing the original evidence.",
@@ -95,22 +96,22 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ],
     sections: [
       {
-        heading: "Enrich for a decision",
+        heading: "Enrich B2B leads for a specific decision",
         paragraphs: [
-          "Every field should help determine fit, explain a problem hypothesis, support contact planning, or improve a message. Unused data creates maintenance work without improving sales decisions.",
+          "Every enrichment field should help determine fit, explain a problem hypothesis, support contact planning, or improve a message. Unused data creates maintenance work without improving sales decisions.",
         ],
       },
       {
-        heading: "Preserve provenance",
+        heading: "Preserve sources, dates, and uncertainty",
         paragraphs: [
-          "Web data changes. Source URLs, observation dates, and confidence labels help representatives verify important details before using them in outreach.",
+          "Web data changes. Source URLs, observation dates, original values, and confidence labels help representatives verify important details before using enriched data in qualification or outreach.",
         ],
         points: ["Identity", "Fit", "Problem evidence", "Reachability", "Personalization"],
       },
       {
-        heading: "Export cleaner records",
+        heading: "Export cleaner, CRM-ready account records",
         paragraphs: [
-          "Consistent formats and duplicate detection make enriched accounts easier to filter and move into a CRM while keeping the underlying context available for review.",
+          "Consistent formats and duplicate detection make enriched accounts easier to filter and move into a CRM while keeping the underlying evidence available for review.",
         ],
       },
     ],
@@ -123,7 +124,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "feature-outreach-automation": {
     eyebrow: "Feature · Sales outreach",
-    title: "Outreach automation with account-specific context",
+    title: "B2B Outreach Automation with Context",
     description:
       "Draft multi-step B2B outreach from verified account evidence, with human review before a message is used or scheduled.",
     answer:
@@ -203,7 +204,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "use-case-agencies": {
     eyebrow: "Use case · Agencies",
-    title: "Lead generation for agencies managing multiple markets",
+    title: "B2B Lead Generation for Agencies",
     description:
       "Create focused account searches for each client or service line, standardize qualification, and prepare relevant outreach without mixing market assumptions.",
     answer:
@@ -283,7 +284,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "use-case-b2b-startups": {
     eyebrow: "Use case · Startups",
-    title: "Founder-led lead generation that learns with every conversation",
+    title: "Founder-Led B2B Lead Generation",
     description:
       "Test narrow B2B market hypotheses, find companies that match, and preserve the evidence needed to learn from early sales conversations.",
     answer:
@@ -323,7 +324,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "use-case-b2b-companies": {
     eyebrow: "Use case · Established B2B companies",
-    title: "Repeatable account discovery across teams and regions",
+    title: "B2B Account Discovery Across Teams",
     description:
       "Expand B2B prospecting into new segments or geographies while preserving qualification standards, source context, and local messaging.",
     answer:
@@ -481,11 +482,105 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Discover companies with the criteria and source context attached.",
     ctaLabel: "Start fresh discovery",
   },
+  "compare-best-lead-scoring-software": {
+    eyebrow: "Comparison · Lead scoring",
+    title: "Best Lead Scoring Software for B2B Teams",
+    description:
+      "Compare B2B lead scoring software by explainability, data coverage, workflow fit, calibration, integrations, and the decisions each product supports.",
+    answer:
+      "The best lead scoring software is the product that matches your buying motion and makes its prioritization useful to sales. CRM-native scoring suits teams with deep activity history; intent platforms emphasize buying signals; ScoreLead is designed for source-aware account discovery, enrichment, and explainable scoring before outreach.",
+    highlights: [
+      "Choose the scoring category that matches your available data.",
+      "Require visible signals, unknown-value handling, and calibration controls.",
+      "Pilot against accepted accounts and real pipeline outcomes before scaling.",
+    ],
+    sections: [
+      {
+        heading: "Define what the score must decide",
+        paragraphs: [
+          "Clarify whether the score should route inbound leads, prioritize target accounts, detect active buying behavior, or rank a newly discovered market. A product can be strong in one of those jobs and weak in another.",
+        ],
+        points: ["Inbound routing", "Account prioritization", "Intent detection", "Market discovery"],
+      },
+      {
+        heading: "Compare evidence and explainability",
+        paragraphs: [
+          "Ask which signals contribute to the score, how missing values behave, whether sales can inspect the evidence, and how overrides are recorded. A precise-looking number is not useful when the team cannot explain or improve it.",
+        ],
+      },
+      {
+        heading: "Evaluate workflow and integration fit",
+        paragraphs: [
+          "Review where scoring happens, which data must already exist, how accounts reach the CRM, and whether the product supports the regions and languages you sell into. Include implementation and data-maintenance work in the comparison.",
+        ],
+        points: ["Required data", "CRM handoff", "Regional coverage", "Human review"],
+      },
+      {
+        heading: "Run a measurable pilot",
+        paragraphs: [
+          "Test a controlled segment and compare accepted-account rate, research time, false positives, opportunities, and rejection reasons. Avoid selecting software from feature count alone.",
+        ],
+      },
+    ],
+    proofLabel: "Comparison methodology",
+    proof:
+      "ScoreLead is included in this comparison and therefore has a commercial interest. The framework avoids unverifiable rankings and focuses on observable product fit, evidence quality, implementation requirements, and measurable pilot outcomes.",
+    ctaTitle: "Test explainable scoring on a focused account segment.",
+    ctaDescription: "Keep the evidence behind every score and compare the result with your current workflow.",
+    ctaLabel: "Try ScoreLead scoring",
+  },
+  "compare-b2b-lead-enrichment-tools": {
+    eyebrow: "Comparison · Data enrichment",
+    title: "B2B Lead Enrichment Tools: Evaluation Guide",
+    description:
+      "Evaluate B2B lead enrichment tools by coverage, provenance, freshness, field accuracy, workflow fit, compliance controls, and total usable-record cost.",
+    answer:
+      "The best B2B lead enrichment tool is the one that returns decision-ready data for your market with enough source context to verify important fields. Database providers emphasize broad structured coverage; research automation offers flexible web collection; ScoreLead combines public account discovery, enrichment evidence, scoring, and review in one workflow.",
+    highlights: [
+      "Measure usable and verified records instead of raw field count.",
+      "Test coverage separately for each target market and company segment.",
+      "Keep sources, dates, unknown values, and compliance review visible.",
+    ],
+    sections: [
+      {
+        heading: "Start with the decision and required fields",
+        paragraphs: [
+          "List the minimum identity, fit, reachability, and personalization fields needed at each workflow stage. Buying a larger dataset does not improve results when most fields are never used.",
+        ],
+        points: ["Identity", "Company fit", "Reachability", "Personalization evidence"],
+      },
+      {
+        heading: "Test coverage and accuracy on your market",
+        paragraphs: [
+          "Use a representative sample across countries, company sizes, and segments. Verify important values against primary company sources and record missing, stale, inferred, and incorrect fields separately.",
+        ],
+      },
+      {
+        heading: "Compare provenance and maintenance",
+        paragraphs: [
+          "Check whether the tool exposes sources and observation dates, supports corrections, prevents duplicates, and refreshes fast-changing fields. These controls determine how much manual verification remains after enrichment.",
+        ],
+        points: ["Source URLs", "Observation dates", "Confidence labels", "Refresh policy"],
+      },
+      {
+        heading: "Calculate cost per usable account",
+        paragraphs: [
+          "Include provider fees, credits, failed lookups, verification time, duplicate cleanup, integration work, and the share of records sales actually accepts. Cost per row hides the operational cost of weak data.",
+        ],
+      },
+    ],
+    proofLabel: "Fair evaluation",
+    proof:
+      "ScoreLead is one of the tools being evaluated. This guide does not claim universal superiority; coverage, accuracy, and value vary by market, provider, source availability, workflow, and intended use.",
+    ctaTitle: "Evaluate enrichment with your own account sample.",
+    ctaDescription: "Discover, enrich, score, and review B2B companies while keeping source context attached.",
+    ctaLabel: "Try B2B enrichment",
+  },
   "case-study-ceramik": {
     eyebrow: "Customer story · Ceramik",
-    title: "How Ceramik expanded a focused prospecting pipeline",
+    title: "Ceramik: A Focused B2B Prospecting Case Study",
     description:
-      "A transparent account of how Ceramik used ScoreLead to discover pottery studios, reduce manual research, and expand its pipeline during an initial 30-day period.",
+      "How Ceramik used ScoreLead to discover pottery studios, reduce manual research, and expand a focused prospecting pipeline during its first 30 days.",
     answer:
       "In a customer-reported comparison with its previous manual workflow, Ceramik attributes 2,450 discovered company leads, 10× pipeline growth, and 85% less research time to its first 30 days using ScoreLead. These figures are directional customer evidence, not independently audited performance measurements.",
     highlights: [
@@ -536,7 +631,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "company-pricing": {
     eyebrow: "Pricing",
-    title: "Start free. Upgrade when the workflow proves useful.",
+    title: "ScoreLead Pricing: Start Free",
     description:
       "Use ScoreLead’s core workflow on the Free plan, try Starter for $2.95, then move up as discovery, outreach, and automation volume grows.",
     answer:
@@ -590,7 +685,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "company-security": {
     eyebrow: "Security and trust",
-    title: "How ScoreLead approaches data and account security",
+    title: "ScoreLead Data and Account Security",
     description:
       "A plain-language overview of authentication, transport protections, access boundaries, data providers, and the responsibilities shared with customers.",
     answer:
@@ -617,7 +712,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
       {
         heading: "Report a concern",
         paragraphs: [
-          "Send suspected vulnerabilities or security questions to hello@scorelead.io with enough detail to reproduce the issue. Do not access, change, or retain data that is not yours.",
+          "Send suspected vulnerabilities or security questions through the ScoreLead contact page with enough detail to reproduce the issue. Do not access, change, or retain data that is not yours.",
         ],
       },
     ],
@@ -670,7 +765,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "company-editorial-policy": {
     eyebrow: "Editorial standards",
-    title: "How ScoreLead researches, writes, and updates content",
+    title: "ScoreLead Editorial Standards",
     description:
       "The standards used for product claims, educational guidance, sources, AI assistance, translations, corrections, and customer evidence.",
     answer:
@@ -697,7 +792,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
       {
         heading: "Corrections and updates",
         paragraphs: [
-          "Readers can send corrections to hello@scorelead.io. Material corrections update the visible review date; dates are not changed merely to make old content look fresh.",
+          "Readers can send corrections through the ScoreLead contact page. Material corrections update the visible review date; dates are not changed merely to make old content look fresh.",
         ],
       },
     ],
@@ -718,7 +813,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     highlights: [
       "Covers B2B prospecting operations and ScoreLead product workflows.",
       "Uses visible publication dates, sources, and methodology notes.",
-      "Accepts corrections at hello@scorelead.io.",
+      "Accepts corrections through the ScoreLead contact page.",
     ],
     sections: [
       {
@@ -750,7 +845,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "tool-icp-worksheet": {
     eyebrow: "Free tool · ICP worksheet",
-    title: "Turn your ideal customer profile into usable search criteria",
+    title: "Build a Usable B2B ICP Worksheet",
     description:
       "Build a compact B2B ICP with required conditions, preferred signals, disqualifiers, problem evidence, and a clear learning plan.",
     answer:
@@ -818,9 +913,9 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "tool-enrichment-checklist": {
     eyebrow: "Free tool · Data checklist",
-    title: "Check whether a B2B account is ready for qualification",
+    title: "B2B Lead Enrichment Checklist",
     description:
-      "Review identity, fit, problem, reachability, provenance, and freshness before data enters outreach or a CRM.",
+      "Review identity, fit, problem, reachability, provenance, and freshness with a free B2B lead enrichment checklist before outreach or CRM import.",
     answer:
       "A complete-looking record is not necessarily useful. This checklist focuses on fields that support a sales decision and the source details needed to verify them.",
     highlights: ["Decision-focused fields", "Progress indicator", "No data is submitted"],
@@ -855,7 +950,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     eyebrow: "Free tool · ROI model",
     title: "Estimate the cost of manual B2B lead research",
     description:
-      "Model monthly research cost, recoverable hours, and the break-even value of a more automated workflow.",
+      "Model monthly B2B lead research cost, recoverable hours, and the break-even value of a more automated prospecting workflow.",
     answer:
       "This calculator converts team size, weekly research hours, loaded hourly cost, and an estimated reduction percentage into a planning estimate. It does not predict revenue or guarantee savings.",
     highlights: ["Transparent assumptions", "Editable reduction rate", "No data is submitted"],

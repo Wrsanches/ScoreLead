@@ -38,6 +38,7 @@ export type MarketingPageDefinition = {
   updatedAt: string
   keywords: string[]
   relatedBlogSlugs: string[]
+  relatedMarketingPaths?: string[]
 }
 
 export type MarketingPage = MarketingPageDefinition & {
@@ -52,6 +53,9 @@ export type MarketingUi = {
   relatedGuides: string
   relatedGuidesDescription: string
   readGuide: string
+  relatedSolutions: string
+  relatedSolutionsDescription: string
+  viewPage: string
   lastReviewed: string
   methodology: string
   methodologyDescription: string

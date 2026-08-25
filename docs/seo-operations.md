@@ -17,7 +17,10 @@ and legitimate authority building.
 
    Store one as `INDEXNOW_KEY` and the other as
    `INDEXNOW_WEBHOOK_SECRET`. Never prefix either with `NEXT_PUBLIC_`.
-3. Deploy, then confirm:
+3. Set `NEXT_PUBLIC_GA_PUBLIC_ID` to the public acquisition GA4 stream and
+   `NEXT_PUBLIC_GA_APP_ID` to a separate authenticated-product stream. The
+   legacy `NEXT_PUBLIC_GA_ID` is accepted only as a public-site fallback.
+4. Deploy, then confirm:
 
    - `https://scorelead.io/robots.txt` returns 200.
    - `https://scorelead.io/sitemap.xml` contains the localized commercial,
@@ -27,7 +30,7 @@ and legitimate authority building.
      links and self-referencing canonicals.
    - `https://scorelead.io` exposes the verified X profile in visible footer
      content and Organization `sameAs` data.
-4. Validate external article references:
+5. Validate external article references:
 
    ```sh
    bun run seo:check-sources
@@ -40,7 +43,7 @@ and legitimate authority building.
    `https://scorelead.io/pt`, and `https://scorelead.io/es`.
 2. Submit `https://scorelead.io/sitemap.xml`.
 3. Inspect and request indexing for the homepage, blog, five feature pages,
-   four use-case pages, three comparison pages, the Ceramik case study, and
+   four use-case pages, five comparison pages, the Ceramik case study, and
    four tools.
 4. Review weekly:
 
@@ -54,7 +57,10 @@ and legitimate authority building.
 
 1. Keep the imported Google Search Console property connected and verified.
 2. Submit the sitemap.
-3. After each production content release, notify IndexNow with either:
+3. A production Next.js server startup automatically submits every sitemap URL
+   when `INDEXNOW_KEY` is configured. This is the deployment path; a failed
+   IndexNow request is logged without preventing the application from starting.
+4. To retry manually after a provider outage, notify IndexNow with either:
 
    ```sh
    bun run seo:indexnow
@@ -66,9 +72,9 @@ and legitimate authority building.
    bun run seo:indexnow -- https://scorelead.io/example https://scorelead.io/pt/example
    ```
 
-4. Confirm receipt in Bing Webmaster Tools. HTTP 200/202 confirms receipt, not
+5. Confirm receipt in Bing Webmaster Tools. HTTP 200/202 confirms receipt, not
    crawling or indexing.
-5. Review Bing's AI Performance report weekly for cited URLs, citation count,
+6. Review Bing's AI Performance report weekly for cited URLs, citation count,
    grounding queries, and changes by locale.
 
 ## Crawler verification
@@ -94,6 +100,17 @@ separate robots group.
 
 ## GA4 measurement
 
+Use separate GA4 properties or web data streams for public acquisition and the
+authenticated product. The runtime routes `scorelead.io` marketing pages to
+`NEXT_PUBLIC_GA_PUBLIC_ID`, routes app/auth pages to
+`NEXT_PUBLIC_GA_APP_ID`, and does not load analytics on preview or localhost
+hosts. Only the public stream records acquisition landing touches.
+
+Before using the public stream as a baseline, define and test GA4 internal
+traffic rules for the ScoreLead team, then activate the filter. Review any
+`Organic Shopping` sessions at source/medium level and correct campaign UTMs or
+custom channel rules instead of treating them as SEO traffic by default.
+
 Create GA4 custom dimensions for:
 
 - `acquisition_channel`
@@ -110,7 +127,7 @@ Create GA4 custom dimensions for:
 - `placement`
 - `pipeline_status`
 
-Mark `signup_completed`, `lead_capture_completed`, `qualified_account`, and
+Mark `signup_completed`, `generate_lead`, `qualified_account`, and
 `customer_conversion` as key events. Keep `signup_submitted` as a diagnostic
 step for email-verification drop-off. The app classifies known ChatGPT,
 Perplexity, Claude, Copilot, Gemini, Meta AI, and You.com referrals as `ai`,
@@ -122,6 +139,25 @@ in GA4 DebugView after each analytics deployment. Use high-intent impressions,
 qualified organic or AI-referred signups, and conversion rate as the primary
 90-day measures. Record the first 14 complete days as the baseline; compare
 later rolling 28-day periods with that baseline.
+
+## Ahrefs Rank Tracker
+
+Create one project for the `scorelead.io` domain and add the keyword map from
+`docs/seo-strategy.md`. Use the United States as the first location for English,
+Brazil for Portuguese, and Spain or the primary Spanish-speaking sales market
+for Spanish. Tag keywords by `category`, `feature`, `comparison`, `tool`, and
+`workflow`, and tag each translated term by locale.
+
+Review weekly:
+
+- positions and SERP features for the mapped page, not just the domain;
+- cannibalization when a different ScoreLead URL ranks for the term;
+- new referring domains that are topically relevant and send real traffic;
+- lost links from customers, partners, directories, or editorial references;
+- content gaps revealed by Search Console queries with impressions.
+
+The Ahrefs connector is read-only in this workflow, so project and keyword
+creation remain an account-level operation in Ahrefs after deployment.
 
 ## Content and authority cadence
 

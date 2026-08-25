@@ -61,6 +61,8 @@ const pageVariants: Record<string, PlatformImageVariant> = {
   "compare-manual-lead-research": "leads",
   "compare-spreadsheets": "pipeline",
   "compare-purchased-lead-lists": "discovery",
+  "compare-best-lead-scoring-software": "leads",
+  "compare-b2b-lead-enrichment-tools": "leads",
   "case-study-ceramik": "case-study",
   "company-pricing": "dashboard",
   "company-security": "dashboard",

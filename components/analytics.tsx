@@ -7,26 +7,43 @@ import {
   getAnalyticsConsent,
   subscribeToAnalyticsConsent,
 } from "@/lib/browser-storage"
-import { isProductionAnalyticsHostname } from "@/lib/site-urls"
+import {
+  getAnalyticsSurface,
+  type AnalyticsSurface,
+} from "@/lib/site-urls"
 
-export function ConsentGatedAnalytics({ gaId }: { gaId: string }) {
+export function ConsentGatedAnalytics({
+  publicGaId,
+  appGaId,
+}: {
+  publicGaId?: string
+  appGaId?: string
+}) {
   const [consent, setConsent] = useState(false)
+  const [surface, setSurface] = useState<AnalyticsSurface | null>(null)
 
   useEffect(() => {
-    if (!isProductionAnalyticsHostname(window.location.hostname)) return
+    const detectedSurface = getAnalyticsSurface(
+      window.location.hostname,
+      window.location.pathname,
+    )
+    const gaId = detectedSurface === "public" ? publicGaId : appGaId
+    if (!detectedSurface || !gaId) return
 
+    setSurface(detectedSurface)
     setConsent(getAnalyticsConsent() === "accepted")
     return subscribeToAnalyticsConsent((value) => {
       setConsent(value === "accepted")
     })
-  }, [])
+  }, [appGaId, publicGaId])
 
-  if (!consent) return null
+  const gaId = surface === "public" ? publicGaId : appGaId
+  if (!consent || !surface || !gaId) return null
 
   return (
     <>
       <GoogleAnalytics gaId={gaId} />
-      <AcquisitionTracker />
+      {surface === "public" ? <AcquisitionTracker /> : null}
     </>
   )
 }

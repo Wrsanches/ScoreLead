@@ -4,8 +4,6 @@ import { WaitlistFooter } from "@/components/waitlist-footer"
 import { Link } from "@/i18n/routing"
 import type { LegalDocumentContent } from "@/lib/legal/types"
 
-const EMAIL = "hello@scorelead.io"
-
 export function LegalDocument({ content }: { content: LegalDocumentContent }) {
   return (
     <div className="min-h-screen bg-[#09090B] text-zinc-100">
@@ -137,12 +135,12 @@ export function LegalDocument({ content }: { content: LegalDocumentContent }) {
                 <div>
                   <h2 className="text-lg font-semibold text-white">{content.contactLabel}</h2>
                   <p className="mt-2 text-sm leading-6 text-zinc-400">{content.contactDescription}</p>
-                  <a
-                    href={`mailto:${EMAIL}`}
+                  <Link
+                    href="/contact"
                     className="mt-3 inline-block rounded-sm text-sm font-medium text-emerald-400 underline decoration-emerald-500/30 underline-offset-4 hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                   >
-                    {EMAIL}
-                  </a>
+                    {content.contactLabel}
+                  </Link>
                 </div>
               </div>
             </div>

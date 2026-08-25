@@ -138,12 +138,6 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
           name: "ScoreLead Editorial",
           url: getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
         },
-        editor: {
-          "@type": "Organization",
-          "@id": `${siteConfig.url}/#product-team`,
-          name: ui.reviewerName,
-          url: getLocalizedUrl(normalizedLocale, "editorial-policy"),
-        },
         publisher: {
           "@type": "Organization",
           "@id": `${siteConfig.url}/#organization`,

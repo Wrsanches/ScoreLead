@@ -7,7 +7,7 @@ const postDetails = [
   {
     slug: "ai-lead-generation-guide",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 8,
     accent: "emerald",
     quickAnswers: {
@@ -25,7 +25,7 @@ const postDetails = [
   {
     slug: "b2b-lead-scoring-model",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 9,
     accent: "cyan",
     quickAnswers: {
@@ -43,7 +43,7 @@ const postDetails = [
   {
     slug: "ideal-customer-profile-guide",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 8,
     accent: "violet",
     quickAnswers: {
@@ -61,7 +61,7 @@ const postDetails = [
   {
     slug: "lead-enrichment-guide",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 7,
     accent: "amber",
     quickAnswers: {
@@ -79,7 +79,7 @@ const postDetails = [
   {
     slug: "sales-prospecting-automation",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 9,
     accent: "rose",
     quickAnswers: {
@@ -97,7 +97,7 @@ const postDetails = [
   {
     slug: "personalized-b2b-outreach",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 8,
     accent: "emerald",
     quickAnswers: {
@@ -115,7 +115,7 @@ const postDetails = [
   {
     slug: "manual-lead-research-vs-automation",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 7,
     accent: "cyan",
     quickAnswers: {
@@ -133,7 +133,7 @@ const postDetails = [
   {
     slug: "b2b-sales-pipeline-guide",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 10,
     accent: "violet",
     quickAnswers: {
@@ -151,7 +151,7 @@ const postDetails = [
   {
     slug: "crm-data-quality-guide",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 8,
     accent: "amber",
     quickAnswers: {
@@ -169,7 +169,7 @@ const postDetails = [
   {
     slug: "multilingual-b2b-prospecting",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-08-25",
     readingMinutes: 9,
     accent: "rose",
     quickAnswers: {

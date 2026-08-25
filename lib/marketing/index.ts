@@ -22,7 +22,7 @@ import {
   siteConfig,
 } from "@/lib/seo";
 
-const UPDATED_AT = "2026-07-23";
+const SEO_UPDATED_AT = "2026-08-25";
 
 const definitions: MarketingPageDefinition[] = [
   {
@@ -30,7 +30,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "features",
     slug: "ai-lead-discovery",
     pathname: "features/ai-lead-discovery",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "AI lead discovery",
       "B2B account discovery",
@@ -46,25 +46,43 @@ const definitions: MarketingPageDefinition[] = [
     group: "features",
     slug: "lead-scoring",
     pathname: "features/lead-scoring",
-    updatedAt: UPDATED_AT,
-    keywords: ["B2B lead scoring", "AI lead scoring", "prospect scoring"],
+    updatedAt: SEO_UPDATED_AT,
+    keywords: [
+      "lead scoring software",
+      "B2B lead scoring software",
+      "AI lead scoring software",
+      "predictive lead scoring software",
+    ],
     relatedBlogSlugs: ["b2b-lead-scoring-model", "b2b-sales-pipeline-guide"],
+    relatedMarketingPaths: [
+      "compare/best-lead-scoring-software",
+      "tools/lead-scoring-calculator",
+    ],
   },
   {
     id: "feature-lead-enrichment",
     group: "features",
     slug: "lead-enrichment",
     pathname: "features/lead-enrichment",
-    updatedAt: UPDATED_AT,
-    keywords: ["B2B lead enrichment", "sales intelligence", "CRM-ready leads"],
+    updatedAt: SEO_UPDATED_AT,
+    keywords: [
+      "B2B lead enrichment",
+      "lead enrichment software",
+      "B2B data enrichment",
+      "CRM-ready leads",
+    ],
     relatedBlogSlugs: ["lead-enrichment-guide", "crm-data-quality-guide"],
+    relatedMarketingPaths: [
+      "compare/b2b-lead-enrichment-tools",
+      "tools/enrichment-checklist",
+    ],
   },
   {
     id: "feature-outreach-automation",
     group: "features",
     slug: "outreach-automation",
     pathname: "features/outreach-automation",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "B2B outreach automation",
       "AI sales outreach",
@@ -80,7 +98,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "features",
     slug: "sales-pipeline",
     pathname: "features/sales-pipeline",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "B2B sales pipeline",
       "lead generation workflow",
@@ -96,7 +114,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "use-cases",
     slug: "agencies",
     pathname: "use-cases/agencies",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["lead generation for agencies", "agency prospecting software"],
     relatedBlogSlugs: ["ai-lead-generation-guide", "personalized-b2b-outreach"],
   },
@@ -105,7 +123,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "use-cases",
     slug: "b2b-sales-teams",
     pathname: "use-cases/b2b-sales-teams",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["B2B sales prospecting software", "sales team lead generation"],
     relatedBlogSlugs: ["b2b-lead-scoring-model", "b2b-sales-pipeline-guide"],
   },
@@ -114,7 +132,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "use-cases",
     slug: "b2b-startups",
     pathname: "use-cases/b2b-startups",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["startup lead generation", "founder-led sales prospecting"],
     relatedBlogSlugs: [
       "ideal-customer-profile-guide",
@@ -126,7 +144,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "use-cases",
     slug: "b2b-companies",
     pathname: "use-cases/b2b-companies",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["B2B company lead generation", "multi-region sales prospecting"],
     relatedBlogSlugs: [
       "multilingual-b2b-prospecting",
@@ -138,7 +156,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "compare",
     slug: "manual-lead-research",
     pathname: "compare/manual-lead-research",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["manual lead research vs automation", "AI lead research"],
     relatedBlogSlugs: [
       "manual-lead-research-vs-automation",
@@ -150,7 +168,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "compare",
     slug: "spreadsheets",
     pathname: "compare/spreadsheets",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "lead generation spreadsheet alternative",
       "sales prospecting software",
@@ -162,16 +180,52 @@ const definitions: MarketingPageDefinition[] = [
     group: "compare",
     slug: "purchased-lead-lists",
     pathname: "compare/purchased-lead-lists",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["purchased lead lists alternative", "fresh B2B lead discovery"],
     relatedBlogSlugs: ["lead-enrichment-guide", "ideal-customer-profile-guide"],
+  },
+  {
+    id: "compare-best-lead-scoring-software",
+    group: "compare",
+    slug: "best-lead-scoring-software",
+    pathname: "compare/best-lead-scoring-software",
+    updatedAt: SEO_UPDATED_AT,
+    keywords: [
+      "best lead scoring software",
+      "lead scoring software comparison",
+      "AI lead scoring software",
+      "predictive lead scoring software",
+    ],
+    relatedBlogSlugs: ["b2b-lead-scoring-model", "b2b-sales-pipeline-guide"],
+    relatedMarketingPaths: [
+      "features/lead-scoring",
+      "tools/lead-scoring-calculator",
+    ],
+  },
+  {
+    id: "compare-b2b-lead-enrichment-tools",
+    group: "compare",
+    slug: "b2b-lead-enrichment-tools",
+    pathname: "compare/b2b-lead-enrichment-tools",
+    updatedAt: SEO_UPDATED_AT,
+    keywords: [
+      "B2B lead enrichment tools",
+      "lead enrichment software",
+      "data enrichment tools",
+      "B2B lead enrichment API",
+    ],
+    relatedBlogSlugs: ["lead-enrichment-guide", "crm-data-quality-guide"],
+    relatedMarketingPaths: [
+      "features/lead-enrichment",
+      "tools/enrichment-checklist",
+    ],
   },
   {
     id: "case-study-ceramik",
     group: "case-studies",
     slug: "ceramik",
     pathname: "case-studies/ceramik",
-    updatedAt: "2026-07-24",
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "Ceramik ScoreLead case study",
       "B2B lead generation case study",
@@ -186,7 +240,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "company",
     slug: "pricing",
     pathname: "pricing",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["ScoreLead pricing", "lead generation software pricing"],
     relatedBlogSlugs: ["ai-lead-generation-guide"],
   },
@@ -195,7 +249,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "company",
     slug: "security",
     pathname: "security",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["ScoreLead security", "ScoreLead data protection"],
     relatedBlogSlugs: ["crm-data-quality-guide"],
   },
@@ -204,7 +258,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "company",
     slug: "about",
     pathname: "about",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["about ScoreLead", "ScoreLead AI lead generation"],
     relatedBlogSlugs: ["ai-lead-generation-guide"],
   },
@@ -213,7 +267,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "company",
     slug: "editorial-policy",
     pathname: "editorial-policy",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["ScoreLead editorial policy", "ScoreLead content methodology"],
     relatedBlogSlugs: ["ai-lead-generation-guide"],
   },
@@ -222,7 +276,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "company",
     slug: "scorelead-editorial",
     pathname: "authors/scorelead-editorial",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["ScoreLead Editorial", "ScoreLead authors"],
     relatedBlogSlugs: ["ai-lead-generation-guide", "b2b-lead-scoring-model"],
   },
@@ -231,7 +285,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "tools",
     slug: "icp-worksheet",
     pathname: "tools/icp-worksheet",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["ideal customer profile worksheet", "B2B ICP template"],
     relatedBlogSlugs: ["ideal-customer-profile-guide"],
   },
@@ -240,7 +294,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "tools",
     slug: "lead-scoring-calculator",
     pathname: "tools/lead-scoring-calculator",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["lead scoring calculator", "B2B lead score template"],
     relatedBlogSlugs: ["b2b-lead-scoring-model"],
   },
@@ -249,7 +303,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "tools",
     slug: "enrichment-checklist",
     pathname: "tools/enrichment-checklist",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: ["lead enrichment checklist", "B2B data enrichment template"],
     relatedBlogSlugs: ["lead-enrichment-guide", "crm-data-quality-guide"],
   },
@@ -258,7 +312,7 @@ const definitions: MarketingPageDefinition[] = [
     group: "tools",
     slug: "lead-research-roi-calculator",
     pathname: "tools/lead-research-roi-calculator",
-    updatedAt: UPDATED_AT,
+    updatedAt: SEO_UPDATED_AT,
     keywords: [
       "lead research ROI calculator",
       "sales research cost calculator",
@@ -286,6 +340,10 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
     relatedGuidesDescription:
       "Go deeper with practical, source-aware guidance.",
     readGuide: "Read guide",
+    relatedSolutions: "Related solutions",
+    relatedSolutionsDescription:
+      "Compare the workflow, evaluate the category, or try a practical tool.",
+    viewPage: "View page",
     lastReviewed: "Last reviewed",
     methodology: "Content methodology",
     methodologyDescription:
@@ -302,6 +360,10 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
     relatedGuidesDescription:
       "Aprofunde o tema com orientação prática e baseada em fontes.",
     readGuide: "Ler guia",
+    relatedSolutions: "Soluções relacionadas",
+    relatedSolutionsDescription:
+      "Compare o fluxo, avalie a categoria ou experimente uma ferramenta prática.",
+    viewPage: "Ver página",
     lastReviewed: "Última revisão",
     methodology: "Metodologia de conteúdo",
     methodologyDescription:
@@ -318,6 +380,10 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
     relatedGuidesDescription:
       "Profundiza con orientación práctica y basada en fuentes.",
     readGuide: "Leer guía",
+    relatedSolutions: "Soluciones relacionadas",
+    relatedSolutionsDescription:
+      "Compara el flujo, evalúa la categoría o prueba una herramienta práctica.",
+    viewPage: "Ver página",
     lastReviewed: "Última revisión",
     methodology: "Metodología de contenido",
     methodologyDescription:

@@ -1,6 +1,24 @@
 # ScoreLead SEO and GEO Strategy
 
-Updated: 2026-07-24
+Updated: 2026-08-25
+
+## Audit baseline
+
+The August 2026 Ahrefs, Google Search Console, and GA4 review established the
+starting point for this plan:
+
+- Search Console recorded 976 impressions and 20 clicks from May through July;
+  impressions grew from 119 to 673 over that period.
+- GA4 recorded 24 organic sessions and 14 engaged sessions, but the public
+  property also contained authenticated `/admin` traffic. Public acquisition
+  and app activity must therefore be measured separately.
+- Ahrefs reported Domain Rating 0 and 161 live referring domains. Most sampled
+  referring domains were irrelevant or spam-like, so raw domain count is not
+  an authority KPI.
+- The Ahrefs Rank Tracker had no configured keywords.
+- The crawl found long titles, short descriptions, invalid article editor
+  markup, one Cloudflare email-protection URL, and 114 URLs not submitted to
+  IndexNow. These repository-level issues were corrected in the August update.
 
 ## Positioning
 
@@ -35,6 +53,8 @@ The core category story is:
   - `/compare/manual-lead-research`
   - `/compare/spreadsheets`
   - `/compare/purchased-lead-lists`
+  - `/compare/best-lead-scoring-software`
+  - `/compare/b2b-lead-enrichment-tools`
 - Trust and conversion:
   - `/pricing`
   - `/security`
@@ -80,6 +100,44 @@ investment is original evidence:
 5. keep the ScoreLead name, description, logo, website, and X profile
    consistent.
 
+Do not disavow or contact spam domains solely because they appear in Ahrefs.
+Investigate only when Search Console reports a manual action or there is clear
+evidence of a manipulative campaign controlled by ScoreLead.
+
+## Keyword map
+
+Track the English terms first, then add Portuguese and Spanish equivalents once
+the English query data is stable. One primary page owns each intent to avoid
+internal competition.
+
+| Intent | Primary query | Landing page |
+| --- | --- | --- |
+| Category | AI lead generation software | `/` |
+| Feature | B2B lead scoring software | `/features/lead-scoring` |
+| Comparison | Best lead scoring software | `/compare/best-lead-scoring-software` |
+| Tool | Lead scoring calculator | `/tools/lead-scoring-calculator` |
+| Feature | B2B lead enrichment software | `/features/lead-enrichment` |
+| Comparison | B2B lead enrichment tools | `/compare/b2b-lead-enrichment-tools` |
+| Tool | Lead enrichment checklist | `/tools/enrichment-checklist` |
+| Workflow | Sales prospecting automation | `/blog/sales-prospecting-automation` |
+| Workflow | B2B sales pipeline stages | `/blog/b2b-sales-pipeline-guide` |
+| Feature | AI lead discovery | `/features/ai-lead-discovery` |
+| Template | Ideal customer profile worksheet | `/tools/icp-worksheet` |
+| Cost | Lead research ROI calculator | `/tools/lead-research-roi-calculator` |
+
+## 90-day execution order
+
+1. Weeks 1–2: deploy the technical fixes, submit the sitemap, configure the
+   keyword set above in Ahrefs Rank Tracker, and verify `generate_lead` in GA4.
+2. Weeks 3–6: collect query-level Search Console data, improve pages with high
+   impressions and weak click-through rate, and add only evidence-backed copy.
+3. Weeks 7–10: promote the free calculators and checklists to relevant sales
+   operations communities, SaaS directories, partners, and customers who can
+   genuinely reference them.
+4. Weeks 11–13: publish one approved customer result or original aggregate
+   benchmark with its methodology, then compare the rolling 28-day period with
+   the baseline.
+
 ## Content Truth Rules
 
 - Use the real first-publication date for every page.
@@ -113,8 +171,11 @@ investment is original evidence:
 The primary outcome is qualified signups, not raw traffic or mentions.
 
 - Preserve immutable first-touch and latest non-direct attribution.
+- Keep public acquisition analytics and authenticated product analytics in
+  separate GA4 properties or data streams.
 - Track article and commercial CTA clicks, signup starts, signup submissions,
-  completed signups, qualified accounts, and customer conversions.
+  `generate_lead`, completed signups, qualified accounts, and customer
+  conversions.
 - Create GA4 custom dimensions for acquisition, locale, landing page, page
   group, article, placement, and pipeline status.
 - Review Google Search Console, Bing index coverage, and Bing AI Performance

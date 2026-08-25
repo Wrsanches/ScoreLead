@@ -71,6 +71,14 @@ export function WaitlistFooter() {
           href: "/compare/purchased-lead-lists" as const,
           label: t("purchasedLeadLists"),
         },
+        {
+          href: "/compare/best-lead-scoring-software" as const,
+          label: t("leadScoringSoftware"),
+        },
+        {
+          href: "/compare/b2b-lead-enrichment-tools" as const,
+          label: t("leadEnrichmentTools"),
+        },
       ],
     },
     {
@@ -112,12 +120,12 @@ export function WaitlistFooter() {
               {t("tagline")}
             </p>
             <div className="mt-4 flex flex-col items-start gap-2">
-              <a
-                href="mailto:hello@scorelead.io"
+              <Link
+                href="/contact"
                 className="rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
               >
-                hello@scorelead.io
-              </a>
+                {t("contactUs")}
+              </Link>
               <div className="flex items-center gap-2 mt-3">
                 <a
                   href="https://x.com/scorelead_"

@@ -9,6 +9,7 @@ import { Link } from "@/i18n/routing";
 import { getBlogPost, getBlogTranslation } from "@/lib/blog";
 import {
   getMarketingPlatformImage,
+  getMarketingPageByPath,
   getMarketingTranslation,
   getMarketingUi,
   type MarketingPage,
@@ -58,6 +59,9 @@ export function MarketingPageView({
   const relatedPosts = page.relatedBlogSlugs
     .map((slug) => getBlogPost(slug))
     .filter((post) => post !== undefined);
+  const relatedPages = (page.relatedMarketingPaths ?? [])
+    .map((pathname) => getMarketingPageByPath(pathname))
+    .filter((relatedPage) => relatedPage !== undefined);
 
   const breadcrumbs = [
     {
@@ -375,6 +379,56 @@ export function MarketingPageView({
                       </div>
                       <span className="inline-flex items-center gap-2 text-sm text-zinc-500 group-hover:text-zinc-200">
                         {ui.readGuide}
+                        <ArrowRight
+                          className="size-4 transition-transform group-hover:translate-x-1"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {relatedPages.length ? (
+          <section
+            className="border-t border-zinc-800/70 px-6 py-16 sm:py-22"
+            aria-labelledby="related-solutions"
+          >
+            <div className="mx-auto max-w-6xl">
+              <div className="max-w-2xl">
+                <h2
+                  id="related-solutions"
+                  className="text-3xl font-medium tracking-tight text-white"
+                >
+                  {ui.relatedSolutions}
+                </h2>
+                <p className="mt-3 leading-7 text-zinc-500">
+                  {ui.relatedSolutionsDescription}
+                </p>
+              </div>
+              <div className="mt-9 grid gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-2">
+                {relatedPages.map((relatedPage) => {
+                  const relatedTranslation = getMarketingTranslation(
+                    relatedPage,
+                    normalizedLocale,
+                  );
+                  return (
+                    <Link
+                      key={relatedPage.pathname}
+                      href={`/${relatedPage.pathname}`}
+                      className="group bg-[#09090B] p-6 transition-colors hover:bg-zinc-900/70"
+                    >
+                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-400">
+                        {relatedTranslation.eyebrow}
+                      </p>
+                      <h3 className="mt-3 text-lg font-medium text-zinc-200 transition-colors group-hover:text-white">
+                        {relatedTranslation.title}
+                      </h3>
+                      <span className="mt-5 inline-flex items-center gap-2 text-sm text-zinc-500 group-hover:text-zinc-200">
+                        {ui.viewPage}
                         <ArrowRight
                           className="size-4 transition-transform group-hover:translate-x-1"
                           aria-hidden="true"

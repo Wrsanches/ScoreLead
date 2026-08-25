@@ -50,6 +50,7 @@ export async function submitIndexNow(urls: string[]) {
       urlList,
     }),
     cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
   })
 
   if (!response.ok && response.status !== 202) {

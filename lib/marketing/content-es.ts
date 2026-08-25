@@ -3,7 +3,7 @@ import type { MarketingPageTranslation } from "./types"
 export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   "feature-ai-lead-discovery": {
     eyebrow: "Función · Descubrimiento de cuentas",
-    title: "Descubrimiento de leads con IA basado en tu mercado real",
+    title: "Descubrimiento de Leads con IA por Mercado",
     description:
       "Encuentra empresas B2B por mercado, región, servicio y perfil de cuenta, conservando la evidencia que explica por qué cada empresa pertenece al pipeline.",
     answer:
@@ -43,11 +43,11 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "feature-lead-scoring": {
     eyebrow: "Función · Priorización",
-    title: "Lead scoring B2B transparente que tu equipo puede cuestionar",
+    title: "Software de Lead Scoring B2B con IA",
     description:
-      "Prioriza cuentas por ajuste, alcance, confianza, potencial de interacción y preparación, manteniendo visible la evidencia.",
+      "Prioriza cuentas con software de lead scoring B2B con IA que mantiene ajuste, alcance, confianza, interacción, preparación y evidencia visibles.",
     answer:
-      "La puntuación de ScoreLead es una capa de priorización, no un veredicto. Convierte señales observables en una cola consistente y mantiene cada dimensión abierta a revisión y mejora.",
+      "ScoreLead es software de lead scoring B2B para equipos que necesitan priorizar cuentas con explicaciones. Convierte señales observables en una cola consistente y mantiene cada dimensión abierta a revisión y mejora.",
     highlights: [
       "Separa el ajuste de la empresa del momento y la preparación.",
       "Muestra evidencia por dimensión, no un número opaco.",
@@ -55,22 +55,23 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ],
     sections: [
       {
-        heading: "Puntúa señales relacionadas con tu oferta",
+        heading: "Aplica el lead scoring a tu ICP real",
         paragraphs: [
-          "El modelo evalúa dimensiones observables y explicables. Los requisitos obligatorios deben filtrar; señales más suaves ordenan las cuentas restantes.",
+          "Empieza por las condiciones de empresa vinculadas al valor y separa requisitos obligatorios de señales de ordenación. ScoreLead evalúa dimensiones que puede observar y explicar.",
         ],
+        points: ["Ajuste de empresa", "Alcance", "Confianza", "Potencial de interacción", "Preparación"],
       },
       {
-        heading: "Mantén visible la incertidumbre",
+        heading: "Mantén cada puntuación de IA explicable",
         paragraphs: [
-          "Un dato ausente no debe convertirse silenciosamente en una nota negativa. Los campos desconocidos se distinguen de la evidencia débil.",
+          "Cada cuenta mantiene evidencia por dimensión junto al total. Los datos ausentes no se vuelven negativos y los valores desconocidos se distinguen de las señales débiles.",
         ],
-        points: ["Ajuste de mercado", "Alcance online", "Confianza", "Interacción", "Preparación"],
+        points: ["Dimensiones visibles", "Fuentes", "Valores desconocidos", "Revisión humana"],
       },
       {
-        heading: "Calibra con resultados comerciales",
+        heading: "Calibra el scoring con resultados comerciales",
         paragraphs: [
-          "Compara puntuaciones con cuentas aceptadas, respuestas, oportunidades y rechazos. Los errores proporcionan la evidencia para mejorar el modelo.",
+          "Compara puntuaciones con cuentas aceptadas, respuestas, oportunidades, clientes y motivos de rechazo. Los errores muestran cuándo deben cambiar el modelo, el ICP o los datos.",
         ],
       },
     ],
@@ -83,11 +84,11 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "feature-lead-enrichment": {
     eyebrow: "Función · Inteligencia de cuentas",
-    title: "Enriquecimiento de leads que vuelve útiles los datos",
+    title: "Software de Enriquecimiento de Leads B2B",
     description:
-      "Convierte un nombre y dominio en contexto estructurado y trazable para calificación, personalización y exportación al CRM.",
+      "Convierte nombre y dominio en enriquecimiento de leads B2B con fuentes para calificación, routing, personalización, investigación y exportación al CRM.",
     answer:
-      "El enriquecimiento B2B debe reducir incertidumbre, no maximizar campos. ScoreLead organiza identidad, ajuste, problema, contacto y personalización con el contexto necesario para verificar.",
+      "ScoreLead es software de enriquecimiento de leads B2B creado para reducir incertidumbre, no maximizar campos. Organiza identidad, ajuste, problema, contacto y personalización con contexto verificable.",
     highlights: [
       "Recopila contexto público de empresa, servicios, ubicación y contacto.",
       "Normaliza sin borrar la evidencia original.",
@@ -95,20 +96,20 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ],
     sections: [
       {
-        heading: "Enriquece para una decisión",
+        heading: "Enriquece leads para una decisión concreta",
         paragraphs: [
           "Cada campo debe apoyar ajuste, una hipótesis de problema, el plan de contacto o un mejor mensaje. Los datos sin uso crean mantenimiento.",
         ],
       },
       {
-        heading: "Conserva la procedencia",
+        heading: "Conserva fuentes, fechas e incertidumbre",
         paragraphs: [
           "Los datos web cambian. URLs de origen, fechas y confianza ayudan a verificar detalles antes del outreach.",
         ],
         points: ["Identidad", "Ajuste", "Evidencia del problema", "Contacto", "Personalización"],
       },
       {
-        heading: "Exporta registros más limpios",
+        heading: "Exporta registros más limpios al CRM",
         paragraphs: [
           "Formatos consistentes y detección de duplicados facilitan filtrar y mover cuentas al CRM sin perder el contexto.",
         ],
@@ -123,9 +124,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "feature-outreach-automation": {
     eyebrow: "Función · Outreach comercial",
-    title: "Automatización de outreach con contexto de la cuenta",
+    title: "Automatización de Outreach B2B con Contexto",
     description:
-      "Crea secuencias B2B a partir de evidencia verificada, con revisión humana antes del uso o programación.",
+      "Crea secuencias de outreach B2B a partir de evidencia verificada, con personalización y revisión humana antes del uso o la programación.",
     answer:
       "ScoreLead convierte contexto revisado en un punto de partida. Puede usar detalles relevantes y adaptar el idioma, pero el remitente sigue siendo responsable de exactitud, consentimiento y reglas del canal.",
     highlights: [
@@ -203,7 +204,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "use-case-agencies": {
     eyebrow: "Caso de uso · Agencias",
-    title: "Generación de leads para agencias con varios mercados",
+    title: "Generación de Leads B2B para Agencias",
     description:
       "Crea búsquedas por cliente o servicio, estandariza la calificación y prepara outreach relevante sin mezclar hipótesis.",
     answer:
@@ -243,7 +244,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "use-case-b2b-sales-teams": {
     eyebrow: "Caso de uso · Equipos de ventas",
-    title: "Un sistema compartido de prospección para ventas B2B",
+    title: "Prospección Compartida para Ventas B2B",
     description:
       "Alinea descubrimiento, calificación, scoring y outreach alrededor de una definición visible de buen prospecto.",
     answer:
@@ -283,7 +284,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "use-case-b2b-startups": {
     eyebrow: "Caso de uso · Startups",
-    title: "Generación founder-led que aprende con cada conversación",
+    title: "Generación de Leads para Startups B2B",
     description:
       "Prueba hipótesis B2B estrechas, encuentra empresas compatibles y conserva evidencia para aprender de las primeras conversaciones.",
     answer:
@@ -323,9 +324,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "use-case-b2b-companies": {
     eyebrow: "Caso de uso · Empresas B2B",
-    title: "Descubrimiento repetible entre equipos y regiones",
+    title: "Descubrimiento de Cuentas B2B entre Equipos",
     description:
-      "Expande la prospección a segmentos o regiones conservando estándares, fuentes y mensajes locales.",
+      "Expande la prospección B2B a nuevos segmentos o regiones conservando criterios compartidos, fuentes verificables y mensajes locales.",
     answer:
       "Las empresas B2B pueden hacer consistente la investigación sin borrar diferencias locales. Los criterios compartidos dan gobernanza; búsquedas y outreach localizados conservan contexto.",
     highlights: [
@@ -403,9 +404,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "compare-spreadsheets": {
     eyebrow: "Comparación · Operaciones",
-    title: "ScoreLead vs. hojas de cálculo para prospección B2B",
+    title: "ScoreLead vs. Hojas de Cálculo B2B",
     description:
-      "Entiende cuándo una hoja basta y cuándo descubrimiento, fuentes, scoring y workflow necesitan un sistema.",
+      "Entiende cuándo una hoja de cálculo basta y cuándo el descubrimiento, las fuentes, el scoring y el workflow de prospección B2B necesitan un sistema.",
     answer:
       "Las hojas son flexibles para listas pequeñas. Se vuelven frágiles con descubrimiento repetible, historial, puntuación consistente, duplicados y responsabilidad compartida.",
     highlights: [
@@ -443,9 +444,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "compare-purchased-lead-lists": {
     eyebrow: "Comparación · Estrategia de datos",
-    title: "Descubrimiento actual vs. listas de leads compradas",
+    title: "Descubrimiento vs. Listas Compradas",
     description:
-      "Compara listas estáticas con criterios, fuentes, evidencia pública reciente y calificación de cuentas.",
+      "Compara listas estáticas con descubrimiento B2B basado en criterios, fuentes verificables, evidencia pública reciente y calificación de cuentas.",
     answer:
       "Las listas compradas ofrecen cobertura rápida, pero su origen, edad, permisos y ajuste pueden ser inciertos. El descubrimiento actual empieza con tu objetivo y recopila evidencia pública reciente.",
     highlights: [
@@ -481,9 +482,103 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Descubre empresas con criterios y fuentes adjuntos.",
     ctaLabel: "Iniciar descubrimiento",
   },
+  "compare-best-lead-scoring-software": {
+    eyebrow: "Comparación · Lead scoring",
+    title: "Mejores Software de Lead Scoring B2B",
+    description:
+      "Compara software de lead scoring B2B por explicabilidad, datos, integración, calibración, ajuste al workflow y decisiones comerciales compatibles.",
+    answer:
+      "El mejor software de lead scoring es el que encaja con tu proceso de compra y hace útil la priorización para ventas. El scoring nativo de CRM aprovecha actividad histórica; las plataformas de intención destacan señales de compra; ScoreLead organiza descubrimiento, enriquecimiento y scoring explicable antes del outreach.",
+    highlights: [
+      "Elige la categoría de scoring compatible con tus datos.",
+      "Exige señales visibles, tratamiento de ausencias y controles de calibración.",
+      "Prueba con cuentas aceptadas y resultados reales del pipeline antes de escalar.",
+    ],
+    sections: [
+      {
+        heading: "Define qué decisión debe apoyar la puntuación",
+        paragraphs: [
+          "Aclara si debe enrutar leads inbound, priorizar cuentas objetivo, detectar intención u ordenar un mercado recién descubierto. Un producto puede ser fuerte en una tarea y débil en otra.",
+        ],
+        points: ["Routing inbound", "Priorización de cuentas", "Señales de intención", "Descubrimiento de mercado"],
+      },
+      {
+        heading: "Compara evidencia y explicabilidad",
+        paragraphs: [
+          "Pregunta qué señales forman la puntuación, cómo se comportan los valores ausentes, si ventas puede revisar la evidencia y cómo se registran los ajustes. Un número preciso no ayuda cuando el equipo no puede explicarlo.",
+        ],
+      },
+      {
+        heading: "Evalúa el workflow y las integraciones",
+        paragraphs: [
+          "Revisa dónde ocurre el scoring, qué datos deben existir, cómo llegan las cuentas al CRM y si el producto cubre regiones e idiomas relevantes. Incluye implementación y mantenimiento.",
+        ],
+        points: ["Datos necesarios", "Handoff al CRM", "Cobertura regional", "Revisión humana"],
+      },
+      {
+        heading: "Ejecuta un piloto medible",
+        paragraphs: [
+          "Prueba un segmento controlado y compara aceptación, tiempo de investigación, falsos positivos, oportunidades y motivos de rechazo. No elijas solo por cantidad de funciones.",
+        ],
+      },
+    ],
+    proofLabel: "Metodología de comparación",
+    proof:
+      "ScoreLead forma parte de la comparación y tiene interés comercial. El marco evita rankings no verificables y compara ajuste, evidencia, implementación y resultados medibles de un piloto.",
+    ctaTitle: "Prueba scoring explicable en un segmento enfocado.",
+    ctaDescription: "Conserva la evidencia detrás de cada puntuación y compara con tu proceso actual.",
+    ctaLabel: "Probar scoring en ScoreLead",
+  },
+  "compare-b2b-lead-enrichment-tools": {
+    eyebrow: "Comparación · Enriquecimiento",
+    title: "Herramientas de Enriquecimiento de Leads B2B",
+    description:
+      "Evalúa herramientas de enriquecimiento de leads B2B por cobertura, fuentes, actualidad, precisión, workflow, cumplimiento y coste por registro utilizable.",
+    answer:
+      "La mejor herramienta de enriquecimiento de leads B2B devuelve datos listos para decidir en tu mercado y suficiente contexto para verificar campos importantes. Las bases priorizan cobertura estructurada; la automatización de investigación ofrece recopilación flexible; ScoreLead combina descubrimiento público, evidencia, scoring y revisión.",
+    highlights: [
+      "Mide registros utilizables y verificados, no cantidad de campos.",
+      "Prueba cobertura por mercado, tamaño y segmento.",
+      "Mantén visibles fuentes, fechas, valores desconocidos y revisión de cumplimiento.",
+    ],
+    sections: [
+      {
+        heading: "Empieza por la decisión y los campos necesarios",
+        paragraphs: [
+          "Enumera los campos mínimos de identidad, ajuste, contacto y personalización en cada etapa. Comprar más datos no mejora el resultado cuando la mayoría nunca se utiliza.",
+        ],
+        points: ["Identidad", "Ajuste de empresa", "Contacto", "Evidencia de personalización"],
+      },
+      {
+        heading: "Prueba cobertura y precisión en tu mercado",
+        paragraphs: [
+          "Usa una muestra representativa de países, tamaños y segmentos. Verifica valores importantes en fuentes primarias y registra por separado datos ausentes, antiguos, inferidos e incorrectos.",
+        ],
+      },
+      {
+        heading: "Compara procedencia y mantenimiento",
+        paragraphs: [
+          "Comprueba si la herramienta muestra fuentes y fechas, admite correcciones, evita duplicados y actualiza campos volátiles. Esos controles determinan cuánto trabajo manual queda.",
+        ],
+        points: ["URLs de origen", "Fechas de observación", "Confianza", "Política de actualización"],
+      },
+      {
+        heading: "Calcula el coste por cuenta utilizable",
+        paragraphs: [
+          "Incluye suscripción, créditos, consultas fallidas, verificación, limpieza de duplicados, integración y la proporción de registros que ventas realmente acepta.",
+        ],
+      },
+    ],
+    proofLabel: "Evaluación justa",
+    proof:
+      "ScoreLead es una de las herramientas evaluadas. Esta guía no afirma superioridad universal; cobertura, precisión y valor varían según mercado, fuente, workflow y uso.",
+    ctaTitle: "Evalúa el enriquecimiento con tu propia muestra.",
+    ctaDescription: "Descubre, enriquece, puntúa y revisa empresas conservando el contexto de las fuentes.",
+    ctaLabel: "Probar enriquecimiento B2B",
+  },
   "case-study-ceramik": {
     eyebrow: "Historia de cliente · Ceramik",
-    title: "Cómo Ceramik amplió un pipeline de prospección enfocado",
+    title: "Ceramik: Caso de Prospección B2B",
     description:
       "Un relato transparente de cómo Ceramik usó ScoreLead para descubrir estudios de cerámica, reducir investigación manual y ampliar su pipeline en 30 días.",
     answer:
@@ -536,7 +631,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "company-pricing": {
     eyebrow: "Precios",
-    title: "Empieza gratis. Mejora cuando el flujo demuestre valor.",
+    title: "Precios de ScoreLead: Empieza Gratis",
     description:
       "Usa el flujo principal con Free, prueba Starter por US$2,95 y sube de plan a medida que crece el volumen de descubrimiento, outreach y automatización.",
     answer:
@@ -590,7 +685,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "company-security": {
     eyebrow: "Seguridad y confianza",
-    title: "Cómo ScoreLead aborda la seguridad de datos y cuentas",
+    title: "Seguridad de Datos y Cuentas",
     description:
       "Una visión directa de autenticación, transporte, límites de acceso, proveedores y responsabilidades compartidas.",
     answer:
@@ -617,7 +712,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
       {
         heading: "Informa una preocupación",
         paragraphs: [
-          "Envía vulnerabilidades sospechadas a hello@scorelead.io. No accedas, cambies ni conserves datos ajenos.",
+          "Envía vulnerabilidades sospechadas mediante la página de contacto de ScoreLead. No accedas, cambies ni conserves datos ajenos.",
         ],
       },
     ],
@@ -630,7 +725,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "company-about": {
     eyebrow: "Acerca de ScoreLead",
-    title: "Creado para hacer más explicable la prospección B2B",
+    title: "Prospección B2B Más Explicable",
     description:
       "ScoreLead conecta descubrimiento, evidencia, calificación, scoring y outreach para que equipos pequeños enfoquen conversaciones informadas.",
     answer:
@@ -670,7 +765,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "company-editorial-policy": {
     eyebrow: "Estándares editoriales",
-    title: "Cómo ScoreLead investiga, escribe y actualiza contenido",
+    title: "Estándares Editoriales de ScoreLead",
     description:
       "Los estándares para afirmaciones, fuentes, asistencia de IA, traducciones, correcciones y evidencia de clientes.",
     answer:
@@ -697,7 +792,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
       {
         heading: "Correcciones y actualizaciones",
         paragraphs: [
-          "Envía correcciones a hello@scorelead.io. Las correcciones materiales cambian la fecha; las fechas no se actualizan solo para parecer recientes.",
+          "Envía correcciones mediante la página de contacto de ScoreLead. Las correcciones materiales cambian la fecha; las fechas no se actualizan solo para parecer recientes.",
         ],
       },
     ],
@@ -718,7 +813,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     highlights: [
       "Cubre operaciones y flujos de ScoreLead.",
       "Usa fechas, fuentes y metodología visibles.",
-      "Acepta correcciones en hello@scorelead.io.",
+      "Acepta correcciones mediante la página de contacto de ScoreLead.",
     ],
     sections: [
       {
@@ -750,9 +845,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "tool-icp-worksheet": {
     eyebrow: "Herramienta gratis · Hoja de ICP",
-    title: "Convierte tu ICP en criterios de búsqueda utilizables",
+    title: "ICP B2B con Criterios de Búsqueda",
     description:
-      "Crea un ICP B2B compacto con requisitos, preferencias, descalificadores, evidencia y un plan de aprendizaje.",
+      "Crea un ICP B2B compacto y accionable con requisitos, preferencias, descalificadores, evidencia observable y un plan de aprendizaje.",
     answer:
       "Un ICP útil ayuda a aceptar o rechazar empresas con consistencia. Esta hoja convierte posicionamiento amplio en criterios observables.",
     highlights: ["Sin cuenta", "Funciona en el navegador", "Imprime o guarda la hoja"],
@@ -786,7 +881,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     eyebrow: "Herramienta gratis · Calculadora de score",
     title: "Crea una puntuación B2B explicable",
     description:
-      "Compara ajuste, alcance, confianza, interacción y preparación sin ocultar las dimensiones.",
+      "Compara ajuste, alcance, confianza, interacción y preparación con una calculadora de lead scoring B2B transparente y gratuita.",
     answer:
       "La calculadora crea un promedio transparente de cinco dimensiones. Ayuda a priorizar y debe revisarse contra la evidencia.",
     highlights: ["Entradas ajustables", "Fórmula visible", "Ningún dato enviado"],
@@ -812,9 +907,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "tool-enrichment-checklist": {
     eyebrow: "Herramienta gratis · Checklist de datos",
-    title: "Comprueba si una cuenta B2B está lista para calificación",
+    title: "Checklist de Enriquecimiento B2B",
     description:
-      "Revisa identidad, ajuste, problema, contacto, procedencia y actualidad antes de outreach o CRM.",
+      "Revisa identidad, ajuste, problema, contacto, procedencia y actualidad con un checklist de enriquecimiento B2B antes del outreach o CRM.",
     answer:
       "Un registro completo no siempre es útil. Este checklist se centra en campos que apoyan decisiones y fuentes para verificarlos.",
     highlights: ["Campos orientados a decisiones", "Progreso visible", "Ningún dato enviado"],
@@ -841,9 +936,9 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "tool-roi-calculator": {
     eyebrow: "Herramienta gratis · Modelo de ROI",
-    title: "Estima el coste de investigar leads B2B manualmente",
+    title: "Coste de Investigación Manual de Leads B2B",
     description:
-      "Modela coste mensual, horas recuperables y valor de equilibrio de un flujo más automatizado.",
+      "Modela el coste mensual, las horas recuperables y el valor de equilibrio de automatizar la investigación y prospección de leads B2B.",
     answer:
       "La calculadora convierte equipo, horas semanales, coste por hora y reducción estimada en un escenario de planificación. No predice ingresos.",
     highlights: ["Supuestos transparentes", "Reducción editable", "Ningún dato enviado"],

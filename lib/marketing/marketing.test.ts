@@ -14,13 +14,15 @@ import { routing } from "@/i18n/routing";
 
 describe("localized SEO content registry", () => {
   it("keeps every commercial page substantive in every supported locale", () => {
-    expect(marketingPages).toHaveLength(22);
+    expect(marketingPages).toHaveLength(24);
 
     for (const page of marketingPages) {
       for (const locale of supportedLocales) {
         const translation = page.translations[locale];
         expect(translation.title.length).toBeGreaterThan(10);
-        expect(translation.description.length).toBeGreaterThan(60);
+        expect(`${translation.title} | ScoreLead`.length).toBeLessThanOrEqual(60);
+        expect(translation.description.length).toBeGreaterThanOrEqual(110);
+        expect(translation.description.length).toBeLessThanOrEqual(160);
         expect(translation.answer.length).toBeGreaterThan(80);
         expect(translation.highlights).toHaveLength(3);
         expect(translation.sections.length).toBeGreaterThanOrEqual(3);
@@ -46,6 +48,20 @@ describe("localized SEO content registry", () => {
       expect(
         Object.values(post.fieldNotes).every((note) => note.length > 100),
       ).toBe(true);
+      expect(
+        Object.values(post.translations).every(
+          (translation) =>
+            `${translation.title} | ScoreLead`.length <= 60 &&
+            translation.description.length >= 110 &&
+            translation.description.length <= 160,
+        ),
+      ).toBe(true);
+    }
+
+    for (const page of marketingPages) {
+      for (const pathname of page.relatedMarketingPaths ?? []) {
+        expect(getMarketingPageByPath(pathname)).toBeDefined();
+      }
     }
   });
 
@@ -53,7 +69,7 @@ describe("localized SEO content registry", () => {
     expect(new Set(blogPosts.map((post) => post.publishedAt))).toEqual(
       new Set(["2026-07-23"]),
     );
-    expect(blogPosts.every((post) => post.updatedAt === "2026-07-24")).toBe(
+    expect(blogPosts.every((post) => post.updatedAt === "2026-08-25")).toBe(
       true,
     );
     expect(
@@ -99,7 +115,7 @@ describe("localized SEO content registry", () => {
 
   it("includes every localized public URL with stable modification dates", () => {
     const entries = sitemap();
-    expect(entries).toHaveLength(114);
+    expect(entries).toHaveLength(120);
 
     for (const page of marketingPages) {
       const matches = entries.filter((entry) =>

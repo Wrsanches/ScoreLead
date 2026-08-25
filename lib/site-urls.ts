@@ -1,3 +1,5 @@
+import { isAppPath } from "@/lib/host-routing"
+
 const DEFAULT_PUBLIC_SITE_URL = "https://scorelead.io"
 const DEFAULT_APP_SITE_URL = "https://app.scorelead.io"
 
@@ -19,6 +21,18 @@ function getUrlHostname(value: string) {
   } catch {
     return ""
   }
+}
+
+export type AnalyticsSurface = "public" | "app"
+
+export function getAnalyticsSurface(
+  hostname: string,
+  pathname: string,
+): AnalyticsSurface | null {
+  const normalizedHostname = hostname.trim().toLowerCase()
+  if (normalizedHostname === getUrlHostname(appSiteUrl)) return "app"
+  if (normalizedHostname !== getUrlHostname(publicSiteUrl)) return null
+  return isAppPath(pathname) ? "app" : "public"
 }
 
 export function isProductionAnalyticsHostname(hostname: string) {

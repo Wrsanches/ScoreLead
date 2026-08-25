@@ -82,7 +82,13 @@ export default async function LocaleLayout({
             <CookieConsent />
           </NextIntlClientProvider>
         </ThemeProvider>
-        <ConsentGatedAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
+        <ConsentGatedAnalytics
+          publicGaId={
+            process.env.NEXT_PUBLIC_GA_PUBLIC_ID ||
+            process.env.NEXT_PUBLIC_GA_ID
+          }
+          appGaId={process.env.NEXT_PUBLIC_GA_APP_ID}
+        />
       </body>
     </html>
   )

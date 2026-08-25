@@ -1,6 +1,4 @@
-import { blogPosts } from "../lib/blog"
-import { marketingPages } from "../lib/marketing"
-import { getLocalizedUrl, supportedLocales } from "../lib/seo"
+import { getIndexableUrls } from "../app/sitemap"
 
 async function main() {
   const endpoint = `${process.env.SCORELEAD_PUBLIC_URL ?? "https://scorelead.io"}/api/indexnow`
@@ -14,16 +12,7 @@ async function main() {
   const urls =
     explicitUrls.length > 0
       ? explicitUrls
-      : [
-          ...marketingPages.flatMap((page) =>
-            supportedLocales.map((locale) => getLocalizedUrl(locale, page.pathname)),
-          ),
-          ...blogPosts.flatMap((post) =>
-            supportedLocales.map((locale) =>
-              getLocalizedUrl(locale, `blog/${post.slug}`),
-            ),
-          ),
-        ]
+      : getIndexableUrls()
 
   const response = await fetch(endpoint, {
     method: "POST",

@@ -4,6 +4,7 @@ import { siteConfig } from "@/lib/seo"
 export default function robots(): MetadataRoute.Robots {
   const privateRoutes = [
     "/api/",
+    "/cdn-cgi/",
     "/admin/",
     "/*/admin/",
     "/onboarding/",

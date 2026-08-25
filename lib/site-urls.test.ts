@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import {
   getAuthClientBaseUrl,
+  getAnalyticsSurface,
   getLocalizedAppPath,
   getLocalizedAppUrl,
   getLocalizedPublicPath,
@@ -17,6 +18,15 @@ describe("site URLs", () => {
     expect(isProductionAnalyticsHostname("scorelead-testing.up.railway.app")).toBe(
       false,
     )
+  })
+
+  it("separates public acquisition pages from application traffic", () => {
+    expect(getAnalyticsSurface("scorelead.io", "/blog/example")).toBe("public")
+    expect(getAnalyticsSurface("scorelead.io", "/pt/admin/leads")).toBe("app")
+    expect(getAnalyticsSurface("scorelead.io", "/en/login")).toBe("app")
+    expect(getAnalyticsSurface("scorelead.io", "/signup")).toBe("app")
+    expect(getAnalyticsSurface("app.scorelead.io", "/es/admin")).toBe("app")
+    expect(getAnalyticsSurface("localhost", "/blog/example")).toBeNull()
   })
 
   it("builds absolute localized public-site links", () => {

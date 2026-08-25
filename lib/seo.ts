@@ -106,7 +106,7 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
   pt: {
     title: "Software de Geracao de Leads com IA | ScoreLead",
     description:
-      "Encontre, pontue, enriqueça e aborde leads de empresas B2B com IA. ScoreLead transforma mercados-alvo em contas qualificadas, dados prontos para CRM e mensagens personalizadas.",
+      "Encontre, pontue e enriqueça leads B2B com IA. O ScoreLead transforma mercados-alvo em contas qualificadas, dados para CRM e outreach personalizado.",
     keywords: [
       "software de geracao de leads com IA",
       "geracao de leads B2B",
@@ -146,7 +146,7 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
   es: {
     title: "Software de Generacion de Leads con IA | ScoreLead",
     description:
-      "Encuentra, puntua, enriquece y contacta leads de empresas B2B con IA. ScoreLead convierte mercados objetivo en cuentas calificadas, datos listos para CRM y outreach personalizado.",
+      "Encuentra, puntúa y enriquece leads B2B con IA. ScoreLead convierte mercados objetivo en cuentas calificadas, datos para CRM y outreach personalizado.",
     keywords: [
       "software de generacion de leads con IA",
       "generacion de leads B2B",
@@ -268,7 +268,7 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     contact: {
       title: "Fale conosco",
       description:
-        "Fale com o ScoreLead sobre vendas, suporte ao produto, parcerias ou geracao de leads B2B com IA.",
+        "Fale com o ScoreLead sobre vendas, suporte ao produto, parcerias ou estratégias para geração e qualificação de leads B2B com IA.",
     },
     privacy: {
       title: "Política de Privacidade",
@@ -318,7 +318,7 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     contact: {
       title: "Contáctanos",
       description:
-        "Contacta con ScoreLead sobre ventas, soporte del producto, alianzas o generacion de leads B2B con IA.",
+        "Contacta con ScoreLead sobre ventas, soporte del producto, alianzas o estrategias de generación y calificación de leads B2B con IA.",
     },
     privacy: {
       title: "Política de Privacidad",

@@ -2,7 +2,7 @@ import type { BlogTranslation } from "./types"
 
 export const portuguesePosts: Record<string, BlogTranslation> = {
   "ai-lead-generation-guide": {
-    title: "Geração de Leads com IA: Guia Prático para Times B2B",
+    title: "Guia de Geração de Leads com IA para B2B",
     description:
       "Aprenda a usar IA para definir um mercado, descobrir contas, qualificar fit e preparar outreach relevante sem abrir mão do julgamento humano.",
     category: "Geração de leads com IA",
@@ -60,7 +60,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-lead-scoring-model": {
-    title: "Como Criar um Modelo de Lead Scoring B2B Confiável",
+    title: "Modelo de Lead Scoring B2B: Guia Prático",
     description:
       "Crie um modelo transparente de lead scoring B2B que combine ICP, evidências da conta, engajamento, prontidão e feedback de vendas.",
     category: "Lead scoring",
@@ -119,7 +119,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "ideal-customer-profile-guide": {
-    title: "Como Definir o Perfil de Cliente Ideal para Prospecção B2B",
+    title: "Perfil de Cliente Ideal para Prospecção B2B",
     description:
       "Transforme evidências de clientes em um ICP B2B acionável, com critérios de fit, desqualificadores, segmentos prioritários e ciclo de feedback.",
     category: "Estratégia de ICP",
@@ -178,7 +178,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "lead-enrichment-guide": {
-    title: "Enriquecimento de Leads B2B: Quais Dados Realmente Importam",
+    title: "Enriquecimento de Leads B2B: Guia Prático",
     description:
       "Descubra quais dados de enriquecimento melhoram qualificação e outreach, como gerenciar confiança das fontes e manter contas úteis.",
     category: "Enriquecimento de leads",
@@ -237,7 +237,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "sales-prospecting-automation": {
-    title: "Automação de Prospecção sem Perder Relevância",
+    title: "Automação de Prospecção: Fluxo e Ferramentas",
     description:
       "Crie um fluxo de automação comercial que escale pesquisa e priorização mantendo qualificação, personalização e revisão humana.",
     category: "Automação comercial",
@@ -296,7 +296,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "personalized-b2b-outreach": {
-    title: "Outreach B2B Personalizado: da Pesquisa à Mensagem Relevante",
+    title: "Outreach B2B Personalizado com Relevância",
     description:
       "Crie outreach B2B personalizado conectando pesquisa verificada a um problema específico, uma proposta de valor útil e follow-ups respeitosos.",
     category: "Outreach B2B",
@@ -355,7 +355,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "manual-lead-research-vs-automation": {
-    title: "Pesquisa Manual de Leads vs. Automação: o que Automatizar?",
+    title: "Pesquisa Manual de Leads vs. Automação",
     description:
       "Compare pesquisa manual e descoberta automatizada para dividir melhor o trabalho entre enriquecimento, qualificação e outreach.",
     category: "Desenho de processos",
@@ -414,7 +414,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "b2b-sales-pipeline-guide": {
-    title: "Como Construir um Pipeline de Vendas B2B do Mercado à Oportunidade",
+    title: "Pipeline de Vendas B2B: Etapas e Métricas",
     description:
       "Desenhe um pipeline B2B mensurável conectando contas-alvo, qualificação, outreach, conversas, oportunidades e aprendizado.",
     category: "Estratégia de pipeline",
@@ -473,7 +473,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "crm-data-quality-guide": {
-    title: "Qualidade de Dados no CRM: Guia para Leads Prontos para Vendas",
+    title: "Qualidade de Dados no CRM para Vendas",
     description:
       "Melhore dados do CRM com responsabilidade clara, validação, deduplicação, rastreamento de fontes e regras de atualização.",
     category: "Qualidade de dados",
@@ -532,7 +532,7 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
     },
   },
   "multilingual-b2b-prospecting": {
-    title: "Prospecção B2B Multilíngue: Como Entrar em Novos Mercados",
+    title: "Prospecção Multilíngue para B2B",
     description:
       "Planeje prospecção B2B multilíngue com segmentação localizada, pesquisa de mercado, mensagens naturais, compliance e resultados comparáveis.",
     category: "Prospecção global",
