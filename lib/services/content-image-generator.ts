@@ -1,6 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import OpenAI from "openai";
-import sharp from "sharp";
 import { unlink, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars";
@@ -215,93 +214,6 @@ const CREATIVE_DIRECTIONS: CreativeDirection[] = [
       "Bold, playful display type anchored to the set geometry, with disciplined spacing and no novelty-font clutter.",
   },
 ];
-
-export interface ExactAssetLayout {
-  id: string;
-  align: "left" | "center" | "right";
-  topFraction: number;
-  maxWidthFraction: number;
-  maxHeightFraction: number;
-  rotation: number;
-  stageDirection: string;
-}
-
-/**
- * Product artwork is composited after generation, so the model only designs
- * the scene around a predictable stage. Each art direction gets a different
- * stage to keep referenced-product posts from collapsing into one template.
- */
-const EXACT_ASSET_LAYOUTS: Record<string, ExactAssetLayout> = {
-  "studio-sculptural": {
-    id: "centered-product-stage",
-    align: "center",
-    topFraction: 0.36,
-    maxWidthFraction: 0.66,
-    maxHeightFraction: 0.57,
-    rotation: 0,
-    stageDirection:
-      "Reserve the lower-center 65% of the frame as a clean, unobstructed hero stage. Keep the headline in the upper third.",
-  },
-  "documentary-editorial": {
-    id: "right-editorial-stage",
-    align: "right",
-    topFraction: 0.37,
-    maxWidthFraction: 0.58,
-    maxHeightFraction: 0.55,
-    rotation: 1.5,
-    stageDirection:
-      "Reserve the lower-right 58% as a clear real-world surface or hand-held stage. Keep people, props, and headline out of that area.",
-  },
-  "tactile-collage": {
-    id: "left-collage-stage",
-    align: "left",
-    topFraction: 0.38,
-    maxWidthFraction: 0.6,
-    maxHeightFraction: 0.54,
-    rotation: -3,
-    stageDirection:
-      "Reserve the lower-left 60% as a clean topmost collage layer. Other paper pieces may point toward it but must not overlap it.",
-  },
-  "graphic-poster": {
-    id: "right-poster-stage",
-    align: "right",
-    topFraction: 0.32,
-    maxWidthFraction: 0.59,
-    maxHeightFraction: 0.61,
-    rotation: 0,
-    stageDirection:
-      "Reserve the center-right 59% as an empty high-contrast poster field. Place the headline on the left or across the top without entering this field.",
-  },
-  "cinematic-narrative": {
-    id: "left-cinematic-stage",
-    align: "left",
-    topFraction: 0.4,
-    maxWidthFraction: 0.57,
-    maxHeightFraction: 0.52,
-    rotation: -1,
-    stageDirection:
-      "Reserve the lower-left 57% as a clearly lit practical surface in the scene. Keep the headline and main human action in the opposite half.",
-  },
-  "playful-practical-set": {
-    id: "right-playful-stage",
-    align: "right",
-    topFraction: 0.38,
-    maxWidthFraction: 0.61,
-    maxHeightFraction: 0.55,
-    rotation: 3,
-    stageDirection:
-      "Reserve the lower-right 61% as the clean top layer of the practical set. Props can frame it but cannot cover or enter it.",
-  },
-};
-
-export function selectExactAssetLayout(
-  creativeDirectionId: string,
-): ExactAssetLayout {
-  return (
-    EXACT_ASSET_LAYOUTS[creativeDirectionId] ??
-    EXACT_ASSET_LAYOUTS["studio-sculptural"]
-  );
-}
 
 function stableHash(value: string): number {
   let hash = 2166136261;
@@ -783,84 +695,6 @@ function carouselVariationForIndex(index: number, total: number): string {
 }
 
 /**
- * Places the original reference pixels into the generated scene after Gemini
- * finishes. The asset may be scaled and gently rotated to fit the composition,
- * but it is never redrawn, recolored, cropped, or regenerated. This is the only
- * reliable way to preserve text-heavy artwork such as bingo cards exactly.
- */
-export async function compositeExactAsset(
-  backgroundBytes: Buffer,
-  assetBytes: Buffer,
-  layout: ExactAssetLayout,
-): Promise<Buffer> {
-  const backgroundMetadata = await sharp(backgroundBytes).metadata();
-  const canvasWidth = backgroundMetadata.width;
-  const canvasHeight = backgroundMetadata.height;
-  if (!canvasWidth || !canvasHeight) {
-    throw new Error("Generated image has no readable dimensions");
-  }
-
-  // Apply EXIF orientation first, then contain the complete asset within the
-  // reserved stage. `inside` is deliberate: no edge of a card can be cropped.
-  const normalized = await sharp(assetBytes).rotate().png().toBuffer();
-  const resized = await sharp(normalized)
-    .resize({
-      width: Math.max(1, Math.floor(canvasWidth * layout.maxWidthFraction)),
-      height: Math.max(1, Math.floor(canvasHeight * layout.maxHeightFraction)),
-      fit: "inside",
-      withoutEnlargement: false,
-    })
-    .png()
-    .toBuffer();
-
-  const rotated = await sharp(resized)
-    .rotate(layout.rotation, {
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    })
-    .png()
-    .toBuffer({ resolveWithObject: true });
-
-  const assetWidth = rotated.info.width;
-  const assetHeight = rotated.info.height;
-  const margin = Math.max(12, Math.floor(canvasWidth * 0.055));
-  const left =
-    layout.align === "left"
-      ? margin
-      : layout.align === "right"
-        ? canvasWidth - margin - assetWidth
-        : Math.floor((canvasWidth - assetWidth) / 2);
-  const top = Math.min(
-    canvasHeight - margin - assetHeight,
-    Math.floor(canvasHeight * layout.topFraction),
-  );
-  const safeLeft = Math.max(0, left);
-  const safeTop = Math.max(0, top);
-
-  // A neutral contact shadow helps a flat screenshot/card sit naturally in a
-  // photographic or collage scene without modifying any pixels in the asset.
-  const shadowPad = Math.max(12, Math.floor(Math.min(canvasWidth, canvasHeight) * 0.018));
-  const shadowOffset = Math.max(4, Math.floor(shadowPad * 0.4));
-  const blur = Math.max(6, Math.floor(shadowPad * 0.55));
-  const shadowWidth = assetWidth + shadowPad * 2;
-  const shadowHeight = assetHeight + shadowPad * 2;
-  const shadowSvg = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${shadowWidth}" height="${shadowHeight}"><defs><filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${blur}"/></filter></defs><rect x="${shadowPad}" y="${shadowPad}" width="${assetWidth}" height="${assetHeight}" rx="${Math.max(4, Math.floor(shadowPad * 0.35))}" fill="black" fill-opacity="0.28" filter="url(#shadow)"/></svg>`,
-  );
-
-  return sharp(backgroundBytes)
-    .composite([
-      {
-        input: shadowSvg,
-        left: Math.max(0, safeLeft - shadowPad + shadowOffset),
-        top: Math.max(0, safeTop - shadowPad + shadowOffset),
-      },
-      { input: rotated.data, left: safeLeft, top: safeTop },
-    ])
-    .png()
-    .toBuffer();
-}
-
-/**
  * Upload a generated slide image (PNG buffer) to S3 and return its public URL.
  */
 async function writeImageToPublic(
@@ -978,9 +812,6 @@ async function runSlideGeneration(
   const editMode = hasBaseImage && !userSourceMode;
   const reference = opts.reference;
   const referenceMode = Boolean(reference);
-  const exactAssetLayout = reference
-    ? selectExactAssetLayout(opts.creativeDirection?.id ?? "studio-sculptural")
-    : null;
 
   // Mention the aspect ratio explicitly in the prompt so the model honors it
   // even when we can't pass `imageConfig.aspectRatio` (some Gemini variants
@@ -994,12 +825,12 @@ The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
           ? `${business.name || "the brand"}'s actual product${reference.description.trim() ? `: "${reference.description.trim()}"` : ""}`
           : "the exact visual asset the user wants featured"
       }.
-- IMPORTANT: the production system will composite the ORIGINAL uploaded pixels into the final image after your render. Do not redraw, imitate, duplicate, replace, crop, blur, recolor, or typeset any part of the reference.
-- Your job is to design the Instagram-ready scene, art direction, light, supporting props, and headline AROUND its reserved stage.
-- ${exactAssetLayout!.stageDirection}
-- Leave that entire stage visually open: no fake card, placeholder rectangle, device screen, copy, hands, faces, or important props inside it.
-- You may harmonize the surrounding palette and lighting with the attached asset, but never reproduce the asset itself. The exact original will be placed there afterward.
-- For bingo cards, worksheets, packaging, screenshots, menus, flyers, and other text-heavy artwork, this rule is absolute: every word, number, grid cell, logo, and mark comes only from the untouched original composite.`
+- Blend the attached image naturally and visibly into the AI-generated Instagram composition. It must be a prominent, intentional part of the scene, not merely a source of inspiration.
+- Treat the attached image as an immutable finished asset. Do not redesign, redraw, regenerate, rewrite, crop, blur, recolor, relabel, simplify, or replace it.
+- Preserve the complete attached image: exact text, spelling, numbers, grid cells, markings, logo, colors, proportions, borders, and layout.
+- Build the art direction, environment, lighting, shadows, props, human interaction, and headline around the unchanged asset so it feels naturally photographed or designed into the scene.
+- If perspective or scale is needed to integrate it, keep the entire asset visible and fully legible. Do not cover it with the headline, hands, props, glare, or effects.
+- For bingo cards, worksheets, packaging, screenshots, menus, flyers, and other text-heavy artwork, fidelity is the highest priority. The final viewer must recognize the attached image as the same original asset, unchanged.`
     : "";
   const freshInstructionLine =
     refinement && !hasBaseImage
@@ -1013,7 +844,7 @@ The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
 A prior version of this slide is the FIRST attached image. Apply this change while preserving everything the user did not ask to change (message, palette, typography, and subject identity):
 "${refinement}"
 
-${reference ? "If the prior slide already contains a rendered or composited version of the attached reference, clear the reserved stage and rebuild only the surroundings. The untouched original asset will be composited there after this edit." : ""}
+${reference ? "Keep the attached reference unchanged while blending it naturally into the refined composition. Do not create a second copy or alter any of its content." : ""}
 Deliver the refined image at the same aspect and quality.`
     : userSourceMode
       ? `${basePrompt}${aspectLine}
@@ -1099,18 +930,7 @@ ${referenceLine}`
       const finalImage =
         imageParts.filter((p) => !p.thought).pop() ?? imageParts.pop();
       if (finalImage) {
-        const generatedBuffer = Buffer.from(
-          finalImage.inlineData.data,
-          "base64",
-        );
-        const buffer =
-          reference && exactAssetLayout
-            ? await compositeExactAsset(
-                generatedBuffer,
-                Buffer.from(reference.base64, "base64"),
-                exactAssetLayout,
-              )
-            : generatedBuffer;
+        const buffer = Buffer.from(finalImage.inlineData.data, "base64");
         const url = await writeImageToPublic(post.id, slideIndex, buffer);
         return { url, headline: slide.headline, prompt: generationPrompt };
       }
