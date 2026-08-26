@@ -140,13 +140,18 @@ export function MarketingPageView({
     ],
   };
 
+
   return (
     <div className="min-h-screen bg-[#09090B] text-zinc-100">
       <JsonLd data={jsonLd} />
       <Navbar />
 
       <main id="main" className="pt-16">
-        <header className="border-b border-zinc-800/70 px-6 py-12 sm:py-20 lg:py-24">
+        {/* ── Hero ─────────────────────────────────────────────
+            One asymmetric stack. The emerald eyebrow is the only
+            accent above the fold; review metadata sits on a quiet
+            baseline row instead of a competing bordered rail. */}
+        <header className="px-6 pb-16 pt-10 sm:pb-24 sm:pt-14">
           <div className="mx-auto max-w-6xl">
             <nav
               aria-label="Breadcrumb"
@@ -162,92 +167,92 @@ export function MarketingPageView({
               <span className="text-zinc-400">{translation.eyebrow}</span>
             </nav>
 
-            <div className="mt-10 grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
-                  {translation.eyebrow}
-                </p>
-                <h1 className="mt-5 max-w-4xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
-                  {translation.title}
-                </h1>
-                <p className="mt-7 max-w-3xl text-pretty text-lg leading-8 text-zinc-400">
-                  {translation.description}
-                </p>
-              </div>
-              <div className="border-y border-zinc-800 py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
-                <p className="text-xs uppercase tracking-[0.15em] text-zinc-600">
-                  {ui.lastReviewed}
-                </p>
+            <p className="mt-12 font-mono text-[11px] uppercase tracking-[0.22em] text-emerald-400">
+              {translation.eyebrow}
+            </p>
+            <h1 className="mt-6 max-w-[19ch] text-balance text-[2.5rem] font-medium leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl sm:leading-[0.98] lg:text-[4.25rem]">
+              {translation.title}
+            </h1>
+            <p className="mt-8 max-w-2xl text-pretty text-lg leading-8 text-zinc-400">
+              {translation.description}
+            </p>
+
+            <div className="mt-9 flex flex-col gap-2 text-sm text-zinc-500 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
+              <span className="flex items-center gap-2">
+                {ui.lastReviewed}
                 <time
                   dateTime={page.updatedAt}
-                  className="mt-2 block text-sm font-medium text-zinc-300"
+                  className="font-mono text-zinc-400"
                 >
                   {formatDate(page.updatedAt, normalizedLocale)}
                 </time>
-                <Link
-                  href="/authors/scorelead-editorial"
-                  className="mt-5 inline-block rounded-sm text-sm text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-                >
-                  ScoreLead Editorial
-                </Link>
-              </div>
+              </span>
+              <span aria-hidden="true" className="hidden text-zinc-700 sm:inline">
+                /
+              </span>
+              <Link
+                href="/authors/scorelead-editorial"
+                className="rounded-sm text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-white hover:decoration-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+              >
+                ScoreLead Editorial
+              </Link>
             </div>
 
             <MarketingPlatformImage page={page} locale={normalizedLocale} />
           </div>
         </header>
 
+        {/* ── Lede / direct answer ─────────────────────────────
+            Marginal label rail + one oversized paragraph. Fixed
+            narrow label column, so it reads as an editorial
+            side-note rather than another 2-column content block. */}
         <section
-          className="px-6 py-14 sm:py-20"
+          className="border-t border-zinc-900 px-6 py-16 sm:py-24"
           aria-labelledby="direct-answer"
         >
-          <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.72fr_1.28fr]">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
-                {ui.overview}
-              </p>
-              <h2
-                id="direct-answer"
-                className="mt-4 text-2xl font-medium tracking-tight text-white"
-              >
-                {translation.title}
-              </h2>
-            </div>
-            <p className="max-w-3xl text-pretty text-xl leading-9 text-zinc-300">
+          <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[9rem_minmax(0,1fr)] lg:gap-12">
+            <h2
+              id="direct-answer"
+              className="text-[11px] uppercase tracking-[0.18em] text-zinc-500 lg:pt-3"
+            >
+              {ui.overview}
+            </h2>
+            <p className="max-w-3xl text-pretty text-[1.375rem] leading-[1.55] text-zinc-200 sm:text-[1.75rem] sm:leading-[1.5]">
               {translation.answer}
             </p>
           </div>
         </section>
 
+        {/* ── What you can do ──────────────────────────────────
+            Deliberately a different shape from every other block:
+            a 3-up grid of rule-topped items, no numbering. */}
         <section
-          className="border-y border-zinc-800/70 px-6"
+          className="border-t border-zinc-900 px-6 py-16 sm:py-20"
           aria-labelledby="outcomes"
         >
-          <div className="mx-auto max-w-6xl py-12 sm:py-16">
-            <h2 id="outcomes" className="text-sm font-medium text-zinc-400">
+          <div className="mx-auto max-w-6xl">
+            <h2
+              id="outcomes"
+              className="text-[11px] uppercase tracking-[0.18em] text-zinc-500"
+            >
               {ui.keyOutcomes}
             </h2>
-            <ol className="mt-8 divide-y divide-zinc-800 border-y border-zinc-800">
-              {translation.highlights.map((highlight, index) => (
+            <ul className="mt-10 grid gap-x-12 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+              {translation.highlights.map((highlight) => (
                 <li
                   key={highlight}
-                  className="grid gap-3 py-6 sm:grid-cols-[60px_1fr] sm:items-start"
+                  className="border-t border-zinc-800 pt-5 text-[1.0625rem] leading-7 text-zinc-300"
                 >
-                  <span className="font-mono text-xs text-emerald-400">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="max-w-3xl text-lg leading-7 text-zinc-200">
-                    {highlight}
-                  </span>
+                  {highlight}
                 </li>
               ))}
-            </ol>
+            </ul>
           </div>
         </section>
 
         {page.group === "tools" ? (
           <section
-            className="px-6 py-14 sm:py-20"
+            className="border-t border-zinc-900 px-6 py-16 sm:py-20"
             aria-label={translation.title}
           >
             <div className="mx-auto max-w-5xl">
@@ -256,73 +261,71 @@ export function MarketingPageView({
           </section>
         ) : null}
 
-        <section className="px-6 py-16 sm:py-24">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-14">
-              {translation.sections.map((section, index) => (
-                <section
-                  key={section.heading}
-                  aria-labelledby={`${page.slug}-section-${index}`}
-                  className="grid gap-7 border-t border-zinc-800 pt-9 lg:grid-cols-[0.72fr_1.28fr]"
-                >
-                  <div>
-                    <span className="font-mono text-xs text-emerald-400">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <h2
-                      id={`${page.slug}-section-${index}`}
-                      className="mt-4 max-w-sm text-2xl font-medium tracking-tight text-white sm:text-3xl"
-                    >
-                      {section.heading}
-                    </h2>
+        {/* ── Body sections ────────────────────────────────────
+            The only place a number appears, and it hangs beside
+            the heading rather than stacking above it. */}
+        <section className="border-t border-zinc-900 px-6 py-16 sm:py-24">
+          <div className="mx-auto grid max-w-6xl gap-16 sm:gap-20">
+            {translation.sections.map((section, index) => (
+              <section
+                key={section.heading}
+                aria-labelledby={`${page.slug}-section-${index}`}
+                className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-16"
+              >
+                <div className="flex gap-4">
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.4rem] font-mono text-xs tabular-nums text-zinc-600"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h2
+                    id={`${page.slug}-section-${index}`}
+                    className="text-[1.5rem] font-medium leading-[1.2] tracking-[-0.02em] text-white sm:text-[1.625rem]"
+                  >
+                    {section.heading}
+                  </h2>
+                </div>
+                <div>
+                  <div className="space-y-5 text-lg leading-8 text-zinc-400">
+                    {section.paragraphs.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
                   </div>
-                  <div>
-                    <div className="space-y-5 text-base leading-8 text-zinc-400 sm:text-lg">
-                      {section.paragraphs.map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
+                  {section.points ? (
+                    <ul className="mt-8 flex flex-wrap gap-2">
+                      {section.points.map((point) => (
+                        <li
+                          key={point}
+                          className="rounded-full border border-zinc-800 px-3.5 py-1.5 text-[0.8125rem] leading-5 text-zinc-400"
+                        >
+                          {point}
+                        </li>
                       ))}
-                    </div>
-                    {section.points ? (
-                      <ul className="mt-7 grid gap-x-8 gap-y-3 border-y border-zinc-800 py-5 sm:grid-cols-2">
-                        {section.points.map((point) => (
-                          <li
-                            key={point}
-                            className="flex items-start gap-3 text-sm leading-6 text-zinc-300"
-                          >
-                            <span
-                              className="mt-2.5 size-1.5 shrink-0 rounded-full bg-emerald-400"
-                              aria-hidden="true"
-                            />
-                            {point}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                </section>
-              ))}
-            </div>
+                    </ul>
+                  ) : null}
+                </div>
+              </section>
+            ))}
           </div>
         </section>
 
-        <section
-          className="border-y border-emerald-500/15 bg-emerald-500/[0.035] px-6 py-14 sm:py-18"
-          aria-labelledby="evidence"
-        >
-          <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[0.72fr_1.28fr]">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
+        {/* ── Evidence and limits ──────────────────────────────
+            An inset panel, not a tinted full-bleed band. The shape
+            is what marks it as an aside. */}
+        <section className="px-6 pb-16 sm:pb-24" aria-labelledby="evidence">
+          <div className="mx-auto max-w-6xl">
+            <div className="rounded-2xl border border-zinc-800/70 bg-zinc-900/25 p-8 sm:p-12">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                 {ui.evidence}
               </p>
               <h2
                 id="evidence"
-                className="mt-4 text-2xl font-medium tracking-tight text-white"
+                className="mt-5 max-w-2xl text-[1.375rem] font-medium leading-[1.25] tracking-[-0.02em] text-white sm:text-2xl"
               >
                 {translation.proofLabel}
               </h2>
-            </div>
-            <div>
-              <p className="max-w-3xl text-lg leading-8 text-zinc-300">
+              <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-400">
                 {translation.proof}
               </p>
               {page.id === "case-study-ceramik" ? (
@@ -330,7 +333,7 @@ export function MarketingPageView({
                   href="https://ceramik.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                  className="mt-7 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-white hover:decoration-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                 >
                   Ceramik
                   <ExternalLink className="size-4" aria-hidden="true" />
@@ -342,22 +345,22 @@ export function MarketingPageView({
 
         {relatedPosts.length ? (
           <section
-            className="px-6 py-16 sm:py-22"
+            className="border-t border-zinc-900 px-6 py-16 sm:py-20"
             aria-labelledby="related-guides"
           >
             <div className="mx-auto max-w-6xl">
-              <div className="max-w-2xl">
+              <div className="flex flex-wrap items-end justify-between gap-4">
                 <h2
                   id="related-guides"
-                  className="text-3xl font-medium tracking-tight text-white"
+                  className="text-[1.75rem] font-medium tracking-[-0.025em] text-white"
                 >
                   {ui.relatedGuides}
                 </h2>
-                <p className="mt-3 leading-7 text-zinc-500">
+                <p className="max-w-sm text-sm leading-6 text-zinc-500">
                   {ui.relatedGuidesDescription}
                 </p>
               </div>
-              <div className="mt-9 divide-y divide-zinc-800 border-y border-zinc-800">
+              <div className="mt-10 border-t border-zinc-800">
                 {relatedPosts.map((post) => {
                   const postTranslation = getBlogTranslation(
                     post,
@@ -367,17 +370,17 @@ export function MarketingPageView({
                     <Link
                       key={post.slug}
                       href={`/blog/${post.slug}`}
-                      className="group grid gap-4 py-6 transition-colors hover:bg-zinc-900/35 sm:grid-cols-[1fr_auto] sm:items-center sm:px-4"
+                      className="group grid gap-3 border-b border-zinc-800 py-6 transition-colors hover:bg-zinc-900/40 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-4"
                     >
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-400">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                           {postTranslation.category}
                         </p>
-                        <h3 className="mt-2 text-lg font-medium text-zinc-200 transition-colors group-hover:text-white">
+                        <h3 className="mt-2.5 text-lg font-medium leading-7 text-zinc-200 transition-colors group-hover:text-white">
                           {postTranslation.title}
                         </h3>
                       </div>
-                      <span className="inline-flex items-center gap-2 text-sm text-zinc-500 group-hover:text-zinc-200">
+                      <span className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors group-hover:text-zinc-200">
                         {ui.readGuide}
                         <ArrowRight
                           className="size-4 transition-transform group-hover:translate-x-1"
@@ -394,22 +397,22 @@ export function MarketingPageView({
 
         {relatedPages.length ? (
           <section
-            className="border-t border-zinc-800/70 px-6 py-16 sm:py-22"
+            className="border-t border-zinc-900 px-6 py-16 sm:py-20"
             aria-labelledby="related-solutions"
           >
             <div className="mx-auto max-w-6xl">
-              <div className="max-w-2xl">
+              <div className="flex flex-wrap items-end justify-between gap-4">
                 <h2
                   id="related-solutions"
-                  className="text-3xl font-medium tracking-tight text-white"
+                  className="text-[1.75rem] font-medium tracking-[-0.025em] text-white"
                 >
                   {ui.relatedSolutions}
                 </h2>
-                <p className="mt-3 leading-7 text-zinc-500">
+                <p className="max-w-sm text-sm leading-6 text-zinc-500">
                   {ui.relatedSolutionsDescription}
                 </p>
               </div>
-              <div className="mt-9 grid gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-2">
+              <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-zinc-900 bg-zinc-900 sm:grid-cols-2">
                 {relatedPages.map((relatedPage) => {
                   const relatedTranslation = getMarketingTranslation(
                     relatedPage,
@@ -419,15 +422,15 @@ export function MarketingPageView({
                     <Link
                       key={relatedPage.pathname}
                       href={`/${relatedPage.pathname}`}
-                      className="group bg-[#09090B] p-6 transition-colors hover:bg-zinc-900/70"
+                      className="group flex flex-col bg-[#09090B] p-7 transition-colors hover:bg-zinc-900/60"
                     >
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-400">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                         {relatedTranslation.eyebrow}
                       </p>
-                      <h3 className="mt-3 text-lg font-medium text-zinc-200 transition-colors group-hover:text-white">
+                      <h3 className="mt-3 text-lg font-medium leading-7 text-zinc-200 transition-colors group-hover:text-white">
                         {relatedTranslation.title}
                       </h3>
-                      <span className="mt-5 inline-flex items-center gap-2 text-sm text-zinc-500 group-hover:text-zinc-200">
+                      <span className="mt-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors group-hover:text-zinc-200">
                         {ui.viewPage}
                         <ArrowRight
                           className="size-4 transition-transform group-hover:translate-x-1"
@@ -442,16 +445,15 @@ export function MarketingPageView({
           </section>
         ) : null}
 
-        <section className="border-t border-zinc-800/70 px-6 py-16 sm:py-22">
-          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+        {/* ── Closing CTA ──────────────────────────────────────
+            The second and last emerald on the page, so it lands. */}
+        <section className="border-t border-zinc-900 px-6 py-20 sm:py-28">
+          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
-                ScoreLead
-              </p>
-              <h2 className="mt-4 max-w-3xl text-balance text-3xl font-medium tracking-tight text-white sm:text-5xl">
+              <h2 className="max-w-3xl text-balance text-[2rem] font-medium leading-[1.08] tracking-[-0.04em] text-white sm:text-[2.75rem]">
                 {translation.ctaTitle}
               </h2>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
+              <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-400">
                 {translation.ctaDescription}
               </p>
             </div>
@@ -459,17 +461,20 @@ export function MarketingPageView({
               href={ctaHref(page)}
               eventName="commercial_cta_click"
               eventParams={{ page_id: page.id, page_group: page.group }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
             >
               {translation.ctaLabel}
-              <ArrowRight className="size-4" aria-hidden="true" />
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </TrackedLink>
           </div>
         </section>
 
         {page.id !== "company-editorial-policy" ? (
           <aside
-            className="border-t border-zinc-800/70 px-6 py-10"
+            className="border-t border-zinc-900 px-6 py-10"
             aria-labelledby="methodology"
           >
             <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -486,10 +491,13 @@ export function MarketingPageView({
               </div>
               <Link
                 href="/editorial-policy"
-                className="inline-flex items-center gap-2 rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                className="group inline-flex shrink-0 items-center gap-2 rounded-sm text-sm font-medium text-zinc-400 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
               >
                 {ui.editorialPolicy}
-                <ArrowRight className="size-4" aria-hidden="true" />
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
           </aside>
