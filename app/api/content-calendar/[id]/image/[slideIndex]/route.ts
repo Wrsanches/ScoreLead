@@ -113,9 +113,12 @@ export async function POST(
     slide = await regenerateSlide(
       {
         name: biz.name,
+        description: biz.description,
         category: biz.category,
         field: biz.field,
         persona: biz.persona,
+        clientPersona: biz.clientPersona,
+        services: biz.services,
         brandStyle: biz.brandStyle,
         brandColorPrimary: biz.brandColorPrimary,
         brandColorSecondary: biz.brandColorSecondary,

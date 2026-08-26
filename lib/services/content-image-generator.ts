@@ -1,5 +1,6 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import OpenAI from "openai";
+import sharp from "sharp";
 import { unlink, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars";
@@ -36,9 +37,12 @@ function getOpenAI(): OpenAI | null {
 
 export interface ImageGenBusiness {
   name: string | null;
+  description: string | null;
   category: string | null;
   field: string | null;
   persona: string | null;
+  clientPersona: string | null;
+  services: string | null;
   brandStyle: string | null;
   brandColorPrimary: string | null;
   brandColorSecondary: string | null;
@@ -211,6 +215,93 @@ const CREATIVE_DIRECTIONS: CreativeDirection[] = [
       "Bold, playful display type anchored to the set geometry, with disciplined spacing and no novelty-font clutter.",
   },
 ];
+
+export interface ExactAssetLayout {
+  id: string;
+  align: "left" | "center" | "right";
+  topFraction: number;
+  maxWidthFraction: number;
+  maxHeightFraction: number;
+  rotation: number;
+  stageDirection: string;
+}
+
+/**
+ * Product artwork is composited after generation, so the model only designs
+ * the scene around a predictable stage. Each art direction gets a different
+ * stage to keep referenced-product posts from collapsing into one template.
+ */
+const EXACT_ASSET_LAYOUTS: Record<string, ExactAssetLayout> = {
+  "studio-sculptural": {
+    id: "centered-product-stage",
+    align: "center",
+    topFraction: 0.36,
+    maxWidthFraction: 0.66,
+    maxHeightFraction: 0.57,
+    rotation: 0,
+    stageDirection:
+      "Reserve the lower-center 65% of the frame as a clean, unobstructed hero stage. Keep the headline in the upper third.",
+  },
+  "documentary-editorial": {
+    id: "right-editorial-stage",
+    align: "right",
+    topFraction: 0.37,
+    maxWidthFraction: 0.58,
+    maxHeightFraction: 0.55,
+    rotation: 1.5,
+    stageDirection:
+      "Reserve the lower-right 58% as a clear real-world surface or hand-held stage. Keep people, props, and headline out of that area.",
+  },
+  "tactile-collage": {
+    id: "left-collage-stage",
+    align: "left",
+    topFraction: 0.38,
+    maxWidthFraction: 0.6,
+    maxHeightFraction: 0.54,
+    rotation: -3,
+    stageDirection:
+      "Reserve the lower-left 60% as a clean topmost collage layer. Other paper pieces may point toward it but must not overlap it.",
+  },
+  "graphic-poster": {
+    id: "right-poster-stage",
+    align: "right",
+    topFraction: 0.32,
+    maxWidthFraction: 0.59,
+    maxHeightFraction: 0.61,
+    rotation: 0,
+    stageDirection:
+      "Reserve the center-right 59% as an empty high-contrast poster field. Place the headline on the left or across the top without entering this field.",
+  },
+  "cinematic-narrative": {
+    id: "left-cinematic-stage",
+    align: "left",
+    topFraction: 0.4,
+    maxWidthFraction: 0.57,
+    maxHeightFraction: 0.52,
+    rotation: -1,
+    stageDirection:
+      "Reserve the lower-left 57% as a clearly lit practical surface in the scene. Keep the headline and main human action in the opposite half.",
+  },
+  "playful-practical-set": {
+    id: "right-playful-stage",
+    align: "right",
+    topFraction: 0.38,
+    maxWidthFraction: 0.61,
+    maxHeightFraction: 0.55,
+    rotation: 3,
+    stageDirection:
+      "Reserve the lower-right 61% as the clean top layer of the practical set. Props can frame it but cannot cover or enter it.",
+  },
+};
+
+export function selectExactAssetLayout(
+  creativeDirectionId: string,
+): ExactAssetLayout {
+  return (
+    EXACT_ASSET_LAYOUTS[creativeDirectionId] ??
+    EXACT_ASSET_LAYOUTS["studio-sculptural"]
+  );
+}
 
 function stableHash(value: string): number {
   let hash = 2166136261;
@@ -560,6 +651,11 @@ function buildSlidePrompt(
   const brandName = business.name || "the brand";
   const brandVoice = business.persona || business.brandStyle || "";
   const category = business.category || business.field || "";
+  const audience =
+    business.clientPersona || "the brand's most likely Instagram customer";
+  const offering =
+    business.services || business.description || category || "the offering";
+  const captionContext = post.caption.replace(/\s+/g, " ").trim().slice(0, 1400);
 
   const roleLine =
     slide.role === "cover"
@@ -581,9 +677,28 @@ function buildSlidePrompt(
       ? carouselVariationForIndex(slideIndex, totalSlides)
       : null;
 
-  return `You are the art director and designer of a distinctive campaign for ${brandName}${category ? ` (${category})` : ""}. Deliver ONE ${aspect} image for an Instagram ${post.postType}. Make this post visibly different from generic AI social content while remaining recognizably on-brand.
+  return `You are a senior Instagram creative director, social-first art director, and conversion-aware designer. You specialize in thumb-stopping organic Instagram posts that communicate in under 1.5 seconds on a phone screen. Create a distinctive campaign asset for ${brandName}${category ? ` (${category})` : ""}, not a generic AI illustration or reusable Canva-style template.
+
+Deliver ONE ${aspect} image for an Instagram ${post.postType}. It must feel native to a high-quality brand feed, remain legible at mobile-feed size, and earn attention without looking like a loud display ad.
 
 ${roleLine}
+
+== INSTAGRAM STRATEGY ==
+Target audience: ${audience}
+
+Business offering: ${offering}
+
+Caption context (strategy only, do not render this paragraph as text):
+"${captionContext}"
+
+${post.callToAction ? `Desired action after viewing: ${post.callToAction}` : "Desired action after viewing: understand the idea and want to read the caption."}
+
+Social-first rules:
+- The first glance must reveal one hook, one focal subject, and one emotional or practical payoff.
+- Compose for a phone screen. Avoid tiny details that only work when zoomed in.
+- Keep essential headline letters and product identity inside a 7% safe margin on every edge.
+- Use visual tension, crop, scale, gesture, or contrast to stop the scroll. Do not use clickbait badges or engagement-bait decoration.
+- Let the image create curiosity for the caption rather than trying to place the whole caption inside the artwork.
 
 == CREATIVE DIRECTION: ${creativeDirection.id} ==
 Name: ${creativeDirection.name}
@@ -623,12 +738,16 @@ ${brandVoice ? `Brand voice: ${brandVoice}\n` : ""}${visualLine}${variationHint 
 This is slide ${slideIndex + 1} of ${totalSlides}. Keep the chosen medium, palette, texture, and type system consistent across the carousel. VARY scale, crop, subject placement, and visual rhythm so swiping feels authored rather than repetitive.
 
 == QUALITY RUBRIC - grade yourself honestly ==
+- Would this stop the intended audience during a fast Instagram scroll?
+- Is the post understandable at feed size in under 1.5 seconds?
+- Does it look authored specifically for this caption, audience, and offering?
 - Does this feel specifically designed for this brand and post rather than generated from a reusable template?
 - Is the chosen creative direction immediately visible and fully executed?
 - Does the composition use space intentionally rather than defaulting to a centered hero?
 - Is there a single clear focal point? No visual noise competing with the subject?
 - Do materials and textures feel convincing for the chosen medium?
 - Is the typography placed on a clear alignment (flush to an object edge, the frame, or a grid), not floating?
+- Are all essential elements safely inside the mobile crop and interface zones?
 - Does the frame feel composed by a human with taste, not generated by defaults?
 
 == HARD DON'TS ==
@@ -661,6 +780,84 @@ function carouselVariationForIndex(index: number, total: number): string {
   ];
   const choice = patterns[(index - 1) % patterns.length];
   return `Vary the composition from the previous slide. This slide: ${choice} Keep the selected medium, palette, texture, and typography consistent with the cover.`;
+}
+
+/**
+ * Places the original reference pixels into the generated scene after Gemini
+ * finishes. The asset may be scaled and gently rotated to fit the composition,
+ * but it is never redrawn, recolored, cropped, or regenerated. This is the only
+ * reliable way to preserve text-heavy artwork such as bingo cards exactly.
+ */
+export async function compositeExactAsset(
+  backgroundBytes: Buffer,
+  assetBytes: Buffer,
+  layout: ExactAssetLayout,
+): Promise<Buffer> {
+  const backgroundMetadata = await sharp(backgroundBytes).metadata();
+  const canvasWidth = backgroundMetadata.width;
+  const canvasHeight = backgroundMetadata.height;
+  if (!canvasWidth || !canvasHeight) {
+    throw new Error("Generated image has no readable dimensions");
+  }
+
+  // Apply EXIF orientation first, then contain the complete asset within the
+  // reserved stage. `inside` is deliberate: no edge of a card can be cropped.
+  const normalized = await sharp(assetBytes).rotate().png().toBuffer();
+  const resized = await sharp(normalized)
+    .resize({
+      width: Math.max(1, Math.floor(canvasWidth * layout.maxWidthFraction)),
+      height: Math.max(1, Math.floor(canvasHeight * layout.maxHeightFraction)),
+      fit: "inside",
+      withoutEnlargement: false,
+    })
+    .png()
+    .toBuffer();
+
+  const rotated = await sharp(resized)
+    .rotate(layout.rotation, {
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png()
+    .toBuffer({ resolveWithObject: true });
+
+  const assetWidth = rotated.info.width;
+  const assetHeight = rotated.info.height;
+  const margin = Math.max(12, Math.floor(canvasWidth * 0.055));
+  const left =
+    layout.align === "left"
+      ? margin
+      : layout.align === "right"
+        ? canvasWidth - margin - assetWidth
+        : Math.floor((canvasWidth - assetWidth) / 2);
+  const top = Math.min(
+    canvasHeight - margin - assetHeight,
+    Math.floor(canvasHeight * layout.topFraction),
+  );
+  const safeLeft = Math.max(0, left);
+  const safeTop = Math.max(0, top);
+
+  // A neutral contact shadow helps a flat screenshot/card sit naturally in a
+  // photographic or collage scene without modifying any pixels in the asset.
+  const shadowPad = Math.max(12, Math.floor(Math.min(canvasWidth, canvasHeight) * 0.018));
+  const shadowOffset = Math.max(4, Math.floor(shadowPad * 0.4));
+  const blur = Math.max(6, Math.floor(shadowPad * 0.55));
+  const shadowWidth = assetWidth + shadowPad * 2;
+  const shadowHeight = assetHeight + shadowPad * 2;
+  const shadowSvg = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${shadowWidth}" height="${shadowHeight}"><defs><filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${blur}"/></filter></defs><rect x="${shadowPad}" y="${shadowPad}" width="${assetWidth}" height="${assetHeight}" rx="${Math.max(4, Math.floor(shadowPad * 0.35))}" fill="black" fill-opacity="0.28" filter="url(#shadow)"/></svg>`,
+  );
+
+  return sharp(backgroundBytes)
+    .composite([
+      {
+        input: shadowSvg,
+        left: Math.max(0, safeLeft - shadowPad + shadowOffset),
+        top: Math.max(0, safeTop - shadowPad + shadowOffset),
+      },
+      { input: rotated.data, left: safeLeft, top: safeTop },
+    ])
+    .png()
+    .toBuffer();
 }
 
 /**
@@ -781,6 +978,9 @@ async function runSlideGeneration(
   const editMode = hasBaseImage && !userSourceMode;
   const reference = opts.reference;
   const referenceMode = Boolean(reference);
+  const exactAssetLayout = reference
+    ? selectExactAssetLayout(opts.creativeDirection?.id ?? "studio-sculptural")
+    : null;
 
   // Mention the aspect ratio explicitly in the prompt so the model honors it
   // even when we can't pass `imageConfig.aspectRatio` (some Gemini variants
@@ -792,13 +992,14 @@ async function runSlideGeneration(
 The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
         reference.kind === "product"
           ? `${business.name || "the brand"}'s actual product${reference.description.trim() ? `: "${reference.description.trim()}"` : ""}`
-          : "an exact visual asset or subject the user wants incorporated"
+          : "the exact visual asset the user wants featured"
       }.
-- Create a NEW composition in the selected creative direction that visibly features the reference's defining subject.
-- Preserve identity faithfully: shape, proportions, colors, materials, labels, layout, grid, markings, and on-screen UI. Do not redesign it or replace it with a generic substitute.
-- If it is a bingo card, game card, board, worksheet, package, or printed piece, retain its recognizable structure and place the actual piece naturally in the scene, collage, or poster.
-- If it is an app or website screenshot, keep its interface recognizable and present it naturally on a device or as a precise graphic element appropriate to the selected medium.
-- Adapt the surrounding scene, framing, and lighting freely. Reference fidelity overrides stylistic abstraction.`
+- IMPORTANT: the production system will composite the ORIGINAL uploaded pixels into the final image after your render. Do not redraw, imitate, duplicate, replace, crop, blur, recolor, or typeset any part of the reference.
+- Your job is to design the Instagram-ready scene, art direction, light, supporting props, and headline AROUND its reserved stage.
+- ${exactAssetLayout!.stageDirection}
+- Leave that entire stage visually open: no fake card, placeholder rectangle, device screen, copy, hands, faces, or important props inside it.
+- You may harmonize the surrounding palette and lighting with the attached asset, but never reproduce the asset itself. The exact original will be placed there afterward.
+- For bingo cards, worksheets, packaging, screenshots, menus, flyers, and other text-heavy artwork, this rule is absolute: every word, number, grid cell, logo, and mark comes only from the untouched original composite.`
     : "";
   const freshInstructionLine =
     refinement && !hasBaseImage
@@ -806,18 +1007,13 @@ The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
       : "";
 
   const generationPrompt = editMode
-    ? `${basePrompt}${aspectLine}
+    ? `${basePrompt}${aspectLine}${referenceLine}
 
 == USER REFINEMENT ON THE PROVIDED IMAGE ==
 A prior version of this slide is the FIRST attached image. Apply this change while preserving everything the user did not ask to change (message, palette, typography, and subject identity):
 "${refinement}"
-${
-  reference
-    ? `
-The SECOND attached image is a ${reference.kind === "product" ? "real product" : "user"} reference. Incorporate its exact defining subject in the refined slide. Preserve its recognizable layout, grid, markings, colors, labels, and interface details rather than inventing an approximation.
-`
-    : ""
-}
+
+${reference ? "If the prior slide already contains a rendered or composited version of the attached reference, clear the reserved stage and rebuild only the surroundings. The untouched original asset will be composited there after this edit." : ""}
 Deliver the refined image at the same aspect and quality.`
     : userSourceMode
       ? `${basePrompt}${aspectLine}
@@ -903,7 +1099,18 @@ ${referenceLine}`
       const finalImage =
         imageParts.filter((p) => !p.thought).pop() ?? imageParts.pop();
       if (finalImage) {
-        const buffer = Buffer.from(finalImage.inlineData.data, "base64");
+        const generatedBuffer = Buffer.from(
+          finalImage.inlineData.data,
+          "base64",
+        );
+        const buffer =
+          reference && exactAssetLayout
+            ? await compositeExactAsset(
+                generatedBuffer,
+                Buffer.from(reference.base64, "base64"),
+                exactAssetLayout,
+              )
+            : generatedBuffer;
         const url = await writeImageToPublic(post.id, slideIndex, buffer);
         return { url, headline: slide.headline, prompt: generationPrompt };
       }
