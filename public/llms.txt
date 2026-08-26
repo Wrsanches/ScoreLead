@@ -50,8 +50,19 @@ Core workflow:
 - Established B2B companies: https://scorelead.io/use-cases/b2b-companies
 - Manual research comparison: https://scorelead.io/compare/manual-lead-research
 - Spreadsheet comparison: https://scorelead.io/compare/spreadsheets
+- Sales prospecting software: https://scorelead.io/compare/sales-prospecting-software
 - Purchased-list comparison: https://scorelead.io/compare/purchased-lead-lists
+- Lead scoring software comparison: https://scorelead.io/compare/best-lead-scoring-software
+- Lead enrichment tools comparison: https://scorelead.io/compare/b2b-lead-enrichment-tools
 - Ceramik case study: https://scorelead.io/case-studies/ceramik
+
+## Practical Guides
+
+- B2B prospecting: https://scorelead.io/blog/b2b-prospecting-guide
+- AI lead generation: https://scorelead.io/blog/ai-lead-generation-guide
+- Lead scoring model: https://scorelead.io/blog/b2b-lead-scoring-model
+- Lead enrichment: https://scorelead.io/blog/lead-enrichment-guide
+- Sales prospecting automation: https://scorelead.io/blog/sales-prospecting-automation
 
 ## Free Tools
 

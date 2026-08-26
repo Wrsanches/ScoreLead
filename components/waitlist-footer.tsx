@@ -68,6 +68,10 @@ export function WaitlistFooter() {
           label: t("spreadsheets"),
         },
         {
+          href: "/compare/sales-prospecting-software" as const,
+          label: t("salesProspectingSoftware"),
+        },
+        {
           href: "/compare/purchased-lead-lists" as const,
           label: t("purchasedLeadLists"),
         },

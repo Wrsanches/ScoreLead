@@ -1,21 +1,23 @@
 # ScoreLead SEO and GEO Strategy
 
-Updated: 2026-08-25
+Updated: 2026-08-26
 
 ## Audit baseline
 
 The August 2026 Ahrefs, Google Search Console, and GA4 review established the
 starting point for this plan:
 
-- Search Console recorded 976 impressions and 20 clicks from May through July;
-  impressions grew from 119 to 673 over that period.
-- GA4 recorded 24 organic sessions and 14 engaged sessions, but the public
-  property also contained authenticated `/admin` traffic. Public acquisition
-  and app activity must therefore be measured separately.
+- Search Console recorded about 1,738 impressions and 28 clicks over the latest
+  13 weeks. The latest complete four-week window grew to 1,217 impressions and
+  13 clicks, while CTR fell from 2.01% to 1.07% as non-brand visibility grew.
+- GA4 recorded 25 organic sessions and 14 engaged sessions, with organic
+  landings almost entirely on `/`. No signup, onboarding, discovery, or
+  subscription conversion was attributed to organic traffic in the period.
 - Ahrefs reported Domain Rating 0 and 161 live referring domains. Most sampled
   referring domains were irrelevant or spam-like, so raw domain count is not
   an authority KPI.
-- The Ahrefs Rank Tracker had no configured keywords.
+- The Ahrefs Rank Tracker contained 12 US keywords but no Brazil or Spain
+  coverage. The expanded, page-owned set is in `docs/seo-keyword-map.csv`.
 - The crawl found long titles, short descriptions, invalid article editor
   markup, one Cloudflare email-protection URL, and 114 URLs not submitted to
   IndexNow. These repository-level issues were corrected in the August update.
@@ -52,6 +54,7 @@ The core category story is:
 - Comparisons:
   - `/compare/manual-lead-research`
   - `/compare/spreadsheets`
+  - `/compare/sales-prospecting-software`
   - `/compare/purchased-lead-lists`
   - `/compare/best-lead-scoring-software`
   - `/compare/b2b-lead-enrichment-tools`
@@ -67,6 +70,8 @@ The core category story is:
   - `/tools/lead-scoring-calculator`
   - `/tools/enrichment-checklist`
   - `/tools/lead-research-roi-calculator`
+- New localized workflow guide:
+  - `/blog/b2b-prospecting-guide`
 
 Every route above ships in English, Portuguese, and Spanish with localized
 copy, metadata, canonicals, and reciprocal hreflang annotations.
@@ -113,6 +118,8 @@ internal competition.
 | Intent | Primary query | Landing page |
 | --- | --- | --- |
 | Category | AI lead generation software | `/` |
+| Workflow | B2B prospecting | `/blog/b2b-prospecting-guide` |
+| Comparison | Sales prospecting software | `/compare/sales-prospecting-software` |
 | Feature | B2B lead scoring software | `/features/lead-scoring` |
 | Comparison | Best lead scoring software | `/compare/best-lead-scoring-software` |
 | Tool | Lead scoring calculator | `/tools/lead-scoring-calculator` |
@@ -124,6 +131,11 @@ internal competition.
 | Feature | AI lead discovery | `/features/ai-lead-discovery` |
 | Template | Ideal customer profile worksheet | `/tools/icp-worksheet` |
 | Cost | Lead research ROI calculator | `/tools/lead-research-roi-calculator` |
+
+The complete English, Portuguese, and Spanish tracker manifest, including
+country, tag, priority, and canonical owner, is maintained in
+`docs/seo-keyword-map.csv`. A query may appear on supporting pages in natural
+copy, but only the mapped page should use it as its primary title and intent.
 
 ## 90-day execution order
 

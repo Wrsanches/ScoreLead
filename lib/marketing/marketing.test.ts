@@ -9,12 +9,18 @@ import {
   getMarketingPageByPath,
   marketingPages,
 } from "@/lib/marketing";
-import { getLanguageAlternates, siteConfig, supportedLocales } from "@/lib/seo";
+import {
+  generatePageMetadata,
+  getSiteMetadata,
+  getLanguageAlternates,
+  siteConfig,
+  supportedLocales,
+} from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 
 describe("localized SEO content registry", () => {
   it("keeps every commercial page substantive in every supported locale", () => {
-    expect(marketingPages).toHaveLength(24);
+    expect(marketingPages).toHaveLength(25);
 
     for (const page of marketingPages) {
       for (const locale of supportedLocales) {
@@ -66,12 +72,16 @@ describe("localized SEO content registry", () => {
   });
 
   it("uses truthful publication dates and current source URLs", () => {
-    expect(new Set(blogPosts.map((post) => post.publishedAt))).toEqual(
-      new Set(["2026-07-23"]),
+    const prospectingGuide = blogPosts.find(
+      (post) => post.slug === "b2b-prospecting-guide",
     );
-    expect(blogPosts.every((post) => post.updatedAt === "2026-08-25")).toBe(
-      true,
-    );
+    expect(prospectingGuide?.publishedAt).toBe("2026-08-26");
+    expect(prospectingGuide?.updatedAt).toBe("2026-08-26");
+    expect(
+      blogPosts.every(
+        (post) => new Date(post.updatedAt) >= new Date(post.publishedAt),
+      ),
+    ).toBe(true);
     expect(
       blogPosts
         .flatMap((post) => post.sources)
@@ -115,7 +125,7 @@ describe("localized SEO content registry", () => {
 
   it("includes every localized public URL with stable modification dates", () => {
     const entries = sitemap();
-    expect(entries).toHaveLength(120);
+    expect(entries).toHaveLength(126);
 
     for (const page of marketingPages) {
       const matches = entries.filter((entry) =>
@@ -161,5 +171,40 @@ describe("localized SEO content registry", () => {
     expect(siteConfig.sameAs).toContain(
       "https://www.instagram.com/scorelead.io/",
     );
+  });
+
+  it("provides complete social metadata for public utility pages", () => {
+    const publicPages = [
+      ["contact", "contact"],
+      ["privacy", "privacy"],
+      ["terms", "terms"],
+      ["dataDeletion", "data-deletion"],
+    ] as const;
+
+    for (const locale of supportedLocales) {
+      const home = getSiteMetadata(locale);
+      expect(home.title.length).toBeLessThanOrEqual(60);
+      expect(home.description.length).toBeGreaterThanOrEqual(110);
+      expect(home.description.length).toBeLessThanOrEqual(160);
+
+      for (const [key, pathname] of publicPages) {
+        const metadata = generatePageMetadata(locale, key, {
+          index: true,
+          pathname,
+        });
+        expect(metadata.alternates?.canonical).toBe(
+          locale === "en"
+            ? `${siteConfig.url}/${pathname}`
+            : `${siteConfig.url}/${locale}/${pathname}`,
+        );
+        expect(metadata.openGraph?.images).toBeDefined();
+        expect(metadata.twitter).toMatchObject({
+          card: "summary_large_image",
+        });
+        expect(`${metadata.title} | ScoreLead`.length).toBeLessThanOrEqual(60);
+        expect(metadata.description?.length).toBeGreaterThanOrEqual(110);
+        expect(metadata.description?.length).toBeLessThanOrEqual(160);
+      }
+    }
   });
 });

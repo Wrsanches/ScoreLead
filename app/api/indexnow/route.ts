@@ -1,6 +1,6 @@
 import { after } from "next/server"
 import { z } from "zod"
-import { submitIndexNow } from "@/lib/indexnow"
+import { normalizeIndexNowUrls, submitIndexNow } from "@/lib/indexnow"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -28,7 +28,14 @@ export async function POST(request: Request) {
     )
   }
 
-  const urls = parsed.data.urls
+  const urls = normalizeIndexNowUrls(parsed.data.urls)
+  if (!urls.length) {
+    return Response.json(
+      { error: "No valid ScoreLead URLs were supplied." },
+      { status: 400 },
+    )
+  }
+
   after(async () => {
     try {
       await submitIndexNow(urls)

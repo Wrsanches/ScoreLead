@@ -40,6 +40,10 @@ const definitions: MarketingPageDefinition[] = [
       "ai-lead-generation-guide",
       "ideal-customer-profile-guide",
     ],
+    relatedMarketingPaths: [
+      "compare/sales-prospecting-software",
+      "use-cases/b2b-sales-teams",
+    ],
   },
   {
     id: "feature-lead-scoring",
@@ -126,6 +130,7 @@ const definitions: MarketingPageDefinition[] = [
     updatedAt: SEO_UPDATED_AT,
     keywords: ["B2B sales prospecting software", "sales team lead generation"],
     relatedBlogSlugs: ["b2b-lead-scoring-model", "b2b-sales-pipeline-guide"],
+    relatedMarketingPaths: ["compare/sales-prospecting-software"],
   },
   {
     id: "use-case-b2b-startups",
@@ -174,6 +179,28 @@ const definitions: MarketingPageDefinition[] = [
       "sales prospecting software",
     ],
     relatedBlogSlugs: ["crm-data-quality-guide", "b2b-sales-pipeline-guide"],
+  },
+  {
+    id: "compare-sales-prospecting-software",
+    group: "compare",
+    slug: "sales-prospecting-software",
+    pathname: "compare/sales-prospecting-software",
+    updatedAt: "2026-08-26",
+    keywords: [
+      "sales prospecting software",
+      "B2B prospecting software",
+      "sales prospecting tools",
+      "AI sales prospecting",
+    ],
+    relatedBlogSlugs: [
+      "b2b-prospecting-guide",
+      "sales-prospecting-automation",
+    ],
+    relatedMarketingPaths: [
+      "features/ai-lead-discovery",
+      "features/lead-scoring",
+      "compare/manual-lead-research",
+    ],
   },
   {
     id: "compare-purchased-lead-lists",

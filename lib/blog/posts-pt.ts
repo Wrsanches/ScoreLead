@@ -531,6 +531,71 @@ export const portuguesePosts: Record<string, BlogTranslation> = {
       ],
     },
   },
+  "b2b-prospecting-guide": {
+    title: "Prospecção B2B: Guia Prático",
+    description:
+      "Aprenda um processo de prospecção B2B para definir o ICP, encontrar contas, qualificar evidências, priorizar abordagens e melhorar com dados do pipeline.",
+    category: "Prospecção B2B",
+    keywords: [
+      "prospecção B2B",
+      "prospecção de clientes",
+      "geração de leads B2B",
+      "pesquisa de contas",
+      "processo de prospecção",
+    ],
+    introduction: [
+      "Prospecção B2B é o trabalho disciplinado de encontrar empresas que podem ter um problema relevante e decidir quais merecem uma conversa comercial. Ela começa antes dos contatos e das mensagens: o time precisa de uma hipótese de mercado clara, critérios observáveis e uma forma de aprender com contas aceitas e rejeitadas.",
+      "Um processo confiável prioriza evidência e iteração, não o tamanho da lista. A automação acelera descoberta, normalização, enriquecimento e primeira priorização; pessoas continuam responsáveis por julgamento, verificação, aprovação da mensagem e compliance.",
+    ],
+    sections: [
+      {
+        heading: "Transforme o ICP em critérios observáveis",
+        paragraphs: [
+          "Converta o perfil de cliente ideal em condições de empresa que um pesquisador ou sistema consiga observar. Comece por mercado, modelo de negócio, geografia, padrão de serviço e sinais do problema. Separe requisitos de preferências e desqualificadores.",
+          "Mantenha uma versão registrada da hipótese. Quando o pipeline desafiar um critério, altere-o deliberadamente e compare a próxima coorte com a anterior.",
+        ],
+        points: [
+          "Escolha um segmento e uma região específicos.",
+          "Conecte cada critério a uma razão comercial.",
+          "Defina desqualificadores e estados desconhecidos.",
+          "Salve a busca para comparação futura.",
+        ],
+      },
+      {
+        heading: "Descubra contas e confirme a identidade",
+        paragraphs: [
+          "Pesquise nas fontes que representam o mercado, como sites, mapas, diretórios setoriais e perfis públicos. Compare nomes, domínios, locais e outros sinais antes de mesclar registros. Uma associação incorreta contamina as decisões seguintes.",
+          "Preserve fonte e data dos campos importantes. Dados desconhecidos devem continuar desconhecidos até a verificação; um campo vazio não prova que a empresa não tem uma capacidade ou necessidade.",
+        ],
+      },
+      {
+        heading: "Priorize com evidências explicáveis",
+        paragraphs: [
+          "Pontue dimensões relevantes, como fit, evidência do problema, alcance, confiança e prontidão. Mostre as observações por trás do total. O score deve ordenar uma fila de revisão, não tomar uma decisão invisível sobre quem será abordado.",
+          "Use revisão humana para contas estratégicas e associações incertas. Rejeitar cedo uma conta fraca gera valor quando o motivo melhora a próxima busca.",
+        ],
+      },
+      {
+        heading: "Conecte abordagem e resultados do pipeline",
+        paragraphs: [
+          "Crie a abordagem a partir de contexto verificado e de uma hipótese de valor crível. Revise destinatário, canal, afirmações, tom e regras aplicáveis antes do envio. Personalização deve mostrar relevância sem inventar familiaridade.",
+          "Meça contas aceitas, prospects alcançáveis, conversas qualificadas, oportunidades, clientes e motivos de rejeição por coorte. Esses resultados mostram se alvo, evidência, prioridade ou mensagem precisam mudar.",
+        ],
+        points: [
+          "Taxa de contas aceitas por segmento",
+          "Tempo de pesquisa por conta aceita",
+          "Conversas e oportunidades qualificadas",
+          "Motivos de rejeição e correção",
+        ],
+      },
+    ],
+    conclusion: {
+      heading: "Crie um ciclo de aprendizado, não uma lista estática",
+      paragraphs: [
+        "Prospecção B2B eficaz conecta ICP testável, evidências verificadas, priorização explicável, abordagem revisada e feedback do pipeline. O fluxo melhora quando cada resultado volta às premissas que produziram a conta.",
+      ],
+    },
+  },
   "multilingual-b2b-prospecting": {
     title: "Prospecção Multilíngue para B2B",
     description:

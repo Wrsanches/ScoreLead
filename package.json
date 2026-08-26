@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "test:seo": "bun test lib/marketing/marketing.test.ts lib/analytics-events.test.ts lib/host-routing.test.ts lib/site-urls.test.ts",
+    "test:seo": "bun test lib/marketing/marketing.test.ts lib/acquisition.test.ts lib/analytics-events.test.ts lib/host-routing.test.ts lib/site-urls.test.ts",
     "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

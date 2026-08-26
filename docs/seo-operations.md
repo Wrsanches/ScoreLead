@@ -76,6 +76,13 @@ and legitimate authority building.
    crawling or indexing.
 6. Review Bing's AI Performance report weekly for cited URLs, citation count,
    grounding queries, and changes by locale.
+7. After deployment, start a fresh Ahrefs Site Audit crawl. The production
+   sitemap should contain 126 localized URLs, `/cdn-cgi/l/email-protection`
+   should return a 308 to `/contact`, and the IndexNow notice should clear
+   after the provider records the submitted URLs. Keep decorative flag and
+   product-illustration images at `alt=""`; they are intentionally omitted
+   from the accessibility tree and should not be filled with repetitive text
+   merely to change an audit score.
 
 ## Crawler verification
 
@@ -111,6 +118,14 @@ traffic rules for the ScoreLead team, then activate the filter. Review any
 `Organic Shopping` sessions at source/medium level and correct campaign UTMs or
 custom channel rules instead of treating them as SEO traffic by default.
 
+In the GA4 web stream, open **Configure tag settings → List unwanted
+referrals** and add `checkout.stripe.com` and `billing.stripe.com`. This is the
+account-level control that prevents Stripe-hosted Checkout and Billing Portal
+returns from starting referral sessions. The application also treats those
+hosts as direct continuations in its first-party attribution store, but that
+does not rewrite historical GA4 channel assignments. Annotate the change date
+and compare only sessions collected after it.
+
 Create GA4 custom dimensions for:
 
 - `acquisition_channel`
@@ -142,11 +157,11 @@ later rolling 28-day periods with that baseline.
 
 ## Ahrefs Rank Tracker
 
-Create one project for the `scorelead.io` domain and add the keyword map from
-`docs/seo-strategy.md`. Use the United States as the first location for English,
-Brazil for Portuguese, and Spain or the primary Spanish-speaking sales market
-for Spanish. Tag keywords by `category`, `feature`, `comparison`, `tool`, and
-`workflow`, and tag each translated term by locale.
+Use the existing `scorelead.io` project and retain its 12 US keywords. Add the
+expanded set from `docs/seo-keyword-map.csv`, using the United States for
+English, Brazil for Portuguese, and Spain or the primary Spanish-speaking sales
+market for Spanish. Keep the CSV's page ownership and tags so cannibalization
+can be reviewed consistently.
 
 Review weekly:
 
@@ -175,3 +190,19 @@ creation remain an account-level operation in Ahrefs after deployment.
 - Seek links through real customer stories, partner integrations, relevant
   SaaS directories, and promotion of the free tools. Do not buy links, create
   fake reviews, or mark up ratings that are not visible and verifiable.
+
+Use a small, qualified outreach queue instead of the raw Ahrefs referring-domain
+count:
+
+1. Add only a customer, partner, sales-operations publication, legitimate SaaS
+   directory, or community whose audience could use the linked page.
+2. Match the pitch to one useful asset: the ICP worksheet, lead scoring
+   calculator, enrichment checklist, ROI calculator, B2B prospecting guide, or
+   an approved customer result.
+3. Record target domain, target page, contact owner, relevance reason, asset,
+   outreach date, response, earned URL, and referral/conversion outcome.
+4. Review five qualified prospects per week. Exclude generic guest-post farms,
+   unrelated coupon/download domains, paid-link offers, and domains whose only
+   justification is DR.
+5. Judge the program by relevant earned links, referral engagement, assisted
+   signups, and commercial rankings—not total referring domains.

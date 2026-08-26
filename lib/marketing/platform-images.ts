@@ -60,6 +60,7 @@ const pageVariants: Record<string, PlatformImageVariant> = {
   "use-case-b2b-companies": "pipeline",
   "compare-manual-lead-research": "leads",
   "compare-spreadsheets": "pipeline",
+  "compare-sales-prospecting-software": "discovery",
   "compare-purchased-lead-lists": "discovery",
   "compare-best-lead-scoring-software": "leads",
   "compare-b2b-lead-enrichment-tools": "leads",

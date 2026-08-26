@@ -27,7 +27,10 @@ async function main() {
     throw new Error(`ScoreLead IndexNow endpoint returned HTTP ${response.status}`)
   }
 
-  console.log(`Accepted ${urls.length} URLs for IndexNow submission.`)
+  const result = (await response.json()) as { accepted?: number }
+  console.log(
+    `Accepted ${result.accepted ?? urls.length} URLs for IndexNow submission.`,
+  )
 }
 
 main().catch((error) => {

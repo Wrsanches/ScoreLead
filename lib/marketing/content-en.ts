@@ -442,6 +442,58 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Use the workflow where consistency matters and export when flexibility helps.",
     ctaLabel: "Try a connected workflow",
   },
+  "compare-sales-prospecting-software": {
+    eyebrow: "Comparison · Buying guide",
+    title: "Sales Prospecting Software: What to Compare",
+    description:
+      "Compare B2B sales prospecting software by targeting control, account evidence, data quality, scoring, workflow fit, and measurable outcomes.",
+    answer:
+      "The right sales prospecting software should help a team turn a defined market into a reviewable account queue. Compare how each product discovers companies, preserves source evidence, handles duplicates and unknown data, explains prioritization, supports human review, and feeds real pipeline outcomes back into targeting.",
+    highlights: [
+      "Start with the prospecting problem and workflow, not the longest feature list.",
+      "Test data provenance, freshness, identity matching, and scoring explanations.",
+      "Measure accepted accounts and pipeline progress instead of exported-record volume.",
+    ],
+    sections: [
+      {
+        heading: "Define the job before comparing products",
+        paragraphs: [
+          "Decide whether the team needs account discovery, contact data, enrichment, scoring, outreach support, pipeline management, or a connected workflow. A narrow requirement makes demos comparable and prevents overlapping tools from creating duplicate records and unclear ownership.",
+        ],
+      },
+      {
+        heading: "Inspect the evidence behind every account",
+        paragraphs: [
+          "Ask where company data came from, when it was observed, how identity is matched, and how the product represents uncertainty. Representatives should be able to verify important fields before using them in qualification or personalization.",
+        ],
+        points: [
+          "Source and observation date",
+          "Company identity and duplicate controls",
+          "Explicit unknown values",
+          "Correctable score reasoning",
+        ],
+      },
+      {
+        heading: "Run a representative pilot",
+        paragraphs: [
+          "Use one real segment and the same acceptance rules for every shortlisted product. Review a sample manually, record false matches and missing evidence, and include the time required to clean, verify, and move accounts into the next step.",
+        ],
+      },
+      {
+        heading: "Compare business outcomes and operating cost",
+        paragraphs: [
+          "Track accepted accounts, research time per accepted account, reachable prospects, qualified conversations, and corrections. Include onboarding, integrations, governance, and human review in total cost; software price alone does not describe workflow value.",
+        ],
+      },
+    ],
+    proofLabel: "Evaluation boundary",
+    proof:
+      "ScoreLead combines company discovery, enrichment, explainable scoring, reviewed outreach, and pipeline status. It does not replace market strategy, fact verification, consent decisions, or the sales representative responsible for the final approach.",
+    ctaTitle: "Evaluate ScoreLead with a real target segment.",
+    ctaDescription:
+      "Run a focused discovery workflow and inspect the evidence before deciding.",
+    ctaLabel: "Start a free evaluation",
+  },
   "compare-purchased-lead-lists": {
     eyebrow: "Comparison · Data strategy",
     title: "Fresh account discovery vs. purchased lead lists",

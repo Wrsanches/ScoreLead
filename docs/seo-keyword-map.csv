@@ -1,0 +1,30 @@
+locale,country,keyword,tag,primary_path,priority
+en,US,b2b prospecting,workflow,/blog/b2b-prospecting-guide,high
+en,US,sales prospecting software,comparison,/compare/sales-prospecting-software,high
+en,US,lead enrichment,feature,/features/lead-enrichment,high
+en,US,lead scoring software,feature,/features/lead-scoring,high
+en,US,b2b lead scoring,feature,/features/lead-scoring,high
+en,US,b2b lead enrichment,feature,/features/lead-enrichment,high
+en,US,ai sales prospecting,comparison,/compare/sales-prospecting-software,high
+en,US,ai lead discovery,feature,/features/ai-lead-discovery,medium
+en,US,best lead scoring software,comparison,/compare/best-lead-scoring-software,medium
+en,US,b2b lead enrichment tools,comparison,/compare/b2b-lead-enrichment-tools,medium
+en,US,b2b sales pipeline stages,workflow,/blog/b2b-sales-pipeline-guide,medium
+en,US,ideal customer profile worksheet,tool,/tools/icp-worksheet,medium
+en,US,lead enrichment checklist,tool,/tools/enrichment-checklist,medium
+en,US,lead scoring calculator,tool,/tools/lead-scoring-calculator,medium
+en,US,lead research roi calculator,tool,/tools/lead-research-roi-calculator,medium
+pt,BR,prospecção de clientes,workflow,/pt/blog/b2b-prospecting-guide,high
+pt,BR,prospecção b2b,workflow,/pt/blog/b2b-prospecting-guide,high
+pt,BR,lead scoring,feature,/pt/features/lead-scoring,high
+pt,BR,geração de leads b2b,category,/pt,high
+pt,BR,ferramentas de prospecção b2b,comparison,/pt/compare/sales-prospecting-software,high
+pt,BR,enriquecimento de leads,feature,/pt/features/lead-enrichment,medium
+pt,BR,calculadora de lead scoring,tool,/pt/tools/lead-scoring-calculator,medium
+es,ES,lead scoring,feature,/es/features/lead-scoring,high
+es,ES,generación de leads b2b,category,/es,high
+es,ES,prospección de clientes,workflow,/es/blog/b2b-prospecting-guide,high
+es,ES,prospección b2b,workflow,/es/blog/b2b-prospecting-guide,high
+es,ES,software de prospección b2b,comparison,/es/compare/sales-prospecting-software,high
+es,ES,enriquecimiento de datos b2b,feature,/es/features/lead-enrichment,medium
+es,ES,calculadora de lead scoring,tool,/es/tools/lead-scoring-calculator,medium

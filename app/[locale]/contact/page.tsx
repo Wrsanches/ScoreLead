@@ -5,8 +5,6 @@ import { Navbar } from "@/components/navbar"
 import { WaitlistFooter } from "@/components/waitlist-footer"
 import {
   generatePageMetadata,
-  getLanguageAlternates,
-  getLocalizedUrl,
 } from "@/lib/seo"
 
 export async function generateMetadata({
@@ -15,13 +13,10 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  return {
-    ...generatePageMetadata(locale, "contact", { index: true }),
-    alternates: {
-      canonical: getLocalizedUrl(locale, "contact"),
-      languages: getLanguageAlternates("contact"),
-    },
-  }
+  return generatePageMetadata(locale, "contact", {
+    index: true,
+    pathname: "contact",
+  })
 }
 
 export default async function ContactPage({

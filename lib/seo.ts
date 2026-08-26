@@ -104,23 +104,24 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
     ],
   },
   pt: {
-    title: "Software de Geracao de Leads com IA | ScoreLead",
+    title: "Software de Geração de Leads B2B com IA | ScoreLead",
     description:
       "Encontre, pontue e enriqueça leads B2B com IA. O ScoreLead transforma mercados-alvo em contas qualificadas, dados para CRM e outreach personalizado.",
     keywords: [
-      "software de geracao de leads com IA",
-      "geracao de leads B2B",
+      "software de geração de leads com IA",
+      "geração de leads B2B",
+      "prospecção B2B",
       "descoberta de leads",
       "pontuacao de leads",
-      "prospeccao de vendas",
+      "prospecção de vendas",
       "inteligencia de vendas",
-      "automacao de vendas com IA",
+      "automação de vendas com IA",
       "enriquecimento de leads",
       "outreach automatizado",
       "leads B2B qualificados",
       "leads de empresas B2B",
-      "pontuacao de prospects",
-      "geracao de pipeline",
+      "pontuação de prospects",
+      "geração de pipeline",
       "leads prontos para CRM",
       "descoberta de contas B2B",
       "outreach multi-idioma",
@@ -144,23 +145,24 @@ const localeMetadata: Record<SupportedLocale, LocaleMetadata> = {
     ],
   },
   es: {
-    title: "Software de Generacion de Leads con IA | ScoreLead",
+    title: "Software de Generación de Leads B2B con IA | ScoreLead",
     description:
       "Encuentra, puntúa y enriquece leads B2B con IA. ScoreLead convierte mercados objetivo en cuentas calificadas, datos para CRM y outreach personalizado.",
     keywords: [
-      "software de generacion de leads con IA",
-      "generacion de leads B2B",
+      "software de generación de leads con IA",
+      "generación de leads B2B",
+      "prospección B2B",
       "descubrimiento de leads",
       "puntuacion de leads",
-      "prospeccion de ventas",
+      "prospección de ventas",
       "inteligencia de ventas",
-      "automatizacion de ventas con IA",
+      "automatización de ventas con IA",
       "enriquecimiento de leads",
       "outreach automatizado",
       "leads B2B calificados",
       "leads de empresas B2B",
-      "puntuacion de prospectos",
-      "generacion de pipeline",
+      "puntuación de prospectos",
+      "generación de pipeline",
       "leads listos para CRM",
       "descubrimiento de cuentas B2B",
       "outreach multi-idioma",
@@ -375,13 +377,50 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
 export function generatePageMetadata(
   locale: string,
   key: PageKey,
-  opts?: { index?: boolean },
+  opts?: { index?: boolean; pathname?: string },
 ): Metadata {
-  const copy = pageMetadata[normalizeLocale(locale)][key]
+  const normalizedLocale = normalizeLocale(locale)
+  const copy = pageMetadata[normalizedLocale][key]
+  const pathname = opts?.pathname
+  const canonical = pathname
+    ? getLocalizedUrl(normalizedLocale, pathname)
+    : undefined
+  const image = getOgImageUrl(normalizedLocale)
+  const socialTitle = `${copy.title} | ${siteConfig.name}`
 
   return {
     title: copy.title,
     ...(copy.description ? { description: copy.description } : {}),
+    ...(canonical
+      ? {
+          alternates: {
+            canonical,
+            languages: getLanguageAlternates(pathname),
+          },
+          openGraph: {
+            type: "website" as const,
+            locale: getLocaleConfig(normalizedLocale).ogLocale,
+            url: canonical,
+            siteName: siteConfig.name,
+            title: socialTitle,
+            ...(copy.description ? { description: copy.description } : {}),
+            images: [
+              {
+                url: image,
+                width: 1200,
+                height: 630,
+                alt: socialTitle,
+              },
+            ],
+          },
+          twitter: {
+            card: "summary_large_image" as const,
+            title: socialTitle,
+            ...(copy.description ? { description: copy.description } : {}),
+            images: [{ url: image, alt: socialTitle }],
+          },
+        }
+      : {}),
     robots: opts?.index ? undefined : { index: false, follow: false },
   }
 }

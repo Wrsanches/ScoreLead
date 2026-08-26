@@ -531,6 +531,71 @@ export const englishPosts: Record<string, BlogTranslation> = {
       ],
     },
   },
+  "b2b-prospecting-guide": {
+    title: "B2B Prospecting: A Practical Guide",
+    description:
+      "Learn a B2B prospecting process for defining an ICP, finding target accounts, qualifying evidence, prioritizing outreach, and improving with pipeline data.",
+    category: "B2B prospecting",
+    keywords: [
+      "B2B prospecting",
+      "sales prospecting",
+      "B2B sales prospecting",
+      "target account research",
+      "prospecting process",
+    ],
+    introduction: [
+      "B2B prospecting is the disciplined work of finding companies that may have a relevant problem and deciding which ones deserve a sales conversation. It begins before contact details or messages: the team needs a clear market hypothesis, observable account criteria, and a way to learn from accepted and rejected prospects.",
+      "A reliable process favors evidence and iteration over list size. Automation can make discovery, normalization, enrichment, and first-pass prioritization faster, while people remain responsible for market judgment, fact verification, message approval, and compliance.",
+    ],
+    sections: [
+      {
+        heading: "Turn the ICP into observable search criteria",
+        paragraphs: [
+          "Translate the ideal customer profile into company-level conditions that a researcher or system can actually observe. Start with market, business model, geography, service pattern, and problem indicators. Separate required criteria from preferences and disqualifiers so the search does not hide important tradeoffs inside a vague score.",
+          "Keep a versioned record of the hypothesis. When pipeline evidence challenges a criterion, change it deliberately and compare the next account cohort with the previous one.",
+        ],
+        points: [
+          "Choose one narrow segment and region.",
+          "Connect each criterion to a sales reason.",
+          "Write clear disqualifiers and unknown states.",
+          "Save the search definition for later comparison.",
+        ],
+      },
+      {
+        heading: "Discover accounts and verify identity",
+        paragraphs: [
+          "Search the sources that best represent the market, including company sites, maps, industry directories, and public business profiles. Match names, domains, locations, and other identity signals before merging records. An incorrect match can contaminate every later decision.",
+          "Preserve the source and observation date for important fields. Unknown data should stay unknown until verified; an empty field is not evidence that a company lacks a capability or need.",
+        ],
+      },
+      {
+        heading: "Prioritize with explainable evidence",
+        paragraphs: [
+          "Score the account dimensions that matter to the team, such as fit, problem evidence, reachability, trust, and readiness. Show the underlying observations rather than only a total. A score should order a review queue, not make an invisible decision about who will be contacted.",
+          "Use human review for strategic accounts and uncertain matches. Rejecting a weak account early is useful when the rejection reason improves the next search.",
+        ],
+      },
+      {
+        heading: "Connect outreach and pipeline outcomes",
+        paragraphs: [
+          "Build outreach from verified company context and a credible value hypothesis. Review the recipient, channel, claim, tone, and applicable communication rules before sending. Personalization should demonstrate relevance without inventing familiarity.",
+          "Measure accepted accounts, reachable prospects, qualified conversations, opportunities, customers, and rejection reasons by cohort. Those outcomes reveal whether the target, evidence, priority model, or message needs work.",
+        ],
+        points: [
+          "Accepted-account rate by segment",
+          "Research time per accepted account",
+          "Qualified conversations and opportunities",
+          "Rejection and correction reasons",
+        ],
+      },
+    ],
+    conclusion: {
+      heading: "Build a learning loop, not a static list",
+      paragraphs: [
+        "Effective B2B prospecting connects a testable ICP, verified account evidence, explainable prioritization, reviewed outreach, and pipeline feedback. The workflow improves when every outcome can be traced back to the assumptions that produced the account.",
+      ],
+    },
+  },
   "multilingual-b2b-prospecting": {
     title: "Multilingual B2B Prospecting for New Markets",
     description:

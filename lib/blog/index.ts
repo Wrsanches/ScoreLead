@@ -95,6 +95,24 @@ const postDetails = [
     relatedMarketingPath: "compare/manual-lead-research",
   },
   {
+    slug: "b2b-prospecting-guide",
+    publishedAt: "2026-08-26",
+    updatedAt: "2026-08-26",
+    readingMinutes: 9,
+    accent: "emerald",
+    quickAnswers: {
+      en: "B2B prospecting is a repeatable process for defining a narrow ideal-customer hypothesis, finding matching companies, verifying account evidence, prioritizing the best-fit opportunities, and using pipeline outcomes to improve the next search.",
+      pt: "Prospecção B2B é um processo repetível para definir uma hipótese de cliente ideal, encontrar empresas compatíveis, verificar evidências, priorizar oportunidades com melhor fit e usar resultados do pipeline para melhorar a próxima busca.",
+      es: "La prospección B2B es un proceso repetible para definir una hipótesis de cliente ideal, encontrar empresas compatibles, verificar evidencia, priorizar las de mejor ajuste y usar resultados del pipeline para mejorar la siguiente búsqueda.",
+    },
+    fieldNotes: {
+      en: "In ScoreLead, a prospecting run begins with market and location criteria, then keeps discovery evidence, enrichment, score dimensions, and pipeline status on the same account record. Teams can review why a company was included before deciding whether to contact it.",
+      pt: "No ScoreLead, a prospecção começa com critérios de mercado e localização e mantém evidências, enriquecimento, dimensões do score e status do pipeline no mesmo registro. O time pode entender por que uma empresa entrou na busca antes de abordá-la.",
+      es: "En ScoreLead, la prospección empieza con criterios de mercado y ubicación y conserva evidencia, enriquecimiento, dimensiones del score y estado del pipeline en el mismo registro. El equipo puede revisar por qué entró una empresa antes de contactarla.",
+    },
+    relatedMarketingPath: "compare/sales-prospecting-software",
+  },
+  {
     slug: "personalized-b2b-outreach",
     publishedAt: "2026-07-23",
     updatedAt: "2026-08-25",
@@ -245,6 +263,23 @@ const sourcesBySlug = {
       title: "Direct marketing guidance",
       publisher: "UK Information Commissioner's Office",
       url: "https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/",
+    },
+  ],
+  "b2b-prospecting-guide": [
+    {
+      title: "Market research and competitive analysis",
+      publisher: "U.S. Small Business Administration",
+      url: "https://www.sba.gov/business-guide/plan-your-business/market-research-competitive-analysis",
+    },
+    {
+      title: "North American Industry Classification System",
+      publisher: "U.S. Census Bureau",
+      url: "https://www.census.gov/naics/",
+    },
+    {
+      title: "CAN-SPAM Act: A Compliance Guide for Business",
+      publisher: "U.S. Federal Trade Commission",
+      url: "https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business",
     },
   ],
   "personalized-b2b-outreach": [

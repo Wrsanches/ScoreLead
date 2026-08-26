@@ -442,6 +442,58 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Usa workflow para consistencia y exporta cuando ayude.",
     ctaLabel: "Probar flujo conectado",
   },
+  "compare-sales-prospecting-software": {
+    eyebrow: "Comparación · Guía de compra",
+    title: "Software de Prospección B2B: Qué Comparar",
+    description:
+      "Compara software de prospección B2B por control del targeting, evidencia de cuenta, calidad de datos, scoring, integración y resultados.",
+    answer:
+      "Un buen software de prospección convierte un mercado definido en una cola de cuentas revisable. Compara cómo cada producto descubre empresas, conserva fuentes, gestiona duplicados y datos desconocidos, explica prioridades, permite revisión humana y usa resultados del pipeline para mejorar el targeting.",
+    highlights: [
+      "Empieza por el problema y el flujo, no por la lista más larga de funciones.",
+      "Prueba procedencia, actualidad, identidad de empresa y explicación del score.",
+      "Mide cuentas aceptadas y avance del pipeline, no solo registros exportados.",
+    ],
+    sections: [
+      {
+        heading: "Define el trabajo antes de comparar",
+        paragraphs: [
+          "Decide si el equipo necesita descubrimiento de cuentas, contactos, enriquecimiento, scoring, apoyo al outreach, pipeline o un flujo conectado. Un requisito claro hace comparables las demostraciones y evita herramientas superpuestas.",
+        ],
+      },
+      {
+        heading: "Inspecciona la evidencia de cada cuenta",
+        paragraphs: [
+          "Pregunta de dónde vienen los datos, cuándo se observaron, cómo se confirma la identidad y cómo se muestra la incertidumbre. El vendedor debe poder verificar los campos importantes antes de calificar o personalizar.",
+        ],
+        points: [
+          "Fuente y fecha de observación",
+          "Identidad y control de duplicados",
+          "Valores desconocidos explícitos",
+          "Razonamiento del score corregible",
+        ],
+      },
+      {
+        heading: "Ejecuta un piloto representativo",
+        paragraphs: [
+          "Usa un segmento real y las mismas reglas de aceptación para cada finalista. Revisa una muestra, registra asociaciones incorrectas y evidencia ausente e incluye el tiempo necesario para limpiar y verificar cuentas.",
+        ],
+      },
+      {
+        heading: "Compara resultados y coste operativo",
+        paragraphs: [
+          "Sigue cuentas aceptadas, tiempo de investigación por cuenta aceptada, prospectos alcanzables, conversaciones calificadas y correcciones. Incluye implementación, integraciones, gobernanza y revisión humana en el coste total.",
+        ],
+      },
+    ],
+    proofLabel: "Límite de evaluación",
+    proof:
+      "ScoreLead reúne descubrimiento, enriquecimiento, scoring explicable, outreach revisado y estado del pipeline. No sustituye estrategia, verificación, decisiones de consentimiento ni al vendedor responsable del contacto final.",
+    ctaTitle: "Evalúa ScoreLead con un segmento real.",
+    ctaDescription:
+      "Ejecuta un descubrimiento enfocado e inspecciona la evidencia antes de decidir.",
+    ctaLabel: "Iniciar evaluación gratis",
+  },
   "compare-purchased-lead-lists": {
     eyebrow: "Comparación · Estrategia de datos",
     title: "Descubrimiento vs. Listas Compradas",
