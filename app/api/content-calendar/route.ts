@@ -6,7 +6,7 @@ import { headers } from "next/headers"
 import { NextResponse, after } from "next/server"
 import { z } from "zod"
 import {
-  resolveBusinessId,
+  resolveManageableBusiness,
   resolveViewableBusiness,
 } from "@/lib/active-business"
 import {
@@ -103,8 +103,11 @@ export async function POST(request: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))
-  const businessId = await resolveBusinessId(session.user.id, body?.businessId)
-  if (!businessId) {
+  const access = await resolveManageableBusiness(
+    session.user.id,
+    body?.businessId,
+  )
+  if (!access) {
     return NextResponse.json(
       { error: "Complete onboarding before planning content." },
       { status: 409 },
@@ -120,8 +123,8 @@ export async function POST(request: Request) {
   const data = parsed.data
   await db.insert(contentPost).values({
     id,
-    userId: session.user.id,
-    businessId,
+    userId: access.ownerUserId,
+    businessId: access.businessId,
     provider: "instagram",
     scheduledFor: new Date(data.scheduledFor),
     postType: data.postType,

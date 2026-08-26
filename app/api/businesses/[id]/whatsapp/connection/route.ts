@@ -92,7 +92,7 @@ export async function POST(
   const { id } = await params
   const scope = await sessionAndBusiness(id)
   if (scope.error) return scope.error
-  if (!can(await getUserPlan(scope.session.user.id), "whatsappAutomation")) {
+  if (!can(await getUserPlan(scope.access.ownerUserId), "whatsappAutomation")) {
     return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const parsed = connectSchema.safeParse(await request.json().catch(() => null))
@@ -199,7 +199,7 @@ export async function PATCH(
   const { id } = await params
   const scope = await sessionAndBusiness(id)
   if (scope.error) return scope.error
-  if (!can(await getUserPlan(scope.session.user.id), "whatsappAutomation")) {
+  if (!can(await getUserPlan(scope.access.ownerUserId), "whatsappAutomation")) {
     return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
   const parsed = settingsSchema.safeParse(await request.json().catch(() => null))

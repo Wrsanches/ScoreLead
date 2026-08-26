@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import { headers } from "next/headers"
-import { auth } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-guard"
 import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
 import DashboardPage from "./business/[businessId]/page"
 import { generatePageMetadata } from "@/lib/seo"
+import { getDashboardStats } from "@/lib/dashboard-stats"
 
 export async function generateMetadata({
   params,
@@ -27,11 +27,16 @@ export default async function AdminIndexPage({
   const { locale } = await params
   const prefix = locale === "en" ? "" : `/${locale}`
 
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session) redirect(`${prefix}/login`)
+  const session = await requireAuth(locale)
 
   const activeBusinessId = await getActiveViewableBusinessIdForUser(session.user.id)
   if (!activeBusinessId) redirect(`${prefix}/onboarding`)
 
-  return <DashboardPage />
+  const initialStats = await getDashboardStats(activeBusinessId)
+  return (
+    <DashboardPage
+      initialBusinessId={activeBusinessId}
+      initialStats={initialStats}
+    />
+  )
 }

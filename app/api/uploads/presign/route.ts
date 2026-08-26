@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPost } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import {
@@ -13,11 +13,13 @@ import {
   publicUrl,
   type UploadKind,
 } from "@/lib/s3"
+import { getBusinessAccess } from "@/lib/business-access"
 
 const VALID_KINDS: UploadKind[] = [
   "business-logo",
   "business-product",
   "avatar",
+  "content-reference",
   "content-slide",
 ]
 
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
   const ext = extForMime(contentType)
   let key: string
 
-  if (kind === "content-slide") {
+  if (kind === "content-slide" || kind === "content-reference") {
     const postId = body.postId as string
     const slideIndex = Number(body.slideIndex)
     if (typeof postId !== "string" || !postId) {
@@ -69,17 +71,24 @@ export async function POST(request: Request) {
     if (!Number.isInteger(slideIndex) || slideIndex < 0 || slideIndex > 20) {
       return NextResponse.json({ error: "Invalid slide index" }, { status: 400 })
     }
-    // Verify the post belongs to the caller before minting a key under it.
+    // Verify the caller may manage the post before minting a key under it.
     const [post] = await db
-      .select({ id: contentPost.id })
+      .select({ id: contentPost.id, businessId: contentPost.businessId })
       .from(contentPost)
-      .where(
-        and(eq(contentPost.id, postId), eq(contentPost.userId, session.user.id)),
-      )
+      .where(eq(contentPost.id, postId))
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
-    key = buildKey(kind, { postId, slideIndex, ext })
+    const access = await getBusinessAccess(session.user.id, post.businessId)
+    if (!access || access.readOnly) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    }
+    key = buildKey(kind, {
+      userId: session.user.id,
+      postId,
+      slideIndex,
+      ext,
+    })
   } else {
     key = buildKey(kind, { userId: session.user.id, ext })
   }

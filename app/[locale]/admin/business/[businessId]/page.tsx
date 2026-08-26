@@ -47,41 +47,7 @@ import {
 } from "@/components/admin";
 import { AiOrb } from "@/components/ai-orb";
 import { formatRelativeDate, getInitials } from "@/lib/admin-utils";
-
-interface DashboardStats {
-  jobs: { total: number; completed: number; running: number; failed: number };
-  leads: {
-    total: number;
-    avgScore: number;
-    avgRating: number | null;
-    highScore: number;
-    withWebsite: number;
-    withEmail: number;
-    withPhone: number;
-    enriched: number;
-  };
-  charts: {
-    scoreDistribution: { bucket: string; count: number }[];
-    sourceBreakdown: { source: string; count: number }[];
-    leadsOverTime: { date: string; count: number }[];
-  };
-  recentLeads: {
-    id: string;
-    name: string | null;
-    score: number;
-    city: string | null;
-    country: string | null;
-    photoUrl: string | null;
-    createdAt: string;
-  }[];
-  recentJobs: {
-    id: string;
-    name: string;
-    status: string;
-    insertedLeads: number;
-    createdAt: string;
-  }[];
-}
+import type { DashboardStats } from "@/lib/dashboard-stats";
 
 const chartConfig = {
   count: { label: "Leads", color: "var(--color-emerald-500)" },
@@ -91,20 +57,28 @@ const chartConfig = {
 // All feel related to the brand without being monotone.
 const PIE_COLORS = ["#10b981", "#14b8a6", "#06b6d4", "#0ea5e9", "#6366f1"];
 
-export default function AdminPage() {
+export default function AdminPage({
+  initialStats = null,
+  initialBusinessId = null,
+}: {
+  initialStats?: DashboardStats | null;
+  initialBusinessId?: string | null;
+}) {
   const t = useTranslations("dashboard");
   const businessId = useBusinessId();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const hydratedStats = initialBusinessId === businessId ? initialStats : null;
+  const [stats, setStats] = useState<DashboardStats | null>(hydratedStats);
+  const [loading, setLoading] = useState(!hydratedStats);
 
   useEffect(() => {
+    if (initialBusinessId === businessId && initialStats) return;
     setLoading(true);
     fetch(`/api/dashboard/stats?businessId=${businessId}`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setStats)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [businessId]);
+  }, [businessId, initialBusinessId, initialStats]);
 
   const hasRunningJobs = (stats?.jobs.running ?? 0) > 0;
 

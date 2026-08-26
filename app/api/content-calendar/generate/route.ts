@@ -4,8 +4,8 @@ import { NextResponse, after } from "next/server"
 import { z } from "zod"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { business, contentPlanJob } from "@/lib/db/schema"
-import { resolveBusinessId } from "@/lib/active-business"
+import { contentPlanJob } from "@/lib/db/schema"
+import { resolveManageableBusiness } from "@/lib/active-business"
 import { assertCanUse, recordUsage, releaseUsage, PlanLimitError } from "@/lib/plan"
 import {
   processContentPlanQueue,
@@ -44,22 +44,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
-  const activeBusinessId = await resolveBusinessId(session.user.id, body?.businessId)
-  if (!activeBusinessId) {
+  const access = await resolveManageableBusiness(
+    session.user.id,
+    body?.businessId,
+  )
+  if (!access) {
     return NextResponse.json(
       { error: "Complete onboarding before planning content." },
       { status: 409 },
     )
   }
-  const [activeBusiness] = await db
-    .select({ id: business.id })
-    .from(business)
-    .where(
-      and(eq(business.id, activeBusinessId), eq(business.userId, session.user.id)),
-    )
-  if (!activeBusiness) {
-    return NextResponse.json({ error: "Active business not found" }, { status: 404 })
-  }
+  const activeBusinessId = access.businessId
+  const billingUserId = access.ownerUserId
 
   const month = parsed.data.month ?? currentMonthKey()
 
@@ -71,7 +67,7 @@ export async function POST(request: Request) {
     .from(contentPlanJob)
     .where(
       and(
-        eq(contentPlanJob.businessId, activeBusiness.id),
+        eq(contentPlanJob.businessId, activeBusinessId),
         eq(contentPlanJob.month, month),
         inArray(contentPlanJob.status, ["queued", "running"]),
       ),
@@ -83,7 +79,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await assertCanUse(session.user.id, "contentPlan")
+    await assertCanUse(billingUserId, "contentPlan")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -100,14 +96,14 @@ export async function POST(request: Request) {
 
   // Charge on enqueue so concurrent requests can't both slip past the cap; the
   // worker refunds via releaseUsage if the job ultimately fails.
-  await recordUsage(session.user.id, "contentPlan")
+  await recordUsage(billingUserId, "contentPlan")
 
   const jobId = crypto.randomUUID()
   try {
     await db.insert(contentPlanJob).values({
       id: jobId,
-      businessId: activeBusiness.id,
-      userId: session.user.id,
+      businessId: activeBusinessId,
+      userId: access.ownerUserId,
       month,
       postCount: parsed.data.postCount ?? null,
       replaceExisting: parsed.data.replaceExisting ?? false,
@@ -117,13 +113,13 @@ export async function POST(request: Request) {
     // Lost a race against a concurrent request: the partial unique index on
     // (businessId, month) WHERE status IN ('queued','running') rejected us.
     // Give the credit back and return the job that won.
-    await releaseUsage(session.user.id, "contentPlan").catch(() => {})
+    await releaseUsage(billingUserId, "contentPlan").catch(() => {})
     const [winner] = await db
       .select()
       .from(contentPlanJob)
       .where(
         and(
-          eq(contentPlanJob.businessId, activeBusiness.id),
+          eq(contentPlanJob.businessId, activeBusinessId),
           eq(contentPlanJob.month, month),
           inArray(contentPlanJob.status, ["queued", "running"]),
         ),

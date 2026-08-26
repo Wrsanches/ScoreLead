@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { savedSearch } from "@/lib/db/schema"
-import { eq, and } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { getBusinessAccess } from "@/lib/business-access"
@@ -51,16 +51,15 @@ export async function DELETE(
   const { id } = await params
 
   const [search] = await db
-    .select({ id: savedSearch.id })
+    .select()
     .from(savedSearch)
-    .where(
-      and(
-        eq(savedSearch.id, id),
-        eq(savedSearch.userId, session.user.id),
-      ),
-    )
+    .where(eq(savedSearch.id, id))
 
-  if (!search) {
+  const access = search
+    ? await getBusinessAccess(session.user.id, search.businessId)
+    : null
+
+  if (!search || !access || access.readOnly) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 

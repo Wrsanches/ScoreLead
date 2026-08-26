@@ -1,19 +1,19 @@
-import { headers } from "next/headers"
 import { notFound } from "next/navigation"
-import { auth } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-guard"
 import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
 import { getBusinessAccess } from "@/lib/business-access"
 
 export default async function NewDiscoveryJobLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  const businessId = session
-    ? await getActiveViewableBusinessIdForUser(session.user.id)
-    : null
-  const access = session && businessId
+  const { locale } = await params
+  const session = await requireAuth(locale)
+  const businessId = await getActiveViewableBusinessIdForUser(session.user.id)
+  const access = businessId
     ? await getBusinessAccess(session.user.id, businessId)
     : null
 

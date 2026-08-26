@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { discoveryJob } from "@/lib/db/schema"
-import { eq, and } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function POST(
   _request: Request,
@@ -22,14 +23,13 @@ export async function POST(
   const [job] = await db
     .select()
     .from(discoveryJob)
-    .where(
-      and(
-        eq(discoveryJob.id, id),
-        eq(discoveryJob.userId, session.user.id),
-      ),
-    )
+    .where(eq(discoveryJob.id, id))
 
-  if (!job) {
+  const access = job
+    ? await getBusinessAccess(session.user.id, job.businessId)
+    : null
+
+  if (!job || !access || access.readOnly) {
     return NextResponse.json({ error: "Job not found" }, { status: 404 })
   }
 

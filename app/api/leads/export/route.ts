@@ -68,7 +68,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const plan = await getUserPlan(session.user.id)
+  const url = new URL(request.url)
+  const access = await resolveViewableBusiness(
+    session.user.id,
+    url.searchParams.get("businessId"),
+  )
+  if (!access) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
+
+  const plan = await getUserPlan(access.ownerUserId)
   if (!can(plan, "csvExport")) {
     return NextResponse.json(
       {
@@ -78,15 +87,6 @@ export async function GET(request: Request) {
       },
       { status: 402 },
     )
-  }
-
-  const url = new URL(request.url)
-  const access = await resolveViewableBusiness(
-    session.user.id,
-    url.searchParams.get("businessId"),
-  )
-  if (!access) {
-    return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
   // Mirror the list endpoint's filter/sort contract so an export matches what

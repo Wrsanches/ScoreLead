@@ -5,8 +5,8 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappSignupNonce } from "@/lib/db/schema"
 import { can, getUserPlan } from "@/lib/plan"
-import { getOwnedBusiness } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function POST(
   _request: Request,
@@ -14,18 +14,19 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id } = await params
+  const access = await getBusinessAccess(session.user.id, id)
+  if (!access || access.readOnly) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
+  if (!access.isPlatformAdmin && !hasWhatsAppEarlyAccess(access.ownerEmail)) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
   }
-  if (!can(await getUserPlan(session.user.id), "whatsappAutomation")) {
+  if (!can(await getUserPlan(access.ownerUserId), "whatsappAutomation")) {
     return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
-  }
-  const { id } = await params
-  if (!(await getOwnedBusiness(id, session.user.id))) {
-    return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
   const appId = process.env.META_APP_ID
   const configId = process.env.META_WHATSAPP_CONFIG_ID

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappSequence, whatsappSequenceStep } from "@/lib/db/schema"
-import { getOwnedLead } from "@/lib/whatsapp/data"
+import { getManageableLead } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 
 export async function POST(
@@ -13,15 +13,19 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id, sequenceId } = await params
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+  if (
+    !manageable.access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(manageable.access.ownerEmail)
+  ) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
-  }
-  const { id, sequenceId } = await params
-  if (!(await getOwnedLead(id, session.user.id))) {
-    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
   const now = new Date()
   const [cancelled] = await db

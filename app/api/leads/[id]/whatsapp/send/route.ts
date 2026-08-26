@@ -16,7 +16,7 @@ import { can, getUserPlan } from "@/lib/plan"
 import { generateWhatsAppTemplateValues } from "@/lib/services/whatsapp-template-variables"
 import {
   getLatestWhatsAppConsent,
-  getOwnedLead,
+  getManageableLead,
   getWhatsAppConnection,
 } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
@@ -50,18 +50,24 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id } = await params
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+  if (
+    !manageable.access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(manageable.access.ownerEmail)
+  ) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
   }
-  if (!can(await getUserPlan(session.user.id), "whatsappAutomation")) {
+  if (!can(await getUserPlan(manageable.access.ownerUserId), "whatsappAutomation")) {
     return NextResponse.json({ error: "WhatsApp automation requires Growth or Pro", code: "PLAN_LIMIT", action: "whatsappAutomation" }, { status: 402 })
   }
-  const { id } = await params
-  const ownedLead = await getOwnedLead(id, session.user.id)
-  if (!ownedLead) return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  const ownedLead = manageable.lead
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) {

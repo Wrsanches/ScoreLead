@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { lead, discoveryJob } from "@/lib/db/schema"
-import { eq, and, inArray } from "drizzle-orm"
+import { lead } from "@/lib/db/schema"
+import { eq, and } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getBusinessAccess } from "@/lib/business-access"
+import { getManageableLead } from "@/lib/whatsapp/data"
 
 /** Allowed lead statuses. Must match STATUS_CONFIG on the client. */
 export const LEAD_STATUSES = [
@@ -20,31 +21,6 @@ export const LEAD_STATUSES = [
 const patchSchema = z.object({
   status: z.enum(LEAD_STATUSES).optional(),
 })
-
-/** Verify that a lead belongs to one of the signed-in user's jobs. */
-async function assertLeadOwnership(leadId: string, userId: string) {
-  const userJobs = await db
-    .select({ id: discoveryJob.id })
-    .from(discoveryJob)
-    .where(eq(discoveryJob.userId, userId))
-
-  if (userJobs.length === 0) return null
-
-  const [row] = await db
-    .select()
-    .from(lead)
-    .where(
-      and(
-        eq(lead.id, leadId),
-        inArray(
-          lead.jobId,
-          userJobs.map((j) => j.id),
-        ),
-      ),
-    )
-
-  return row || null
-}
 
 export async function GET(
   request: Request,
@@ -104,10 +80,11 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
   }
 
-  const existing = await assertLeadOwnership(id, session.user.id)
-  if (!existing) {
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const existing = manageable.lead
 
   const updates: Partial<typeof lead.$inferInsert> = {}
   if (parsed.data.status) updates.status = parsed.data.status

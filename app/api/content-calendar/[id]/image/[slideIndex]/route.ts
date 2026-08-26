@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { business, contentPost } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -9,11 +9,14 @@ import { regenerateSlide } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
 import { reserveImages, releaseImages, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
+import { deleteObject, publicUrl } from "@/lib/s3"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export const maxDuration = 180
 
 const bodySchema = z.object({
   refinementPrompt: z.string().max(1000).optional(),
+  referenceKey: z.string().max(1024).optional(),
 })
 
 export async function POST(
@@ -22,14 +25,6 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-  const limit = rateLimit(`image-gen:${session.user.id}`, 12, 60_000)
-  if (!limit.allowed) {
-    return NextResponse.json(
-      { error: "Slow down, generating too quickly", retryAfterMs: limit.retryAfterMs },
-      { status: 429 },
-    )
-  }
 
   const { id, slideIndex } = await params
   const index = Number.parseInt(slideIndex, 10)
@@ -43,25 +38,43 @@ export async function POST(
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
+  const referenceKey = parsed.data.referenceKey
+  const referencePrefix = `content-references/${session.user.id}/${id}/`
+  if (referenceKey && !referenceKey.startsWith(referencePrefix)) {
+    return NextResponse.json({ error: "Invalid reference image" }, { status: 400 })
+  }
+
+  const limit = rateLimit(`image-gen:${session.user.id}`, 12, 60_000)
+  if (!limit.allowed) {
+    if (referenceKey) await deleteObject(referenceKey)
+    return NextResponse.json(
+      { error: "Slow down, generating too quickly", retryAfterMs: limit.retryAfterMs },
+      { status: 429 },
+    )
+  }
+
   const [post] = await db
     .select()
     .from(contentPost)
-    .where(and(eq(contentPost.id, id), eq(contentPost.userId, session.user.id)))
+    .where(eq(contentPost.id, id))
 
   if (!post) {
+    if (referenceKey) await deleteObject(referenceKey)
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+  }
+
+  const access = await getBusinessAccess(session.user.id, post.businessId)
+  if (!access || access.readOnly) {
+    if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
   const [biz] = await db
     .select()
     .from(business)
-    .where(
-      and(
-        eq(business.id, post.businessId),
-        eq(business.userId, session.user.id),
-      ),
-    )
+    .where(eq(business.id, post.businessId))
   if (!biz) {
+    if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
@@ -69,9 +82,10 @@ export async function POST(
   // (released below if generation fails) so concurrent requests can't exceed
   // the cap during the slow generation.
   try {
-    await reserveImages(session.user.id, 1)
+    await reserveImages(access.ownerUserId, 1)
   } catch (e) {
     if (e instanceof PlanLimitError) {
+      if (referenceKey) await deleteObject(referenceKey)
       return NextResponse.json(
         {
           error:
@@ -87,6 +101,7 @@ export async function POST(
         { status: 402 },
       )
     }
+    if (referenceKey) await deleteObject(referenceKey)
     throw e
   }
 
@@ -122,18 +137,26 @@ export async function POST(
       {
         refinementPrompt: parsed.data.refinementPrompt,
         baseImageUrl: previousSlide?.url,
+        baseImageRole:
+          previousSlide?.prompt === "uploaded-by-user"
+            ? "user-source"
+            : "existing-slide",
+        referenceImageUrl: referenceKey ? publicUrl(referenceKey) : undefined,
         previousUrl: previousSlide?.url,
+        previousPrompt: previousSlide?.prompt,
       },
     )
   } catch (e) {
     // Generation threw after we reserved the credit - give it back.
-    await releaseImages(session.user.id, 1)
+    await releaseImages(access.ownerUserId, 1)
     throw e
+  } finally {
+    if (referenceKey) await deleteObject(referenceKey)
   }
 
   if (!slide) {
     // No image produced - release the reserved credit.
-    await releaseImages(session.user.id, 1)
+    await releaseImages(access.ownerUserId, 1)
     return NextResponse.json(
       { error: "Image generation failed" },
       { status: 502 },

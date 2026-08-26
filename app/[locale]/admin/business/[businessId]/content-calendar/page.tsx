@@ -345,9 +345,19 @@ export default function ContentCalendarPage() {
     }
   }
 
-  async function handleGenerateImage(postId: string) {
+  async function handleGenerateImage(postId: string, referenceFile?: File) {
+    const referenceUpload = referenceFile
+      ? await uploadImage(referenceFile, {
+          kind: "content-reference",
+          postId,
+          slideIndex: 0,
+          maxBytes: 4 * 1024 * 1024,
+        })
+      : null;
     const res = await fetch(`/api/content-calendar/${postId}/image`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ referenceKey: referenceUpload?.key }),
     });
     if (res.status === 402) {
       const body = await res.json().catch(() => ({}));
@@ -373,13 +383,25 @@ export default function ContentCalendarPage() {
     postId: string,
     slideIndex: number,
     refinementPrompt?: string,
+    referenceFile?: File,
   ) {
+    const referenceUpload = referenceFile
+      ? await uploadImage(referenceFile, {
+          kind: "content-reference",
+          postId,
+          slideIndex,
+          maxBytes: 4 * 1024 * 1024,
+        })
+      : null;
     const res = await fetch(
       `/api/content-calendar/${postId}/image/${slideIndex}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refinementPrompt }),
+        body: JSON.stringify({
+          refinementPrompt,
+          referenceKey: referenceUpload?.key,
+        }),
       },
     );
     if (res.status === 402) {

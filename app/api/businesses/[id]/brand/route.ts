@@ -1,10 +1,11 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { extractBrandProfile } from "@/lib/services/brand-extractor"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export async function POST(
   _request: Request,
@@ -19,16 +20,15 @@ export async function POST(
   }
 
   const { id } = await params
+  const access = await getBusinessAccess(session.user.id, id)
+  if (!access || access.readOnly) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
 
   const [row] = await db
     .select()
     .from(business)
-    .where(
-      and(
-        eq(business.id, id),
-        eq(business.userId, session.user.id),
-      ),
-    )
+    .where(eq(business.id, id))
 
   if (!row) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 })

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   LayoutDashboard,
@@ -46,19 +46,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { ViewableBusiness as Business } from "@/lib/business-access";
 
-type Business = {
-  id: string;
-  name: string | null;
-  logo: string | null;
-  field: string | null;
-  website: string | null;
-  ownerName?: string | null;
-  ownerEmail?: string | null;
-  readOnly?: boolean;
-};
+type SidebarBusiness = Pick<
+  Business,
+  | "id"
+  | "name"
+  | "logo"
+  | "field"
+  | "website"
+  | "ownerUserId"
+  | "ownerName"
+  | "ownerEmail"
+  | "readOnly"
+>;
 
-function getBusinessLogo(b: Business | undefined): string | null {
+function getBusinessLogo(b: SidebarBusiness | undefined): string | null {
   if (!b) return null;
   if (b.logo) return b.logo;
   if (b.website) {
@@ -78,7 +81,10 @@ export function AdminSidebar({
   collapsed,
   onCollapsedChange,
   animateLayout,
-  userEmail: serverUserEmail,
+  businesses,
+  userName = "",
+  userEmail = "",
+  userImage,
   isPlatformAdmin = false,
 }: {
   open: boolean;
@@ -86,7 +92,10 @@ export function AdminSidebar({
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
   animateLayout: boolean;
+  businesses: SidebarBusiness[];
+  userName?: string | null;
   userEmail?: string | null;
+  userImage?: string | null;
   isPlatformAdmin?: boolean;
 }) {
   const t = useTranslations("dashboard");
@@ -96,33 +105,21 @@ export function AdminSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
-  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const resolvedUserName = userName ?? "";
+  const resolvedUserEmail = userEmail ?? "";
 
   const { open: openSearch, clearSelectedLead } = useSearch();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [businessesLoading, setBusinessesLoading] = useState(true);
   const businessId = useOptionalBusinessId() ?? businesses[0]?.id ?? null;
 
-  const userName = session?.user?.name || "";
-  const userEmail = serverUserEmail || session?.user?.email || "";
-  const userImage = session?.user?.image;
   const whatsappAvailable =
     process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true" &&
-    (isPlatformAdmin || hasWhatsAppEarlyAccess(userEmail));
-  const userInitials = userName
+    (isPlatformAdmin || hasWhatsAppEarlyAccess(resolvedUserEmail));
+  const userInitials = resolvedUserName
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
-
-  useEffect(() => {
-    fetch("/api/businesses")
-      .then((res) => res.json())
-      .then((data: Business[]) => setBusinesses(data))
-      .catch(() => {})
-      .finally(() => setBusinessesLoading(false));
-  }, []);
 
   const selectedBusiness = useMemo(
     () => businesses.find((b) => b.id === businessId) || businesses[0],
@@ -203,9 +200,6 @@ export function AdminSidebar({
       </div>
 
       <div className={`p-3 space-y-2 ${collapsed ? "lg:px-2" : ""}`}>
-        {businessesLoading ? (
-          <SidebarBizSkeleton collapsed={collapsed} />
-        ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -307,7 +301,6 @@ export function AdminSidebar({
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-        )}
 
         <button
           onClick={openSearch}
@@ -325,10 +318,6 @@ export function AdminSidebar({
           </span>
         </button>
       </div>
-
-      {!businessId && businessesLoading && (
-        <SidebarNavSkeleton collapsed={collapsed} />
-      )}
 
       {businessId && (
         <div className={`px-3 space-y-0.5 ${collapsed ? "lg:px-2" : ""}`}>
@@ -425,14 +414,11 @@ export function AdminSidebar({
             </span>
           </button>
         )}
-        {sessionPending ? (
-          <SidebarAccountSkeleton collapsed={collapsed} />
-        ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               className={`group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-800 dark:hover:text-zinc-200 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
-              title={userName || userEmail || "Account"}
+              title={resolvedUserName || resolvedUserEmail || "Account"}
             >
               {userImage ? (
                 <Image
@@ -457,8 +443,8 @@ export function AdminSidebar({
               <div
                 className={`flex-1 min-w-0 text-left ${collapsed ? "lg:hidden" : ""}`}
               >
-                <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{userName}</p>
-                <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
+                <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{resolvedUserName}</p>
+                <p className="text-xs text-zinc-500 truncate">{resolvedUserEmail}</p>
               </div>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors duration-200 ${collapsed ? "lg:hidden" : ""}`}
@@ -495,9 +481,9 @@ export function AdminSidebar({
                 )}
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
-                    {userName}
+                    {resolvedUserName}
                   </p>
-                  <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
+                  <p className="text-xs text-zinc-500 truncate">{resolvedUserEmail}</p>
                   <span
                     className={`mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[10px] font-medium ${
                       isPaid
@@ -544,76 +530,8 @@ export function AdminSidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        )}
       </div>
     </aside>
-  );
-}
-
-// ── Loading skeletons (shown on initial data load, e.g. a hard refresh) ──
-// Each mirrors the real row's box so the layout doesn't shift, and collapses
-// to a centered icon placeholder just like the real items.
-
-function SkeletonBar({ className = "" }: { className?: string }) {
-  return (
-    <div
-      className={`rounded bg-zinc-200 dark:bg-zinc-800 animate-pulse ${className}`}
-    />
-  );
-}
-
-function SidebarBizSkeleton({ collapsed }: { collapsed?: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
-    >
-      <div
-        className={`w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
-      />
-      <SkeletonBar
-        className={`h-3.5 flex-1 max-w-32 ${collapsed ? "lg:hidden" : ""}`}
-      />
-    </div>
-  );
-}
-
-function SidebarNavSkeleton({ collapsed }: { collapsed?: boolean }) {
-  const widths = ["w-20", "w-24", "w-16", "w-28", "w-20", "w-24"];
-  return (
-    <div
-      aria-hidden="true"
-      className={`px-3 space-y-0.5 ${collapsed ? "lg:px-2" : ""}`}
-    >
-      {widths.map((w, i) => (
-        <div
-          key={i}
-          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
-        >
-          <div
-            className={`w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
-          />
-          <SkeletonBar className={`h-3 ${w} ${collapsed ? "lg:hidden" : ""}`} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SidebarAccountSkeleton({ collapsed }: { collapsed?: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
-    >
-      <div
-        className={`w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
-      />
-      <div className={`flex-1 space-y-1.5 ${collapsed ? "lg:hidden" : ""}`}>
-        <SkeletonBar className="h-3 w-24" />
-        <SkeletonBar className="h-2.5 w-32" />
-      </div>
-    </div>
   );
 }
 

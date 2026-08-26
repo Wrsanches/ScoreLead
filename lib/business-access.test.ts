@@ -24,7 +24,7 @@ describe("business access policy", () => {
     ).toBe(true)
   })
 
-  test("platform admins cannot manage another user's business", () => {
+  test("platform admins can manage another user's business", () => {
     expect(
       canAccessBusiness({
         actorUserId: "admin",
@@ -32,7 +32,7 @@ describe("business access policy", () => {
         ownerUserId: "owner",
         mode: "manage",
       }),
-    ).toBe(false)
+    ).toBe(true)
   })
 
   test("regular users cannot access another user's business", () => {

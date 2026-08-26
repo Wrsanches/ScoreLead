@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { and, eq } from "drizzle-orm"
+import { cache } from "react"
 import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
 import { getBusinessAccess, isPlatformAdmin } from "@/lib/business-access"
@@ -17,7 +18,7 @@ export const ACTIVE_BUSINESS_COOKIE = "active_business_id"
  *
  * Returns null if the user has no businesses.
  */
-export async function getActiveBusinessIdForUser(
+export const getActiveBusinessIdForUser = cache(async function getActiveBusinessIdForUser(
   userId: string,
 ): Promise<string | null> {
   const cookieStore = await cookies()
@@ -38,7 +39,7 @@ export async function getActiveBusinessIdForUser(
 
   const completed = rows.find((b) => b.onboardingCompleted)
   return (completed ?? rows[0])?.id ?? null
-}
+})
 
 /**
  * Resolves a business id for an explicitly scoped API request. Browser routes
@@ -61,11 +62,10 @@ export async function resolveBusinessId(
 }
 
 /**
- * Admin-aware active business resolver used only by read/navigation paths.
- * Mutation paths must continue using resolveBusinessId so platform admins
- * cannot act as another organization.
+ * Admin-aware active business resolver used by navigation and delegated admin
+ * actions. Individual mutation routes must still verify manage access.
  */
-export async function getActiveViewableBusinessIdForUser(
+export const getActiveViewableBusinessIdForUser = cache(async function getActiveViewableBusinessIdForUser(
   userId: string,
 ): Promise<string | null> {
   const cookieStore = await cookies()
@@ -86,7 +86,7 @@ export async function getActiveViewableBusinessIdForUser(
     .limit(1)
 
   return first?.id ?? null
-}
+})
 
 /**
  * Resolves an explicitly requested business for a read path. Unlike the legacy
@@ -103,6 +103,19 @@ export async function resolveViewableBusiness(
 
   const activeId = await getActiveViewableBusinessIdForUser(userId)
   return activeId ? getBusinessAccess(userId, activeId) : null
+}
+
+/**
+ * Resolves a business for a mutation. Platform admins may act on the selected
+ * business, but callers should persist tenant-owned data under ownerUserId so
+ * it remains visible and metered to the business owner.
+ */
+export async function resolveManageableBusiness(
+  userId: string,
+  requestedId: string | null | undefined,
+) {
+  const access = await resolveViewableBusiness(userId, requestedId)
+  return access && !access.readOnly ? access : null
 }
 
 /**

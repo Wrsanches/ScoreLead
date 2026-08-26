@@ -1,53 +1,75 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { business, contentPost } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { generatePostImages } from "@/lib/services/content-image-generator"
 import { rateLimit } from "@/lib/rate-limit"
 import { reserveImages, releaseImages, PlanLimitError } from "@/lib/plan"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
+import { deleteObject, publicUrl } from "@/lib/s3"
+import { z } from "zod"
+import { getBusinessAccess } from "@/lib/business-access"
 
 export const maxDuration = 300
 
+const bodySchema = z.object({
+  referenceKey: z.string().max(1024).optional(),
+})
+
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
+  const rawBody = await request.json().catch(() => ({}))
+  const parsed = bodySchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 })
+  }
+
+  const referenceKey = parsed.data.referenceKey
+  const referencePrefix = `content-references/${session.user.id}/${id}/`
+  if (referenceKey && !referenceKey.startsWith(referencePrefix)) {
+    return NextResponse.json({ error: "Invalid reference image" }, { status: 400 })
+  }
+
   const limit = rateLimit(`image-gen:${session.user.id}`, 12, 60_000)
   if (!limit.allowed) {
+    if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json(
       { error: "Slow down, generating too quickly", retryAfterMs: limit.retryAfterMs },
       { status: 429 },
     )
   }
 
-  const { id } = await params
-
   const [post] = await db
     .select()
     .from(contentPost)
-    .where(and(eq(contentPost.id, id), eq(contentPost.userId, session.user.id)))
+    .where(eq(contentPost.id, id))
 
   if (!post) {
+    if (referenceKey) await deleteObject(referenceKey)
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+  }
+
+  const access = await getBusinessAccess(session.user.id, post.businessId)
+  if (!access || access.readOnly) {
+    if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
   const [biz] = await db
     .select()
     .from(business)
-    .where(
-      and(
-        eq(business.id, post.businessId),
-        eq(business.userId, session.user.id),
-      ),
-    )
+    .where(eq(business.id, post.businessId))
 
   if (!biz) {
+    if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
@@ -81,15 +103,16 @@ export async function POST(
       },
       post.images ?? null,
       {
+        referenceImageUrl: referenceKey ? publicUrl(referenceKey) : undefined,
         beforeGenerate: async (plannedImageCount) => {
-          await reserveImages(session.user.id, plannedImageCount)
+          await reserveImages(access.ownerUserId, plannedImageCount)
           reserved = plannedImageCount
         },
       },
     )
   } catch (e) {
     // Generation failed after reserving - give the credits back.
-    if (reserved > 0) await releaseImages(session.user.id, reserved)
+    if (reserved > 0) await releaseImages(access.ownerUserId, reserved)
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
         {
@@ -107,11 +130,13 @@ export async function POST(
       )
     }
     throw e
+  } finally {
+    if (referenceKey) await deleteObject(referenceKey)
   }
 
   // Release credits reserved for slides that failed to render.
   if (reserved > result.slides.length) {
-    await releaseImages(session.user.id, reserved - result.slides.length)
+    await releaseImages(access.ownerUserId, reserved - result.slides.length)
   }
 
   if (result.slides.length === 0) {

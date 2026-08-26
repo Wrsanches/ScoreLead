@@ -673,11 +673,11 @@ export function leadCap(plan: Plan, requested: number): number {
 
 /** Shape returned by /api/billing/status for the client UI. */
 export async function getPlanStatus(userId: string) {
-  const [{ plan, isTrialing, limits, periodEnd }, u] = await Promise.all([
+  const [{ plan, isTrialing, limits, periodEnd }, u, businesses] = await Promise.all([
     getEntitlement(userId),
     getUsage(userId),
+    businessCount(userId),
   ])
-  const businesses = await businessCount(userId)
   return {
     plan,
     isTrialing,
@@ -709,3 +709,21 @@ export async function getPlanStatus(userId: string) {
     },
   }
 }
+
+/** JSON/RSC-safe shape shared by the billing API and the hydrated admin shell. */
+export function serializePlanStatus(
+  status: Awaited<ReturnType<typeof getPlanStatus>>,
+) {
+  return {
+    ...status,
+    periodEnd: status.periodEnd?.toISOString() ?? null,
+    limits: Object.fromEntries(
+      Object.entries(status.limits).map(([key, value]) => [
+        key,
+        Number.isFinite(value) ? value : null,
+      ]),
+    ) as Record<keyof typeof status.limits, number | null>,
+  }
+}
+
+export type SerializedPlanStatus = ReturnType<typeof serializePlanStatus>

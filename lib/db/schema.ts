@@ -81,45 +81,49 @@ export const account = pgTable(
   ],
 )
 
-export const business = pgTable("business", {
-  id: text("id").primaryKey(),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  website: text("website"),
-  instagram: text("instagram"),
-  facebook: text("facebook"),
-  linkedin: text("linkedin"),
-  other: text("other"),
-  location: text("location"),
-  name: text("name"),
-  description: text("description"),
-  persona: text("persona"),
-  clientPersona: text("clientPersona"),
-  field: text("field"),
-  category: text("category"),
-  tags: text("tags"),
-  logo: text("logo"),
-  productImages: jsonb("productImages").$type<
-    { id: string; url: string; description: string }[]
-  >(),
-  language: text("language"),
-  brandColors: jsonb("brandColors").$type<string[]>(),
-  brandColorPrimary: text("brandColorPrimary"),
-  brandColorSecondary: text("brandColorSecondary"),
-  brandFonts: jsonb("brandFonts").$type<string[]>(),
-  brandStyle: text("brandStyle"),
-  businessModel: text("businessModel"),
-  services: text("services"),
-  serviceArea: text("serviceArea"),
-  competitors: text("competitors"),
-  suggestedKeywords: jsonb("suggestedKeywords").$type<string[]>(),
-  lastDiscoveryKeywords: jsonb("lastDiscoveryKeywords").$type<string[]>(),
-  onboardingCompleted: boolean("onboardingCompleted").notNull().default(false),
-  onboardingStep: text("onboardingStep").notNull().default("links"),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-})
+export const business = pgTable(
+  "business",
+  {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    website: text("website"),
+    instagram: text("instagram"),
+    facebook: text("facebook"),
+    linkedin: text("linkedin"),
+    other: text("other"),
+    location: text("location"),
+    name: text("name"),
+    description: text("description"),
+    persona: text("persona"),
+    clientPersona: text("clientPersona"),
+    field: text("field"),
+    category: text("category"),
+    tags: text("tags"),
+    logo: text("logo"),
+    productImages: jsonb("productImages").$type<
+      { id: string; url: string; description: string }[]
+    >(),
+    language: text("language"),
+    brandColors: jsonb("brandColors").$type<string[]>(),
+    brandColorPrimary: text("brandColorPrimary"),
+    brandColorSecondary: text("brandColorSecondary"),
+    brandFonts: jsonb("brandFonts").$type<string[]>(),
+    brandStyle: text("brandStyle"),
+    businessModel: text("businessModel"),
+    services: text("services"),
+    serviceArea: text("serviceArea"),
+    competitors: text("competitors"),
+    suggestedKeywords: jsonb("suggestedKeywords").$type<string[]>(),
+    lastDiscoveryKeywords: jsonb("lastDiscoveryKeywords").$type<string[]>(),
+    onboardingCompleted: boolean("onboardingCompleted").notNull().default(false),
+    onboardingStep: text("onboardingStep").notNull().default("links"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => [index("business_user_idx").on(table.userId)],
+)
 
 export const savedSearch = pgTable("saved_search", {
   id: text("id").primaryKey(),
@@ -177,6 +181,10 @@ export const discoveryJob = pgTable("discovery_job", {
   index("discovery_job_status_idx").on(table.status),
   index("discovery_job_user_idx").on(table.userId),
   index("discovery_job_business_idx").on(table.businessId),
+  index("discovery_job_business_created_idx").on(
+    table.businessId,
+    table.createdAt,
+  ),
 ])
 
 export const lead = pgTable("lead", {
@@ -254,6 +262,7 @@ export const lead = pgTable("lead", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 }, (table) => [
   index("lead_business_idx").on(table.businessId),
+  index("lead_business_created_idx").on(table.businessId, table.createdAt),
   index("lead_job_idx").on(table.jobId),
 ])
 
@@ -606,25 +615,34 @@ export const verification = pgTable("verification", {
 
 // Managed by the @better-auth/stripe plugin. Field names must match what the
 // plugin reads/writes. referenceId is the user id (account-level subscription).
-export const subscription = pgTable("subscription", {
-  id: text("id").primaryKey(),
-  plan: text("plan").notNull(),
-  referenceId: text("referenceId").notNull(),
-  stripeCustomerId: text("stripeCustomerId"),
-  stripeSubscriptionId: text("stripeSubscriptionId"),
-  status: text("status").notNull(),
-  periodStart: timestamp("periodStart"),
-  periodEnd: timestamp("periodEnd"),
-  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd"),
-  cancelAt: timestamp("cancelAt"),
-  canceledAt: timestamp("canceledAt"),
-  endedAt: timestamp("endedAt"),
-  seats: integer("seats"),
-  trialStart: timestamp("trialStart"),
-  trialEnd: timestamp("trialEnd"),
-  billingInterval: text("billingInterval"),
-  stripeScheduleId: text("stripeScheduleId"),
-})
+export const subscription = pgTable(
+  "subscription",
+  {
+    id: text("id").primaryKey(),
+    plan: text("plan").notNull(),
+    referenceId: text("referenceId").notNull(),
+    stripeCustomerId: text("stripeCustomerId"),
+    stripeSubscriptionId: text("stripeSubscriptionId"),
+    status: text("status").notNull(),
+    periodStart: timestamp("periodStart"),
+    periodEnd: timestamp("periodEnd"),
+    cancelAtPeriodEnd: boolean("cancelAtPeriodEnd"),
+    cancelAt: timestamp("cancelAt"),
+    canceledAt: timestamp("canceledAt"),
+    endedAt: timestamp("endedAt"),
+    seats: integer("seats"),
+    trialStart: timestamp("trialStart"),
+    trialEnd: timestamp("trialEnd"),
+    billingInterval: text("billingInterval"),
+    stripeScheduleId: text("stripeScheduleId"),
+  },
+  (table) => [
+    index("subscription_reference_status_idx").on(
+      table.referenceId,
+      table.status,
+    ),
+  ],
+)
 
 // Custom tiered usage metering. One row per user. Lifetime counters enforce the
 // Free caps; the month-keyed buckets enforce the monthly windows on Starter,

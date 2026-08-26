@@ -75,67 +75,186 @@ export interface GeneratePostImagesResult {
 
 interface GeneratePostImagesOptions {
   beforeGenerate?: (plannedImageCount: number) => Promise<void>;
+  /** One-off reference uploaded specifically for this generation. */
+  referenceImageUrl?: string;
 }
 
 interface PillarDirection {
-  archetype: string;
-  composition: string;
-  lighting: string;
+  intent: string;
+  subjectPriority: string;
   typography: string;
 }
 
 const PILLAR_DIRECTION: Record<ContentPillar, PillarDirection> = {
   educate: {
-    archetype:
-      "Conceptual still-life photography in the spirit of Apple's product campaigns, Aesop's in-store photography, and Byredo's fragrance stills. Each idea is embodied by a SINGLE, carefully-chosen object (or a tight, intentional arrangement of 2-3 objects) staged like a museum piece. Objects feel chosen, not found. Sculpture-of-meaning over flat-lay.",
-    composition:
-      "Extreme negative space around a single hero subject - the subject is small-to-medium in the frame, surrounded by a wide field of color or texture that breathes. Unexpected angle: top-down god's-eye-view, perfect 3/4 at table height, or extreme macro with selective focus. Suspended, floating, or isolated on a color-blocked backdrop. Leave a clear silent zone for the headline type. One focal point, no clutter.",
-    lighting:
-      "Studio sculpture lighting - a soft key light from one side carves the subject, a gentle fill ensures shadows are rich not black, a subtle rim catches an edge. Think Peter Belanger (Apple), Scheltens & Abbenes, or Maurizio Di Iorio. Shot on Hasselblad X2D or Phase One, 80mm macro or 120mm. Rich controlled color, lifted blacks, faint digital noise. No synthetic HDR.",
+    intent:
+      "Make one idea instantly understandable through a concrete visual metaphor. Clarity comes from the subject and composition, not from diagrams or extra explanatory copy.",
+    subjectPriority:
+      "Choose one memorable object, gesture, or comparison that embodies the lesson. Keep the hierarchy unmistakable and leave a calm area for the headline.",
     typography:
-      "Swiss-editorial display headline OVERLAID on the photograph in the silent zone. Very tight kerning, medium-to-bold weight. One typeface. White or primary color, whichever has the highest contrast against its patch of background. Left-aligned, aligned to a visual grid. Restrained - the object does the talking.",
+      "Clear editorial headline with disciplined alignment and strong contrast. The visual teaches; the type names the idea.",
   },
   showcase: {
-    archetype:
-      "Apple keynote hero photography meets Jacquemus campaign color-blocking. A single subject shot with reverence. Cinematic, iconic, wallpaper-worthy. The kind of image that would be printed in a coffee-table book.",
-    composition:
-      "One hero subject isolated against a bold monochrome or gradient backdrop (often in the brand's primary color). Extreme negative space, hero occupies 25-40% of frame. Unexpected angle: hero viewed from below (low-hero), from directly above, or floating in a seamless color field. Real shadow anchors it to reality. Shallow depth of field with real optical bokeh. Could be a single object, a plated dish, a pair of hands holding something, a tool of the trade.",
-    lighting:
-      "Cinematic three-point studio light with dramatic falloff - the subject is carved out of darkness by a single key light with a soft fill. Real specular highlights on any reflective surface. Shot on Hasselblad X2D or Phase One IQ4, 80-120mm. Color graded like a Bottega Veneta or Prada campaign: saturated but sophisticated, rich shadows, a single accent of secondary color.",
+    intent:
+      "Make the real product, service artifact, or result unmistakably desirable. The featured subject is specific to this business, never a generic category substitute.",
+    subjectPriority:
+      "Give the product a decisive hero moment. Preserve recognizable details and use scale, framing, or context to make its value felt.",
     typography:
-      "Massive wordmark-scale headline, anchored in the negative space. Letter spacing tight. One typeface, one weight. The type feels typeset by Pentagram or Mother Design - not placed, composed.",
+      "Confident display headline integrated into the composition without covering the product's defining details.",
   },
   story: {
-    archetype:
-      "Documentary-art photography in the spirit of Ryan McGinley, Alec Soth, Stephen Shore, or The New Yorker's 'Goings On About Town' photo essays. Real moments with the eye of an artist. Kinfolk and Cereal at the editorial layer, with more intention and edge - not just 'pretty morning light'.",
-    composition:
-      "A decisive moment captured with craft - hands at work mid-gesture, the negative space of a workshop, a side-profile silhouette framed against a window, an arrangement of tools that tells a story of the day. 35mm or 50mm at waist height or over the shoulder. Rule of thirds broken intentionally. Sometimes a second 'frame within the frame' via a doorway, mirror, or reflection.",
-    lighting:
-      "Real natural light - morning window light, golden hour, or tungsten practicals in the scene. Visible halation on highlights, lifted blacks, dense shadows. Shot on Portra 400 or Cinestill 800T with real grain. Warm to neutral grade, never oversaturated.",
+    intent:
+      "Create a lived-in narrative moment with a sense of before and after. It should feel observed, personal, and particular to the business.",
+    subjectPriority:
+      "Show a meaningful gesture, place, tool, or trace of human activity. Favor emotional specificity over a polished generic scene.",
     typography:
-      "A quiet headline placed with restraint - bottom-left, lowercase, almost like a caption in a photo-book. Small relative to the frame. The type acknowledges the photograph is the art.",
+      "A quieter headline, placed like an editorial caption or opening title so the scene can carry the emotion.",
   },
   proof: {
-    archetype:
-      "Editorial portrait-photography with pull-quote, like a Monocle magazine profile, a Vogue Business feature, or a Bloomberg Businessweek cover. The quote is a sculpture of type OVER a considered photograph - a workshop detail, a product in use, hands holding something meaningful. NOT a UI card, NOT a gradient, NOT a template.",
-    composition:
-      "A crafted environmental photograph that gives the quote a stage. Could be a blurred workshop in the primary color, a detail of the service being delivered, or a portrait from behind/in silhouette. The quote is carved into the image at a carefully-chosen quadrant with generous margin. Rule of thirds, strong horizon or leading line. Optional: a small, elegant star or mark glyph.",
-    lighting:
-      "Soft editorial portrait lighting. Slightly desaturated in the photograph zone so the typography reads clearly. Real depth of field, real bokeh, real fabric/material texture.",
+    intent:
+      "Turn evidence, a result, or a customer truth into the hero. The frame should feel credible and earned rather than like a decorative testimonial template.",
+    subjectPriority:
+      "Show the proof in context: a real artifact, a product in use, a meaningful detail, or a human reaction. Never invent metrics, logos, or customer identities.",
     typography:
-      "The quote rendered like a magazine pull-quote: italic serif (think Tiempos, Canela, or Romana) or a confident geometric sans (Söhne, General Sans), 40-64px, tight leading, hanging quotation mark. Below it, in small caps and 1/4 the size, optionally 'a client' or a generic attribution. One typeface family across both.",
+      "Treat the headline like a magazine pull-quote or evidence statement, with generous margins and a strong reading order.",
   },
   engagement: {
-    archetype:
-      "Surreal-kinetic fashion/art photography in the spirit of Jacquemus, Bottega Veneta, Loewe, or a Tim Walker fashion editorial. A real photograph that feels like a painting - bold color, unexpected subject, a sense of motion or suspended impossibility. OR decisive-moment sport photography like Walter Iooss Jr. for Nike.",
-    composition:
-      "A visually-surprising composition: a splash frozen in air, a subject caught mid-leap, objects arranged in an impossibly balanced way, a hand breaking into the frame from an edge, or a color-blocked scene with one pop of contrasting element. Asymmetric crop with strong diagonal or radial energy.",
-    lighting:
-      "Vibrant but disciplined. High-chroma natural light, stage lighting, or studio strobe freezing a moment. The brand colors appear as real environmental elements (paint, fabric, liquid, light temperature, wardrobe) - never a flat overlay. Rich shadows keep it cinematic.",
+    intent:
+      "Create an immediate visual question, tension, or playful surprise that invites a response without relying on engagement-bait graphics.",
+    subjectPriority:
+      "Use an unexpected juxtaposition, expressive gesture, bold crop, or tactile interaction. The image should reward a second look.",
     typography:
-      "Oversize headline overlaid on the photograph. Mixed weights to emphasize one key word. Can break onto multiple lines. Type layers confidently over the moving scene.",
+      "Use energetic display type with one emphasized word or phrase, while keeping the exact headline readable at feed size.",
   },
 };
+
+export interface CreativeDirection {
+  id: string;
+  name: string;
+  medium: string;
+  composition: string;
+  lightAndTexture: string;
+  typography: string;
+}
+
+const CREATIVE_DIRECTIONS: CreativeDirection[] = [
+  {
+    id: "studio-sculptural",
+    name: "Sculptural studio campaign",
+    medium:
+      "High-end real product photography with a deliberately built physical set, real materials, optical depth, and controlled studio light.",
+    composition:
+      "One hero subject, bold scale contrast, crisp silhouette, and generous but intentional negative space. Avoid the habitual centered object-on-gradient layout.",
+    lightAndTexture:
+      "Directional key light, tactile surfaces, convincing contact shadows, restrained highlights, and rich tonal separation.",
+    typography:
+      "Precise modern display type aligned to the subject or a visible grid. One family and no more than two weights.",
+  },
+  {
+    id: "documentary-editorial",
+    name: "Lived-in editorial documentary",
+    medium:
+      "Naturalistic editorial photography that feels observed rather than staged: a real place, human gesture, and useful environmental detail.",
+    composition:
+      "Layer foreground, subject, and environment. Use an off-center decisive moment, frame-within-a-frame, or close human point of view.",
+    lightAndTexture:
+      "Available window light or practical light, subtle film grain, honest material texture, and natural color variation.",
+    typography:
+      "Quiet editorial type placed like a photo-essay title, with generous margins and minimal interference with the scene.",
+  },
+  {
+    id: "tactile-collage",
+    name: "Tactile cut-paper collage",
+    medium:
+      "A sophisticated physical paper collage photographed from above: cut edges, layered card stock, printed fragments, tape, ink, and real cast shadows. Handcrafted, not clip-art.",
+    composition:
+      "Build an asymmetric arrangement with clear depth between layers and one unmistakable focal asset. Use cropping and overlap to create rhythm.",
+    lightAndTexture:
+      "Soft raking light reveals paper fibers, folds, embossing, and small imperfections. The result should feel physically assembled and then photographed.",
+    typography:
+      "Headline can be typeset cleanly or constructed from one consistent printed treatment; never ransom-note lettering or a generic scrapbook font.",
+  },
+  {
+    id: "graphic-poster",
+    name: "Bold modernist poster",
+    medium:
+      "A custom-designed editorial poster combining confident typography, geometric color fields, and a faithful cutout or depiction of the core subject. Designed, not templated.",
+    composition:
+      "Use decisive asymmetry, unusual scale, hard cropping, and one strong visual axis. Let the subject break the grid once for tension.",
+    lightAndTexture:
+      "Mostly graphic color with a controlled printed texture, subtle halftone, or one photographic material detail. Avoid glossy gradients and floating UI-card decoration.",
+    typography:
+      "Typography is the compositional engine: large, tightly spaced, and deliberately aligned. Preserve the exact headline and keep all other copy out.",
+  },
+  {
+    id: "cinematic-narrative",
+    name: "Cinematic narrative frame",
+    medium:
+      "A cinematic still from an implied story, photographed with realistic locations, motivated light, atmospheric depth, and a specific moment of action.",
+    composition:
+      "Use a low, close, over-the-shoulder, or wide establishing viewpoint. Build visual tension through foreground occlusion, leading lines, or motion just entering the frame.",
+    lightAndTexture:
+      "Motivated light, deep but readable shadows, restrained halation, nuanced color grade, and realistic lens behavior.",
+    typography:
+      "Treat the headline like a film title card integrated into available negative space, never as a social-media sticker.",
+  },
+  {
+    id: "playful-practical-set",
+    name: "Playful practical set",
+    medium:
+      "A witty, surreal scene built from real props, miniatures, painted surfaces, and practical effects, then photographed. Imaginative but materially believable.",
+    composition:
+      "Create one surprising relationship of scale or balance around the hero subject. Keep the scene simple enough that the joke reads instantly.",
+    lightAndTexture:
+      "Crisp stage or daylight-inspired lighting, real shadows, saturated physical color, and visible crafted materials rather than smooth CGI.",
+    typography:
+      "Bold, playful display type anchored to the set geometry, with disciplined spacing and no novelty-font clutter.",
+  },
+];
+
+function stableHash(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  // Avalanche the low bits too. We take a small modulo below, and raw FNV-1a
+  // low bits cluster for sequential post ids such as post-1, post-2, ...
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 0x85ebca6b);
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 0xc2b2ae35);
+  hash ^= hash >>> 16;
+  return hash >>> 0;
+}
+
+function directionIdFromPrompt(prompt?: string): string | null {
+  if (!prompt) return null;
+  return prompt.match(/== CREATIVE DIRECTION: ([a-z-]+) ==/)?.[1] ?? null;
+}
+
+/**
+ * Chooses a repeatable direction for a new post and rotates away from the
+ * previous direction on regeneration. Refinements preserve the current look.
+ */
+export function selectCreativeDirection(
+  seed: string,
+  previousPrompt?: string,
+  preservePrevious = false,
+): CreativeDirection {
+  const previousId = directionIdFromPrompt(previousPrompt);
+  const previousIndex = CREATIVE_DIRECTIONS.findIndex(
+    (direction) => direction.id === previousId,
+  );
+  if (previousIndex >= 0) {
+    return CREATIVE_DIRECTIONS[
+      preservePrevious
+        ? previousIndex
+        : (previousIndex + 1) % CREATIVE_DIRECTIONS.length
+    ];
+  }
+  return CREATIVE_DIRECTIONS[stableHash(seed) % CREATIVE_DIRECTIONS.length];
+}
 
 const POST_TYPE_ASPECT: Record<ContentPostType, "4:5" | "9:16" | "1:1"> = {
   single: "4:5",
@@ -396,7 +515,7 @@ function mimeFromUrl(url: string): string {
 /** Reads a selected product image into the shape runSlideGeneration expects. */
 async function loadProductReference(
   img: ProductImage,
-): Promise<ProductReference | undefined> {
+): Promise<ImageReference | undefined> {
   const key = keyFromUrl(img.url);
   const base64 = key ? await getObjectBase64(key) : null;
   if (!base64) return undefined;
@@ -404,6 +523,20 @@ async function loadProductReference(
     base64,
     mimeType: mimeFromUrl(img.url),
     description: img.description,
+    kind: "product",
+  };
+}
+
+async function loadUserReference(
+  url: string,
+): Promise<ImageReference | undefined> {
+  const base64 = await readPublicImageAsBase64(url);
+  if (!base64) return undefined;
+  return {
+    base64,
+    mimeType: mimeFromUrl(url),
+    description: "User-attached visual reference",
+    kind: "user",
   };
 }
 
@@ -413,6 +546,9 @@ function buildSlidePrompt(
   slide: SlidePlan,
   slideIndex: number,
   totalSlides: number,
+  creativeDirection: CreativeDirection = selectCreativeDirection(
+    `${post.id}:${post.caption}`,
+  ),
 ): string {
   const aspect = POST_TYPE_ASPECT[post.postType];
   const direction = post.pillar
@@ -430,7 +566,7 @@ function buildSlidePrompt(
       ? `This is the COVER slide (slide 1 of ${totalSlides}). It must stop the scroll in a feed. The headline is the hero - OVERSIZE it.`
       : slide.role === "cta"
         ? `This is the final CTA slide (slide ${slideIndex + 1} of ${totalSlides}). Calmer composition - the headline is a direct invitation.`
-        : `This is body slide ${slideIndex + 1} of ${totalSlides}. Keep the visual language consistent with the cover - same photographer, same grade, same brand palette - but with a fresh scene that matches this slide's idea.`;
+        : `This is body slide ${slideIndex + 1} of ${totalSlides}. Keep the visual language consistent with the cover - same medium, texture, brand palette, and type system - but use a fresh composition that matches this slide's idea.`;
 
   const sceneLine = slide.sceneNote
     ? `\nSCENE FOR THIS SLIDE: ${slide.sceneNote}`
@@ -445,91 +581,86 @@ function buildSlidePrompt(
       ? carouselVariationForIndex(slideIndex, totalSlides)
       : null;
 
-  return `You are the art director and lead photographer on an Apple-caliber campaign for ${brandName}${category ? ` (${category})` : ""}. Deliver ONE ${aspect} image for an Instagram ${post.postType} that is a PHOTOGRAPH - not an illustration, not a cartoon, not a 3D render, not vector art, not a graphic design. A real photograph with real light on real objects, with the headline typeset on top.
+  return `You are the art director and designer of a distinctive campaign for ${brandName}${category ? ` (${category})` : ""}. Deliver ONE ${aspect} image for an Instagram ${post.postType}. Make this post visibly different from generic AI social content while remaining recognizably on-brand.
 
 ${roleLine}
 
-== ART DIRECTION PHILOSOPHY ==
-This image must feel ARTFUL, not informational. Intentional, not reported. Measured against these brands - if it wouldn't fit in one of their feeds or campaigns, it is not good enough:
+== CREATIVE DIRECTION: ${creativeDirection.id} ==
+Name: ${creativeDirection.name}
 
-Apple (product photography: floating objects, single key light, extreme negative space), Aesop (still-life restraint, natural materials, earth tones), Byredo / Le Labo (editorial perfume stills, muted color blocking), Jacquemus (saturated color, surreal miniaturism, intentional wit), Bottega Veneta (color-blocked hero objects, high craft), Loewe (nature + object surrealism), Hermès (window-display whimsy, crafted storytelling), Kinfolk / Cereal (quiet editorial photography), Nike (decisive action moments). Typography direction from Pentagram, Mother Design, Base Design - every type choice feels designed, never dropped.
+Medium: ${creativeDirection.medium}
 
-CORE TECHNIQUES - use at least two deliberately:
-- Extreme negative space around one small-to-medium hero subject.
-- One strong key light that sculpts the subject. Rich shadows - never flat lighting.
-- Unexpected angle: top-down god's-eye, extreme low-hero, macro detail, or a flat-on color-blocked hero.
-- Color-blocked backdrop in the brand primary, with the subject as the only focal contrast.
-- Real shadow anchors - objects sit in space, not float randomly.
-- Tension between soft and hard (soft fabric vs hard ceramic, wet vs dry, warm light vs cool metal).
+Composition: ${creativeDirection.composition}
 
-== THE OUTPUT MUST BE PHOTOREALISTIC ==
-The base image is a photograph captured on a real camera with real light. Any art direction below is executed AS A PHOTOGRAPH. If any element would be rendered as illustration, cartoon, vector, 3D CGI, or flat graphic - reinterpret it as a real object photographed in a real environment. The only non-photographic element permitted is the headline type overlaid on the finished photograph.
+Light and texture: ${creativeDirection.lightAndTexture}
+
+Typography approach: ${creativeDirection.typography}
+
+Commit fully to this direction. Do not drift back to the default AI look of a centered object on a smooth gradient. Other posts in the calendar deliberately receive other media and visual languages.
 
 == THE HEADLINE ==
-Overlay this exact headline on the photograph - perfectly typeset, crisp anti-aliased type, zero spelling errors:
+Render this exact headline in the final image - perfectly typeset, crisp, and with zero spelling errors:
 "${slide.headline}"
 ${sceneLine}
 
-== VISUAL STYLE - ${post.pillar?.toUpperCase() ?? "EDITORIAL"} ==
-Archetype: ${direction.archetype}
+== CONTENT INTENT - ${post.pillar?.toUpperCase() ?? "EDITORIAL"} ==
+Intent: ${direction.intent}
 
-Composition: ${direction.composition}
-
-Lighting & grade: ${direction.lighting}
+Subject priority: ${direction.subjectPriority}
 
 Typography treatment: ${direction.typography}
 
 == BRAND SYSTEM ==
-Palette (use these EXACT hex values - do not invent colors):
-- Primary: ${primary} - the dominant hue. Show it as real environmental color (painted backdrop, fabric, ceramic, liquid, material, light temperature, wardrobe) or as the headline type color, NOT as a flat graphic overlay. ~50-70% of the visual weight.
-- Secondary: ${secondary} - accent color in a real prop, highlight, or type.
+Palette:
+- Primary: ${primary} - use as the dominant brand cue in a way native to the chosen medium.
+- Secondary: ${secondary} - use as a supporting accent or contrast.
 
-Typeface for the overlaid headline: inspired by "${font}" if it fits the mood. Otherwise default to a contemporary editorial typeface (Söhne, General Sans, Canela, Tiempos, Inter Display). One typeface only. Two weights maximum. Typography placed on a visible grid - aligned to the subject or the frame edge, never floating arbitrarily.
+Typeface for the headline: inspired by "${font}" if it fits the mood. Otherwise use a contemporary editorial face. One family only and two weights maximum. Typography must feel composed with the subject, never dropped on afterward.
 
 ${brandVoice ? `Brand voice: ${brandVoice}\n` : ""}${visualLine}${variationHint ? `\n\n== THIS SLIDE'S VARIATION ==\n${variationHint}` : ""}
 
 == CAROUSEL COHESION (when this is a carousel slide) ==
-This is slide ${slideIndex + 1} of ${totalSlides}. Keep the visual LANGUAGE consistent with the rest of the carousel: same camera body/feel, same color grade, same palette, same typeface/weight, same photographic restraint. But VARY the composition and angle from slide to slide (one wide, one macro, one top-down, one silhouette) so swiping feels like turning pages in a beautiful lookbook, not scrolling through variations of the same shot.
+This is slide ${slideIndex + 1} of ${totalSlides}. Keep the chosen medium, palette, texture, and type system consistent across the carousel. VARY scale, crop, subject placement, and visual rhythm so swiping feels authored rather than repetitive.
 
 == QUALITY RUBRIC - grade yourself honestly ==
-- Would this photograph be printed in a brand's annual report or art book? (If no, reshoot.)
-- Does the composition use real negative space, not accidental empty area?
-- Is the light doing work - carving form, telling time of day, creating mood?
+- Does this feel specifically designed for this brand and post rather than generated from a reusable template?
+- Is the chosen creative direction immediately visible and fully executed?
+- Does the composition use space intentionally rather than defaulting to a centered hero?
 - Is there a single clear focal point? No visual noise competing with the subject?
-- Do materials feel real - specular highlights, micro-texture, realistic bokeh, light falloff?
+- Do materials and textures feel convincing for the chosen medium?
 - Is the typography placed on a clear alignment (flush to an object edge, the frame, or a grid), not floating?
 - Does the frame feel composed by a human with taste, not generated by defaults?
 
 == HARD DON'TS ==
-- NO illustrations, cartoons, anime, 3D renders, CGI, clay-model look, vector art, flat graphic design, isometric, claymation, Pixar look, emoji art. The output is a photograph.
-- No watermarks, no logos, no Instagram UI mockups, no borders or frames, no slide numbers printed on the image.
-- No other text besides the overlaid headline. No fake body copy, no fake signatures.
-- No stock-photo clichés (handshakes, lightbulb=idea, thumbs-up, smiling office, generic pointing-at-laptop). No muddy gradient backgrounds. No cluttered flat-lays with 10 objects. No pastel-gradient-with-blob-shapes 2019 aesthetic.
+- No watermarks, invented third-party logos, Instagram UI mockups, borders, frames, or slide numbers. Faithfully preserve a real brand mark that is intrinsic to an attached product reference.
+- No invented text besides the headline. Text, numbers, labels, grids, and interface details intrinsic to an attached reference must remain recognizable. No fake body copy or signatures.
+- No stock-photo clichés, generic dashboard cards, muddy gradients, decorative blob shapes, emoji art, or unrelated filler props.
+- Do not repeat the familiar single-object studio composition unless the selected creative direction explicitly calls for it.
 - No misspellings. Render the headline letter-for-letter as given.
 - No recognizable real celebrities. Generic people from behind, side profile, or hands/torso only.
 - No em dashes in visible text.
 
-Final check: if this image appeared in Apple's, Aesop's, or Jacquemus's Instagram feed, would it feel at home? If not, reshoot until it does.`;
+Final check: can a viewer identify the selected ${creativeDirection.name} direction without reading this prompt? If not, redesign until they can.`;
 }
 
 function carouselVariationForIndex(index: number, total: number): string {
   if (total <= 1) return "A single considered hero composition.";
   if (index === 0) {
-    return "COVER - the boldest composition of the carousel. Strong single subject in negative space with maximum visual impact. Set the visual language the rest of the carousel inherits.";
+    return "COVER - the boldest composition of the carousel. Establish one unmistakable focal subject and set the visual language the rest of the carousel inherits.";
   }
   if (index === total - 1) {
-    return "FINAL SLIDE - a calmer, quieter composition. Can be a small detail, a softer still-life, or a blank-space-heavy moment that lets the headline land. Feels like a gentle close.";
+    return "FINAL SLIDE - a calmer, quieter composition. Use a small detail, reduced scale, or generous breathing room so the headline lands like a considered close.";
   }
   const patterns = [
-    "A tight macro detail - extreme close-up of one material or texture relevant to this slide's idea. Selective focus, one sharp plane.",
-    "An overhead top-down still-life shot - objects arranged like a museum composition on a flat textured surface.",
-    "A wide environmental shot with depth - foreground / midground / background layers. Subject small in frame.",
-    "A color-blocked hero on a painted backdrop in the brand primary color. Single isolated subject, deep shadow anchor.",
-    "A hand-in-frame action moment - a real hand doing something relevant to this slide's idea, shot at 50mm waist height.",
-    "A silhouette or rim-lit side profile, subject carved out of shadow by a single light source.",
+    "A tight detail: magnify one material, symbol, or product feature until its texture becomes the composition.",
+    "A top-down or flat-plane arrangement with deliberate spacing and a strong diagonal reading path.",
+    "A wide contextual composition with foreground, subject, and background layers. Keep the hero smaller in frame.",
+    "A dominant brand-color field interrupted by one sharply contrasting subject or gesture.",
+    "A human interaction moment: a hand using, holding, marking, moving, or revealing the subject.",
+    "A silhouette, cutout, or edge-defined profile that reduces the idea to one memorable shape.",
   ];
   const choice = patterns[(index - 1) % patterns.length];
-  return `Vary the composition from the previous slide. This slide: ${choice} Keep palette, grade, and typography identical to the cover.`;
+  return `Vary the composition from the previous slide. This slide: ${choice} Keep the selected medium, palette, texture, and typography consistent with the cover.`;
 }
 
 /**
@@ -586,25 +717,29 @@ async function readPublicImageAsBase64(url: string): Promise<string | null> {
   }
 }
 
-interface ProductReference {
+interface ImageReference {
   base64: string;
   mimeType: string;
   description: string;
+  kind: "product" | "user";
 }
 
 interface RunSlideOptions {
   refinementPrompt?: string;
   baseImageUrl?: string;
-  /** Business product image to feature in a fresh generation. */
-  productReference?: ProductReference;
+  /** Whether an uploaded base should inspire a new composition instead of being edited in place. */
+  baseImageRole?: "existing-slide" | "user-source";
+  /** Product or user-supplied image to feature in the generated result. */
+  reference?: ImageReference;
+  creativeDirection?: CreativeDirection;
 }
 
 /**
  * Generates or edits a single slide.
  * - If baseImageUrl + refinementPrompt are provided and the file is readable,
  *   runs Nano Banana in image-to-image mode.
- * - If productReference is provided (and no refinement), runs a fresh
- *   generation with the product photo attached as a reference image.
+ * - If a reference is provided, keeps it in context during both generation
+ *   and refinement so the real product/source survives subsequent edits.
  * - Otherwise does a fresh text-to-image generation.
  * Tries up to 2 attempts before surfacing failure.
  */
@@ -625,70 +760,108 @@ async function runSlideGeneration(
     slide,
     slideIndex,
     totalSlides,
+    opts.creativeDirection,
   );
 
   const aspectRatio = POST_TYPE_ASPECT[post.postType];
-  const refinement = opts.refinementPrompt?.trim();
+  const refinement =
+    opts.refinementPrompt?.trim() ||
+    (opts.reference?.kind === "user"
+      ? "Create a new version that meaningfully incorporates the attached reference while preserving the post's message and brand system."
+      : "");
 
   let inlineImageBase64: string | null = null;
   if (refinement && opts.baseImageUrl) {
     inlineImageBase64 = await readPublicImageAsBase64(opts.baseImageUrl);
   }
 
-  const editMode = Boolean(refinement && inlineImageBase64);
-  const productReference = !editMode ? opts.productReference : undefined;
-  const referenceMode = Boolean(productReference);
+  const hasBaseImage = Boolean(refinement && inlineImageBase64);
+  const userSourceMode =
+    hasBaseImage && opts.baseImageRole === "user-source";
+  const editMode = hasBaseImage && !userSourceMode;
+  const reference = opts.reference;
+  const referenceMode = Boolean(reference);
 
   // Mention the aspect ratio explicitly in the prompt so the model honors it
   // even when we can't pass `imageConfig.aspectRatio` (some Gemini variants
   // like flash-lite reject the config).
   const aspectLine = `\n\n== FRAME ==\nDeliver the image at an exact ${aspectRatio} aspect ratio (width:height). Do not letterbox, do not crop text, do not pad. The canvas itself is ${aspectRatio}.`
 
-  const referenceLine = productReference
-    ? `\n\n== PRODUCT REFERENCE IMAGE (attached) ==
-The attached image is a REAL photo/screenshot of ${business.name || "the brand"}'s actual product${productReference.description.trim() ? `: "${productReference.description.trim()}"` : ""}.
-It is a REFERENCE for a brand-new photograph, not an image to edit or return.
-- Compose a completely NEW scene following all art direction above, featuring THIS exact product as the hero subject.
-- Reproduce the product faithfully: exact shape, proportions, colors, materials, labels, and any on-screen UI. Do not redesign, restyle, or invent a generic substitute.
-- If the reference is an app or software screenshot, show it naturally on a real device screen (phone or laptop) within the photographed scene, crisp and legible.
-- Do NOT copy the reference image's background, framing, or lighting - only the product itself carries over.`
+  const referenceLine = reference
+    ? `\n\n== ${reference.kind === "product" ? "PRODUCT" : "USER"} REFERENCE IMAGE (attached) ==
+The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
+        reference.kind === "product"
+          ? `${business.name || "the brand"}'s actual product${reference.description.trim() ? `: "${reference.description.trim()}"` : ""}`
+          : "an exact visual asset or subject the user wants incorporated"
+      }.
+- Create a NEW composition in the selected creative direction that visibly features the reference's defining subject.
+- Preserve identity faithfully: shape, proportions, colors, materials, labels, layout, grid, markings, and on-screen UI. Do not redesign it or replace it with a generic substitute.
+- If it is a bingo card, game card, board, worksheet, package, or printed piece, retain its recognizable structure and place the actual piece naturally in the scene, collage, or poster.
+- If it is an app or website screenshot, keep its interface recognizable and present it naturally on a device or as a precise graphic element appropriate to the selected medium.
+- Adapt the surrounding scene, framing, and lighting freely. Reference fidelity overrides stylistic abstraction.`
     : "";
+  const freshInstructionLine =
+    refinement && !hasBaseImage
+      ? `\n\n== USER REQUEST FOR THIS NEW VERSION ==\n"${refinement}"`
+      : "";
 
-  const editPrompt = editMode
+  const generationPrompt = editMode
     ? `${basePrompt}${aspectLine}
 
 == USER REFINEMENT ON THE PROVIDED IMAGE ==
-A prior version of this slide is attached. Apply this change while preserving everything else (composition, palette, light, typography, subject identity):
+A prior version of this slide is the FIRST attached image. Apply this change while preserving everything the user did not ask to change (message, palette, typography, and subject identity):
 "${refinement}"
+${
+  reference
+    ? `
+The SECOND attached image is a ${reference.kind === "product" ? "real product" : "user"} reference. Incorporate its exact defining subject in the refined slide. Preserve its recognizable layout, grid, markings, colors, labels, and interface details rather than inventing an approximation.
+`
+    : ""
+}
+Deliver the refined image at the same aspect and quality.`
+    : userSourceMode
+      ? `${basePrompt}${aspectLine}
 
-Deliver the refined photograph at the same aspect and quality.`
-    : `${basePrompt}${aspectLine}${referenceLine}`;
+== USER-UPLOADED SOURCE IMAGE ==
+The FIRST attached image is a source asset, not a finished slide to retouch. Create a brand-new AI composition in the selected creative direction and visibly incorporate the exact subject from that source.
+- Preserve its recognizable layout, grid, markings, colors, labels, proportions, and interface details.
+- For a bingo or game card, keep the card recognizable and show it being held, played, marked, printed, displayed, layered into the design, or otherwise used naturally.
+- Do not merely return the uploaded image with a filter or headline added.
 
-  const contents = editMode
-    ? [
-        {
-          inlineData: { mimeType: "image/png", data: inlineImageBase64! },
-        },
-        { text: editPrompt },
-      ]
-    : referenceMode
-      ? [
-          {
-            inlineData: {
-              mimeType: productReference!.mimeType,
-              data: productReference!.base64,
-            },
-          },
-          { text: editPrompt },
-        ]
-      : editPrompt;
+User instruction: "${refinement}"
+${referenceLine}`
+      : `${basePrompt}${aspectLine}${referenceLine}${freshInstructionLine}`;
+
+  const inputParts: Array<
+    | { inlineData: { mimeType: string; data: string } }
+    | { text: string }
+  > = [];
+  if (hasBaseImage) {
+    inputParts.push({
+      inlineData: {
+        mimeType: mimeFromUrl(opts.baseImageUrl!),
+        data: inlineImageBase64!,
+      },
+    });
+  }
+  if (referenceMode) {
+    inputParts.push({
+      inlineData: {
+        mimeType: reference!.mimeType,
+        data: reference!.base64,
+      },
+    });
+  }
+  inputParts.push({ text: generationPrompt });
+  const contents = inputParts.length > 1 ? inputParts : generationPrompt;
 
   // All `*-image*` Gemini models accept imageConfig. Text-only models don't
   // and must be avoided at the source (see lib/models.ts). With any inline
   // image input (edit or reference mode) we drop imageConfig because it isn't
   // allowed alongside it - the == FRAME == prompt line covers aspect ratio.
   const supportsImageConfig = /image/.test(GEMINI_IMAGE_MODEL);
-  let disableImageConfig = editMode || referenceMode || !supportsImageConfig;
+  let disableImageConfig =
+    hasBaseImage || referenceMode || !supportsImageConfig;
 
   function buildConfig() {
     const base: Record<string, unknown> = {
@@ -732,7 +905,7 @@ Deliver the refined photograph at the same aspect and quality.`
       if (finalImage) {
         const buffer = Buffer.from(finalImage.inlineData.data, "base64");
         const url = await writeImageToPublic(post.id, slideIndex, buffer);
-        return { url, headline: slide.headline, prompt: editPrompt };
+        return { url, headline: slide.headline, prompt: generationPrompt };
       }
       // Response arrived but contains no image. Almost always means the
       // configured model isn't an image generator. Abort both attempts.
@@ -779,7 +952,7 @@ Deliver the refined photograph at the same aspect and quality.`
 export async function generatePostImages(
   business: ImageGenBusiness,
   post: ImageGenPost,
-  previousImages: { url: string }[] | null = null,
+  previousImages: { url: string; prompt?: string }[] | null = null,
   options: GeneratePostImagesOptions = {},
 ): Promise<GeneratePostImagesResult> {
   let slides: SlidePlan[];
@@ -800,15 +973,28 @@ export async function generatePostImages(
   // OpenAI selection call. Policy: the product reference applies to the cover
   // slide only - body slides inherit the visual language via carousel
   // cohesion, and repeating the same product photo makes carousels monotonous.
-  const reference = await selectProductReferenceImage(business, post);
-  const productReference = reference
-    ? await loadProductReference(reference)
+  const explicitReference = options.referenceImageUrl
+    ? await loadUserReference(options.referenceImageUrl)
     : undefined;
+  if (options.referenceImageUrl && !explicitReference) {
+    throw new Error("Could not read the uploaded generation reference");
+  }
+  const selectedProduct = explicitReference
+    ? null
+    : await selectProductReferenceImage(business, post);
+  const imageReference =
+    explicitReference ??
+    (selectedProduct ? await loadProductReference(selectedProduct) : undefined);
+  const creativeDirection = selectCreativeDirection(
+    `${post.id}:${post.caption}`,
+    previousImages?.[0]?.prompt,
+  );
 
   const generated = await Promise.all(
     slides.map((s, i) =>
       runSlideGeneration(business, post, s, i, total, {
-        productReference: s.role === "cover" ? productReference : undefined,
+        reference: s.role === "cover" ? imageReference : undefined,
+        creativeDirection,
       }),
     ),
   );
@@ -837,7 +1023,14 @@ export async function regenerateSlide(
   post: ImageGenPost,
   slideIndex: number,
   totalSlides: number,
-  opts: { refinementPrompt?: string; baseImageUrl?: string; previousUrl?: string },
+  opts: {
+    refinementPrompt?: string;
+    baseImageUrl?: string;
+    baseImageRole?: "existing-slide" | "user-source";
+    referenceImageUrl?: string;
+    previousUrl?: string;
+    previousPrompt?: string;
+  },
 ): Promise<GeneratedSlide | null> {
   // If we know the slide plan from the post's caption, rebuild just that slide.
   let slides: SlidePlan[];
@@ -852,13 +1045,26 @@ export async function regenerateSlide(
   }
   const slide = slides[slideIndex] ?? slides[0];
 
-  // Plain regeneration of a cover slide re-applies the product reference;
-  // refinements keep their single-base-image edit mode untouched.
-  let productReference: ProductReference | undefined;
-  if (!opts.refinementPrompt?.trim() && slide.role === "cover") {
-    const reference = await selectProductReferenceImage(business, post);
-    if (reference) productReference = await loadProductReference(reference);
+  // An explicit per-refinement upload wins. Otherwise keep the configured
+  // product reference attached to cover-slide refinements as well as fresh runs.
+  let imageReference = opts.referenceImageUrl
+    ? await loadUserReference(opts.referenceImageUrl)
+    : undefined;
+  if (!imageReference && slide.role === "cover") {
+    const selectedProduct = await selectProductReferenceImage(business, post);
+    if (selectedProduct) {
+      imageReference = await loadProductReference(selectedProduct);
+    }
   }
+
+  const preserveDirection = Boolean(
+    opts.refinementPrompt?.trim() || opts.referenceImageUrl,
+  );
+  const creativeDirection = selectCreativeDirection(
+    `${post.id}:${post.caption}:${slideIndex}`,
+    opts.previousPrompt,
+    preserveDirection,
+  );
 
   const result = await runSlideGeneration(
     business,
@@ -869,7 +1075,9 @@ export async function regenerateSlide(
     {
       refinementPrompt: opts.refinementPrompt,
       baseImageUrl: opts.baseImageUrl,
-      productReference,
+      baseImageRole: opts.baseImageRole,
+      reference: imageReference,
+      creativeDirection,
     },
   );
 

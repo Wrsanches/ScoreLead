@@ -13,13 +13,14 @@ export type UploadKind =
   | "business-logo"
   | "business-product"
   | "avatar"
+  | "content-reference"
   | "content-slide"
 
 export interface UploadOptions {
   kind: UploadKind
-  /** Required for content-slide uploads. */
+  /** Required for content-slide and content-reference uploads. */
   postId?: string
-  /** Required for content-slide uploads. */
+  /** Required for content-slide and content-reference uploads. */
   slideIndex?: number
   /** Override the max file size (defaults to 8MB). */
   maxBytes?: number

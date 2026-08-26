@@ -1,11 +1,14 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { savedSearch, business } from "@/lib/db/schema"
-import { eq, and, desc } from "drizzle-orm"
+import { savedSearch } from "@/lib/db/schema"
+import { eq, desc } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { resolveViewableBusiness } from "@/lib/active-business"
+import {
+  resolveManageableBusiness,
+  resolveViewableBusiness,
+} from "@/lib/active-business"
 
 const createSchema = z.object({
   businessId: z.string(),
@@ -65,18 +68,11 @@ export async function POST(request: Request) {
 
   const data = parsed.data
 
-  // Verify business ownership
-  const [biz] = await db
-    .select({ id: business.id })
-    .from(business)
-    .where(
-      and(
-        eq(business.id, data.businessId),
-        eq(business.userId, session.user.id),
-      ),
-    )
-
-  if (!biz) {
+  const access = await resolveManageableBusiness(
+    session.user.id,
+    data.businessId,
+  )
+  if (!access) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
@@ -85,7 +81,7 @@ export async function POST(request: Request) {
   await db.insert(savedSearch).values({
     id,
     businessId: data.businessId,
-    userId: session.user.id,
+    userId: access.ownerUserId,
     name: data.name,
     country: data.country,
     state: data.state,

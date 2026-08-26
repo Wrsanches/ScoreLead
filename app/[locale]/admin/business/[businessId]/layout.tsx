@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { headers } from "next/headers"
-import { auth } from "@/lib/auth"
+import { requireAuthOnly } from "@/lib/auth-guard"
 import { BusinessProvider } from "@/components/admin/business-context"
 import { generatePageMetadata } from "@/lib/seo"
 import { getBusinessAccess } from "@/lib/business-access"
@@ -22,14 +21,12 @@ export default async function BusinessLayout({
   params,
 }: {
   children: React.ReactNode
-  params: Promise<{ businessId: string }>
+  params: Promise<{ businessId: string; locale: string }>
 }) {
-  const { businessId } = await params
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { businessId, locale } = await params
+  const session = await requireAuthOnly(locale)
 
-  const access = session
-    ? await getBusinessAccess(session.user.id, businessId)
-    : null
+  const access = await getBusinessAccess(session.user.id, businessId)
   if (!access) notFound()
 
   // Keep old bookmarks valid long enough for BusinessProvider to persist this

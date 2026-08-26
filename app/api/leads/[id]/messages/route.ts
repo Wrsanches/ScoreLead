@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { lead, discoveryJob, business } from "@/lib/db/schema"
-import { eq, and, inArray } from "drizzle-orm"
+import { lead, business } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import {
@@ -12,33 +12,9 @@ import {
 } from "@/lib/services/outreach-messages"
 import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
 import { getBusinessAccess } from "@/lib/business-access"
+import { getManageableLead } from "@/lib/whatsapp/data"
 
 export const maxDuration = 60
-
-/** Verify the lead belongs to one of the signed-in user's discovery jobs. */
-async function assertLeadOwnership(leadId: string, userId: string) {
-  const userJobs = await db
-    .select({ id: discoveryJob.id })
-    .from(discoveryJob)
-    .where(eq(discoveryJob.userId, userId))
-
-  if (userJobs.length === 0) return null
-
-  const [row] = await db
-    .select()
-    .from(lead)
-    .where(
-      and(
-        eq(lead.id, leadId),
-        inArray(
-          lead.jobId,
-          userJobs.map((j) => j.id),
-        ),
-      ),
-    )
-
-  return row || null
-}
 
 export async function GET(
   _request: Request,
@@ -71,14 +47,16 @@ export async function POST(
   }
 
   const { id } = await params
-  const row = await assertLeadOwnership(id, session.user.id)
-  if (!row) {
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
+  const row = manageable.lead
+  const billingUserId = manageable.access.ownerUserId
 
   // Gate: Free allows 3 AI outreach generations total.
   try {
-    await assertCanUse(session.user.id, "outreachMessage")
+    await assertCanUse(billingUserId, "outreachMessage")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -147,7 +125,7 @@ export async function POST(
     )
   }
 
-  await recordUsage(session.user.id, "outreachMessage")
+  await recordUsage(billingUserId, "outreachMessage")
 
   await db
     .update(lead)
@@ -167,8 +145,8 @@ export async function PATCH(
   }
 
   const { id } = await params
-  const row = await assertLeadOwnership(id, session.user.id)
-  if (!row) {
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 })
   }
 

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappConsentEvent } from "@/lib/db/schema"
-import { getLatestWhatsAppConsent, getOwnedLead } from "@/lib/whatsapp/data"
+import { getLatestWhatsAppConsent, getManageableLead } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { cancelWhatsAppSequencesForRecipient } from "@/lib/whatsapp/sequences"
 
@@ -14,15 +14,21 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id } = await params
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+  if (
+    !manageable.access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(manageable.access.ownerEmail)
+  ) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
   }
-  const { id } = await params
-  const ownedLead = await getOwnedLead(id, session.user.id)
-  if (!ownedLead) return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  const ownedLead = manageable.lead
   const latest = await getLatestWhatsAppConsent(id)
   if (!latest || latest.status !== "granted") {
     return NextResponse.json({ error: "No active WhatsApp consent" }, { status: 409 })

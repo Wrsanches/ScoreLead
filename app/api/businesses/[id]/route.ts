@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
 import { MAX_PRODUCT_IMAGES } from "@/lib/product-images"
 import { deleteObject, isManagedUrl, keyFromUrl } from "@/lib/s3"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -97,6 +97,11 @@ export async function PATCH(
   }
 
   const { id } = await params
+  const access = await getBusinessAccess(session.user.id, id)
+  if (!access || access.readOnly) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
+
   const body = await request.json().catch(() => ({}))
   const parsed = patchSchema.safeParse(body)
 
@@ -107,27 +112,27 @@ export async function PATCH(
   const [row] = await db
     .select()
     .from(business)
-    .where(
-      and(
-        eq(business.id, id),
-        eq(business.userId, session.user.id),
-      ),
-    )
+    .where(eq(business.id, id))
 
   if (!row) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 })
   }
 
-  // Product image URLs must belong to THIS user's own upload namespace.
-  // isManagedUrl only proves the object lives in our bucket, not who owns it,
-  // so without this check a user could point productImages at another tenant's
-  // object and (via the cleanup below or the generator's reference read) act on
-  // it. Keys are namespaced business-products/{userId}/.
+  // New images must come from the authenticated actor's upload namespace.
+  // Images already attached to this authorized business remain valid so an
+  // admin can edit an owner's business (and the owner can later retain images
+  // uploaded by the admin) without crossing into an unrelated tenant.
   const productPrefix = `business-products/${session.user.id}/`
+  const existingProductUrls = new Set(
+    (row.productImages ?? []).map((image) => image.url),
+  )
   if (parsed.data.productImages) {
     const allOwned = parsed.data.productImages.every((img) => {
       const key = keyFromUrl(img.url)
-      return key !== null && key.startsWith(productPrefix)
+      return (
+        existingProductUrls.has(img.url) ||
+        (key !== null && key.startsWith(productPrefix))
+      )
     })
     if (!allOwned) {
       return NextResponse.json({ error: "Invalid image URL" }, { status: 400 })
@@ -139,8 +144,7 @@ export async function PATCH(
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(business.id, id))
 
-  // Best-effort cleanup of product images removed by this update. Scoped to the
-  // caller's own namespace so the delete can never reach another user's object.
+  // Best-effort cleanup of product images removed from this authorized row.
   if (parsed.data.productImages) {
     const keptUrls = new Set(parsed.data.productImages.map((img) => img.url))
     const removed = (row.productImages ?? []).filter(
@@ -149,7 +153,7 @@ export async function PATCH(
     await Promise.all(
       removed.map((img) => {
         const key = keyFromUrl(img.url)
-        if (!key || !key.startsWith(productPrefix)) return null
+        if (!key) return null
         return deleteObject(key)
       }),
     )

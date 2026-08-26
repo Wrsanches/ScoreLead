@@ -7,6 +7,7 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { processDiscoveryQueue } from "@/lib/jobs/discovery-queue"
 import { can, getUserPlan } from "@/lib/plan"
+import { getBusinessAccess } from "@/lib/business-access"
 
 /**
  * Run the next batch of an existing discovery job ("Continue"). Re-queues the
@@ -30,14 +31,18 @@ export async function POST(
   const [job] = await db
     .select()
     .from(discoveryJob)
-    .where(and(eq(discoveryJob.id, id), eq(discoveryJob.userId, session.user.id)))
+    .where(eq(discoveryJob.id, id))
 
-  if (!job) {
+  const access = job
+    ? await getBusinessAccess(session.user.id, job.businessId)
+    : null
+
+  if (!job || !access || access.readOnly) {
     return NextResponse.json({ error: "Job not found" }, { status: 404 })
   }
 
   // Continuing a batch unlocks at Growth.
-  const plan = await getUserPlan(session.user.id)
+  const plan = await getUserPlan(access.ownerUserId)
   if (!can(plan, "continueJob")) {
     return NextResponse.json(
       {

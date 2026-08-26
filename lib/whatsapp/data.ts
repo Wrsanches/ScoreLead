@@ -34,20 +34,17 @@ function connectionAccessToken(connection: WhatsAppConnectionRow): string {
 }
 
 export async function getOwnedBusiness(businessId: string, userId: string) {
+  const access = await getBusinessAccess(userId, businessId)
+  if (!access || access.readOnly) return null
   const [row] = await db
     .select()
     .from(business)
-    .where(and(eq(business.id, businessId), eq(business.userId, userId)))
+    .where(eq(business.id, businessId))
   return row ?? null
 }
 
 export async function getOwnedLead(leadId: string, userId: string) {
-  const [row] = await db
-    .select({ lead })
-    .from(lead)
-    .innerJoin(business, eq(lead.businessId, business.id))
-    .where(and(eq(lead.id, leadId), eq(business.userId, userId)))
-  return row?.lead ?? null
+  return (await getManageableLead(leadId, userId))?.lead ?? null
 }
 
 export async function getViewableLead(leadId: string, actorUserId: string) {
@@ -60,6 +57,11 @@ export async function getViewableLead(leadId: string, actorUserId: string) {
 
   const access = await getBusinessAccess(actorUserId, row.businessId)
   return access ? { lead: row, access } : null
+}
+
+export async function getManageableLead(leadId: string, actorUserId: string) {
+  const viewable = await getViewableLead(leadId, actorUserId)
+  return viewable && !viewable.access.readOnly ? viewable : null
 }
 
 export async function getWhatsAppConnection(businessId: string) {

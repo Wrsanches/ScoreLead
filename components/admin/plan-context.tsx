@@ -12,17 +12,9 @@ import { UpgradeDialog } from "@/components/admin/upgrade-dialog"
 import { CongratsModal } from "@/components/admin/congrats-modal"
 import { planRank, type PlanId } from "@/lib/plan-tiers"
 import { trackMarketingEvent } from "@/lib/analytics-events"
+import type { SerializedPlanStatus } from "@/lib/plan"
 
 export type Plan = PlanId
-
-interface PlanUsage {
-  businesses: number
-  discoveryJobs: number
-  outreachMessages: number
-  contentPlans: number
-  aiImages: number
-  aiImagesToday?: number
-}
 
 export type PlanCapability =
   | "continueJob"
@@ -30,16 +22,7 @@ export type PlanCapability =
   | "csvExport"
   | "decisionMakers"
 
-interface PlanStatus {
-  plan: Plan
-  isTrialing: boolean
-  window: "lifetime" | "month"
-  periodEnd: string | null
-  usage: PlanUsage
-  /** Unlimited caps arrive as null, because JSON cannot carry Infinity. */
-  limits: Record<string, number | null>
-  capabilities: Record<PlanCapability, boolean>
-}
+type PlanStatus = SerializedPlanStatus
 
 interface PlanContextValue extends Partial<PlanStatus> {
   plan: Plan
@@ -58,9 +41,15 @@ interface PlanContextValue extends Partial<PlanStatus> {
 
 const PlanContext = createContext<PlanContextValue | null>(null)
 
-export function PlanProvider({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<PlanStatus | null>(null)
-  const [loading, setLoading] = useState(true)
+export function PlanProvider({
+  children,
+  initialStatus,
+}: {
+  children: React.ReactNode
+  initialStatus?: PlanStatus | null
+}) {
+  const [status, setStatus] = useState<PlanStatus | null>(initialStatus ?? null)
+  const [loading, setLoading] = useState(!initialStatus)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [upgradeAction, setUpgradeAction] = useState<string | null>(null)
   const [congratsOpen, setCongratsOpen] = useState(false)
@@ -77,8 +66,8 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    if (!initialStatus) refresh()
+  }, [initialStatus, refresh])
 
   // Returning from Stripe Checkout: ?upgraded=1 → celebrate + refresh the plan
   // (the webhook flips the subscription async, so poll a few times), then strip

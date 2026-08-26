@@ -5,14 +5,37 @@ import { Menu } from "lucide-react"
 import { AdminSidebar } from "./admin-sidebar"
 import { SearchProvider } from "./search-overlay"
 import { PlanProvider } from "@/components/admin/plan-context"
+import type { ViewableBusiness } from "@/lib/business-access"
+import type { SerializedPlanStatus } from "@/lib/plan"
+
+type SidebarBusiness = Pick<
+  ViewableBusiness,
+  | "id"
+  | "name"
+  | "logo"
+  | "field"
+  | "website"
+  | "ownerUserId"
+  | "ownerName"
+  | "ownerEmail"
+  | "readOnly"
+>
 
 export function AdminShell({
   children,
+  businesses,
+  planStatus,
+  userName,
   userEmail,
+  userImage,
   isPlatformAdmin = false,
 }: {
   children: React.ReactNode
+  businesses: SidebarBusiness[]
+  planStatus: SerializedPlanStatus
+  userName?: string | null
   userEmail?: string | null
+  userImage?: string | null
   isPlatformAdmin?: boolean
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -34,7 +57,7 @@ export function AdminShell({
   }, [sidebarCollapsed, sidebarPreferenceLoaded])
 
   return (
-    <PlanProvider>
+    <PlanProvider initialStatus={planStatus}>
     <SearchProvider>
       <div className="flex h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950">
         {sidebarOpen && (
@@ -50,7 +73,10 @@ export function AdminShell({
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
           animateLayout={sidebarTransitionsReady}
+          businesses={businesses}
+          userName={userName}
           userEmail={userEmail}
+          userImage={userImage}
           isPlatformAdmin={isPlatformAdmin}
         />
 

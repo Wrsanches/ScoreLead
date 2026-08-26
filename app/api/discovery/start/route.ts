@@ -15,6 +15,7 @@ import {
   leadCap,
   PlanLimitError,
 } from "@/lib/plan"
+import { resolveManageableBusiness } from "@/lib/active-business"
 
 const startJobSchema = z.object({
   businessId: z.string(),
@@ -59,6 +60,14 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data
+  const access = await resolveManageableBusiness(
+    session.user.id,
+    data.businessId,
+  )
+  if (!access) {
+    return NextResponse.json({ error: "Business not found" }, { status: 404 })
+  }
+  const billingUserId = access.ownerUserId
 
   const [biz] = await db
     .select()
@@ -66,7 +75,6 @@ export async function POST(request: Request) {
     .where(
       and(
         eq(business.id, data.businessId),
-        eq(business.userId, session.user.id),
         eq(business.onboardingCompleted, true),
       ),
     )
@@ -77,7 +85,7 @@ export async function POST(request: Request) {
 
   // Gate: Free allows 1 discovery job total.
   try {
-    await assertCanUse(session.user.id, "discoveryJob")
+    await assertCanUse(billingUserId, "discoveryJob")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -93,7 +101,7 @@ export async function POST(request: Request) {
   }
 
   // Each tier is clamped to its own per-run lead cap to protect API costs.
-  const plan = await getUserPlan(session.user.id)
+  const plan = await getUserPlan(billingUserId)
   const maxResults = leadCap(plan, data.maxResults)
 
   // Save keywords for next time
@@ -107,7 +115,7 @@ export async function POST(request: Request) {
   await db.insert(discoveryJob).values({
     id: jobId,
     businessId: data.businessId,
-    userId: session.user.id,
+    userId: access.ownerUserId,
     name: data.name,
     country: data.country,
     state: data.state,
@@ -119,7 +127,7 @@ export async function POST(request: Request) {
     status: "queued",
   })
 
-  await recordUsage(session.user.id, "discoveryJob")
+  await recordUsage(billingUserId, "discoveryJob")
 
   // The job is queued; the pump claims and runs it subject to the global
   // and per-user concurrency caps (see lib/jobs/discovery-queue.ts).

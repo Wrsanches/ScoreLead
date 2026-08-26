@@ -1,13 +1,15 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
 import { MapPin, ArrowRight, ArrowLeft } from "lucide-react"
-import { Country, State, City } from "country-state-city"
-import type { ICountry, IState, ICity } from "country-state-city"
-import { SearchableSelect, type SelectOption } from "@/components/searchable-select"
-import { parseLocationSelection } from "@/lib/onboarding-location"
+import { SearchableSelect } from "@/components/searchable-select"
+import { LocationLoadError } from "@/components/location-load-error"
+import {
+  resolveLocationSelection,
+  useLocationOptions,
+} from "@/hooks/use-location-options"
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
@@ -20,47 +22,35 @@ interface StepLocationProps {
 export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocationProps) {
   const t = useTranslations("onboarding")
 
-  const [initialLocation] = useState(() => parseLocationSelection(defaultLocation))
-  const [countryCode, setCountryCode] = useState(initialLocation.countryCode)
-  const [stateCode, setStateCode] = useState(initialLocation.stateCode)
-  const [cityName, setCityName] = useState(initialLocation.cityName)
+  const [countryCode, setCountryCode] = useState("")
+  const [stateCode, setStateCode] = useState("")
+  const [cityName, setCityName] = useState("")
+  const resolvedDefault = useRef<string | null>(null)
+  const {
+    countryOptions,
+    stateOptions,
+    cityOptions,
+    loadingCountries,
+    loadingStates,
+    loadingCities,
+    locationLoadFailed,
+    retryLocations,
+  } = useLocationOptions(countryCode, stateCode)
 
-  // Build country options
-  const countryOptions: SelectOption[] = useMemo(() => {
-    const countries: ICountry[] = Country.getAllCountries()
-    return countries.map((c) => ({
-      value: c.isoCode,
-      label: `${c.flag} ${c.name}`,
-    }))
-  }, [])
-
-  // Build state options based on selected country
-  const stateOptions: SelectOption[] = useMemo(() => {
-    if (!countryCode) return []
-    const states: IState[] = State.getStatesOfCountry(countryCode)
-    return states.map((s) => ({
-      value: s.isoCode,
-      label: s.name,
-    }))
-  }, [countryCode])
-
-  // Build city options based on selected state
-  const cityOptions: SelectOption[] = useMemo(() => {
-    if (!countryCode) return []
-    if (!stateCode) {
-      // If country has no states, show all cities of the country
-      const cities: ICity[] = City.getCitiesOfCountry(countryCode) || []
-      return cities.map((c) => ({
-        value: c.name,
-        label: c.name,
-      }))
+  useEffect(() => {
+    if (!defaultLocation || resolvedDefault.current === defaultLocation) return
+    resolvedDefault.current = defaultLocation
+    let active = true
+    resolveLocationSelection(defaultLocation).then((selection) => {
+      if (!active) return
+      setCountryCode(selection.countryCode)
+      setStateCode(selection.stateCode)
+      setCityName(selection.cityName)
+    }).catch(() => {})
+    return () => {
+      active = false
     }
-    const cities: ICity[] = City.getCitiesOfState(countryCode, stateCode) || []
-    return cities.map((c) => ({
-      value: c.name,
-      label: c.name,
-    }))
-  }, [countryCode, stateCode])
+  }, [defaultLocation])
 
   const handleCountryChange = useCallback((value: string) => {
     setCountryCode(value)
@@ -81,19 +71,17 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
     // Build location string like "San Francisco, California, United States"
     const parts: string[] = []
     if (cityName) parts.push(cityName)
-    if (stateCode) {
-      const state = State.getStateByCodeAndCountry(stateCode, countryCode)
-      if (state) parts.push(state.name)
-    }
-    if (countryCode) {
-      const country = Country.getCountryByCode(countryCode)
-      if (country) parts.push(country.name)
-    }
+    const state = stateOptions.find((option) => option.value === stateCode)
+    const country = countryOptions.find((option) => option.value === countryCode)
+    if (state) parts.push(state.name)
+    if (country) parts.push(country.name)
     onSubmit(parts.join(", "))
   }
 
   const hasStates = stateOptions.length > 0
   const hasCities = cityOptions.length > 0
+  const locationOptionsLoading = loadingCountries || loadingStates || loadingCities
+  const canSubmitLocation = Boolean(countryCode) && !locationOptionsLoading && !locationLoadFailed
 
   return (
     <div>
@@ -107,6 +95,15 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
       </div>
 
       <div className="space-y-5">
+        {locationLoadFailed && (
+          <LocationLoadError
+            message={t("locationLoadError")}
+            retryLabel={t("locationRetry")}
+            retrying={locationOptionsLoading}
+            onRetry={retryLocations}
+          />
+        )}
+
         {/* Country */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -120,6 +117,7 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
             placeholder={t("locationCountryPlaceholder")}
             label={t("locationCountry")}
             icon={<MapPin className="w-4 h-4" />}
+            disabled={loadingCountries}
           />
         </motion.div>
 
@@ -136,6 +134,7 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
               onChange={handleStateChange}
               placeholder={t("locationStatePlaceholder")}
               label={t("locationState")}
+              disabled={loadingStates}
             />
           </motion.div>
         )}
@@ -153,6 +152,7 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
               onChange={handleCityChange}
               placeholder={t("locationCityPlaceholder")}
               label={t("locationCity")}
+              disabled={loadingCities}
             />
           </motion.div>
         )}
@@ -176,9 +176,9 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
         <motion.button
           type="button"
           onClick={handleSubmitClick}
-          disabled={!countryCode}
-          whileHover={countryCode ? { scale: 1.01 } : {}}
-          whileTap={countryCode ? { scale: 0.99 } : {}}
+          disabled={!canSubmitLocation}
+          whileHover={canSubmitLocation ? { scale: 1.01 } : {}}
+          whileTap={canSubmitLocation ? { scale: 0.99 } : {}}
           className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
         >
           {t("analyzeWithAI")}

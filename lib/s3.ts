@@ -41,6 +41,7 @@ export type UploadKind =
   | "business-logo"
   | "business-product"
   | "avatar"
+  | "content-reference"
   | "content-slide"
   | "lead-photo"
 
@@ -111,6 +112,8 @@ export function buildKey(
       return `business-products/${ctx.userId}/${id}.${ctx.ext}`
     case "avatar":
       return `avatars/${ctx.userId}/${id}.${ctx.ext}`
+    case "content-reference":
+      return `content-references/${ctx.userId}/${ctx.postId}/${ctx.slideIndex}-${id}.${ctx.ext}`
     case "content-slide":
       return `content/${ctx.postId}/${ctx.slideIndex}-${id}.${ctx.ext}`
     case "lead-photo":

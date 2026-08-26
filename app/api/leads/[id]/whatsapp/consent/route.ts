@@ -6,7 +6,7 @@ import { z } from "zod"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { whatsappConsentEvent } from "@/lib/db/schema"
-import { getOwnedLead, getViewableLead } from "@/lib/whatsapp/data"
+import { getManageableLead, getViewableLead } from "@/lib/whatsapp/data"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { isE164 } from "@/lib/whatsapp/security"
 import { WHATSAPP_CONSENT_SOURCES } from "@/lib/whatsapp/types"
@@ -55,15 +55,21 @@ export async function POST(
 ) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (!hasWhatsAppEarlyAccess(session.user.email)) {
+  const { id } = await params
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+  if (
+    !manageable.access.isPlatformAdmin &&
+    !hasWhatsAppEarlyAccess(manageable.access.ownerEmail)
+  ) {
     return NextResponse.json(
       { error: "WhatsApp integration is not available yet", code: "FEATURE_NOT_AVAILABLE" },
       { status: 403 },
     )
   }
-  const { id } = await params
-  const ownedLead = await getOwnedLead(id, session.user.id)
-  if (!ownedLead) return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  const ownedLead = manageable.lead
   const parsed = schema.safeParse(await request.json().catch(() => null))
   if (!parsed.success || !isE164(parsed.data.phoneE164)) {
     return NextResponse.json({ error: "Enter a valid E.164 phone number and consent evidence" }, { status: 400 })

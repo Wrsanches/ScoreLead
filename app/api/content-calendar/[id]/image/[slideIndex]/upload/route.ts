@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPost } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { removePublicImage } from "@/lib/services/content-image-generator"
 import { publicUrl } from "@/lib/s3"
+import { getBusinessAccess } from "@/lib/business-access"
 
 /**
  * Confirms a user-uploaded slide image. The browser has already uploaded the
@@ -29,8 +30,13 @@ export async function POST(
   const [post] = await db
     .select()
     .from(contentPost)
-    .where(and(eq(contentPost.id, id), eq(contentPost.userId, session.user.id)))
+    .where(eq(contentPost.id, id))
   if (!post) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+  }
+
+  const access = await getBusinessAccess(session.user.id, post.businessId)
+  if (!access || access.readOnly) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 

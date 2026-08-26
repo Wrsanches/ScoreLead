@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPost } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { removePublicImage } from "@/lib/services/content-image-generator"
+import { getBusinessAccess } from "@/lib/business-access"
 
 const patchSchema = z.object({
   scheduledFor: z.string().datetime().optional(),
@@ -31,6 +32,17 @@ const patchSchema = z.object({
     .optional(),
 })
 
+async function getManageablePost(actorUserId: string, postId: string) {
+  const [post] = await db
+    .select()
+    .from(contentPost)
+    .where(eq(contentPost.id, postId))
+
+  if (!post) return null
+  const access = await getBusinessAccess(actorUserId, post.businessId)
+  return access && !access.readOnly ? post : null
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -45,10 +57,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
 
-  const [existing] = await db
-    .select()
-    .from(contentPost)
-    .where(and(eq(contentPost.id, id), eq(contentPost.userId, session.user.id)))
+  const existing = await getManageablePost(session.user.id, id)
 
   if (!existing) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
@@ -85,10 +94,7 @@ export async function DELETE(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const [existing] = await db
-    .select()
-    .from(contentPost)
-    .where(and(eq(contentPost.id, id), eq(contentPost.userId, session.user.id)))
+  const existing = await getManageablePost(session.user.id, id)
 
   if (!existing) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 })

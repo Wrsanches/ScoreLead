@@ -27,11 +27,15 @@ interface PostSheetProps {
   draftDate: Date | null;
   onSave: (values: PostFormValues) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
-  onGenerateImage?: (postId: string) => Promise<{ failureIndexes: number[] }>;
+  onGenerateImage?: (
+    postId: string,
+    referenceFile?: File,
+  ) => Promise<{ failureIndexes: number[] }>;
   onRegenerateSlide?: (
     postId: string,
     slideIndex: number,
     refinementPrompt?: string,
+    referenceFile?: File,
   ) => Promise<void>;
   onUploadSlide?: (
     postId: string,

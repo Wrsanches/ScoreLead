@@ -18,7 +18,10 @@ export async function register() {
 
       pump()
 
-      const g = globalThis as { __discoveryPumpTimer?: ReturnType<typeof setInterval> }
+      const g = globalThis as {
+        __discoveryPumpTimer?: ReturnType<typeof setInterval>
+        __indexNowStartupSubmitted?: boolean
+      }
       if (!g.__discoveryPumpTimer) {
         g.__discoveryPumpTimer = setInterval(pump, 5 * 60_000)
         g.__discoveryPumpTimer.unref?.()
@@ -27,7 +30,16 @@ export async function register() {
       console.error("[instrumentation] queue pump setup failed:", error)
     }
 
-    const { submitIndexableUrlsOnStartup } = await import("@/lib/indexnow-startup")
-    await submitIndexableUrlsOnStartup()
+    // Search-engine notification must never delay process readiness. Guard it
+    // per process because instrumentation can register more than once in dev.
+    const g = globalThis as { __indexNowStartupSubmitted?: boolean }
+    if (!g.__indexNowStartupSubmitted) {
+      g.__indexNowStartupSubmitted = true
+      void import("@/lib/indexnow-startup").then(
+        ({ submitIndexableUrlsOnStartup }) => submitIndexableUrlsOnStartup(),
+      ).catch((error) => {
+        console.error("[instrumentation] IndexNow startup import failed:", error)
+      })
+    }
   }
 }

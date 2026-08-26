@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useBusinessId } from "@/components/admin/business-context"
@@ -16,9 +16,9 @@ import {
   CheckCircle2,
   Bookmark,
 } from "lucide-react"
-import { Country, State, City } from "country-state-city"
-import type { ICountry, IState, ICity } from "country-state-city"
-import { SearchableSelect, type SelectOption } from "@/components/searchable-select"
+import { SearchableSelect } from "@/components/searchable-select"
+import { LocationLoadError } from "@/components/location-load-error"
+import { useLocationOptions } from "@/hooks/use-location-options"
 import { PageHeader, ContentWrapper } from "@/components/admin"
 import { toast } from "sonner"
 
@@ -109,33 +109,16 @@ export default function NewDiscoveryJobPage() {
     setLoadingSuggestions(false)
   }
 
-  // Country/State/City options
-  const countryOptions: SelectOption[] = useMemo(() => {
-    const countries: ICountry[] = Country.getAllCountries()
-    return countries.map((c) => ({
-      value: c.isoCode,
-      label: `${c.flag} ${c.name}`,
-    }))
-  }, [])
-
-  const stateOptions: SelectOption[] = useMemo(() => {
-    if (!countryCode) return []
-    const states: IState[] = State.getStatesOfCountry(countryCode)
-    return states.map((s) => ({
-      value: s.isoCode,
-      label: s.name,
-    }))
-  }, [countryCode])
-
-  const cityOptions: SelectOption[] = useMemo(() => {
-    if (!countryCode) return []
-    if (!stateCode) {
-      const cities: ICity[] = City.getCitiesOfCountry(countryCode) || []
-      return cities.map((c) => ({ value: c.name, label: c.name }))
-    }
-    const cities: ICity[] = City.getCitiesOfState(countryCode, stateCode) || []
-    return cities.map((c) => ({ value: c.name, label: c.name }))
-  }, [countryCode, stateCode])
+  const {
+    countryOptions,
+    stateOptions,
+    cityOptions,
+    loadingCountries,
+    loadingStates,
+    loadingCities,
+    locationLoadFailed,
+    retryLocations,
+  } = useLocationOptions(countryCode, stateCode)
 
   const handleCountryChange = useCallback((value: string) => {
     setCountryCode(value)
@@ -158,14 +141,10 @@ export default function NewDiscoveryJobPage() {
   function buildLocation(): string {
     const parts: string[] = []
     if (cityName) parts.push(cityName)
-    if (stateCode) {
-      const state = State.getStateByCodeAndCountry(stateCode, countryCode)
-      if (state) parts.push(state.name)
-    }
-    if (countryCode) {
-      const country = Country.getCountryByCode(countryCode)
-      if (country) parts.push(country.name)
-    }
+    const state = stateOptions.find((option) => option.value === stateCode)
+    const country = countryOptions.find((option) => option.value === countryCode)
+    if (state) parts.push(state.name)
+    if (country) parts.push(country.name)
     return parts.join(", ")
   }
 
@@ -212,8 +191,9 @@ export default function NewDiscoveryJobPage() {
     setBatchSize((current) => (current > leadCap ? batchOptions.at(-1) ?? 10 : current))
   }, [planLoading, leadCap])
 
-  const canSubmit = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting
-  const canSave = jobName.trim() && countryCode && keywords.length > 0 && businessId && !isSubmitting && !savingSearch
+  const locationOptionsLoading = loadingCountries || loadingStates || loadingCities
+  const canSubmit = jobName.trim() && countryCode && keywords.length > 0 && businessId && !locationOptionsLoading && !locationLoadFailed && !isSubmitting
+  const canSave = jobName.trim() && countryCode && keywords.length > 0 && businessId && !locationOptionsLoading && !locationLoadFailed && !isSubmitting && !savingSearch
 
   async function handleSaveSearch() {
     if (!canSave) return
@@ -331,6 +311,15 @@ export default function NewDiscoveryJobPage() {
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("targetLocation")}</span>
                 </div>
 
+                {locationLoadFailed && (
+                  <LocationLoadError
+                    message={t("locationLoadError")}
+                    retryLabel={t("locationRetry")}
+                    retrying={locationOptionsLoading}
+                    onRetry={retryLocations}
+                  />
+                )}
+
                 <SearchableSelect
                   options={countryOptions}
                   value={countryCode}
@@ -338,7 +327,7 @@ export default function NewDiscoveryJobPage() {
                   placeholder="Select a country"
                   label="Country"
                   icon={<MapPin className="w-4 h-4" />}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loadingCountries}
                 />
 
                 {countryCode && hasStates && (
@@ -348,7 +337,7 @@ export default function NewDiscoveryJobPage() {
                     onChange={handleStateChange}
                     placeholder="Select a state"
                     label="State"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loadingStates}
                   />
                 )}
 
@@ -359,7 +348,7 @@ export default function NewDiscoveryJobPage() {
                     onChange={handleCityChange}
                     placeholder="Select a city"
                     label="City"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loadingCities}
                   />
                 )}
               </div>

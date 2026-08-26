@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { uploadImage, UploadError } from "@/lib/upload-client"
@@ -30,6 +31,7 @@ type ProfileValues = z.infer<ReturnType<typeof makeSchema>>
 
 export function ProfileSection() {
   const t = useTranslations("settings")
+  const router = useRouter()
   const { data: session, refetch } = authClient.useSession()
   const fileRef = useRef<HTMLInputElement | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -55,7 +57,10 @@ export function ProfileSection() {
       body: JSON.stringify({ name: values.name, image: values.image }),
     })
     if (!res.ok) throw new Error("save-failed")
-    refetch?.()
+    // Refresh both consumers of profile data: Better Auth's client session
+    // and the server-rendered admin shell/sidebar props.
+    void refetch?.()
+    router.refresh()
   }
 
   async function onSubmit(values: ProfileValues) {

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Sparkles, Upload, Wand2 } from "lucide-react";
+import { ImagePlus, Loader2, Sparkles, Upload, Wand2, X } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -16,7 +16,7 @@ interface SlideControlsProps {
   regenerating: boolean;
   canRegenerate: boolean;
   canUpload: boolean;
-  onRegenerate: (refinementPrompt?: string) => void;
+  onRegenerate: (refinementPrompt?: string, referenceFile?: File) => void;
   onUpload: (file: File) => void;
 }
 
@@ -34,14 +34,17 @@ export function SlideControls({
   const t = useTranslations("contentCalendar");
   const [refineOpen, setRefineOpen] = useState(false);
   const [refinementPrompt, setRefinementPrompt] = useState("");
+  const [referenceFile, setReferenceFile] = useState<File | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
+  const referenceInputRef = useRef<HTMLInputElement | null>(null);
 
   function applyRefinement() {
     const prompt = refinementPrompt.trim();
-    if (!prompt) return;
+    if (!prompt && !referenceFile) return;
     setRefineOpen(false);
     setRefinementPrompt("");
-    onRegenerate(prompt);
+    onRegenerate(prompt || undefined, referenceFile ?? undefined);
+    setReferenceFile(null);
   }
 
   const secondaryButtonClass =
@@ -90,11 +93,58 @@ export function SlideControls({
             autoFocus
             className={`${fieldClass} px-2.5 py-2 rounded-lg text-xs resize-none`}
           />
+          <div className="mt-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 p-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-zinc-700 dark:text-zinc-300">
+                  {t("refineReference")}
+                </p>
+                <p className="text-[9px] leading-relaxed text-zinc-500 dark:text-zinc-600">
+                  {t("refineReferenceHint")}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => referenceInputRef.current?.click()}
+                disabled={busy}
+                className="shrink-0 inline-flex items-center gap-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1 text-[10px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-emerald-500/40 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors disabled:opacity-40"
+              >
+                <ImagePlus className="h-3 w-3" />
+                {referenceFile ? t("replaceReference") : t("attachReference")}
+              </button>
+            </div>
+            {referenceFile && (
+              <div className="mt-2 flex items-center gap-2 rounded-md bg-white dark:bg-zinc-950 px-2 py-1.5 ring-1 ring-zinc-200 dark:ring-zinc-800">
+                <ImagePlus className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <span className="min-w-0 flex-1 truncate text-[10px] text-zinc-700 dark:text-zinc-300">
+                  {referenceFile.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setReferenceFile(null)}
+                  className="rounded p-0.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                  aria-label={t("removeReference")}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+            <input
+              ref={referenceInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                setReferenceFile(e.target.files?.[0] ?? null);
+                e.target.value = "";
+              }}
+            />
+          </div>
           <div className="flex items-center gap-2 mt-2">
             <button
               type="button"
               onClick={applyRefinement}
-              disabled={busy || !refinementPrompt.trim()}
+              disabled={busy || (!refinementPrompt.trim() && !referenceFile)}
               className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-[11px] font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Wand2 className="w-3 h-3" />
@@ -105,6 +155,7 @@ export function SlideControls({
               onClick={() => {
                 setRefineOpen(false);
                 setRefinementPrompt("");
+                setReferenceFile(null);
               }}
               className="px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
             >
@@ -119,6 +170,7 @@ export function SlideControls({
         onClick={() => uploadInputRef.current?.click()}
         disabled={busy || !canUpload}
         className={secondaryButtonClass}
+        title={t("uploadSlideHint")}
       >
         <Upload className="w-3 h-3" />
         {t("uploadSlide")}

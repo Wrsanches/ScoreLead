@@ -4,27 +4,28 @@ import { business } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { cache } from "react"
 import {
   getActiveViewableBusinessIdForUser,
 } from "@/lib/active-business"
 import { isPlatformAdmin } from "@/lib/business-access"
 
-async function getSession() {
+export const getSession = cache(async () => {
   return auth.api.getSession({
     headers: await headers(),
   })
-}
+})
 
-async function hasCompletedBusiness(userId: string) {
+const hasCompletedBusiness = cache(async (userId: string) => {
   const rows = await db
     .select({ onboardingCompleted: business.onboardingCompleted })
     .from(business)
     .where(eq(business.userId, userId))
   return rows.some(r => r.onboardingCompleted)
-}
+})
 
 /** Auth only - no onboarding check. Used by onboarding layout. */
-export async function requireAuthOnly(locale: string) {
+export const requireAuthOnly = cache(async function requireAuthOnly(locale: string) {
   const session = await getSession()
 
   if (!session) {
@@ -33,10 +34,10 @@ export async function requireAuthOnly(locale: string) {
   }
 
   return session
-}
+})
 
 /** Full guard - requires auth + completed onboarding. Used by admin layout. */
-export async function requireAuth(locale: string) {
+export const requireAuth = cache(async function requireAuth(locale: string) {
   const session = await requireAuthOnly(locale)
   const prefix = locale === "en" ? "" : `/${locale}`
 
@@ -51,7 +52,7 @@ export async function requireAuth(locale: string) {
   }
 
   return session
-}
+})
 
 /** Redirect authenticated users away from auth pages (login/signup). */
 export async function redirectIfAuthenticated(locale: string) {
