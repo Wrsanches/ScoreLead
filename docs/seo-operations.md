@@ -77,10 +77,11 @@ and legitimate authority building.
 6. Review Bing's AI Performance report weekly for cited URLs, citation count,
    grounding queries, and changes by locale.
 7. After deployment, start a fresh Ahrefs Site Audit crawl. The production
-   sitemap should contain 126 localized URLs, `/cdn-cgi/l/email-protection`
-   should return a 308 to `/contact`, and the IndexNow notice should clear
-   after the provider records the submitted URLs. Keep decorative flag and
-   product-illustration images at `alt=""`; they are intentionally omitted
+   sitemap should contain 126 localized URLs, public signup links should point
+   directly to `app.scorelead.io`, and served HTML should not contain
+   `/cdn-cgi/l/email-protection` or `data-cfemail`. The IndexNow notice should
+   clear after the provider records the submitted URLs. Keep decorative flag
+   and product-illustration images at `alt=""`; they are intentionally omitted
    from the accessibility tree and should not be filled with repetitive text
    merely to change an audit score.
 

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next"
+import { getLocalizedAppUrl } from "@/lib/site-urls"
 
 export const siteConfig = {
   name: "ScoreLead",
@@ -567,7 +568,7 @@ export function generateJsonLd(locale: string) {
   const config = getLocaleConfig(normalizedLocale)
   const meta = getSiteMetadata(normalizedLocale)
   const canonicalUrl = getLocalizedUrl(normalizedLocale)
-  const signupUrl = getLocalizedUrl(normalizedLocale, "/signup")
+  const signupUrl = getLocalizedAppUrl("/signup", normalizedLocale)
   const ogImageUrl = getOgImageUrl(normalizedLocale)
   const organizationId = `${siteConfig.url}/#organization`
   const webSiteId = `${siteConfig.url}/#website`
@@ -651,10 +652,8 @@ export function generateJsonLd(locale: string) {
         applicationCategory: "BusinessApplication",
         applicationSubCategory: "Lead generation software",
         operatingSystem: "Web",
-        browserRequirements: "Requires JavaScript and a modern web browser",
         isAccessibleForFree: true,
         inLanguage: config.htmlLang,
-        availableLanguage: supportedLocales.map((supportedLocale) => localeConfig[supportedLocale].languageName),
         creator: {
           "@id": organizationId,
         },

@@ -1,5 +1,12 @@
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { JsonLd } from "@/components/json-ld";
+import {
+  evidenceIcon as EvidenceIcon,
+  getMarketingGroupIcon,
+  getMarketingHighlightIcon,
+  methodologyIcon as MethodologyIcon,
+  relatedGuideIcon as RelatedGuideIcon,
+} from "@/lib/marketing/page-icons";
 import { MarketingPlatformImage } from "@/components/marketing-platform-image";
 import { MarketingTool } from "@/components/marketing-tool";
 import { Navbar } from "@/components/navbar";
@@ -54,6 +61,7 @@ export function MarketingPageView({
   const translation = getMarketingTranslation(page, normalizedLocale);
   const ui = getMarketingUi(normalizedLocale);
   const canonical = getLocalizedUrl(normalizedLocale, page.pathname);
+  const GroupIcon = getMarketingGroupIcon(page.group);
   const platformImage = getMarketingPlatformImage(page.id);
   const platformImageUrl = `${siteConfig.url}${platformImage.src}`;
   const relatedPosts = page.relatedBlogSlugs
@@ -140,7 +148,6 @@ export function MarketingPageView({
     ],
   };
 
-
   return (
     <div className="min-h-screen bg-[#09090B] text-zinc-100">
       <JsonLd data={jsonLd} />
@@ -151,8 +158,14 @@ export function MarketingPageView({
             One asymmetric stack. The emerald eyebrow is the only
             accent above the fold; review metadata sits on a quiet
             baseline row instead of a competing bordered rail. */}
-        <header className="px-6 pb-16 pt-10 sm:pb-24 sm:pt-14">
-          <div className="mx-auto max-w-6xl">
+        <header className="relative overflow-hidden px-6 pb-16 pt-10 sm:pb-24 sm:pt-14">
+          {/* Same on-tone emerald wash the landing hero uses, so marketing
+              pages sit in the same room as the homepage. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(ellipse_70%_60%_at_40%_0%,rgba(16,185,129,0.11),transparent_72%)]"
+          />
+          <div className="relative mx-auto max-w-6xl">
             <nav
               aria-label="Breadcrumb"
               className="flex items-center gap-2 text-xs text-zinc-600"
@@ -167,7 +180,12 @@ export function MarketingPageView({
               <span className="text-zinc-400">{translation.eyebrow}</span>
             </nav>
 
-            <p className="mt-12 font-mono text-[11px] uppercase tracking-[0.22em] text-emerald-400">
+            <p className="mt-12 flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.22em] text-emerald-400">
+              <GroupIcon
+                className="size-4"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               {translation.eyebrow}
             </p>
             <h1 className="mt-6 max-w-[19ch] text-balance text-[2.5rem] font-medium leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl sm:leading-[0.98] lg:text-[4.25rem]">
@@ -187,7 +205,10 @@ export function MarketingPageView({
                   {formatDate(page.updatedAt, normalizedLocale)}
                 </time>
               </span>
-              <span aria-hidden="true" className="hidden text-zinc-700 sm:inline">
+              <span
+                aria-hidden="true"
+                className="hidden text-zinc-700 sm:inline"
+              >
                 /
               </span>
               <Link
@@ -237,15 +258,28 @@ export function MarketingPageView({
             >
               {ui.keyOutcomes}
             </h2>
-            <ul className="mt-10 grid gap-x-12 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
-              {translation.highlights.map((highlight) => (
-                <li
-                  key={highlight}
-                  className="border-t border-zinc-800 pt-5 text-[1.0625rem] leading-7 text-zinc-300"
-                >
-                  {highlight}
-                </li>
-              ))}
+            <ul className="mt-10 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {translation.highlights.map((highlight, index) => {
+                const HighlightIcon = getMarketingHighlightIcon(
+                  page.id,
+                  page.group,
+                  index,
+                );
+                return (
+                  <li key={highlight}>
+                    <span className="inline-flex size-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-400">
+                      <HighlightIcon
+                        className="size-[1.125rem]"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <p className="mt-5 text-[1.0625rem] leading-7 text-zinc-300">
+                      {highlight}
+                    </p>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </section>
@@ -315,30 +349,39 @@ export function MarketingPageView({
             is what marks it as an aside. */}
         <section className="px-6 pb-16 sm:pb-24" aria-labelledby="evidence">
           <div className="mx-auto max-w-6xl">
-            <div className="rounded-2xl border border-zinc-800/70 bg-zinc-900/25 p-8 sm:p-12">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                {ui.evidence}
-              </p>
-              <h2
-                id="evidence"
-                className="mt-5 max-w-2xl text-[1.375rem] font-medium leading-[1.25] tracking-[-0.02em] text-white sm:text-2xl"
-              >
-                {translation.proofLabel}
-              </h2>
-              <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-400">
-                {translation.proof}
-              </p>
-              {page.id === "case-study-ceramik" ? (
-                <a
-                  href="https://ceramik.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-7 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-white hover:decoration-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+            <div className="flex flex-col gap-6 rounded-2xl border border-zinc-800/70 bg-zinc-900/25 p-8 sm:flex-row sm:gap-8 sm:p-12">
+              <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/60 text-zinc-400">
+                <EvidenceIcon
+                  className="size-5"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+              </span>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                  {ui.evidence}
+                </p>
+                <h2
+                  id="evidence"
+                  className="mt-4 max-w-2xl text-[1.375rem] font-medium leading-[1.25] tracking-[-0.02em] text-white sm:text-2xl"
                 >
-                  Ceramik
-                  <ExternalLink className="size-4" aria-hidden="true" />
-                </a>
-              ) : null}
+                  {translation.proofLabel}
+                </h2>
+                <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-400">
+                  {translation.proof}
+                </p>
+                {page.id === "case-study-ceramik" ? (
+                  <a
+                    href="https://ceramik.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-7 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-white hover:decoration-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                  >
+                    Ceramik
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                  </a>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
@@ -370,8 +413,15 @@ export function MarketingPageView({
                     <Link
                       key={post.slug}
                       href={`/blog/${post.slug}`}
-                      className="group grid gap-3 border-b border-zinc-800 py-6 transition-colors hover:bg-zinc-900/40 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-4"
+                      className="group grid gap-3 border-b border-zinc-800 py-6 transition-colors hover:bg-zinc-900/40 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-8 sm:px-4"
                     >
+                      <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-500 transition-colors group-hover:text-zinc-300">
+                        <RelatedGuideIcon
+                          className="size-[1.125rem]"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      </span>
                       <div>
                         <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                           {postTranslation.category}
@@ -418,12 +468,20 @@ export function MarketingPageView({
                     relatedPage,
                     normalizedLocale,
                   );
+                  const RelatedIcon = getMarketingGroupIcon(relatedPage.group);
                   return (
                     <Link
                       key={relatedPage.pathname}
                       href={`/${relatedPage.pathname}`}
                       className="group flex flex-col bg-[#09090B] p-7 transition-colors hover:bg-zinc-900/60"
                     >
+                      <span className="mb-5 inline-flex size-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-500 transition-colors group-hover:border-zinc-700 group-hover:text-zinc-300">
+                        <RelatedIcon
+                          className="size-[1.125rem]"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      </span>
                       <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                         {relatedTranslation.eyebrow}
                       </p>
@@ -478,16 +536,25 @@ export function MarketingPageView({
             aria-labelledby="methodology"
           >
             <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2
-                  id="methodology"
-                  className="text-sm font-medium text-zinc-300"
-                >
-                  {ui.methodology}
-                </h2>
-                <p className="mt-1 text-sm text-zinc-600">
-                  {ui.methodologyDescription}
-                </p>
+              <div className="flex items-start gap-4">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-500">
+                  <MethodologyIcon
+                    className="size-4"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                </span>
+                <div>
+                  <h2
+                    id="methodology"
+                    className="text-sm font-medium text-zinc-300"
+                  >
+                    {ui.methodology}
+                  </h2>
+                  <p className="mt-1 text-sm text-zinc-600">
+                    {ui.methodologyDescription}
+                  </p>
+                </div>
               </div>
               <Link
                 href="/editorial-policy"
