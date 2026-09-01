@@ -71,6 +71,19 @@ describe("localized SEO content registry", () => {
     }
   });
 
+  it("keeps informational articles pointed at one descriptive commercial owner", () => {
+    for (const post of blogPosts) {
+      const destination = getMarketingPageByPath(post.relatedMarketingPath);
+      expect(destination).toBeDefined();
+
+      for (const locale of supportedLocales) {
+        const title = destination?.translations[locale].title ?? "";
+        expect(title.length).toBeGreaterThan(10);
+        expect(post.translations[locale].title).not.toBe(title);
+      }
+    }
+  });
+
   it("uses truthful publication dates and current source URLs", () => {
     const prospectingGuide = blogPosts.find(
       (post) => post.slug === "b2b-prospecting-guide",

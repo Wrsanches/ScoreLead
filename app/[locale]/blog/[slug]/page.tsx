@@ -15,6 +15,10 @@ import {
   getBlogUi,
 } from "@/lib/blog";
 import {
+  getMarketingPageByPath,
+  getMarketingTranslation,
+} from "@/lib/marketing";
+import {
   getLanguageAlternates,
   getLocaleConfig,
   getLocalizedUrl,
@@ -111,6 +115,14 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
 
   const translation = getBlogTranslation(post, normalizedLocale);
   const ui = getBlogUi(normalizedLocale);
+  const relatedMarketingPage = getMarketingPageByPath(
+    post.relatedMarketingPath,
+  );
+  if (!relatedMarketingPage) notFound();
+  const relatedMarketingTranslation = getMarketingTranslation(
+    relatedMarketingPage,
+    normalizedLocale,
+  );
   const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
   const image = `${siteConfig.url}/images/blog-og.png`;
   const related = blogPosts
@@ -414,7 +426,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                   href={`/${post.relatedMarketingPath}`}
                   className="mt-6 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                 >
-                  {ui.productGuide}
+                  {ui.productGuide}: {relatedMarketingTranslation.title}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </section>

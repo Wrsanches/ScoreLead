@@ -8,35 +8,13 @@ import { Link } from "@/i18n/routing"
 
 const featureCards = [
   {
-    illustration: (
-      <div className="relative w-full h-80 lg:h-90 flex items-center justify-center overflow-hidden rounded-lg">
-        <Image
-          src="/images/radar-discovery.svg"
-          alt=""
-          fill
-          className="object-contain"
-          aria-hidden="true"
-          unoptimized
-        />
-      </div>
-    ),
+    illustrationSrc: "/images/radar-discovery.svg",
   },
   {
-    illustration: (
-      <div className="relative w-full h-80 lg:h-90 flex items-center justify-center overflow-hidden rounded-lg">
-        <Image
-          src="/images/lead-scoring.svg"
-          alt=""
-          fill
-          className="object-contain"
-          aria-hidden="true"
-          unoptimized
-        />
-      </div>
-    ),
+    illustrationSrc: "/images/lead-scoring.svg",
   },
   {
-    illustration: null,
+    illustrationSrc: null,
   },
 ]
 
@@ -160,7 +138,19 @@ export function FeatureCardsSection() {
                     WebkitMaskImage: "linear-gradient(#000 70%, transparent 90%)",
                   }}
                 >
-                  {card.illustration || <OutreachIllustration />}
+                  {card.illustrationSrc ? (
+                    <div className="relative flex h-80 w-full items-center justify-center overflow-hidden rounded-lg lg:h-90">
+                      <Image
+                        src={card.illustrationSrc}
+                        alt={t(cardKeys[index])}
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <OutreachIllustration />
+                  )}
                 </div>
                 <div
                   className="absolute bottom-0 left-0 right-0 h-24 z-5 pointer-events-none"

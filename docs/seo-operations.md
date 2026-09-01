@@ -80,10 +80,9 @@ and legitimate authority building.
    sitemap should contain 126 localized URLs, public signup links should point
    directly to `app.scorelead.io`, and served HTML should not contain
    `/cdn-cgi/l/email-protection` or `data-cfemail`. The IndexNow notice should
-   clear after the provider records the submitted URLs. Keep decorative flag
-   and product-illustration images at `alt=""`; they are intentionally omitted
-   from the accessibility tree and should not be filled with repetitive text
-   merely to change an audit score.
+   clear after the provider records the submitted URLs. Homepage product
+   illustrations must expose their localized feature name as alternative text;
+   purely decorative flags and repeated avatars should remain at `alt=""`.
 
 ## Crawler verification
 

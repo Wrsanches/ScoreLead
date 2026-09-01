@@ -22,7 +22,7 @@ import {
   siteConfig,
 } from "@/lib/seo";
 
-const SEO_UPDATED_AT = "2026-08-25";
+const SEO_UPDATED_AT = "2026-09-01";
 
 const definitions: MarketingPageDefinition[] = [
   {
