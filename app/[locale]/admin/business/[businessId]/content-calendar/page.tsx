@@ -12,6 +12,7 @@ import {
   ChevronRight,
   AtSign,
   Loader2,
+  Plus,
 } from "lucide-react";
 import { PageHeader, ContentWrapper, LoadingState } from "@/components/admin";
 import { MonthGrid } from "@/components/admin/content-calendar/month-grid";
@@ -503,6 +504,20 @@ export default function ContentCalendarPage() {
             </button>
 
             <div className="ml-auto flex items-center gap-2">
+              {!readOnly && (
+                <button
+                  type="button"
+                  disabled={loading || generating}
+                  onClick={() => {
+                    const today = new Date();
+                    openNew(monthParam(cursor) === monthParam(today) ? today : monthStart);
+                  }}
+                  className="inline-flex items-center gap-2 h-10 px-4 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-semibold text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Plus className="w-4 h-4" aria-hidden="true" />
+                  {t("addPost")}
+                </button>
+              )}
               <div className="inline-flex items-center gap-1.5 px-2.5 h-10 bg-zinc-50/60 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800/70 rounded-xl text-xs text-zinc-700 dark:text-zinc-300">
                 <AtSign className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                 {t("provider")}
