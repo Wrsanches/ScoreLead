@@ -84,6 +84,21 @@ test("denied publishing permission prevents a usable connection", async () => {
     "INSTAGRAM_PERMISSIONS_REQUIRED",
   )
 })
+test("token diagnostics classify the failure without retaining the provider message", async () => {
+  globalThis.fetch = mock(async () => Response.json({
+    error: { code: 100, message: "Invalid client secret: private-secret-from-provider" },
+  }, { status: 400 })) as unknown as typeof fetch
+  try {
+    await exchangeInstagramCode("private-code")
+    throw new Error("Expected rejection")
+  } catch (error) {
+    expect(error).toBeInstanceOf(InstagramApiError)
+    expect((error as InstagramApiError).operation).toBe("authorization_code")
+    expect((error as InstagramApiError).reason).toBe("CLIENT_SECRET_REJECTED")
+    expect(JSON.stringify(error)).not.toContain("private-secret")
+    expect(JSON.stringify(error)).not.toContain("private-code")
+  }
+})
 test("image, carousel and publish calls use bearer tokens and preserve caption Unicode", async () => {
   const calls: { url: string; init?: RequestInit }[] = []
   globalThis.fetch = mock(

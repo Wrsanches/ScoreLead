@@ -5,6 +5,8 @@ export class InstagramApiError extends Error {
     public code: number,
     public transient: boolean,
     public httpStatus: number,
+    public operation = "graph",
+    public reason = "REQUEST_REJECTED",
   ) {
     // Do not propagate API payloads, request URLs or tokens to logs/UI.
     super("INSTAGRAM_API_ERROR")
@@ -13,6 +15,7 @@ export class InstagramApiError extends Error {
 async function request<T>(
   url: URL | string,
   init: RequestInit = {},
+  operation = "graph",
 ): Promise<T> {
   const response = await fetch(url, {
     ...init,
@@ -22,14 +25,25 @@ async function request<T>(
   })
   const body = await response.json().catch(() => null)
   if (!response.ok || body?.error || !body) {
+    const message = String(body?.error?.message || body?.error_message || "")
+    const reason = /client.?secret/i.test(message) ? "CLIENT_SECRET_REJECTED"
+      : /redirect.*uri/i.test(message) ? "REDIRECT_URI_REJECTED"
+      : /authorization code|code.*(used|expired|valid)/i.test(message) ? "AUTHORIZATION_CODE_REJECTED"
+      : /tester|app role|developer role|not authorized/i.test(message) ? "ACCOUNT_NOT_AUTHORIZED"
+      : /access.?token/i.test(message) ? "ACCESS_TOKEN_REJECTED"
+      : /permission/i.test(message) ? "PERMISSIONS_REJECTED"
+      : /client.?id|app.?id|application/i.test(message) ? "APP_REJECTED"
+      : "REQUEST_REJECTED"
     throw new InstagramApiError(
-      Number(body?.error?.code || 0),
+      Number(body?.error?.code || body?.code || 0),
       Boolean(
         body?.error?.is_transient ||
         response.status === 429 ||
         response.status >= 500,
       ),
       response.status,
+      operation,
+      reason,
     )
   }
   return body as T
@@ -67,6 +81,7 @@ export async function exchangeInstagramCode(code: string) {
   const result = await request<Short & { data?: Short[] }>(
     "https://api.instagram.com/oauth/access_token",
     { method: "POST", body },
+    "authorization_code",
   )
   const short = result.data?.[0] ?? result
   if (!short.access_token || !short.user_id)
@@ -82,7 +97,7 @@ export async function exchangeInstagramCode(code: string) {
     client_secret: appSecret,
     access_token: short.access_token,
   }).toString()
-  const token = await request<AccessToken>(url)
+  const token = await request<AccessToken>(url, {}, "long_lived_token")
   validateToken(token)
   return { ...token, oauthUserId: String(short.user_id) }
 }
