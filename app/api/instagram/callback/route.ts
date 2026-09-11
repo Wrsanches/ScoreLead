@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   )
   let outcome = "AUTH_FAILED"
   try {
-    if (!instagramEnabled()) throw new Error("disabled")
+    if (!instagramEnabled(pending.businessId)) throw new Error("disabled")
     const access = await getBusinessAccess(session.user.id, pending.businessId)
     if (!access || access.readOnly) throw new Error("forbidden")
     if (url.searchParams.has("error")) {

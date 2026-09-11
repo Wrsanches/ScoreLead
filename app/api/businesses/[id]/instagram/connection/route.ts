@@ -16,7 +16,7 @@ export async function GET(
     await instagramAccess(request, id)
     return NextResponse.json(
       {
-        enabled: instagramEnabled(),
+        enabled: instagramEnabled(id),
         connection: publicConnection(await getConnection(id)),
       },
       { headers: { "Cache-Control": "no-store" } },

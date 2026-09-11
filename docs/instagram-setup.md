@@ -17,6 +17,8 @@ The ScoreLead app already has a verified business and technology provider, and a
 
 Customer activation stays disabled until `INSTAGRAM_INTEGRATION_ENABLED=true` and all required credentials are configured. Never enable a staging worker against the production database.
 
+During App Review, set `INSTAGRAM_ALLOWED_BUSINESS_IDS` to the comma-separated IDs of the approved test workspaces before enabling the integration. Connection, OAuth callback, and scheduling enforce this list on the server; other workspaces keep the unavailable state. After Advanced Access approval, clear the list to enable customer onboarding. Existing authorized jobs can still complete/reconcile when a workspace is removed from the rollout list.
+
 Configuration verified in the Meta dashboard on 2026-09-11: the Instagram case is installed in parent app `27622597120683836`; its Instagram app is **ScoreLead-IG**, ID `1109926375021798`. The production OAuth, deauthorization and data-deletion URLs above are saved. Both `instagram_business_basic` and `instagram_business_content_publish` are added and marked **Ready for testing**, with no successful test calls yet. This is not Advanced Access approval. No messaging, comments or insights permissions were requested.
 
 Official references: [Instagram Login](https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login/business-login.md), [publishing](https://developers.facebook.com/documentation/instagram-platform/content-publishing.md), [App Review](https://developers.facebook.com/documentation/instagram-platform/app-review.md).

@@ -30,6 +30,8 @@ export async function scheduleInstagramPost(
     .from(contentPost)
     .where(eq(contentPost.id, postId))
   if (!post) throw new PublishingError("POST_NOT_FOUND", 404)
+  if (!instagramEnabled(post.businessId))
+    throw new PublishingError("INSTAGRAM_NOT_CONFIGURED", 503)
   const connection = await getConnection(post.businessId)
   if (
     !connection?.accessTokenEncrypted ||

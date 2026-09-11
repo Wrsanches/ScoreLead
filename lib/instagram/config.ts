@@ -19,8 +19,13 @@ export function instagramConfig() {
   return { appId, appSecret, redirectUri, version }
 }
 
-export function instagramEnabled() {
+export function instagramEnabled(businessId?: string) {
   if (process.env.INSTAGRAM_INTEGRATION_ENABLED !== "true") return false
+  // An optional rollout list keeps App Review testing within named workspaces.
+  // Workers omit the ID so they can finish/reconcile already-authorized jobs.
+  const allowed = (process.env.INSTAGRAM_ALLOWED_BUSINESS_IDS || "")
+    .split(",").map((id) => id.trim()).filter(Boolean)
+  if (businessId && allowed.length && !allowed.includes(businessId)) return false
   try {
     instagramConfig()
     return Boolean(process.env.INSTAGRAM_TOKEN_ENCRYPTION_KEY)

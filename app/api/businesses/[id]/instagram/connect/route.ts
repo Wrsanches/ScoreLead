@@ -19,7 +19,7 @@ export async function POST(
     const { session } = await instagramAccess(request, id, true)
     if (!rateLimit(`instagram-connect:${session.user.id}`, 10, 60_000).allowed)
       throw new PublishingError("RATE_LIMITED", 429)
-    if (!instagramEnabled())
+    if (!instagramEnabled(id))
       throw new PublishingError("INSTAGRAM_NOT_CONFIGURED", 503)
     const body = await request.json().catch(() => ({}))
     const locale = ["pt", "en", "es"].includes(body.locale) ? body.locale : "en"
