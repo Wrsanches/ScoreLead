@@ -7,10 +7,29 @@ export class InstagramApiError extends Error {
     public httpStatus: number,
     public operation = "graph",
     public reason = "REQUEST_REJECTED",
+    public detail = "",
   ) {
-    // Do not propagate API payloads, request URLs or tokens to logs/UI.
+    // The user-facing message is fixed; diagnostics are scrubbed separately.
     super("INSTAGRAM_API_ERROR")
   }
+}
+function safeProviderDetail(message: string, url: URL | string, init: RequestInit) {
+  const params = new URL(url).searchParams
+  const secrets = [new Headers(init.headers).get("authorization")?.replace(/^Bearer\s+/i, "")]
+  for (const key of ["access_token", "client_secret", "code"]) {
+    secrets.push(params.get(key) || undefined)
+    if (init.body instanceof FormData || init.body instanceof URLSearchParams) {
+      const value = init.body.get(key)
+      if (typeof value === "string") secrets.push(value)
+    }
+  }
+  let safe = message
+  for (const secret of secrets.filter((value): value is string => Boolean(value))) {
+    safe = safe.split(secret).join("[redacted]").split(encodeURIComponent(secret)).join("[redacted]")
+  }
+  return safe.replace(/https?:\/\/\S+/gi, "[url]")
+    .replace(/[A-Za-z0-9_=-]{24,}/g, "[redacted]")
+    .replace(/[\r\n\t]/g, " ").slice(0, 240)
 }
 async function request<T>(
   url: URL | string,
@@ -44,6 +63,7 @@ async function request<T>(
       response.status,
       operation,
       reason,
+      safeProviderDetail(message, url, init),
     )
   }
   return body as T

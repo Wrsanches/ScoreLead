@@ -99,6 +99,27 @@ test("token diagnostics classify the failure without retaining the provider mess
     expect(JSON.stringify(error)).not.toContain("private-code")
   }
 })
+test("long-token diagnostics redact request credentials and URLs", async () => {
+  let call = 0
+  globalThis.fetch = mock(async () => ++call === 1 ? Response.json({
+    access_token: "short-token-private", user_id: "123", permissions: [
+      "instagram_business_basic", "instagram_business_content_publish",
+    ],
+  }) : Response.json({ error: { code: 100, message:
+    "Unsupported request. short-token-private test-instagram-secret https://graph.instagram.com/access_token?access_token=short-token-private",
+  } }, { status: 400 })) as unknown as typeof fetch
+  try {
+    await exchangeInstagramCode("private-code")
+    throw new Error("Expected rejection")
+  } catch (error) {
+    expect(error).toBeInstanceOf(InstagramApiError)
+    expect((error as InstagramApiError).operation).toBe("long_lived_token")
+    expect((error as InstagramApiError).detail).toContain("Unsupported request.")
+    for (const secret of ["short-token-private", "test-instagram-secret", "https://"]) {
+      expect(JSON.stringify(error)).not.toContain(secret)
+    }
+  }
+})
 test("image, carousel and publish calls use bearer tokens and preserve caption Unicode", async () => {
   const calls: { url: string; init?: RequestInit }[] = []
   globalThis.fetch = mock(

@@ -123,6 +123,7 @@ export async function GET(request: Request) {
         httpStatus: error.httpStatus,
         operation: error.operation,
         providerReason: error.reason,
+        providerDetail: error.detail,
       } : {}),
       ...(error instanceof Error && [
         "INSTAGRAM_NOT_CONFIGURED", "INSTAGRAM_AUTH_FAILED",
