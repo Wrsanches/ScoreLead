@@ -6,6 +6,8 @@ import { Loader2, Unplug } from "lucide-react"
 import { SocialIcon } from "@/components/admin/social-icon"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { usePathname } from "@/i18n/routing"
+import { parseLegacyBusinessPath } from "@/lib/admin-routes"
 
 type ConnectionState = {
   enabled: boolean
@@ -24,10 +26,12 @@ export function InstagramConnectionCard({
 }) {
   const t = useTranslations("instagram")
   const locale = useLocale()
+  const pathname = usePathname()
   const [data, setData] = useState<ConnectionState | null>(null)
   const [busy, setBusy] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [revision, setRevision] = useState(0)
+  const [oauthResult, setOauthResult] = useState<string | null>(null)
   useEffect(() => {
     const controller = new AbortController()
     fetch(`/api/businesses/${businessId}/instagram/connection`, {
@@ -47,9 +51,13 @@ export function InstagramConnectionCard({
     return () => controller.abort()
   }, [businessId, revision])
   useEffect(() => {
+    // BusinessProvider first migrates legacy callback URLs to the clean route.
+    // Consuming the result before that reload loses both the query and toast.
+    if (parseLegacyBusinessPath(pathname)) return
     const url = new URL(window.location.href)
     const result = url.searchParams.get("instagram")
     if (!result) return
+    setOauthResult(result)
     if (result === "connected") toast.success(t("connectedToast"))
     else
       toast.error(
@@ -59,13 +67,14 @@ export function InstagramConnectionCard({
       )
     url.searchParams.delete("instagram")
     window.history.replaceState(
-      null,
+      window.history.state,
       "",
       `${url.pathname}${url.search}${url.hash}`,
     )
-  }, [t])
+  }, [pathname, t])
   async function connect() {
     setBusy(true)
+    setOauthResult(null)
     try {
       const response = await fetch(
         `/api/businesses/${businessId}/instagram/connect`,
@@ -186,6 +195,13 @@ export function InstagramConnectionCard({
       {loadError && (
         <p role="alert" className="mt-3 text-sm text-red-600">
           {t("errors.LOAD_FAILED")}
+        </p>
+      )}
+      {oauthResult && oauthResult !== "connected" && (
+        <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
+          {t.has(`errors.${oauthResult}`)
+            ? t(`errors.${oauthResult}`)
+            : t("errors.AUTH_FAILED")}
         </p>
       )}
     </section>

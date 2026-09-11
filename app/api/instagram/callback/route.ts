@@ -11,7 +11,7 @@ import {
 } from "@/lib/db/schema"
 import { getBusinessAccess } from "@/lib/business-access"
 import { getLocalizedAppPath } from "@/lib/site-urls"
-import { exchangeInstagramCode, instagramProfile } from "@/lib/instagram/api"
+import { exchangeInstagramCode, instagramProfile, InstagramApiError } from "@/lib/instagram/api"
 import { instagramConfig, instagramEnabled } from "@/lib/instagram/config"
 import { encryptInstagramToken, stateHash } from "@/lib/instagram/security"
 
@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     new URL(instagramConfig().redirectUri).origin,
   )
   let outcome = "AUTH_FAILED"
+  let stage = "access"
   try {
     if (!instagramEnabled(pending.businessId)) throw new Error("disabled")
     const access = await getBusinessAccess(session.user.id, pending.businessId)
@@ -43,8 +44,11 @@ export async function GET(request: Request) {
     }
     const code = url.searchParams.get("code")
     if (!code || code.length > 4096) throw new Error("missing code")
+    stage = "token_exchange"
     const token = await exchangeInstagramCode(code)
+    stage = "profile"
     const profile = await instagramProfile(token.access_token)
+    stage = "save_connection"
     await db.transaction(async (tx) => {
       await tx
         .select({ id: business.id })
@@ -110,6 +114,21 @@ export async function GET(request: Request) {
     const dbError = error as { code?: string; cause?: { code?: string } }
     if (dbError.code === "23505" || dbError.cause?.code === "23505")
       outcome = "ACCOUNT_ALREADY_CONNECTED"
+    // Log only bounded diagnostic metadata, never provider payloads or tokens.
+    console.warn("[instagram] OAuth connection failed", {
+      stage,
+      outcome,
+      ...(error instanceof InstagramApiError ? {
+        providerCode: error.code,
+        httpStatus: error.httpStatus,
+      } : {}),
+      ...(error instanceof Error && [
+        "INSTAGRAM_NOT_CONFIGURED", "INSTAGRAM_AUTH_FAILED",
+        "INSTAGRAM_PERMISSIONS_REQUIRED", "TimeoutError", "AbortError",
+      ].includes(error.message) ? { reason: error.message } : {}),
+      ...(/^[A-Z0-9]{5}$/.test(dbError.code || dbError.cause?.code || "")
+        ? { databaseCode: dbError.code || dbError.cause?.code } : {}),
+    })
   }
   destination.searchParams.set("instagram", outcome)
   return NextResponse.redirect(destination, {
