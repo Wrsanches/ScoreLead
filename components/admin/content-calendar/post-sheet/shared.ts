@@ -50,6 +50,7 @@ export function imageAspectClass(postType: ContentPostType): string {
 
 export function toLocalInputValue(iso: string): string {
   const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return "";
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -60,7 +61,7 @@ export function toLocalInputValue(iso: string): string {
 
 export function fromLocalInputValue(v: string): string {
   const d = new Date(v);
-  return d.toISOString();
+  return Number.isFinite(d.getTime()) ? d.toISOString() : "";
 }
 
 export function blank(draftDate: Date | null): PostFormValues {

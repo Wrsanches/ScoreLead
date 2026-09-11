@@ -1,3 +1,5 @@
+import { assertPostEditable, updateEditablePost, attachPublications } from "@/lib/instagram/data"
+import { withPublishingErrors } from "@/lib/instagram/http"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { business, contentPost } from "@/lib/db/schema"
@@ -18,7 +20,7 @@ const bodySchema = z.object({
   referenceKey: z.string().max(1024).optional(),
 })
 
-export async function POST(
+async function POSTHandler(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -62,6 +64,8 @@ export async function POST(
     if (referenceKey) await deleteObject(referenceKey)
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
+
+  await assertPostEditable(id)
 
   const [biz] = await db
     .select()
@@ -149,18 +153,14 @@ export async function POST(
     )
   }
 
-  await db
-    .update(contentPost)
-    .set({
-      images: result.slides,
-      updatedAt: new Date(),
-    })
-    .where(eq(contentPost.id, id))
+  await updateEditablePost(id, { images: result.slides })
 
   const [updated] = await db
     .select()
     .from(contentPost)
     .where(eq(contentPost.id, id))
 
-  return NextResponse.json({ post: updated, failures: result.failures })
+  return NextResponse.json({ post: (await attachPublications([updated]))[0], failures: result.failures })
 }
+
+export async function POST(...args: Parameters<typeof POSTHandler>) { return withPublishingErrors(() => POSTHandler(...args)) }

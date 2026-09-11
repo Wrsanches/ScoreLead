@@ -35,6 +35,7 @@ interface ImagePaneProps {
   ) => Promise<void>;
   /** Slot for the business product reference-image picker. */
   referenceSlot?: React.ReactNode;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function ImagePane({
@@ -48,8 +49,10 @@ export function ImagePane({
   onRegenerateSlide,
   onUploadSlide,
   referenceSlot,
+  onBusyChange,
 }: ImagePaneProps) {
   const t = useTranslations("contentCalendar");
+  const ti = useTranslations("instagram");
   const [generatingImage, setGeneratingImage] = useState(false);
   const [regeneratingSlideIndex, setRegeneratingSlideIndex] = useState<
     number | null
@@ -73,6 +76,9 @@ export function ImagePane({
   const aspectClass = imageAspectClass(postType);
   const isCarousel = postType === "carousel";
   const busy = generatingImage || regeneratingSlideIndex !== null;
+
+  useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
+  useEffect(() => () => onBusyChange?.(false), [onBusyChange]);
 
   async function handleGenerateImage() {
     if (generatingImage) return;
@@ -158,6 +164,21 @@ export function ImagePane({
             }
             onUpload={(file) => handleUploadSlide(clampedIndex, file)}
           />
+        )}
+
+        {onUploadSlide && (!hasImages || (isCarousel && images.length < 10)) && (
+          <div>
+            <input id={`upload-photo-${post.id}`} type="file" accept="image/png,image/jpeg,image/webp"
+              className="peer sr-only" disabled={busy}
+              onChange={event => {
+                const file = event.target.files?.[0]; event.target.value = "";
+                if (file) void handleUploadSlide(images.length, file);
+              }} />
+            <label htmlFor={`upload-photo-${post.id}`}
+              className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-500/40 px-3 py-2 text-sm font-semibold text-emerald-700 peer-disabled:cursor-wait peer-disabled:opacity-50 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 dark:text-emerald-400">
+              <ImagePlus className="size-4" />{hasImages ? ti("addPhoto") : ti("uploadPhoto")}
+            </label>
+          </div>
         )}
 
         {referenceSlot}

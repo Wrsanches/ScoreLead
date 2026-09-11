@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+import { publicationLocksPost } from "@/lib/instagram/status"
 import Image from "next/image"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
@@ -22,6 +24,8 @@ interface PostChipProps {
 }
 
 export function PostChip({ post, onSelect, compact = true, draggable = true }: PostChipProps) {
+  const t = useTranslations("instagram")
+  draggable = draggable && !publicationLocksPost(post.publication?.status)
   const pillar = getPillar(post.pillar)
   const Icon = POST_TYPE_ICON[post.postType] ?? Square
 
@@ -52,6 +56,16 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
       style={style}
       {...(draggable ? listeners : {})}
       {...(draggable ? attributes : {})}
+      {...(!draggable ? {
+        role: "button",
+        tabIndex: 0,
+        onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            onSelect?.(post.id)
+          }
+        },
+      } : {})}
       onClick={(e) => {
         e.stopPropagation()
         if (!isDragging) onSelect?.(post.id)
@@ -87,7 +101,11 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
         <span className="text-[11px] text-zinc-800 dark:text-zinc-200 truncate leading-tight flex-1">
           {hookLine}
         </span>
-        {approved && (
+        {post.publication && !["cancelled"].includes(post.publication.status) ? (
+          <span className={`text-[9px] shrink-0 ${post.publication.status === "failed" || post.publication.status === "needs_review" ? "text-amber-700 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-400"}`}>
+            {t(`status.${post.publication.status}`)}
+          </span>
+        ) : approved && (
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Approved" />
         )}
       </div>

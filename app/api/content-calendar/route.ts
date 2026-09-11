@@ -1,3 +1,4 @@
+import { attachPublications } from "@/lib/instagram/data"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPlanJob, contentPost } from "@/lib/db/schema"
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
   after(() => pumpContentPlanQueueIfDue())
 
   return NextResponse.json({
-    posts: rows,
+    posts: await attachPublications(rows),
     job: jobs[0] ? serializeJob(jobs[0]) : null,
     businessId: access.businessId,
     monthStart: start.toISOString(),

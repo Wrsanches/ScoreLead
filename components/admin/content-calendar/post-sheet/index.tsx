@@ -1,5 +1,8 @@
 "use client";
 
+import { PublicationPanel } from "./publication-panel";
+import { publicationLocksPost } from "@/lib/instagram/status";
+import type { PublicationView } from "@/lib/instagram/data";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Loader2, Sparkles, Trash2 } from "lucide-react";
@@ -25,7 +28,8 @@ interface PostSheetProps {
   businessId: string;
   post: ContentPostRow | null;
   draftDate: Date | null;
-  onSave: (values: PostFormValues) => Promise<void>;
+  onSave: (values: PostFormValues, keepOpen?: boolean) => Promise<ContentPostRow>;
+  onPublicationChange: (publication: PublicationView | null) => void;
   onDelete?: (id: string) => Promise<void>;
   onGenerateImage?: (
     postId: string,
@@ -70,6 +74,7 @@ function PostSheetBody({
   post,
   draftDate,
   onSave,
+  onPublicationChange,
   onDelete,
   onGenerateImage,
   onRegenerateSlide,
@@ -77,6 +82,10 @@ function PostSheetBody({
   readOnly = false,
 }: Omit<PostSheetProps, "open" | "onOpenChange">) {
   const t = useTranslations("contentCalendar");
+  const ti = useTranslations("instagram");
+  const [imageBusy, setImageBusy] = useState(false);
+  const [publishingBusy, setPublishingBusy] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [values, setValues] = useState<PostFormValues>(() =>
@@ -84,12 +93,16 @@ function PostSheetBody({
   );
 
   const isNew = !post;
+  const locked = readOnly || publishingBusy || publicationLocksPost(post?.publication?.status);
 
   async function handleSave() {
     if (saving) return;
     setSaving(true);
     try {
+      setFormError(null);
       await onSave(values);
+    } catch {
+      setFormError(ti("errors.SAVE_FAILED"));
     } finally {
       setSaving(false);
     }
@@ -100,6 +113,8 @@ function PostSheetBody({
     setDeleting(true);
     try {
       await onDelete(post.id);
+    } catch {
+      setFormError(ti("errors.SAVE_FAILED"));
     } finally {
       setDeleting(false);
     }
@@ -120,7 +135,7 @@ function PostSheetBody({
       <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[26rem_1fr]">
         {/* Left: live Instagram preview */}
         <div className="border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/20 px-5 py-6 lg:h-full lg:min-h-0 lg:overflow-y-auto">
-          {post && onGenerateImage && !readOnly ? (
+          {post && onGenerateImage && !locked ? (
             <ImagePane
               post={post}
               businessId={businessId}
@@ -131,6 +146,7 @@ function PostSheetBody({
               onGenerateImage={onGenerateImage}
               onRegenerateSlide={onRegenerateSlide}
               onUploadSlide={onUploadSlide}
+              onBusyChange={setImageBusy}
               referenceSlot={
                 <ReferenceImagePicker
                   postId={post.id}
@@ -155,7 +171,7 @@ function PostSheetBody({
                 imageFailures={[]}
                 onExpand={() => {}}
               />
-              {!readOnly && (
+              {!locked && (
                 <p className="mx-auto w-full max-w-sm text-center text-[11px] text-zinc-500 dark:text-zinc-600">
                   {t("imageAfterSaveHint")}
                 </p>
@@ -166,22 +182,25 @@ function PostSheetBody({
 
         {/* Right: compose controls */}
         <div className="px-5 py-6 lg:h-full lg:min-h-0 lg:overflow-y-auto">
-          <fieldset disabled={readOnly}>
+          <fieldset disabled={locked || saving || imageBusy}>
             <PostFormFields
               values={values}
               onChange={(patch) => setValues((v) => ({ ...v, ...patch }))}
             />
           </fieldset>
+          {formError && <p role="alert" className="mt-3 text-sm text-red-600">{formError}</p>}
+          <PublicationPanel post={post} values={values} businessId={businessId} readOnly={readOnly || saving || imageBusy}
+            onSave={onSave} onPublicationChange={onPublicationChange} onBusyChange={setPublishingBusy} />
         </div>
       </div>
 
-      {!readOnly && (
+      {!locked && (
       <div className="border-t border-zinc-200 dark:border-zinc-800 px-5 py-3 flex items-center gap-2">
         {!isNew && onDelete && (
           <button
             type="button"
             onClick={handleDelete}
-            disabled={deleting}
+            disabled={deleting || imageBusy}
             className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
           >
             {deleting ? (
@@ -195,7 +214,7 @@ function PostSheetBody({
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || imageBusy}
           className="ml-auto flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-xl transition-colors disabled:opacity-50"
         >
           {saving ? (

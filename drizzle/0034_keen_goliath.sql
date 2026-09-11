@@ -1,0 +1,2 @@
+DROP INDEX "instagram_connection_account_uidx";--> statement-breakpoint
+CREATE UNIQUE INDEX "instagram_connection_account_uidx" ON "instagram_connection" USING btree ("instagramUserId") WHERE "instagram_connection"."status" <> 'disconnected';

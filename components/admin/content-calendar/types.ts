@@ -1,3 +1,4 @@
+import type { PublicationView } from "@/lib/instagram/data"
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars"
 import type { ReferenceImagePref } from "@/lib/product-images"
 
@@ -16,6 +17,7 @@ export interface ContentPostRow {
   images: { url: string; headline: string; prompt: string }[] | null
   referenceImagePref: ReferenceImagePref | null
   status: "draft" | "approved"
+  publication?: PublicationView | null
   aiGenerated: boolean
   createdAt: string
   updatedAt: string

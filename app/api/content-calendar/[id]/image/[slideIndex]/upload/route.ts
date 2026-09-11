@@ -1,3 +1,5 @@
+import { assertPostEditable, updateEditablePost, attachPublications } from "@/lib/instagram/data"
+import { withPublishingErrors } from "@/lib/instagram/http"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPost } from "@/lib/db/schema"
@@ -14,7 +16,7 @@ import { getBusinessAccess } from "@/lib/business-access"
  * endpoint validates the resulting object key, persists its public URL onto
  * the post, and cleans up the previous image.
  */
-export async function POST(
+async function POSTHandler(
   request: Request,
   { params }: { params: Promise<{ id: string; slideIndex: string }> },
 ) {
@@ -40,6 +42,8 @@ export async function POST(
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
+  await assertPostEditable(id)
+
   const body = await request.json().catch(() => null)
   const key = body?.key
   const headline = body?.headline
@@ -63,10 +67,7 @@ export async function POST(
     prompt: "uploaded-by-user",
   }
 
-  await db
-    .update(contentPost)
-    .set({ images: nextImages, updatedAt: new Date() })
-    .where(eq(contentPost.id, id))
+  await updateEditablePost(id, { images: nextImages })
 
   // Best-effort cleanup of the image we just replaced.
   if (previous?.url) await removePublicImage(previous.url)
@@ -75,5 +76,7 @@ export async function POST(
     .select()
     .from(contentPost)
     .where(eq(contentPost.id, id))
-  return NextResponse.json({ post: updated })
+  return NextResponse.json({ post: (await attachPublications([updated]))[0] })
 }
+
+export async function POST(...args: Parameters<typeof POSTHandler>) { return withPublishingErrors(() => POSTHandler(...args)) }

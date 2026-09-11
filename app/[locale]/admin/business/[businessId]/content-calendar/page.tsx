@@ -24,6 +24,9 @@ import { CalendarEmptyState } from "@/components/admin/content-calendar/empty-st
 import type { ContentPostRow } from "@/components/admin/content-calendar/types";
 import type { ContentPlanJobView } from "@/lib/jobs/content-plan-queue";
 import { uploadImage } from "@/lib/upload-client";
+import { Link } from "@/i18n/routing";
+import { publicationLocksPost } from "@/lib/instagram/status";
+import type { PublicationView } from "@/lib/instagram/data";
 import { usePlan } from "@/components/admin/plan-context";
 
 function monthStartUtc(d: Date): Date {
@@ -40,6 +43,7 @@ function monthParam(d: Date): string {
 
 export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
+  const ti = useTranslations("instagram");
   const tb = useTranslations("billing");
   const locale = useLocale();
   const businessId = useBusinessId();
@@ -65,6 +69,7 @@ export default function ContentCalendarPage() {
    * in this component, so a reload picks the run back up mid-flight.
    */
   const [job, setJob] = useState<ContentPlanJobView | null>(null);
+  const publishing = posts.some(post => post.publication && ["scheduled", "publishing"].includes(post.publication.status));
   const generating = job?.status === "queued" || job?.status === "running";
   /** Job ids we have already surfaced, so the banner fires once per run. */
   const announcedJobRef = useRef<string | null>(null);
@@ -148,7 +153,7 @@ export default function ContentCalendarPage() {
   // returns the posts and the job together, so the finished plan lands in the
   // same response that reports completion.
   useEffect(() => {
-    if (!generating) return;
+    if (!generating && !publishing) return;
     const id = setInterval(() => {
       fetch(
         `/api/content-calendar?businessId=${businessId}&month=${monthParam(cursor)}`,
@@ -156,7 +161,9 @@ export default function ContentCalendarPage() {
         .then((r) => (r.ok ? r.json() : null))
         .then((body) => {
           if (!body) return;
-          setPosts((body.posts as ContentPostRow[]) ?? []);
+          const received = (body.posts as ContentPostRow[]) ?? [];
+          setPosts(received);
+          setEditingPost(previous => previous ? received.find(post => post.id === previous.id) ?? previous : null);
           const incoming = (body.job as ContentPlanJobView | null) ?? null;
           setJob(incoming);
           if (
@@ -174,7 +181,7 @@ export default function ContentCalendarPage() {
         .catch(() => {});
     }, 3000);
     return () => clearInterval(id);
-  }, [generating, businessId, cursor]);
+  }, [generating, publishing, businessId, cursor]);
 
   async function handleGenerate() {
     if (generating) return;
@@ -263,6 +270,7 @@ export default function ContentCalendarPage() {
   }
 
   async function handleReschedule(postId: string, newDate: Date) {
+    if (publicationLocksPost(posts.find(post => post.id === postId)?.publication?.status)) return;
     const previous = posts;
     setPosts((prev) =>
       prev.map((p) =>
@@ -295,54 +303,28 @@ export default function ContentCalendarPage() {
     setSheetOpen(true);
   }
 
-  async function handleSave(values: PostFormValues) {
-    if (editingPost) {
-      const previous = posts;
-      const optimistic: ContentPostRow = {
-        ...editingPost,
-        ...values,
-        pillar: values.pillar,
-        hashtags: values.hashtags,
-      };
-      setPosts((prev) =>
-        prev.map((p) => (p.id === editingPost.id ? optimistic : p)),
-      );
-      setSheetOpen(false);
-      try {
-        const res = await fetch(`/api/content-calendar/${editingPost.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
-        if (!res.ok) throw new Error("Failed");
-        const body = await res.json();
-        if (body.post) {
-          setPosts((prev) =>
-            prev.map((p) =>
-              p.id === editingPost.id ? (body.post as ContentPostRow) : p,
-            ),
-          );
-        }
-      } catch {
-        setPosts(previous);
-      }
-    } else {
-      setSheetOpen(false);
-      try {
-        const res = await fetch("/api/content-calendar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...values, businessId }),
-        });
-        if (!res.ok) throw new Error("Failed");
-        const body = await res.json();
-        if (body.post) {
-          setPosts((prev) => [...prev, body.post as ContentPostRow]);
-        }
-      } catch {
-        // noop
-      }
-    }
+  async function handleSave(values: PostFormValues, keepOpen = false): Promise<ContentPostRow> {
+    const response = await fetch(editingPost ? `/api/content-calendar/${editingPost.id}` : "/api/content-calendar", {
+      method: editingPost ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editingPost ? values : { ...values, businessId }),
+    });
+    const body = await response.json();
+    if (!response.ok || !body.post) throw new Error(body.code || "SAVE_FAILED");
+    const saved = body.post as ContentPostRow;
+    setPosts(previous => editingPost ? previous.map(post => post.id === saved.id ? saved : post) : [...previous, saved]);
+    setEditingPost(saved);
+    // Keep a new post open so the user can immediately upload its images.
+    if (editingPost && !keepOpen) setSheetOpen(false);
+    return saved;
+  }
+
+  function handlePublicationChange(publication: PublicationView | null) {
+    if (!editingPost) return;
+    const update = (post: ContentPostRow): ContentPostRow => ({ ...post, publication,
+      ...(publication?.status === "scheduled" ? { scheduledFor: publication.scheduledAt, status: "approved" as const } : {}) });
+    setPosts(previous => previous.map(post => post.id === editingPost.id ? update(post) : post));
+    setEditingPost(previous => previous ? update(previous) : previous);
   }
 
   async function handleGenerateImage(postId: string, referenceFile?: File) {
@@ -447,17 +429,10 @@ export default function ContentCalendarPage() {
   }
 
   async function handleDelete(id: string) {
+    const response = await fetch(`/api/content-calendar/${id}`, { method: "DELETE" });
+    if (!response.ok) throw new Error("SAVE_FAILED");
+    setPosts(previous => previous.filter(post => post.id !== id));
     setSheetOpen(false);
-    const previous = posts;
-    setPosts((prev) => prev.filter((p) => p.id !== id));
-    try {
-      const res = await fetch(`/api/content-calendar/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed");
-    } catch {
-      setPosts(previous);
-    }
   }
 
   const monthLabel = cursor.toLocaleString(undefined, {
@@ -472,6 +447,9 @@ export default function ContentCalendarPage() {
 
       <div className="flex-1 overflow-auto">
         <ContentWrapper>
+          <div className="mb-4 flex justify-end">
+            <Link href={`/admin/business/${businessId}/integrations`} className="text-sm text-emerald-700 underline underline-offset-4 dark:text-emerald-400">{ti("manageConnection")}</Link>
+          </div>
           {/* Sticky header: month nav + provider + generate */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
             <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/60 dark:bg-zinc-900/30 p-1">
@@ -619,6 +597,7 @@ export default function ContentCalendarPage() {
         post={editingPost}
         draftDate={draftDate}
         onSave={handleSave}
+        onPublicationChange={handlePublicationChange}
         onDelete={handleDelete}
         onGenerateImage={handleGenerateImage}
         onRegenerateSlide={handleRegenerateSlide}

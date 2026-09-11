@@ -1,3 +1,6 @@
+import { updateEditablePost, deleteEditablePost, attachPublications } from "@/lib/instagram/data"
+import { removePublicationImages } from "@/lib/instagram/media"
+import { withPublishingErrors } from "@/lib/instagram/http"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contentPost } from "@/lib/db/schema"
@@ -43,7 +46,7 @@ async function getManageablePost(actorUserId: string, postId: string) {
   return access && !access.readOnly ? post : null
 }
 
-export async function PATCH(
+async function PATCHHandler(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -63,7 +66,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
-  const update: Record<string, unknown> = { updatedAt: new Date() }
+  const update: Partial<typeof contentPost.$inferInsert> = { updatedAt: new Date() }
   const p = parsed.data
   if (p.scheduledFor !== undefined) update.scheduledFor = new Date(p.scheduledFor)
   if (p.postType !== undefined) update.postType = p.postType
@@ -76,17 +79,11 @@ export async function PATCH(
   if (p.referenceImagePref !== undefined)
     update.referenceImagePref = p.referenceImagePref
 
-  await db.update(contentPost).set(update).where(eq(contentPost.id, id))
-
-  const [updated] = await db
-    .select()
-    .from(contentPost)
-    .where(eq(contentPost.id, id))
-
-  return NextResponse.json({ post: updated })
+  const updated = await updateEditablePost(id, update)
+  return NextResponse.json({ post: (await attachPublications([updated]))[0] })
 }
 
-export async function DELETE(
+async function DELETEHandler(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -101,7 +98,11 @@ export async function DELETE(
   }
 
   const existingImages = existing.images ?? []
-  await db.delete(contentPost).where(eq(contentPost.id, id))
+  const publicationImages = await deleteEditablePost(id)
+  await removePublicationImages(publicationImages)
   await Promise.all(existingImages.map((img) => removePublicImage(img.url)))
   return NextResponse.json({ success: true })
 }
+
+export async function PATCH(...args: Parameters<typeof PATCHHandler>) { return withPublishingErrors(() => PATCHHandler(...args)) }
+export async function DELETE(...args: Parameters<typeof DELETEHandler>) { return withPublishingErrors(() => DELETEHandler(...args)) }

@@ -232,6 +232,20 @@
       "when": 1787704394880,
       "tag": "0032_hot_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1789154025807,
+      "tag": "0033_nervous_lightspeed",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1789154989559,
+      "tag": "0034_keen_goliath",
+      "breakpoints": true
     }
   ]
 }

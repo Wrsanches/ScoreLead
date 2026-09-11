@@ -547,6 +547,63 @@ export const contentPost = pgTable("content_post", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
 
+export const instagramConnection = pgTable("instagram_connection", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  instagramUserId: text("instagramUserId").notNull(),
+  oauthUserId: text("oauthUserId").notNull(),
+  username: text("username").notNull(),
+  accessTokenEncrypted: text("accessTokenEncrypted"),
+  status: text("status").notNull().default("connected"),
+  tokenExpiresAt: timestamp("tokenExpiresAt", { withTimezone: true }).notNull(),
+  refreshAfter: timestamp("refreshAfter", { withTimezone: true }).notNull(),
+  connectedAt: timestamp("connectedAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("instagram_connection_business_uidx").on(table.businessId),
+  uniqueIndex("instagram_connection_account_uidx").on(table.instagramUserId)
+    .where(sql`${table.status} <> 'disconnected'`),
+])
+
+export const instagramOAuthState = pgTable("instagram_oauth_state", {
+  hash: text("hash").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  locale: text("locale").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+})
+
+export type InstagramPublicationStatus = "scheduled" | "publishing" | "published" | "failed" | "cancelled" | "needs_review"
+
+/** Immutable publishing snapshot. Approval of a draft never schedules it. */
+export const instagramPublication = pgTable("instagram_publication", {
+  id: text("id").primaryKey(),
+  postId: text("postId").notNull().references(() => contentPost.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId").notNull().references(() => instagramConnection.id, { onDelete: "cascade" }),
+  status: text("status").$type<InstagramPublicationStatus>().notNull().default("scheduled"),
+  scheduledAt: timestamp("scheduledAt", { withTimezone: true }).notNull(),
+  timeZone: text("timeZone").notNull(),
+  caption: text("caption").notNull(),
+  mediaUrls: jsonb("mediaUrls").$type<string[]>().notNull(),
+  childContainerIds: jsonb("childContainerIds").$type<string[]>().notNull().default([]),
+  containerId: text("containerId"),
+  containerCreatedAt: timestamp("containerCreatedAt", { withTimezone: true }),
+  publishAttemptedAt: timestamp("publishAttemptedAt", { withTimezone: true }),
+  instagramMediaId: text("instagramMediaId"),
+  permalink: text("permalink"),
+  publishedAt: timestamp("publishedAt", { withTimezone: true }),
+  errorCode: text("errorCode"),
+  attempts: integer("attempts").notNull().default(0),
+  nextAttemptAt: timestamp("nextAttemptAt", { withTimezone: true }).notNull(),
+  leaseToken: text("leaseToken"),
+  leaseExpiresAt: timestamp("leaseExpiresAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("instagram_publication_post_uidx").on(table.postId),
+  index("instagram_publication_queue_idx").on(table.status, table.nextAttemptAt),
+])
+
 /**
  * Durable job row for AI content-plan generation.
  *

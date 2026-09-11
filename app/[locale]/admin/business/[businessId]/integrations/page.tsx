@@ -1,5 +1,6 @@
 "use client"
 
+import { InstagramConnectionCard } from "@/components/admin/instagram-connection-card"
 import Script from "next/script"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
@@ -80,6 +81,7 @@ const WHATSAPP_INTEGRATION_CONFIGURED =
 
 export default function IntegrationsPage() {
   const t = useTranslations("whatsapp")
+  const ti = useTranslations("instagram")
   const td = useTranslations("dashboard")
   const { can: planCan, openUpgrade } = usePlan()
   const { businessId, readOnly } = useBusinessAccess()
@@ -367,10 +369,12 @@ export default function IntegrationsPage() {
       <ContentWrapper>
         <PageHeader
           variant="hero"
-          title={t("title")}
-          description={integrationEnabled ? t("description") : t("comingSoonPageDescription")}
-          breadcrumbs={[{ label: td("businessPage"), href: "/admin/profile" }, { label: t("title") }]}
+          title={ti("integrationsTitle")}
+          description={ti("integrationsDescription")}
+          breadcrumbs={[{ label: td("businessPage"), href: "/admin/profile" }, { label: ti("integrationsTitle") }]}
         />
+
+        <InstagramConnectionCard businessId={businessId} readOnly={readOnly} />
 
         {!integrationEnabled ? (
           <section

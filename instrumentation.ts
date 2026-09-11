@@ -30,6 +30,20 @@ export async function register() {
       console.error("[instrumentation] queue pump setup failed:", error)
     }
 
+    // The scheduler runs independently of browser traffic on Railway. Postgres
+    // leases protect each publication when several replicas are running.
+    if (process.env.INSTAGRAM_INTEGRATION_ENABLED === "true") {
+      const timers = globalThis as { __instagramPumpTimer?: ReturnType<typeof setInterval> }
+      if (!timers.__instagramPumpTimer) {
+        const pump = () => import("@/lib/jobs/instagram-queue")
+          .then(({ processInstagramQueue }) => processInstagramQueue())
+          .catch(() => console.error("[instagram] Queue pump failed; will retry"))
+        void pump()
+        timers.__instagramPumpTimer = setInterval(pump, 30_000)
+        timers.__instagramPumpTimer.unref?.()
+      }
+    }
+
     // Search-engine notification must never delay process readiness. Guard it
     // per process because instrumentation can register more than once in dev.
     const g = globalThis as { __indexNowStartupSubmitted?: boolean }
