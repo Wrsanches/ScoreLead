@@ -247,3 +247,13 @@ export async function sendTemplateMessage(input: {
   }
   return { messageId }
 }
+
+export async function sendTextMessage(input: { phoneNumberId: string; accessToken: string; toE164: string; text: string; replyTo: string }): Promise<{ messageId: string }> {
+  if (!input.text.trim() || input.text.length > 4096) throw new Error("Invalid WhatsApp reply")
+  const result = await graphRequest<{ messages?: Array<{ id?: string }> }>(`${input.phoneNumberId}/messages`, input.accessToken, {
+    method: "POST", body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: input.toE164.replace(/^\+/, ""), type: "text", text: { body: input.text }, context: { message_id: input.replyTo } }),
+  })
+  const messageId = result.messages?.[0]?.id
+  if (!messageId) throw new MetaGraphError("Meta accepted no message identifier", 502, null, null)
+  return { messageId }
+}

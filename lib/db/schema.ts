@@ -547,6 +547,83 @@ export const contentPost = pgTable("content_post", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
 
+/** Each business owns its repository grant, indexed snapshot and assistant policy. */
+export const supportAssistant = pgTable("support_assistant", {
+  businessId: text("businessId").primaryKey().references(() => business.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").notNull().default(false),
+  version: integer("version").notNull().default(0),
+  instructions: text("instructions").notNull().default(""),
+  handoffMessage: text("handoffMessage").notNull().default("Vou encaminhar sua pergunta para a equipe de atendimento."),
+  repository: text("repository"),
+  repositoryId: text("repositoryId"),
+  installationId: text("installationId"),
+  githubUserId: text("githubUserId"),
+  branch: text("branch"),
+  includePaths: jsonb("includePaths").$type<string[]>().notNull().default(["README.md", "docs/"]),
+  grantToken: text("grantToken"),
+  grantUserId: text("grantUserId"),
+  grantGithubUserId: text("grantGithubUserId"),
+  grantExpiresAt: timestamp("grantExpiresAt"),
+  status: text("status").notNull().default("disconnected"),
+  syncRequestedAt: timestamp("syncRequestedAt"),
+  syncStartedAt: timestamp("syncStartedAt"),
+  syncToken: text("syncToken"),
+  snapshotSha: text("snapshotSha"),
+  snapshotPaths: jsonb("snapshotPaths").$type<string[]>().notNull().default([]),
+  skippedFiles: integer("skippedFiles").notNull().default(0),
+  vectorStoreId: text("vectorStoreId"),
+  fileId: text("fileId"),
+  lastSyncedAt: timestamp("lastSyncedAt"),
+  errorCode: text("errorCode"),
+  previewedVersion: integer("previewedVersion"),
+  lastPreviewAt: timestamp("lastPreviewAt"),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [index("support_assistant_installation_idx").on(table.installationId)])
+
+export const supportGithubState = pgTable("support_github_state", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  verifier: text("verifier").notNull(),
+  locale: text("locale").notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+})
+
+export const supportGithubDelivery = pgTable("support_github_delivery", {
+  id: text("id").primaryKey(),
+  receivedAt: timestamp("receivedAt").notNull().defaultNow(),
+})
+
+export const supportArtifactCleanup = pgTable("support_artifact_cleanup", {
+  id: text("id").primaryKey(),
+  vectorStoreId: text("vectorStoreId"),
+  fileId: text("fileId"),
+  deleteAfter: timestamp("deleteAfter").notNull().defaultNow(),
+})
+
+export const supportConversation = pgTable("support_conversation", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId").notNull().references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  phone: text("phone").notNull(),
+  mode: text("mode").notNull().default("bot"),
+  lastMessageAt: timestamp("lastMessageAt").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+}, (table) => [uniqueIndex("support_conversation_recipient_uidx").on(table.connectionId, table.phone)])
+
+export const supportReply = pgTable("support_reply", {
+  id: text("id").primaryKey(),
+  conversationId: text("conversationId").notNull().references(() => supportConversation.id, { onDelete: "cascade" }),
+  inboundId: text("inboundId").notNull().references(() => whatsappInboundMessage.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("queued"),
+  body: text("body"),
+  handoff: boolean("handoff").notNull().default(false),
+  metaMessageId: text("metaMessageId"),
+  errorCode: text("errorCode"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [uniqueIndex("support_reply_inbound_uidx").on(table.inboundId), index("support_reply_queue_idx").on(table.status, table.createdAt)])
+
 export const instagramConnection = pgTable("instagram_connection", {
   id: text("id").primaryKey(),
   businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),

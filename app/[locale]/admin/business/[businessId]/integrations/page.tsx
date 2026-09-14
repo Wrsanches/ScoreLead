@@ -1,6 +1,7 @@
 "use client"
 
 import { InstagramConnectionCard } from "@/components/admin/instagram-connection-card"
+import { SupportAssistantCard } from "@/components/admin/support-assistant-card"
 import Script from "next/script"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
@@ -375,6 +376,8 @@ export default function IntegrationsPage() {
         />
 
         <InstagramConnectionCard businessId={businessId} readOnly={readOnly} />
+
+        {!readOnly && <SupportAssistantCard key={businessId} businessId={businessId} readOnly={false} />}
 
         {!integrationEnabled ? (
           <section

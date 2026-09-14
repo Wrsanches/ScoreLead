@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server"
+import { after, NextResponse } from "next/server"
 import { verifyMetaWebhookSignature } from "@/lib/whatsapp/security"
 import { processWhatsAppWebhook } from "@/lib/whatsapp/webhooks"
 import type { WhatsAppWebhookPayload } from "@/lib/whatsapp/types"
+import { processSupportReplies } from "@/lib/support/queue"
 
-export const maxDuration = 60
+export const maxDuration = 120
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -33,5 +34,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
   await processWhatsAppWebhook(payload)
+  after(() => processSupportReplies())
   return NextResponse.json({ ok: true })
 }

@@ -17,6 +17,8 @@ import {
   pauseWhatsAppSequencesForReply,
 } from "@/lib/whatsapp/sequences"
 import type { WhatsAppWebhookPayload } from "@/lib/whatsapp/types"
+import { enqueueSupportReply } from "@/lib/support/queue"
+import { supportReply, supportConversation } from "@/lib/db/schema"
 
 const OPT_OUT_WORDS = new Set([
   "STOP",
@@ -77,7 +79,8 @@ async function handleInbound(connection: typeof whatsappConnection.$inferSelect,
     ))
     .orderBy(desc(whatsappSequence.createdAt))
     .limit(1)
-  const [inserted] = await db
+  const inserted = await db.transaction(async (tx) => {
+    const [saved] = await tx
     .insert(whatsappInboundMessage)
     .values({
       id: randomUUID(),
@@ -91,6 +94,12 @@ async function handleInbound(connection: typeof whatsappConnection.$inferSelect,
     })
     .onConflictDoNothing({ target: whatsappInboundMessage.metaMessageId })
     .returning({ id: whatsappInboundMessage.id })
+    if (saved) await enqueueSupportReply(tx, {
+      businessId: connection.businessId, connectionId: connection.id, inboundId: saved.id,
+      phone: from, receivedAt: timestamp(message.timestamp), text: textBody, optedOut: isWhatsAppOptOut(textBody),
+    })
+    return saved
+  })
   if (!inserted) return
 
   const optedOut = isWhatsAppOptOut(textBody)
@@ -147,7 +156,13 @@ async function handleStatus(status: Record<string, unknown>) {
     .select()
     .from(whatsappSequenceStep)
     .where(eq(whatsappSequenceStep.metaMessageId, messageId))
-  if (!step) return
+  if (!step) {
+    if (state === "failed") {
+      const [reply] = await db.update(supportReply).set({ status: "needs_review", errorCode: "delivery_failed", updatedAt: new Date() }).where(eq(supportReply.metaMessageId, messageId)).returning()
+      if (reply) await db.update(supportConversation).set({ mode: "human" }).where(eq(supportConversation.id, reply.conversationId))
+    }
+    return
+  }
   const rank: Record<string, number> = { accepted: 0, sent: 1, delivered: 2, read: 3 }
   if (state !== "failed" && (rank[step.status] ?? -1) >= (rank[state] ?? -1)) return
   const errors = Array.isArray(status.errors) ? status.errors : []

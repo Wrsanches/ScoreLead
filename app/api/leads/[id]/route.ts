@@ -9,7 +9,7 @@ import { getBusinessAccess } from "@/lib/business-access"
 import { getManageableLead } from "@/lib/whatsapp/data"
 
 /** Allowed lead statuses. Must match STATUS_CONFIG on the client. */
-export const LEAD_STATUSES = [
+const LEAD_STATUSES = [
   "new",
   "contacted",
   "interested",
