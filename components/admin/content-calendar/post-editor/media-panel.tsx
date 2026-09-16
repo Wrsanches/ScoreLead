@@ -4,21 +4,35 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   AlertCircle,
-  ChevronDown,
+  ChevronRight,
   ImagePlus,
   Images,
   Loader2,
   RefreshCw,
-  Sparkles,
+  SlidersHorizontal,
   Upload,
   Wand2,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { ContentPostRow } from "../types";
 import { ReferenceImagePicker } from "../reference-image-picker";
 import { type PostFormValues, fieldClass, imageAspectClass } from "./shared";
@@ -43,7 +57,7 @@ interface MediaPanelProps {
 }
 
 const toolButtonClass =
-  "glass-pill inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-300";
+  "glass-pill inline-flex h-8 items-center justify-center gap-1 rounded-lg px-2 text-[11px] font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-300";
 
 /**
  * Instagram preview plus everything that changes its images: AI generation,
@@ -70,6 +84,7 @@ export function MediaPanel({
   const [refsOpen, setRefsOpen] = useState(false);
   const [generationReference, setGenerationReference] = useState<File | null>(null);
   const [refineOpen, setRefineOpen] = useState(false);
+  const [redoOpen, setRedoOpen] = useState(false);
   const [refinementPrompt, setRefinementPrompt] = useState("");
   const [refineReference, setRefineReference] = useState<File | null>(null);
   const addInputRef = useRef<HTMLInputElement | null>(null);
@@ -153,24 +168,31 @@ export function MediaPanel({
   const canAddPhoto = !hasImages || (isCarousel && images.length < 10);
 
   return (
-    <div className="space-y-4">
+    // On laptop and larger screens the column is pinned and sized to the
+    // viewport: the Instagram card scales down (via --preview-w) until the
+    // whole post fits below the header, and only the tools under it scroll.
+    // Card height is roughly width * 1.25 (4:5 media) + 7rem of chrome, and
+    // the compact tool stack below needs about 11rem, so
+    // width <= (100vh - 26rem) * 0.8. The overflow on the tools is only a
+    // fallback for the expanded refine box or an error message.
+    <div className="flex flex-col gap-3 [--preview-w:24rem] lg:h-[calc(100vh-7.5rem)] lg:[--preview-w:clamp(15rem,calc((100vh-26rem)*0.8),24rem)]">
+      <div className="shrink-0">
       <InstagramPreview
         businessId={businessId}
+        postId={post?.id ?? null}
         images={images}
         index={clamped}
         onIndexChange={setSlideIndex}
-        caption={values.caption}
-        hashtags={values.hashtags}
         postType={values.postType}
-        scheduledFor={values.scheduledFor}
         generating={generating}
         regeneratingIndex={regeneratingIndex}
         imageFailures={failures}
         onExpand={() => setViewerOpen(true)}
       />
+      </div>
 
       {!locked && (
-        <div className="mx-auto w-full max-w-sm space-y-3">
+        <div className="mx-auto w-full max-w-[var(--preview-w,24rem)] space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-1">
           {/* Two ways to get an image: let the AI design one, or use your own. */}
           <div className={`grid gap-2 ${canAddPhoto ? "grid-cols-2" : "grid-cols-1"}`}>
             <div className="min-w-0">
@@ -178,7 +200,7 @@ export function MediaPanel({
                 type="button"
                 onClick={handleGenerate}
                 disabled={busy}
-                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-500/10 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-500/10 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {generating ? (
                   <>
@@ -204,7 +226,7 @@ export function MediaPanel({
                   </>
                 )}
               </button>
-              <p className="mt-1.5 text-center text-[10px] leading-4 text-zinc-500">
+              <p className="mt-1 text-center text-[10px] leading-4 text-zinc-500">
                 {t("generateHint")}
               </p>
             </div>
@@ -214,14 +236,14 @@ export function MediaPanel({
                   type="button"
                   onClick={() => addInputRef.current?.click()}
                   disabled={busy}
-                  className="glass-pill inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-3 text-sm font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-300"
+                  className="glass-pill inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl px-3 text-sm font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-300"
                 >
                   <ImagePlus className="size-4 shrink-0" aria-hidden="true" />
                   <span className="truncate">
                     {hasImages ? t("addMyPhoto") : t("useMyPhoto")}
                   </span>
                 </button>
-                <p className="mt-1.5 text-center text-[10px] leading-4 text-zinc-500">
+                <p className="mt-1 text-center text-[10px] leading-4 text-zinc-500">
                   {t("useMyPhotoHint")}
                 </p>
                 <input
@@ -241,14 +263,15 @@ export function MediaPanel({
 
           {/* Per-slide tools */}
           {hasImages && !generating && (
-            <div className="surface-card rounded-xl p-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="surface-card rounded-xl p-2 pl-3">
+              <div className="flex items-center justify-between gap-2">
+              <p className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                 {t("slideTools", { n: clamped + 1, total: images.length })}
               </p>
-              <div className="mt-2 grid grid-cols-3 gap-1.5">
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => handleRegenerate(clamped)}
+                  onClick={() => setRedoOpen(true)}
                   disabled={busy}
                   className={toolButtonClass}
                 >
@@ -261,12 +284,12 @@ export function MediaPanel({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRefineOpen((open) => !open)}
+                  onClick={() => setRefineOpen(true)}
                   disabled={busy}
-                  aria-expanded={refineOpen}
-                  className={`${toolButtonClass} ${refineOpen ? "ring-1 ring-emerald-500/40 text-emerald-700 dark:text-emerald-300" : ""}`}
+                  aria-haspopup="dialog"
+                  className={toolButtonClass}
                 >
-                  <Sparkles className="size-3.5" aria-hidden="true" />
+                  <SlidersHorizontal className="size-3.5" aria-hidden="true" />
                   {t("refineSlide")}
                 </button>
                 <button
@@ -291,113 +314,40 @@ export function MediaPanel({
                   }}
                 />
               </div>
+              </div>
 
-              {refineOpen && (
-                <div className="mt-3 space-y-2">
-                  <textarea
-                    value={refinementPrompt}
-                    onChange={(e) => setRefinementPrompt(e.target.value.slice(0, 500))}
-                    placeholder={t("refinePlaceholder")}
-                    rows={3}
-                    autoFocus
-                    className={`${fieldClass} resize-none text-xs`}
-                  />
-                  <FileAttachRow
-                    file={refineReference}
-                    inputRef={refineRefInputRef}
-                    label={t("refineReference")}
-                    onPick={setRefineReference}
-                    disabled={busy}
-                    attachLabel={t("attachReference")}
-                    replaceLabel={t("replaceReference")}
-                    removeLabel={t("removeReference")}
-                  />
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={applyRefinement}
-                      disabled={busy || (!refinementPrompt.trim() && !refineReference)}
-                      className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 text-xs font-semibold text-zinc-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <Wand2 className="size-3.5" aria-hidden="true" />
-                      {t("applyRefinement")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRefineOpen(false);
-                        setRefinementPrompt("");
-                        setRefineReference(null);
-                      }}
-                      className="glass-hover h-9 rounded-lg px-3 text-xs text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                    >
-                      {t("cancel")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
-          {/* References */}
-          <Collapsible open={refsOpen} onOpenChange={setRefsOpen}>
-            <div className="surface-card rounded-xl">
-              <CollapsibleTrigger asChild>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between gap-3 rounded-xl p-3 text-left"
-                >
-                  <span className="flex min-w-0 items-start gap-2.5">
-                    {/* Source photos the AI draws from, tinted violet so it reads
-                        as an input rather than as the emerald generate action. */}
-                    <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/25 dark:text-violet-300">
-                      <Images className="size-4" strokeWidth={1.75} aria-hidden="true" />
+          {/* References: a compact row here, the controls live in a dialog. */}
+          <button
+            type="button"
+            onClick={() => setRefsOpen(true)}
+            aria-haspopup="dialog"
+            className="surface-card flex w-full items-center justify-between gap-3 rounded-xl p-2.5 text-left transition-[filter] hover:brightness-110"
+          >
+            <span className="flex min-w-0 items-center gap-2.5">
+              {/* Source photos the AI draws from, tinted violet so it reads
+                  as an input rather than as the emerald generate action. */}
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/25 dark:text-violet-300">
+                <Images className="size-4" strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="flex items-center gap-2 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                  {t("references")}
+                  {generationReference ? (
+                    <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 ring-1 ring-emerald-500/20 dark:text-emerald-300">
+                      {t("referencePending")}
                     </span>
-                    <span className="min-w-0">
-                      <span className="flex items-center gap-2 text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                        {t("references")}
-                        {generationReference ? (
-                          <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 ring-1 ring-emerald-500/20 dark:text-emerald-300">
-                            {t("referencePending")}
-                          </span>
-                        ) : null}
-                      </span>
-                      <span className="mt-0.5 block text-[11px] leading-snug text-zinc-500">
-                        {t("referencesHint")}
-                      </span>
-                    </span>
-                  </span>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-zinc-500 transition-transform ${refsOpen ? "rotate-180" : ""}`}
-                    aria-hidden="true"
-                  />
-                </button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="space-y-4 px-3 pb-3">
-                  {post ? (
-                    <ReferenceImagePicker
-                      key={post.id}
-                      postId={post.id}
-                      businessId={businessId}
-                      initialPref={post.referenceImagePref}
-                    />
                   ) : null}
-                  <FileAttachRow
-                    file={generationReference}
-                    inputRef={generationRefInputRef}
-                    label={t("generationReference")}
-                    hint={t("generationReferenceHint")}
-                    onPick={setGenerationReference}
-                    disabled={busy}
-                    attachLabel={t("attachReference")}
-                    replaceLabel={t("replaceReference")}
-                    removeLabel={t("removeReference")}
-                  />
-                </div>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] leading-snug text-zinc-500">
+                  {t("referencesHint")}
+                </span>
+              </span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-zinc-500" aria-hidden="true" />
+          </button>
 
           {failures.length > 0 && (
             <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-2.5 text-[11px] text-red-700 dark:text-red-300">
@@ -415,9 +365,146 @@ export function MediaPanel({
         </div>
       )}
 
+      <Dialog open={refsOpen} onOpenChange={setRefsOpen}>
+        <DialogContent className="glass-strong rounded-2xl border-transparent sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2.5">
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/25 dark:text-violet-300">
+                <Images className="size-4" strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              {t("references")}
+            </DialogTitle>
+            <DialogDescription>{t("referencesHint")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-5">
+            {post ? (
+              <ReferenceImagePicker
+                key={post.id}
+                postId={post.id}
+                businessId={businessId}
+                initialPref={post.referenceImagePref}
+              />
+            ) : null}
+            <FileAttachRow
+              file={generationReference}
+              inputRef={generationRefInputRef}
+              label={t("generationReference")}
+              hint={t("generationReferenceHint")}
+              onPick={setGenerationReference}
+              disabled={busy}
+              attachLabel={t("attachReference")}
+              replaceLabel={t("replaceReference")}
+              removeLabel={t("removeReference")}
+            />
+          </div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setRefsOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
+            >
+              {t("done")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={redoOpen} onOpenChange={setRedoOpen}>
+        <AlertDialogContent className="glass-strong rounded-2xl border-transparent">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("redoConfirmTitle", { n: clamped + 1 })}</AlertDialogTitle>
+            <AlertDialogDescription>{t("redoConfirmBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setRedoOpen(false);
+                handleRegenerate(clamped);
+              }}
+              className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+            >
+              {t("redoConfirmAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={refineOpen}
+        onOpenChange={(open) => {
+          setRefineOpen(open);
+          if (!open) {
+            setRefinementPrompt("");
+            setRefineReference(null);
+          }
+        }}
+      >
+        <DialogContent className="glass-strong rounded-2xl border-transparent sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("refineSlideLabel", { n: clamped + 1 })}</DialogTitle>
+            <DialogDescription>{t("refineDialogHint")}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 sm:grid-cols-[7rem_minmax(0,1fr)]">
+            {images[clamped] ? (
+              <div className="relative hidden aspect-[4/5] overflow-hidden rounded-xl bg-zinc-900 ring-1 ring-white/[0.08] sm:block">
+                <Image
+                  src={images[clamped].url}
+                  alt={images[clamped].headline}
+                  fill
+                  sizes="112px"
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            ) : null}
+            <div className="space-y-3">
+              <textarea
+                value={refinementPrompt}
+                onChange={(e) => setRefinementPrompt(e.target.value.slice(0, 500))}
+                placeholder={t("refinePlaceholder")}
+                rows={5}
+                autoFocus
+                className={`${fieldClass} resize-none`}
+              />
+              <FileAttachRow
+                file={refineReference}
+                inputRef={refineRefInputRef}
+                label={t("refineReference")}
+                hint={t("refineReferenceHint")}
+                onPick={setRefineReference}
+                disabled={busy}
+                attachLabel={t("attachReference")}
+                replaceLabel={t("replaceReference")}
+                removeLabel={t("removeReference")}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setRefineOpen(false)}
+              className="glass-hover inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={applyRefinement}
+              disabled={busy || (!refinementPrompt.trim() && !refineReference)}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Wand2 className="size-4" aria-hidden="true" />
+              {t("applyRefinement")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <ImageViewerDialog
         open={viewerOpen}
         onOpenChange={setViewerOpen}
+        postId={post?.id ?? null}
         images={images}
         index={clamped}
         onIndexChange={setSlideIndex}

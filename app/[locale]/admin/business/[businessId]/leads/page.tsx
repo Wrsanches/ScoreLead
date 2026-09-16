@@ -282,7 +282,7 @@ export default function LeadsPage() {
       )}
 
       {/* Lead list */}
-      <div className="w-full sm:w-85 h-full bg-zinc-50/60 dark:bg-white/[0.03] border-r border-zinc-200 dark:border-white/[0.08] flex flex-col shrink-0">
+      <div className="w-full sm:w-85 h-full border-r border-zinc-200 dark:border-white/[0.08] flex flex-col shrink-0">
         <div className="px-4 h-18 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileMenuButton />
@@ -577,7 +577,7 @@ export default function LeadsPage() {
 
       {/* Detail panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full bg-zinc-50/60 dark:bg-white/[0.03] flex flex-col overflow-hidden transition-transform duration-200 ease-out sm:relative sm:flex sm:flex-1 sm:translate-x-0 ${
+        className={`fixed inset-y-0 right-0 z-50 w-full bg-[var(--glass-canvas)] flex flex-col overflow-hidden transition-transform duration-200 ease-out sm:relative sm:flex sm:flex-1 sm:translate-x-0 sm:bg-transparent ${
           detailOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -619,7 +619,7 @@ export default function LeadsPage() {
           </div>
         ) : (
           <>
-            <div className="px-4 sm:px-5 h-18 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between shrink-0 bg-white/80 dark:bg-black/25 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+            <div className="px-4 sm:px-5 h-18 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setDetailOpen(false)}

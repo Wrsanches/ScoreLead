@@ -550,7 +550,7 @@ export function PostEditor({
                   />
                 </div>
 
-                <aside className="min-w-0 lg:sticky lg:top-0 lg:self-start">
+                <aside className="min-w-0 lg:sticky lg:top-6 lg:self-start">
                   <MediaPanel
                     post={post}
                     businessId={businessId}

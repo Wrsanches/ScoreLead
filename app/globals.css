@@ -288,14 +288,19 @@ select:-webkit-autofill:focus {
   }
 }
 
-/* Ambient canvas the glass refracts. Soft, slow, low-chroma light. */
+/* Ambient canvas the glass refracts. Soft, slow, low-chroma light. Painted
+   once on the full-screen admin root, which never scrolls, so the gradient
+   needs no fixed attachment. (Fixed attachment under composited children such
+   as backdrop-filter panels made browsers paint the gradient per layer, which
+   showed up as a colour seam between the sidebar margin and the content.) */
 @utility glass-canvas {
   background-color: var(--glass-canvas);
   background-image:
     radial-gradient(ellipse 55% 45% at 8% 0%, var(--glass-blob-1), transparent 62%),
     radial-gradient(ellipse 50% 55% at 100% 100%, var(--glass-blob-2), transparent 60%),
     radial-gradient(ellipse 35% 30% at 70% 15%, var(--glass-blob-3), transparent 60%);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 /* Ambient canvas for marketing pages: same light sources as the homepage,

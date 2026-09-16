@@ -168,6 +168,21 @@ export async function deleteObject(key: string): Promise<void> {
 }
 
 /** Read an object back as base64 (used to feed Gemini image-edit mode). */
+export async function getObjectBytes(
+  key: string,
+): Promise<{ bytes: Uint8Array; contentType: string } | null> {
+  try {
+    const res = await getS3().send(
+      new GetObjectCommand({ Bucket: getBucket(), Key: key }),
+    )
+    const bytes = await res.Body?.transformToByteArray()
+    if (!bytes) return null
+    return { bytes, contentType: res.ContentType || "application/octet-stream" }
+  } catch {
+    return null
+  }
+}
+
 export async function getObjectBase64(key: string): Promise<string | null> {
   try {
     const res = await getS3().send(

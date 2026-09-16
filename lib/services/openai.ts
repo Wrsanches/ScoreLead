@@ -14,6 +14,8 @@ export interface BusinessProfile {
   field: string
   category: string
   tags: string[]
+  /** Main services or products inferred from the site; may be empty. */
+  services?: string[]
   language: string
 }
 

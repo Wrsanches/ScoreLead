@@ -42,7 +42,7 @@ export function StepWelcome({ userName, onContinue }: StepWelcomeProps) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={onContinue}
-        className="group relative px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center gap-3 shadow-lg shadow-emerald-500/20"
+        className="group relative px-8 py-3.5 press bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center gap-3 shadow-lg shadow-emerald-500/20"
       >
         {t("welcomeCta")}
         <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />

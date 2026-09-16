@@ -99,3 +99,24 @@ export function fromPost(post: ContentPostRow): PostFormValues {
     status: post.status,
   };
 }
+
+/**
+ * Downloads a slide through the same-origin proxy route and saves it with the
+ * server-provided filename. Done via fetch + blob rather than an <a download>
+ * so the click never looks like a navigation to the page's top loader.
+ */
+export async function downloadSlide(postId: string, slideIndex: number): Promise<void> {
+  const response = await fetch(
+    `/api/content-calendar/${postId}/image/${slideIndex}/download`,
+  );
+  if (!response.ok) throw new Error("DOWNLOAD_FAILED");
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const filename =
+    /filename="([^"]+)"/.exec(disposition)?.[1] ?? `slide-${slideIndex + 1}.png`;
+  const blobUrl = URL.createObjectURL(await response.blob());
+  const anchor = document.createElement("a");
+  anchor.href = blobUrl;
+  anchor.download = filename;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000);
+}

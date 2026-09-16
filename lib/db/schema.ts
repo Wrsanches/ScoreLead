@@ -31,6 +31,8 @@ export const user = pgTable("user", {
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
   stripeCustomerId: text("stripeCustomerId"),
+  /** IANA zone (e.g. "America/Sao_Paulo"), synced from the browser once and editable in Settings. */
+  timezone: text("timezone"),
   notificationPreferences: jsonb("notificationPreferences")
     .$type<NotificationPreferences>()
     .notNull()

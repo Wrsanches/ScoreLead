@@ -97,7 +97,7 @@ export function StepMoreLinks({ defaultValues, onSubmit, onBack, onSkip }: StepM
                 id={name}
                 type="url"
                 placeholder={placeholder}
-                className="w-full pl-11 pr-10 py-3.5 bg-zinc-800/20 border border-zinc-800/80 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
+                className="w-full pl-11 pr-10 py-3.5 surface-card border border-transparent rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 transition-all duration-200"
               />
               {watch(name)?.trim() && !errors[name] && (
                 <motion.div
@@ -135,7 +135,7 @@ export function StepMoreLinks({ defaultValues, onSubmit, onBack, onSkip }: StepM
               type="submit"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
+              className="flex-1 py-3 press bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
             >
               {t("continue")}
               <ArrowRight className="w-4 h-4" />

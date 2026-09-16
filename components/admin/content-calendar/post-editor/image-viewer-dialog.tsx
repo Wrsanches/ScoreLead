@@ -2,7 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Download, Loader2, X } from "lucide-react";
+import { downloadSlide } from "./shared";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,8 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 interface ImageViewerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Saved post id; enables the same-origin download link. */
+  postId?: string | null;
   images: { url: string; headline: string }[];
   index: number;
   onIndexChange: (index: number) => void;
@@ -23,6 +27,7 @@ interface ImageViewerDialogProps {
 export function ImageViewerDialog({
   open,
   onOpenChange,
+  postId,
   images,
   index,
   onIndexChange,
@@ -30,21 +35,22 @@ export function ImageViewerDialog({
 }: ImageViewerDialogProps) {
   const t = useTranslations("contentCalendar");
   const currentImage = images[index] ?? null;
+  const [downloading, setDownloading] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="p-0 max-w-3xl"
+        className="w-auto max-w-[calc(100vw-2rem)] overflow-hidden p-0 sm:max-w-[calc(100vw-2rem)]"
       >
         <VisuallyHidden.Root>
           <DialogTitle>{currentImage?.headline || t("postImage")}</DialogTitle>
           <DialogDescription>{t("imageHint")}</DialogDescription>
         </VisuallyHidden.Root>
         {currentImage && (
-          <div className="flex flex-col">
+          <div className="flex w-fit max-w-full flex-col">
             <div
-              className={`relative w-full ${aspectClass} max-h-[80vh] bg-black flex items-center justify-center`}
+              className={`relative ${aspectClass} h-[min(78vh,48rem)] max-w-[calc(100vw-2rem)] bg-black`}
             >
               <Image
                 src={currentImage.url}
@@ -95,14 +101,30 @@ export function ImageViewerDialog({
                     {index + 1} / {images.length}
                   </span>
                 )}
-                <a
-                  href={currentImage.url}
-                  download
-                  className="flex items-center gap-1 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
-                >
-                  <Download className="w-3 h-3" />
-                  {t("imageDownload")}
-                </a>
+                {postId ? (
+                  <button
+                    type="button"
+                    disabled={downloading}
+                    onClick={async () => {
+                      setDownloading(true);
+                      try {
+                        await downloadSlide(postId, index);
+                      } catch {
+                        // Nothing to recover; the button simply re-enables.
+                      } finally {
+                        setDownloading(false);
+                      }
+                    }}
+                    className="glass-pill inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:opacity-60 dark:text-zinc-300"
+                  >
+                    {downloading ? (
+                      <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Download className="size-3.5" aria-hidden="true" />
+                    )}
+                    {t("imageDownload")}
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>

@@ -127,6 +127,7 @@ export async function POST(request: Request) {
       field: profile.field,
       category: profile.category,
       tags: JSON.stringify(profile.tags),
+      services: JSON.stringify(Array.isArray(profile.services) ? profile.services : []),
       logo,
       language: profile.language || null,
       brandColors: profile.brandColors?.length ? profile.brandColors : null,

@@ -138,7 +138,7 @@ Generate diverse B2B company discovery queries. Maximum 15 queries.`
 
 export function buildBusinessProfilePrompt(languageHint: string | null): string {
   const languageInstruction = languageHint
-    ? `The business website language was detected as "${languageHint}". Write ALL text fields (description, persona, clientPersona, field, category, tags) in that same language. Also return a "language" field with the ISO 639-1 code (e.g. "en", "pt", "es").`
+    ? `The business website language was detected as "${languageHint}". Write ALL text fields (description, persona, clientPersona, field, category, tags, services) in that same language. Also return a "language" field with the ISO 639-1 code (e.g. "en", "pt", "es").`
     : `Detect the language of the scraped content. Write ALL text fields in the same language as the content. Return a "language" field with the ISO 639-1 code (e.g. "en", "pt", "es").`
 
   return `You are a business analyst. Given scraped content from a business's online presence, extract a structured profile. Return JSON with these fields:
@@ -149,6 +149,7 @@ export function buildBusinessProfilePrompt(languageHint: string | null): string 
 - field: The industry or field (e.g., "Technology", "Healthcare", "Real Estate")
 - category: MUST be one of these exact values: ${BUSINESS_CATEGORIES.join(", ")}. Pick the closest match. Use "Other" only if nothing fits.
 - tags: An array of relevant tags (5-12 tags, maximum 12)
+- services: An array of the business's main services or products as short, specific labels (3-8 items, e.g. "Beginner pottery courses", "Kiln rental"). Use an empty array if none can be inferred.
 - language: ISO 639-1 language code
 
 ${languageInstruction}

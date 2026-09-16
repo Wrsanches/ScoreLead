@@ -40,6 +40,7 @@ interface BusinessProfile {
   category: string
   tags: string[]
   brandColors: string[]
+  services?: string[]
 }
 
 function parseTags(raw: string): string[] {
@@ -55,6 +56,7 @@ function parseTags(raw: string): string[] {
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
 const STEP_ORDER: Step[] = ["welcome", "primaryLinks", "moreLinks", "location", "targeting", "processing", "review"]
+const PROGRESS_STEPS: Step[] = ["primaryLinks", "moreLinks", "location", "targeting", "review"]
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -263,6 +265,14 @@ export default function OnboardingPage() {
       const { profile: result, logo: fetchedLogo } = await response.json()
       const colors: string[] = Array.isArray(result?.brandColors) ? result.brandColors : []
       setProfile({ ...result, brandColors: colors })
+      // The services field is optional: when the user skipped it, take the
+      // AI's reading of the site so discovery still knows what they sell.
+      const detectedServices: string[] = Array.isArray(result?.services)
+        ? result.services.filter((v: unknown): v is string => typeof v === "string" && v.trim().length > 0).slice(0, 10)
+        : []
+      if (b2bTargeting.services.length === 0 && detectedServices.length > 0) {
+        setTargeting((prev) => ({ ...prev, services: detectedServices }))
+      }
       if (fetchedLogo) setLogo(fetchedLogo)
       setPrimaryColor((prev) => prev ?? colors[0] ?? null)
       setSecondaryColor((prev) => prev ?? colors[1] ?? null)
@@ -338,11 +348,8 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
-      {/* Neural network background */}
+      {/* Neural network background over the site's ambient canvas */}
       <NeuralBackground />
-
-      {/* Ambient glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-emerald-500/3 blur-[120px] pointer-events-none" />
 
       <motion.div
         className="w-full max-w-xl relative z-10"
@@ -351,13 +358,35 @@ export default function OnboardingPage() {
         transition={{ duration: 0.4, ease: EASE }}
       >
         {/* Header */}
-        <div className="flex flex-col items-center mb-10">
-          <Link href="/" className="flex items-center gap-2.5 mb-6">
+        <div className="flex flex-col items-center mb-8 gap-5">
+          <Link href="/" className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-white/[0.06]">
             <ScoreLeadLogo className="w-8 h-8 text-white" />
             <span className="text-white font-semibold text-xl tracking-tight">
               ScoreLead
             </span>
           </Link>
+          {/* Step progress: the four questions before the AI takes over */}
+          {PROGRESS_STEPS.includes(step) && (
+            <ol className="flex items-center gap-1.5" aria-label="Progress">
+              {PROGRESS_STEPS.map((s, i) => {
+                const currentIdx = PROGRESS_STEPS.indexOf(step)
+                const state = i < currentIdx ? "done" : i === currentIdx ? "current" : "todo"
+                return (
+                  <li
+                    key={s}
+                    aria-current={state === "current" ? "step" : undefined}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      state === "current"
+                        ? "w-6 bg-emerald-400"
+                        : state === "done"
+                          ? "w-1.5 bg-emerald-400/60"
+                          : "w-1.5 bg-white/[0.12]"
+                    }`}
+                  />
+                )
+              })}
+            </ol>
+          )}
         </div>
 
         {/* Error banner */}
@@ -377,25 +406,18 @@ export default function OnboardingPage() {
           )}
         </AnimatePresence>
 
-        {/* Step content */}
+        {/* Step content: the welcome screen floats on the canvas; every
+            other step sits in the same Liquid Glass panel as the rest of
+            the app so onboarding feels like the first screen of the product. */}
         <div className="relative">
-          {/* Top edge highlight */}
           <motion.div
-            className="absolute top-0 left-4 right-4 h-px bg-linear-to-r from-transparent via-zinc-700/50 to-transparent"
-            initial={false}
-            animate={{ opacity: step !== "welcome" ? 1 : 0 }}
+            layout
             transition={{ duration: 0.5, ease: EASE }}
-          />
-
-          <motion.div
-            initial={false}
-            animate={
+            className={
               step === "welcome"
-                ? { backgroundColor: "rgba(24,24,27,0)", borderColor: "rgba(39,39,42,0)", boxShadow: "0 0 0 0 rgba(0,0,0,0)", padding: 0 }
-                : { backgroundColor: "rgba(24,24,27,0.3)", borderColor: "rgba(39,39,42,0.6)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.2)", padding: "clamp(1.5rem, 4vw, 2.5rem)" }
+                ? "p-0"
+                : "glass-strong rounded-3xl p-6 sm:p-10"
             }
-            transition={{ duration: 0.5, ease: EASE }}
-            className="rounded-2xl border backdrop-blur-sm"
           >
             {/* AI Orb inside card */}
             <div className="flex justify-center mb-6">
@@ -486,6 +508,8 @@ export default function OnboardingPage() {
                     secondaryColor={secondaryColor}
                     onPrimaryColorChange={setPrimaryColor}
                     onSecondaryColorChange={setSecondaryColor}
+                    services={targeting.services}
+                    onServicesChange={(services) => setTargeting((prev) => ({ ...prev, services }))}
                     onSubmit={handleReviewSubmit}
                     onBack={() => goTo("targeting")}
                     isSubmitting={isSubmitting}

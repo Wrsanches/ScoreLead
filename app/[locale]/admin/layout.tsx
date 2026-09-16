@@ -11,6 +11,8 @@ import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
 import { BusinessProvider } from "@/components/admin/business-context"
 import { AdminViewBanner } from "@/components/admin/admin-view-banner"
 import { getPlanStatus, serializePlanStatus } from "@/lib/plan"
+import { getUserTimeZone } from "@/lib/user-timezone"
+import { UserTimeZoneProvider } from "@/components/admin/user-timezone-context"
 
 export const metadata: Metadata = {
   robots: {
@@ -29,10 +31,11 @@ export default async function AdminLayout({
   const { locale } = await params
   setRequestLocale(locale)
   const session = await requireAuth(locale)
-  const [platformAdmin, businessId, businesses] = await Promise.all([
+  const [platformAdmin, businessId, businesses, timeZone] = await Promise.all([
     isPlatformAdmin(session.user.id),
     getActiveViewableBusinessIdForUser(session.user.id),
     listViewableBusinesses(session.user.id),
+    getUserTimeZone(session.user.id),
   ])
   const access = businessId
     ? await getBusinessAccess(session.user.id, businessId)
@@ -59,6 +62,7 @@ export default async function AdminLayout({
   // gives every clean route the same server-validated business selection.
   return (
     <div className="glass-canvas h-screen w-screen overflow-hidden">
+      <UserTimeZoneProvider initialTimeZone={timeZone}>
       <BusinessProvider
         businessId={access?.businessId ?? null}
         readOnly={access?.readOnly ?? false}
@@ -83,6 +87,7 @@ export default async function AdminLayout({
           {children}
         </AdminShell>
       </BusinessProvider>
+      </UserTimeZoneProvider>
     </div>
   )
 }

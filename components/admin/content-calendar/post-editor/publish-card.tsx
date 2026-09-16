@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { CalendarClock, ExternalLink, Loader2, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { getLocalizedAppPath } from "@/lib/site-urls";
+import { useUserTimeZone } from "@/components/admin/user-timezone-context";
 import type { PublicationView } from "@/lib/instagram/data";
 import type { ContentPostRow } from "../types";
 import { EditorCard } from "./compose-fields";
@@ -41,9 +42,7 @@ export function PublishCard({
   const locale = useLocale();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [timeZone] = useState(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-  );
+  const { timeZone } = useUserTimeZone();
 
   const publication = post?.publication ?? null;
   const canSchedule =

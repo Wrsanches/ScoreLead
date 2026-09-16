@@ -59,7 +59,8 @@ export function AdminShell({
   return (
     <PlanProvider initialStatus={planStatus}>
     <SearchProvider>
-      <div className="glass-canvas relative flex h-full w-full overflow-hidden">
+      {/* The ambient canvas is painted once by the admin layout root. */}
+      <div className="relative flex h-full w-full overflow-hidden">
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"

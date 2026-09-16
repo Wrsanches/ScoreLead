@@ -46,7 +46,7 @@ export function StepProcessing({ status }: StepProcessingProps) {
                 isActive
                   ? "bg-emerald-500/[0.08] border border-emerald-500/20"
                   : isDone
-                    ? "bg-zinc-800/20 border border-zinc-800/40"
+                    ? "surface-card border border-transparent"
                     : "border border-transparent opacity-30"
               }`}
             >
@@ -55,8 +55,8 @@ export function StepProcessing({ status }: StepProcessingProps) {
                   isActive
                     ? "bg-emerald-500/15"
                     : isDone
-                      ? "bg-zinc-800/50"
-                      : "bg-zinc-800/30"
+                      ? "bg-white/[0.06]"
+                      : "bg-white/[0.04]"
                 }`}
               >
                 {isDone ? (

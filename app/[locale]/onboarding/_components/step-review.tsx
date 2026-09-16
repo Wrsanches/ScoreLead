@@ -12,16 +12,20 @@ import { ChevronDown } from "lucide-react"
 import { useLocale } from "next-intl"
 import { BrandColorPicker } from "@/components/admin/brand-color-picker"
 import { TagsInput } from "@/components/admin/tags-input"
+import { ChipInput } from "./step-targeting"
 
 function createReviewSchema(t: (key: string) => string) {
   return z.object({
+    // Name and field are all the server requires. Everything else improves
+    // discovery and copy quality but must not block someone who has no
+    // website for the AI to read.
     name: z.string().min(1, t("errorNameRequired")),
-    description: z.string().min(1, t("errorDescriptionRequired")),
-    persona: z.string().min(1, t("errorPersonaRequired")),
-    clientPersona: z.string().min(1, t("errorClientPersonaRequired")),
+    description: z.string(),
+    persona: z.string(),
+    clientPersona: z.string(),
     field: z.string().min(1, t("errorFieldRequired")),
-    category: z.string().min(1, t("errorCategoryRequired")),
-    tags: z.string().min(1, t("errorTagsRequired")),
+    category: z.string(),
+    tags: z.string(),
     location: z.string(),
   })
 }
@@ -37,6 +41,9 @@ interface StepReviewProps {
   secondaryColor?: string | null
   onPrimaryColorChange?: (color: string | null) => void
   onSecondaryColorChange?: (color: string | null) => void
+  /** Services typed in the targeting step, or detected by the AI when left empty. */
+  services?: string[]
+  onServicesChange?: (services: string[]) => void
   onSubmit: (data: ReviewValues) => void
   onBack?: () => void
   isSubmitting: boolean
@@ -45,7 +52,7 @@ interface StepReviewProps {
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
 const inputClasses =
-  "w-full px-4 py-3 bg-zinc-800/20 border border-zinc-800/80 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
+  "w-full px-4 py-3 surface-card border border-transparent rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 transition-all duration-200"
 
 export function StepReview({
   defaultValues,
@@ -56,6 +63,8 @@ export function StepReview({
   secondaryColor = null,
   onPrimaryColorChange,
   onSecondaryColorChange,
+  services = [],
+  onServicesChange,
   onSubmit,
   onBack,
   isSubmitting,
@@ -137,7 +146,7 @@ export function StepReview({
       <div className="flex flex-col items-center text-center mb-8">
         {/* Logo */}
         <div className="relative group mb-5">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden surface-card border border-transparent flex items-center justify-center">
             {logo ? (
               <Image
                 src={logo}
@@ -187,7 +196,7 @@ export function StepReview({
               onPrimaryChange={(c) => onPrimaryColorChange?.(c)}
               onSecondaryChange={(c) => onSecondaryColorChange?.(c)}
             />
-            <div className="h-px bg-zinc-800/60 my-6" />
+            <div className="h-px bg-white/[0.06] my-6" />
           </motion.div>
         )}
 
@@ -198,7 +207,7 @@ export function StepReview({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: groupIndex * 0.1, ease: EASE }}
           >
-            {groupIndex > 0 && <div className="h-px bg-zinc-800/60 my-6" />}
+            {groupIndex > 0 && <div className="h-px bg-white/[0.06] my-6" />}
             <div className="space-y-4">
               {group.fields.map((field) => (
                 <div key={field.name}>
@@ -241,11 +250,11 @@ export function StepReview({
                           id={field.name}
                           className={`${inputClasses} pr-10 appearance-none cursor-pointer`}
                         >
-                          <option value="" className="bg-zinc-900 text-zinc-500">
+                          <option value="" className="bg-zinc-950 text-zinc-500">
                             {field.placeholder}
                           </option>
                           {categories.map((cat) => (
-                            <option key={cat.value} value={cat.value} className="bg-zinc-900 text-white">
+                            <option key={cat.value} value={cat.value} className="bg-zinc-950 text-white">
                               {cat.label}
                             </option>
                           ))}
@@ -314,6 +323,28 @@ export function StepReview({
           </motion.div>
         ))}
 
+        {onServicesChange && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.3, ease: EASE }}
+          >
+            <div className="h-px bg-white/[0.06] my-6" />
+            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-medium">
+              {t("targetServicesLabel")}
+            </label>
+            <p className="text-xs text-zinc-500 mb-3">
+              {services.length > 0 ? t("reviewServicesDetected") : t("reviewServicesEmpty")}
+            </p>
+            <ChipInput
+              values={services}
+              onChange={onServicesChange}
+              placeholder={t("targetServicesPlaceholder")}
+              max={10}
+            />
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -336,7 +367,7 @@ export function StepReview({
             disabled={isSubmitting}
             whileHover={isSubmitting ? {} : { scale: 1.01 }}
             whileTap={isSubmitting ? {} : { scale: 0.99 }}
-            className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
+            className="flex-1 py-3 press bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
           >
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

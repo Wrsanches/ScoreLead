@@ -36,7 +36,7 @@ export default async function OnboardingLayout({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="marketing-canvas min-h-screen">
       {children}
     </div>
   )

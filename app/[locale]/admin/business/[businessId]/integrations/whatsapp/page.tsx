@@ -33,6 +33,7 @@ import { usePlan } from "@/components/admin/plan-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { useBusinessAccess } from "@/components/admin/business-context"
+import { useUserTimeZone } from "@/components/admin/user-timezone-context"
 
 declare global {
   interface Window {
@@ -81,6 +82,7 @@ const WHATSAPP_INTEGRATION_CONFIGURED =
 export default function WhatsAppIntegrationPage() {
   const t = useTranslations("whatsapp")
   const ti = useTranslations("integrations")
+  const { timeZone: userTimeZone } = useUserTimeZone()
   const { can: planCan, openUpgrade } = usePlan()
   const { businessId, readOnly } = useBusinessAccess()
   const { data: session } = authClient.useSession()
@@ -169,7 +171,7 @@ export default function WhatsAppIntegrationPage() {
           nonce: config.nonce,
           wabaId: result.wabaId,
           phoneNumberId: result.phoneNumberId,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+          timezone: userTimeZone,
         }),
       })
       const body = await response.json().catch(() => ({}))

@@ -7,11 +7,19 @@ import { z } from "zod"
 import { Globe, Camera, ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { motion } from "framer-motion"
 
+/** Accepts "ceramik.com" as well as "https://ceramik.com". */
+function normalizeUrl(value: string): string {
+  const trimmed = value.trim()
+  if (!trimmed) return ""
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
+}
+
 function createSchema(t: (key: string) => string) {
-  return z.object({
-    website: z.string().url(t("errorValidURL")).or(z.literal("")),
-    instagram: z.string().url(t("errorValidURL")).or(z.literal("")),
-  })
+  const link = z
+    .string()
+    .transform(normalizeUrl)
+    .pipe(z.string().url(t("errorValidURL")).or(z.literal("")))
+  return z.object({ website: link, instagram: link })
 }
 
 export type PrimaryLinksValues = z.infer<ReturnType<typeof createSchema>>
@@ -40,6 +48,12 @@ export function StepPrimaryLinks({ defaultValues, onSubmit, onBack }: StepPrimar
       instagram: defaultValues?.instagram || "",
     },
   })
+
+  // The website is the source the AI reads the business from, so it is
+  // required. Instagram is a helpful extra but cannot stand in for it.
+  const watched = watch()
+  const hasWebsite = Boolean(watched.website?.trim())
+  const canContinue = hasWebsite && schema.safeParse(watched).success
 
   const fields = [
     {
@@ -88,7 +102,7 @@ export function StepPrimaryLinks({ defaultValues, onSubmit, onBack }: StepPrimar
                 id={name}
                 type="url"
                 placeholder={placeholder}
-                className="w-full pl-11 pr-10 py-3.5 bg-zinc-800/20 border border-zinc-800/80 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
+                className="w-full pl-11 pr-10 py-3.5 surface-card border border-transparent rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 transition-all duration-200"
               />
               {watch(name)?.trim() && !errors[name] && (
                 <motion.div
@@ -123,9 +137,10 @@ export function StepPrimaryLinks({ defaultValues, onSubmit, onBack }: StepPrimar
 
           <motion.button
             type="submit"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
+            disabled={!canContinue}
+            whileHover={canContinue ? { scale: 1.01 } : {}}
+            whileTap={canContinue ? { scale: 0.99 } : {}}
+            className="flex-1 py-3 press bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
           >
             {t("continue")}
             <ArrowRight className="w-4 h-4" />

@@ -8,7 +8,7 @@ import { ArrowRight, ArrowLeft, X, Plus, CornerDownLeft, Globe } from "lucide-re
 const EASE = [0.25, 0.46, 0.45, 0.94] as const
 
 const inputClasses =
-  "w-full px-4 py-3 bg-zinc-800/20 border border-zinc-800/80 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
+  "w-full px-4 py-3 surface-card border border-transparent rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 transition-all duration-200"
 
 export interface TargetingValues {
   businessModel: "b2b" | "b2c" | "both"
@@ -46,16 +46,16 @@ function RadioOption({
       onClick={onSelect}
       className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 ${
         selected
-          ? "border-emerald-500/30 bg-emerald-500/[0.08]"
+          ? "glass-pill border-transparent ring-1 ring-emerald-500/40"
           : disabled
-            ? "border-zinc-800/60 bg-zinc-900/30 opacity-70 cursor-not-allowed"
-          : "border-zinc-800/80 bg-zinc-800/20 hover:border-zinc-700/80"
+            ? "surface-card border-transparent opacity-70 cursor-not-allowed"
+          : "surface-card border-transparent hover:brightness-110"
       }`}
     >
       <div className="flex items-center gap-3">
         <div
           className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-            selected ? "border-emerald-500" : "border-zinc-600"
+            selected ? "border-emerald-500" : "border-zinc-500"
           }`}
         >
           {selected && (
@@ -72,7 +72,7 @@ function RadioOption({
               {label}
             </p>
             {badge && (
-              <span className="rounded-full border border-zinc-700/80 bg-zinc-800/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
+              <span className="rounded-full glass-pill border-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
                 {badge}
               </span>
             )}
@@ -84,7 +84,7 @@ function RadioOption({
   )
 }
 
-function ChipInput({
+export function ChipInput({
   values,
   onChange,
   placeholder,
@@ -168,7 +168,7 @@ function ChipInput({
             className={`absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
               inputValue.trim()
                 ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
-                : "bg-zinc-800/40 text-zinc-600"
+                : "bg-white/[0.05] text-zinc-500"
             }`}
           >
             <CornerDownLeft className="w-3 h-3" />
@@ -324,7 +324,7 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
           </div>
         </motion.div>
 
-        <div className="h-px bg-zinc-800/60" />
+        <div className="h-px bg-white/[0.06]" />
 
         {/* Services */}
         <motion.div
@@ -332,10 +332,16 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2, ease: EASE }}
         >
-          <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-medium">
+          <label className="flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-500 mb-2 font-medium">
             {t("targetServicesLabel")}
+            <span className="glass-pill rounded-full px-2 py-0.5 text-[10px] normal-case tracking-normal text-zinc-400">
+              {t("optional")}
+            </span>
           </label>
-          <p className="text-xs text-zinc-600 mb-3">{t("targetServicesHint")}</p>
+          <p className="text-xs text-zinc-500 mb-3">
+            {t("targetServicesHint")}{" "}
+            <span className="text-zinc-400">{t("targetServicesAiHint")}</span>
+          </p>
           <ChipInput
             values={services}
             onChange={setServices}
@@ -344,7 +350,7 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
           />
         </motion.div>
 
-        <div className="h-px bg-zinc-800/60" />
+        <div className="h-px bg-white/[0.06]" />
 
         {/* Service Area */}
         <motion.div
@@ -368,7 +374,7 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
           </div>
         </motion.div>
 
-        <div className="h-px bg-zinc-800/60" />
+        <div className="h-px bg-white/[0.06]" />
 
         {/* Competitors */}
         <motion.div
@@ -406,10 +412,9 @@ export function StepTargeting({ defaultValues, onSubmit, onBack }: StepTargeting
         <motion.button
           type="button"
           onClick={handleSubmit}
-          disabled={services.length === 0}
-          whileHover={services.length > 0 ? { scale: 1.01 } : {}}
-          whileTap={services.length > 0 ? { scale: 0.99 } : {}}
-          className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          className="flex-1 py-3 press bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
         >
           {t("continue")}
           <ArrowRight className="w-4 h-4" />

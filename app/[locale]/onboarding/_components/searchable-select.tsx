@@ -136,8 +136,8 @@ export function SearchableSelect({
         className={`
           w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-left transition-all duration-200
           ${disabled
-            ? "bg-zinc-800/10 border border-zinc-800/40 cursor-not-allowed opacity-40"
-            : "bg-zinc-800/20 border border-zinc-800/80 hover:border-zinc-700/80 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 cursor-pointer"
+            ? "surface-card border border-transparent cursor-not-allowed opacity-40"
+            : "surface-card border border-transparent hover:brightness-110 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 cursor-pointer"
           }
         `}
         aria-haspopup="listbox"
@@ -163,12 +163,12 @@ export function SearchableSelect({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: openUpward ? 4 : -4, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className={`absolute z-50 w-full bg-zinc-900 border border-zinc-700/50 rounded-xl overflow-hidden shadow-2xl shadow-black/40 ${
+            className={`absolute z-50 w-full glass-strong rounded-xl overflow-hidden ${
               openUpward ? "bottom-full mb-2" : "top-full mt-2"
             }`}
           >
             {/* Search input */}
-            <div className="p-2 border-b border-zinc-800/60">
+            <div className="p-2 border-b border-white/[0.06]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
                 <input
@@ -177,7 +177,7 @@ export function SearchableSelect({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search..."
-                  className="w-full pl-9 pr-3 py-2 bg-zinc-800/40 rounded-lg text-sm text-white placeholder:text-zinc-600 focus:outline-none"
+                  className="w-full pl-9 pr-3 py-2 bg-white/[0.05] rounded-lg text-sm text-white placeholder:text-zinc-600 focus:outline-none"
                 />
               </div>
             </div>
@@ -186,7 +186,7 @@ export function SearchableSelect({
             <ul
               ref={listRef}
               role="listbox"
-              className="max-h-52 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
+              className="max-h-52 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-transparent"
             >
               {filtered.length === 0 ? (
                 <li className="px-4 py-3 text-sm text-zinc-600 text-center">
@@ -205,7 +205,7 @@ export function SearchableSelect({
                       onClick={() => handleSelect(option.value)}
                       className={`
                         px-4 py-2.5 text-sm cursor-pointer transition-colors duration-100 flex items-center justify-between
-                        ${isHighlighted ? "bg-emerald-500/10 text-white" : isSelected ? "text-emerald-400" : "text-zinc-300 hover:bg-zinc-800/60"}
+                        ${isHighlighted ? "bg-emerald-500/10 text-white" : isSelected ? "text-emerald-400" : "text-zinc-300 hover:bg-white/[0.05]"}
                       `}
                     >
                       <span className="truncate">{option.label}</span>

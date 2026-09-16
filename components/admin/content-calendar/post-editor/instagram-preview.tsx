@@ -7,6 +7,7 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  Download,
   Expand,
   Heart,
   ImageIcon,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 import type { ContentPostType } from "@/lib/content-pillars";
 import { getInitials } from "@/lib/admin-utils";
-import { imageAspectClass } from "./shared";
+import { downloadSlide, imageAspectClass } from "./shared";
 
 type BizInfo = { name: string | null; logo: string | null; location: string | null };
 
@@ -42,13 +43,12 @@ function fetchBiz(id: string): Promise<BizInfo> {
 
 interface InstagramPreviewProps {
   businessId: string;
+  /** Saved post id; enables the download button on the current slide. */
+  postId?: string | null;
   images: { url: string; headline: string }[];
   index: number;
   onIndexChange: (index: number) => void;
-  caption: string;
-  hashtags: string[];
   postType: ContentPostType;
-  scheduledFor: string;
   generating: boolean;
   regeneratingIndex: number | null;
   imageFailures: number[];
@@ -57,13 +57,11 @@ interface InstagramPreviewProps {
 
 export function InstagramPreview({
   businessId,
+  postId,
   images,
   index,
   onIndexChange,
-  caption,
-  hashtags,
   postType,
-  scheduledFor,
   generating,
   regeneratingIndex,
   imageFailures,
@@ -71,7 +69,7 @@ export function InstagramPreview({
 }: InstagramPreviewProps) {
   const t = useTranslations("contentCalendar");
   const [biz, setBiz] = useState<BizInfo | null>(null);
-  const [captionOpen, setCaptionOpen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,14 +87,9 @@ export function InstagramPreview({
   const aspectClass = imageAspectClass(postType);
   const name = biz?.name?.trim() || "your_business";
   const handle = name.toLowerCase().replace(/\s+/g, "");
-  const scheduledLabel = formatSchedule(scheduledFor);
-
-  const captionLong = caption.length > 120;
-  const captionText =
-    captionOpen || !captionLong ? caption : `${caption.slice(0, 120).trimEnd()}…`;
 
   return (
-    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-black/25 shadow-sm">
+    <div className="mx-auto w-full max-w-[var(--preview-w,24rem)] overflow-hidden rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-black/25 shadow-sm">
       {/* Profile row */}
       <div className="flex items-center gap-2.5 px-3.5 py-2.5">
         <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-rose-400/70 bg-zinc-100 dark:bg-white/[0.05]">
@@ -228,63 +221,45 @@ export function InstagramPreview({
         </div>
       )}
 
-      {/* Action row */}
-      <div className="flex items-center gap-4 px-3.5 pt-3 pb-1">
-        <Heart className="w-6 h-6 text-zinc-800 dark:text-zinc-200" />
-        <MessageCircle className="w-6 h-6 -scale-x-100 text-zinc-800 dark:text-zinc-200" />
-        <Send className="w-[22px] h-[22px] text-zinc-800 dark:text-zinc-200" />
-        <Bookmark className="w-6 h-6 ml-auto text-zinc-800 dark:text-zinc-200" />
-      </div>
-
-      {/* Caption + hashtags */}
-      <div className="px-3.5 pb-3.5 pt-1">
-        {caption.trim() || hashtags.length > 0 ? (
-          <p className="text-[13px] leading-relaxed text-zinc-800 dark:text-zinc-200">
-            <span className="font-semibold text-zinc-900 dark:text-white">
-              {handle}
-            </span>{" "}
-            <span className="whitespace-pre-wrap">{captionText}</span>
-            {captionLong && (
-              <button
-                type="button"
-                onClick={() => setCaptionOpen((v) => !v)}
-                className="ml-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
-              >
-                {captionOpen ? t("previewLess") : t("previewMore")}
-              </button>
+      {/* Action row - the preview stops here; caption and tags live in the form.
+          The Instagram icons are decorative; the download on the right is real. */}
+      <div className="flex items-center gap-4 px-3.5 py-2.5">
+        <Heart className="w-6 h-6 text-zinc-800 dark:text-zinc-200" aria-hidden="true" />
+        <MessageCircle className="w-6 h-6 -scale-x-100 text-zinc-800 dark:text-zinc-200" aria-hidden="true" />
+        <Send className="w-[22px] h-[22px] text-zinc-800 dark:text-zinc-200" aria-hidden="true" />
+        {postId && current && !generating ? (
+          <button
+            type="button"
+            disabled={downloading}
+            onClick={async (e) => {
+              e.stopPropagation();
+              setDownloading(true);
+              try {
+                await downloadSlide(postId, clamped);
+              } catch {
+                // Nothing to recover; the button simply re-enables.
+              } finally {
+                setDownloading(false);
+              }
+            }}
+            className="glass-pill ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-zinc-700 transition-[filter] hover:brightness-110 disabled:opacity-60 dark:text-zinc-300"
+            title={t("imageDownload")}
+          >
+            {downloading ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Download className="size-3.5" aria-hidden="true" />
             )}
-            {hashtags.length > 0 && (
-              <span className="text-sky-600 dark:text-sky-400">
-                {" "}
-                {hashtags.map((tag) => `#${tag}`).join(" ")}
-              </span>
-            )}
-          </p>
+            {t("imageDownload")}
+          </button>
         ) : (
-          <p className="text-[13px] text-zinc-400 dark:text-zinc-600 italic">
-            {t("previewCaptionEmpty")}
-          </p>
-        )}
-        {scheduledLabel && (
-          <p className="mt-2 text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
-            {t("previewScheduledFor", { date: scheduledLabel })}
-          </p>
+          <Bookmark className="w-6 h-6 ml-auto text-zinc-800 dark:text-zinc-200" aria-hidden="true" />
         )}
       </div>
     </div>
   );
 }
 
-function formatSchedule(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 /**
  * A generated image with a loading shimmer and automatic retries. Right after
@@ -327,6 +302,9 @@ function SlideImage({ url, alt }: { url: string; alt: string }) {
         className={`object-cover transition-opacity duration-200 ${status === "loaded" ? "opacity-100" : "opacity-0"}`}
         sizes="384px"
         unoptimized
+        // The current slide is the page's largest above-the-fold element, so
+        // load it eagerly instead of lazily.
+        priority
         onLoad={() => setStatus("loaded")}
         onError={() => setStatus("error")}
       />

@@ -17,9 +17,8 @@ import {
   POST_TYPE_LABEL_KEY,
   PILLAR_LABEL_KEY,
   fieldClass,
-  fromLocalInputValue,
-  toLocalInputValue,
 } from "./shared";
+import { SchedulePicker } from "./schedule-picker";
 
 /** Content-layer card shared by every editor section. */
 export function EditorCard({
@@ -149,14 +148,10 @@ export function ComposeFields({ values, onChange }: ComposeFieldsProps) {
 
         <div className="mt-5">
           <FieldLabel htmlFor="post-when">{t("whenLabel")}</FieldLabel>
-          <input
+          <SchedulePicker
             id="post-when"
-            type="datetime-local"
-            value={toLocalInputValue(values.scheduledFor)}
-            onChange={(e) =>
-              onChange({ scheduledFor: fromLocalInputValue(e.target.value) })
-            }
-            className={`${fieldClass} scheme-dark sm:max-w-xs`}
+            value={values.scheduledFor}
+            onChange={(iso) => onChange({ scheduledFor: iso })}
           />
         </div>
       </EditorCard>

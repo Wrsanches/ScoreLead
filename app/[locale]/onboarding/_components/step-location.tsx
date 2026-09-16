@@ -179,7 +179,7 @@ export function StepLocation({ defaultLocation, onSubmit, onBack }: StepLocation
           disabled={!canSubmitLocation}
           whileHover={canSubmitLocation ? { scale: 1.01 } : {}}
           whileTap={canSubmitLocation ? { scale: 0.99 } : {}}
-          className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
+          className="flex-1 py-3 press bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl transition-[transform,background-color] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15"
         >
           {t("analyzeWithAI")}
           <ArrowRight className="w-4 h-4" />

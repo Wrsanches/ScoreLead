@@ -5,12 +5,17 @@ import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { isValidTimeZone } from "@/lib/timezone"
 
 const preferencesSchema = z
   .object({
     leadAlerts: z.boolean().optional(),
     weeklyDigest: z.boolean().optional(),
     productUpdates: z.boolean().optional(),
+    timezone: z
+      .string()
+      .refine(isValidTimeZone, "Unknown time zone")
+      .optional(),
   })
   .strict()
 
@@ -24,13 +29,17 @@ export async function GET() {
   }
 
   const [row] = await db
-    .select({ notificationPreferences: user.notificationPreferences })
+    .select({
+      notificationPreferences: user.notificationPreferences,
+      timezone: user.timezone,
+    })
     .from(user)
     .where(eq(user.id, session.user.id))
     .limit(1)
 
   return NextResponse.json({
     preferences: row?.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES,
+    timezone: row?.timezone ?? null,
   })
 }
 
@@ -56,15 +65,20 @@ export async function PATCH(request: Request) {
     .where(eq(user.id, session.user.id))
     .limit(1)
 
+  const { timezone, ...notificationPatch } = parsed.data
   const merged = {
     ...(current?.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES),
-    ...parsed.data,
+    ...notificationPatch,
   }
 
   await db
     .update(user)
-    .set({ notificationPreferences: merged, updatedAt: new Date() })
+    .set({
+      notificationPreferences: merged,
+      ...(timezone ? { timezone } : {}),
+      updatedAt: new Date(),
+    })
     .where(eq(user.id, session.user.id))
 
-  return NextResponse.json({ success: true, preferences: merged })
+  return NextResponse.json({ success: true, preferences: merged, timezone: timezone ?? null })
 }

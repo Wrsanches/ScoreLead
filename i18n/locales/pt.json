@@ -438,7 +438,10 @@
     "supportTopicFeature": "Sugestao de recurso",
     "supportTopicOther": "Outro assunto",
     "supportResponseTitle": "Tempo de resposta",
-    "supportResponseBody": "Normalmente respondemos em um dia util."
+    "supportResponseBody": "Normalmente respondemos em um dia util.",
+    "timezone": "Fuso horário",
+    "timezoneDescription": "Usado para agendar posts e mensagens e para os horários exibidos no app. Definido automaticamente pelo seu dispositivo no primeiro acesso.",
+    "timezoneUseDevice": "Usar o fuso deste dispositivo ({zone})"
   },
   "business": {
     "title": "Negócio",
@@ -1037,7 +1040,11 @@
     "errorClientPersonaRequired": "Descrição do cliente ideal é obrigatória",
     "errorFieldRequired": "Indústria/setor é obrigatório",
     "errorCategoryRequired": "Categoria é obrigatória",
-    "errorTagsRequired": "Pelo menos uma tag é necessária"
+    "errorTagsRequired": "Pelo menos uma tag é necessária",
+    "optional": "Opcional",
+    "targetServicesAiHint": "Deixe em branco e vamos detectar a partir do seu site.",
+    "reviewServicesDetected": "Confira o que encontramos. Remova o que não fizer sentido ou adicione o que faltar.",
+    "reviewServicesEmpty": "Não conseguimos detectar seus serviços. Adicione alguns para a descoberta saber o que você vende."
   },
   "contentCalendar": {
     "title": "Calendário de Conteúdo",
@@ -1088,7 +1095,7 @@
     "regenerateSlide": "Refazer slide",
     "regeneratingSlide": "Refazendo slide...",
     "refineSlide": "Refinar",
-    "refineSlideLabel": "Ajustes para o slide {n}",
+    "refineSlideLabel": "Refinar slide {n}",
     "refinePlaceholder": "ex. Luz mais quente. Diminuir zoom. Trocar a tigela de cerâmica por tecido de linho. Mantenha o resto.",
     "refineReference": "Imagem de referência (opcional)",
     "refineReferenceHint": "Anexe um produto, cartão, captura de tela ou layout para a IA incorporar à nova versão.",
@@ -1184,7 +1191,14 @@
     "leaveBody": "Este post tem alterações não salvas. Salve antes de sair ou descarte-as.",
     "leaveSave": "Salvar e sair",
     "leaveDiscard": "Descartar alterações",
-    "leaveStay": "Continuar editando"
+    "leaveStay": "Continuar editando",
+    "tomorrow": "Amanhã",
+    "timeLabel": "Horário",
+    "done": "Concluído",
+    "refineDialogHint": "Descreva o que deve mudar. Tudo o que você não mencionar continua igual.",
+    "redoConfirmTitle": "Refazer o slide {n}?",
+    "redoConfirmBody": "A imagem atual será substituída por uma nova geração da IA. Isso consome uma imagem da sua cota mensal e não pode ser desfeito.",
+    "redoConfirmAction": "Refazer slide"
   },
   "instagram": {
     "description": "Conecte seu Instagram e publique fotos e carrosséis pelo calendário de conteúdo.",
