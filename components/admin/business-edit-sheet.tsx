@@ -49,7 +49,7 @@ interface BusinessEditSheetProps {
 }
 
 const INPUT =
-  "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+  "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all"
 
 export function BusinessEditSheet({
   open,
@@ -120,9 +120,9 @@ export function BusinessEditSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="max-w-xl! w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 p-0 flex flex-col"
+        className="max-w-xl! w-full text-zinc-800 dark:text-zinc-200 p-0 flex flex-col"
       >
-        <SheetHeader className="border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
+        <SheetHeader className="border-b border-zinc-200 dark:border-white/[0.08] px-5 py-4">
           <SheetTitle className="text-zinc-900 dark:text-white text-base">
             {t("editBusiness")}
           </SheetTitle>
@@ -135,7 +135,7 @@ export function BusinessEditSheet({
           {/* Logo + Name row */}
           <div className="flex items-center gap-4">
             <div className="relative group shrink-0">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center">
                 {values.logo ? (
                   <Image
                     src={values.logo}
@@ -205,11 +205,11 @@ export function BusinessEditSheet({
                   onChange={(e) => set("category", e.target.value)}
                   className={`${INPUT} appearance-none cursor-pointer`}
                 >
-                  <option value="" className="bg-zinc-50 dark:bg-zinc-900 text-zinc-500">
+                  <option value="" className="bg-zinc-50 dark:bg-white/[0.05] text-zinc-500">
                     --
                   </option>
                   {categories.map((c) => (
-                    <option key={c.value} value={c.value} className="bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white">
+                    <option key={c.value} value={c.value} className="bg-zinc-50 dark:bg-white/[0.05] text-zinc-900 dark:text-white">
                       {c.label}
                     </option>
                   ))}
@@ -365,17 +365,17 @@ export function BusinessEditSheet({
             />
           </Group>
 
-          <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-600 pt-2 border-t border-zinc-200/80 dark:border-zinc-800/60">
+          <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-600 pt-2 border-t border-zinc-200/80 dark:border-white/[0.08]">
             <ImageIcon className="w-3 h-3" />
             {t("editColorsHint")}
           </div>
         </div>
 
-        <div className="border-t border-zinc-200 dark:border-zinc-800 px-5 py-3 flex items-center justify-end gap-2">
+        <div className="border-t border-zinc-200 dark:border-white/[0.08] px-5 py-3 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="px-3 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 rounded-lg transition-colors"
+            className="px-3 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-colors"
           >
             {t("cancel")}
           </button>

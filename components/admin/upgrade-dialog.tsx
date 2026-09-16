@@ -96,7 +96,7 @@ export function UpgradeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-100 sm:max-w-lg">
+      <DialogContent className="bg-zinc-950 text-zinc-100 sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/15">
@@ -113,7 +113,7 @@ export function UpgradeDialog({
           <div
             role="radiogroup"
             aria-label={t("monthly")}
-            className="inline-flex self-start rounded-lg border border-zinc-800 p-0.5 text-xs"
+            className="inline-flex self-start rounded-lg border border-white/[0.08] p-0.5 text-xs"
           >
             {([false, true] as const).map((isAnnual) => (
               <button
@@ -152,7 +152,7 @@ export function UpgradeDialog({
                 className={`w-full rounded-xl border p-4 text-left transition-colors ${
                   active
                     ? "border-emerald-500/50 bg-emerald-500/[0.06]"
-                    : "border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/60"
+                    : "border-white/[0.08] hover:border-zinc-700 hover:bg-zinc-900/60"
                 }`}
               >
                 <div className="flex items-baseline justify-between gap-3">

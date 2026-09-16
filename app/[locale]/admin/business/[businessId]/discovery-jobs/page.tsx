@@ -198,7 +198,7 @@ export default function DiscoveryJobsPage() {
                   className={`block rounded-xl border transition-all duration-200 group ${
                     isActive
                       ? "border-emerald-500/20 hover:border-emerald-500/30 hover:bg-emerald-500/[0.02]"
-                      : "border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300/80 dark:hover:border-zinc-700/60 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40"
+                      : "border-zinc-200/80 dark:border-white/[0.08] hover:border-zinc-300/80 dark:hover:border-white/[0.22] hover:bg-zinc-100/60 dark:hover:bg-white/[0.06]"
                   }`}
                 >
                   <div className="px-5 py-4">
@@ -252,7 +252,7 @@ export default function DiscoveryJobsPage() {
                           {kws.slice(0, 3).map((kw) => (
                             <span
                               key={kw}
-                              className="text-[11px] text-zinc-500 bg-zinc-200/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800/80 px-1.5 py-0.5 rounded shrink-0"
+                              className="text-[11px] text-zinc-500 bg-zinc-200/50 dark:bg-white/[0.07] border border-zinc-200 dark:border-white/[0.08] px-1.5 py-0.5 rounded shrink-0"
                             >
                               {kw}
                             </span>

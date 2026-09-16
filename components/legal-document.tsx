@@ -6,11 +6,11 @@ import type { LegalDocumentContent } from "@/lib/legal/types"
 
 export function LegalDocument({ content }: { content: LegalDocumentContent }) {
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100">
+    <div className="marketing-canvas min-h-screen text-zinc-100">
       <Navbar />
 
-      <main id="main" className="pt-16">
-        <section className="border-b border-zinc-800/70">
+      <main id="main" className="pt-20">
+        <section className="border-b border-white/[0.08]">
           <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20 lg:py-24">
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
               {content.eyebrow}
@@ -33,7 +33,7 @@ export function LegalDocument({ content }: { content: LegalDocumentContent }) {
               {content.tocLabel}
             </h2>
             <nav className="mt-5" aria-label={content.tocLabel}>
-              <ol className="space-y-3 border-l border-zinc-800 pl-4">
+              <ol className="space-y-3 border-l border-white/[0.08] pl-4">
                 {content.sections.map((section, index) => (
                   <li key={section.id}>
                     <a
@@ -56,7 +56,7 @@ export function LegalDocument({ content }: { content: LegalDocumentContent }) {
               <section
                 id={section.id}
                 key={section.id}
-                className={`scroll-mt-24 border-b border-zinc-800/70 pb-12 last:border-b-0 ${
+                className={`scroll-mt-24 border-b border-white/[0.08] pb-12 last:border-b-0 ${
                   index > 0 ? "pt-12" : ""
                 }`}
               >
@@ -127,9 +127,9 @@ export function LegalDocument({ content }: { content: LegalDocumentContent }) {
               </section>
             ))}
 
-            <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 sm:p-8">
+            <div className="mt-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
               <div className="flex items-start gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.14] bg-zinc-900">
                   <Mail aria-hidden="true" className="size-4 text-emerald-400" />
                 </div>
                 <div>

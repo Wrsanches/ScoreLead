@@ -27,6 +27,13 @@ export const POST_TYPE_LABEL_KEY: Record<ContentPostType, string> = {
   story: "postTypeStory",
 };
 
+export const POST_TYPE_HINT_KEY: Record<ContentPostType, string> = {
+  single: "postTypeSingleHint",
+  carousel: "postTypeCarouselHint",
+  reel: "postTypeReelHint",
+  story: "postTypeStoryHint",
+};
+
 export const PILLAR_LABEL_KEY: Record<ContentPillar, string> = {
   educate: "pillarEducate",
   showcase: "pillarShowcase",

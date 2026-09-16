@@ -99,7 +99,7 @@ export function ProfileSection() {
   const submitting = form.formState.isSubmitting
 
   return (
-    <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+    <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
       <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">{t("profile")}</h2>
       <p className="text-sm text-zinc-500 mb-6">{t("description")}</p>
 
@@ -113,7 +113,7 @@ export function ProfileSection() {
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="group relative w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 overflow-hidden flex items-center justify-center shrink-0"
+            className="group relative w-14 h-14 rounded-full bg-zinc-200 dark:bg-white/[0.07] border border-zinc-300 dark:border-white/[0.14] overflow-hidden flex items-center justify-center shrink-0"
             aria-label={t("profileImage")}
           >
             {imagePreview ? (
@@ -157,7 +157,7 @@ export function ProfileSection() {
           <Input
             id="settings-name"
             placeholder={t("displayNamePlaceholder")}
-            className="bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+            className="bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-zinc-100"
             {...form.register("name")}
           />
           {form.formState.errors.name && (
@@ -172,7 +172,7 @@ export function ProfileSection() {
           <Input
             value={session?.user?.email ?? ""}
             disabled
-            className="bg-zinc-50/80 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800 text-zinc-500"
+            className="bg-zinc-50/80 dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-500"
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-600">{t("emailHint")}</p>
         </div>

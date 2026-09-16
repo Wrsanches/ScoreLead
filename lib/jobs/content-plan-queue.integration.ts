@@ -188,13 +188,17 @@ describe("content-plan queue", () => {
     expect((await jobRow(id)).status).toBe("completed")
 
     const surviving = await db
-      .select({ id: contentPost.id })
+      .select({ id: contentPost.id, status: contentPost.status })
       .from(contentPost)
       .where(eq(contentPost.businessId, BIZ))
     const ids = surviving.map((r) => r.id)
     expect(ids).toContain(keepEdited)
     expect(ids).toContain(keepImage)
     expect(ids).not.toContain(drop)
+    // Freshly generated posts arrive approved, not as drafts.
+    const generated = surviving.filter((r) => ![keepEdited, keepImage].includes(r.id))
+    expect(generated.length).toBeGreaterThan(0)
+    expect(generated.every((r) => r.status === "approved")).toBe(true)
   })
 
   test("retries a transient failure instead of giving up", async () => {

@@ -92,7 +92,7 @@ export function CalendarEmptyState({
   const currentStepIndex = genSteps.findIndex((s) => s.key === genStatus);
 
   return (
-    <div className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800/70 bg-white/80 dark:bg-zinc-950/60 overflow-hidden">
+    <div className="relative rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white/80 dark:bg-black/25 overflow-hidden">
       {/* Soft brand radial behind the orb */}
       <div
         aria-hidden
@@ -112,7 +112,7 @@ export function CalendarEmptyState({
         {[260, 380, 520].map((size, i) => (
           <div
             key={size}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-zinc-800/40"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-white/[0.08]"
             style={{
               width: size,
               height: size,
@@ -187,7 +187,7 @@ export function CalendarEmptyState({
                     isActive
                       ? "bg-emerald-500/8 border border-emerald-500/20"
                       : isDone
-                        ? "bg-zinc-800/20 border border-zinc-200/60 dark:border-zinc-800/40"
+                        ? "bg-zinc-800/20 border border-zinc-200/60 dark:border-white/[0.08]"
                         : "border border-transparent opacity-30"
                   }`}
                 >
@@ -196,8 +196,8 @@ export function CalendarEmptyState({
                       isActive
                         ? "bg-emerald-500/15"
                         : isDone
-                          ? "bg-zinc-200/50 dark:bg-zinc-800/50"
-                          : "bg-zinc-200/30 dark:bg-zinc-800/30"
+                          ? "bg-zinc-200/50 dark:bg-white/[0.07]"
+                          : "bg-zinc-200/30 dark:bg-white/[0.07]"
                     }`}
                   >
                     {isDone ? (

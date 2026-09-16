@@ -96,10 +96,10 @@ export function InstagramPreview({
     captionOpen || !captionLong ? caption : `${caption.slice(0, 120).trimEnd()}…`;
 
   return (
-    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-black/25 shadow-sm">
       {/* Profile row */}
       <div className="flex items-center gap-2.5 px-3.5 py-2.5">
-        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-rose-400/70 bg-zinc-100 dark:bg-zinc-900">
+        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-rose-400/70 bg-zinc-100 dark:bg-white/[0.05]">
           {biz?.logo ? (
             <Image
               src={biz.logo}
@@ -128,7 +128,7 @@ export function InstagramPreview({
 
       {/* Media */}
       <div
-        className={`group relative ${aspectClass} bg-zinc-100 dark:bg-zinc-900 ${
+        className={`group relative ${aspectClass} bg-zinc-100 dark:bg-white/[0.05] ${
           current && !generating ? "cursor-pointer" : ""
         }`}
         onClick={() => current && !generating && onExpand()}
@@ -138,14 +138,14 @@ export function InstagramPreview({
             <SlideImage url={current.url} alt={current.headline} />
             {regeneratingIndex !== clamped && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/25 opacity-0 group-hover:opacity-100 transition-all duration-150">
-                <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-zinc-950/85 border border-zinc-200 dark:border-zinc-800 text-[11px] font-medium text-zinc-800 dark:text-zinc-200">
+                <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.08] text-[11px] font-medium text-zinc-800 dark:text-zinc-200">
                   <Expand className="w-3 h-3" />
                   {t("imageExpand")}
                 </span>
               </div>
             )}
             {regeneratingIndex === clamped && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-sm">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/80 dark:bg-black/25 backdrop-blur-sm">
                 <Loader2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 animate-spin" />
                 <p className="text-[10px] text-zinc-700 dark:text-zinc-300">
                   {t("regeneratingSlide")}
@@ -186,7 +186,7 @@ export function InstagramPreview({
                 e.stopPropagation();
                 onIndexChange((clamped - 1 + images.length) % images.length);
               }}
-              className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/85 dark:bg-zinc-950/75 hover:bg-white dark:hover:bg-zinc-900 flex items-center justify-center text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity shadow"
+              className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/85 dark:bg-black/25 hover:bg-white dark:hover:bg-white/[0.09] flex items-center justify-center text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity shadow"
               aria-label={t("slidePrev")}
             >
               <ChevronLeft className="w-4 h-4" />
@@ -197,7 +197,7 @@ export function InstagramPreview({
                 e.stopPropagation();
                 onIndexChange((clamped + 1) % images.length);
               }}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/85 dark:bg-zinc-950/75 hover:bg-white dark:hover:bg-zinc-900 flex items-center justify-center text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity shadow"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/85 dark:bg-black/25 hover:bg-white dark:hover:bg-white/[0.09] flex items-center justify-center text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity shadow"
               aria-label={t("slideNext")}
             >
               <ChevronRight className="w-4 h-4" />
@@ -220,7 +220,7 @@ export function InstagramPreview({
                   ? "w-1.5 bg-sky-500"
                   : imageFailures.includes(i)
                     ? "w-1.5 bg-red-500"
-                    : "w-1.5 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-500"
+                    : "w-1.5 bg-zinc-300 dark:bg-white/[0.12] hover:bg-zinc-500"
               }`}
               aria-label={t("slideN", { n: i + 1 })}
             />
@@ -331,7 +331,7 @@ function SlideImage({ url, alt }: { url: string; alt: string }) {
         onError={() => setStatus("error")}
       />
       {status !== "loaded" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900 animate-pulse">
+        <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-white/[0.05] animate-pulse">
           <ImageIcon className="w-7 h-7 text-zinc-300 dark:text-zinc-700" />
         </div>
       )}

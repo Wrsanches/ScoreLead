@@ -88,13 +88,13 @@ export function NotificationsSection() {
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+    <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
       <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">
         {t("notifications")}
       </h2>
       <p className="text-sm text-zinc-500 mb-6">{t("description")}</p>
 
-      <ul className="divide-y divide-zinc-200/80 dark:divide-zinc-800/80">
+      <ul className="divide-y divide-zinc-200/80 dark:divide-white/[0.08]">
         {ROWS.map((row) => (
           <li
             key={row.key}

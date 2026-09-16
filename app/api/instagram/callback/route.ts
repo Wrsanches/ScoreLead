@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "INVALID_OAUTH_STATE" }, { status: 400 })
   const destination = new URL(
     getLocalizedAppPath(
-      `/admin/business/${pending.businessId}/integrations`,
+      `/admin/business/${pending.businessId}/integrations/instagram`,
       pending.locale,
     ),
     new URL(instagramConfig().redirectUri).origin,

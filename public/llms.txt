@@ -29,8 +29,6 @@ Core workflow:
 - Product pricing: https://scorelead.io/pricing
 - Security and trust: https://scorelead.io/security
 - About ScoreLead: https://scorelead.io/about
-- Editorial policy: https://scorelead.io/editorial-policy
-- ScoreLead Editorial: https://scorelead.io/authors/scorelead-editorial
 - Blog: https://scorelead.io/blog
 - Sitemap: https://scorelead.io/sitemap.xml
 
@@ -41,17 +39,12 @@ Core workflow:
 - Lead enrichment: https://scorelead.io/features/lead-enrichment
 - Outreach automation: https://scorelead.io/features/outreach-automation
 - Sales pipeline: https://scorelead.io/features/sales-pipeline
+- AI content calendar: https://scorelead.io/features/ai-content-creation
 
 ## Use Cases and Comparisons
 
 - Agencies: https://scorelead.io/use-cases/agencies
-- B2B sales teams: https://scorelead.io/use-cases/b2b-sales-teams
-- B2B startups: https://scorelead.io/use-cases/b2b-startups
-- Established B2B companies: https://scorelead.io/use-cases/b2b-companies
-- Manual research comparison: https://scorelead.io/compare/manual-lead-research
-- Spreadsheet comparison: https://scorelead.io/compare/spreadsheets
 - Sales prospecting software: https://scorelead.io/compare/sales-prospecting-software
-- Purchased-list comparison: https://scorelead.io/compare/purchased-lead-lists
 - Lead scoring software comparison: https://scorelead.io/compare/best-lead-scoring-software
 - Lead enrichment tools comparison: https://scorelead.io/compare/b2b-lead-enrichment-tools
 - Ceramik case study: https://scorelead.io/case-studies/ceramik

@@ -29,6 +29,7 @@ import {
   Copy,
   Check,
   Radar,
+  ChevronRight,
   Building2,
   ChevronDown,
   Users,
@@ -281,8 +282,8 @@ export default function LeadsPage() {
       )}
 
       {/* Lead list */}
-      <div className="w-full sm:w-85 h-full bg-zinc-50/60 dark:bg-zinc-900/30 border-r border-zinc-200 dark:border-zinc-800 flex flex-col shrink-0">
-        <div className="px-4 h-18 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+      <div className="w-full sm:w-85 h-full bg-zinc-50/60 dark:bg-white/[0.03] border-r border-zinc-200 dark:border-white/[0.08] flex flex-col shrink-0">
+        <div className="px-4 h-18 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileMenuButton />
             <div>
@@ -297,7 +298,7 @@ export default function LeadsPage() {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 bg-zinc-200/40 dark:bg-zinc-800/40 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 transition-all duration-150">
+              <button className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 bg-zinc-200/40 dark:bg-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/[0.11] px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-white/[0.08] transition-all duration-150">
                 <span className="text-zinc-800 dark:text-zinc-200">
                   {sortBy === "score"
                     ? t("score")
@@ -418,6 +419,23 @@ export default function LeadsPage() {
           </div>
         )}
 
+        {/* Pinned, floating entry point to discovery jobs */}
+        <div className="px-3 pt-3 pb-4 shrink-0">
+          <Link
+            href="/admin/discovery-jobs"
+            className="glass-card group flex items-center gap-3 rounded-2xl px-3.5 py-3 ring-1 ring-emerald-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:ring-emerald-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+              <Radar className="w-4 h-4" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold tracking-tight text-zinc-900 dark:text-white">{t("discoveryCta")}</span>
+              <span className="block text-xs text-zinc-500 truncate">{t("discoveryCtaHint")}</span>
+            </span>
+            <ChevronRight className="w-4 h-4 shrink-0 text-zinc-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />
+          </Link>
+        </div>
+
         <div
           ref={leadListRef}
           className="relative flex-1 overflow-auto scrollbar-hide"
@@ -429,12 +447,12 @@ export default function LeadsPage() {
             <div className="p-4 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="flex items-start gap-3 px-4 py-3">
-                  <div className="w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse mt-1.5" />
+                  <div className="w-2 h-2 rounded-full bg-zinc-200 dark:bg-white/[0.07] animate-pulse mt-1.5" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded-md animate-pulse w-3/4" />
-                    <div className="h-3 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-md animate-pulse w-1/2" />
+                    <div className="h-4 bg-zinc-200 dark:bg-white/[0.07] rounded-md animate-pulse w-3/4" />
+                    <div className="h-3 bg-zinc-200/60 dark:bg-white/[0.07] rounded-md animate-pulse w-1/2" />
                   </div>
-                  <div className="h-5 w-10 bg-zinc-200 dark:bg-zinc-800 rounded-md animate-pulse" />
+                  <div className="h-5 w-10 bg-zinc-200 dark:bg-white/[0.07] rounded-md animate-pulse" />
                 </div>
               ))}
             </div>
@@ -478,7 +496,7 @@ export default function LeadsPage() {
                   className={`group px-4 py-3.5 cursor-pointer transition-all duration-150 ${
                     i === selectedIndex
                       ? "bg-emerald-500/5 border-l-[3px] border-l-emerald-500"
-                      : "border-l-[3px] border-l-transparent hover:bg-zinc-100/60 dark:hover:bg-zinc-800/25 hover:translate-x-0.5"
+                      : "border-l-[3px] border-l-transparent hover:bg-zinc-100/60 dark:hover:bg-white/[0.11] hover:translate-x-0.5"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -493,7 +511,7 @@ export default function LeadsPage() {
                           unoptimized
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-white/[0.07] flex items-center justify-center">
                           <span className="text-[10px] font-medium text-zinc-500">
                             {getInitials(l.name)}
                           </span>
@@ -532,7 +550,7 @@ export default function LeadsPage() {
                 </div>
               ))}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 py-3 border-t border-zinc-200/60 dark:border-zinc-800/40">
+                <div className="flex items-center justify-center gap-2 py-3 border-t border-zinc-200/60 dark:border-white/[0.08]">
                   <button
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page === 1}
@@ -559,14 +577,14 @@ export default function LeadsPage() {
 
       {/* Detail panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full bg-zinc-50/60 dark:bg-zinc-900/30 flex flex-col overflow-hidden transition-transform duration-200 ease-out sm:relative sm:flex sm:flex-1 sm:translate-x-0 ${
+        className={`fixed inset-y-0 right-0 z-50 w-full bg-zinc-50/60 dark:bg-white/[0.03] flex flex-col overflow-hidden transition-transform duration-200 ease-out sm:relative sm:flex sm:flex-1 sm:translate-x-0 ${
           detailOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {!lead ? (
           <div className="flex-1 flex items-center justify-center p-6">
-            <div className="max-w-sm rounded-2xl border border-zinc-200 dark:border-zinc-800/70 bg-white/70 dark:bg-zinc-950/40 px-8 py-10 text-center shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-zinc-900/70 ring-1 ring-zinc-800">
+            <div className="max-w-sm rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white/70 dark:bg-black/25 px-8 py-10 text-center shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-white/[0.03] ring-1 ring-white/[0.08]">
                 <Users className="h-5 w-5 text-zinc-500" />
               </div>
               {!isLoading && leads.length === 0 ? (
@@ -601,11 +619,11 @@ export default function LeadsPage() {
           </div>
         ) : (
           <>
-            <div className="px-4 sm:px-5 h-18 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white/80 dark:bg-zinc-950/50 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+            <div className="px-4 sm:px-5 h-18 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between shrink-0 bg-white/80 dark:bg-black/25 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setDetailOpen(false)}
-                  className="sm:hidden p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 rounded-lg transition-colors duration-150"
+                  className="sm:hidden p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-colors duration-150"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
@@ -629,7 +647,7 @@ export default function LeadsPage() {
                 {lead.email && (
                   <a
                     href={`mailto:${lead.email}`}
-                    className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/90 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 rounded-lg transition-all duration-150 flex items-center gap-1.5"
+                    className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] bg-zinc-50/90 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-all duration-150 flex items-center gap-1.5"
                     title={`Email ${lead.email}`}
                   >
                     <Mail className="w-3.5 h-3.5" />
@@ -639,7 +657,7 @@ export default function LeadsPage() {
                 {lead.phone && (
                   <a
                     href={`tel:${lead.phone}`}
-                    className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/90 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 rounded-lg transition-all duration-150 flex items-center gap-1.5"
+                    className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] bg-zinc-50/90 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-all duration-150 flex items-center gap-1.5"
                     title={`Call ${lead.phone}`}
                   >
                     <Phone className="w-3.5 h-3.5" />
@@ -658,7 +676,7 @@ export default function LeadsPage() {
                   </a>
                 )}
                 <button
-                  className="h-8 w-8 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 rounded-lg transition-colors duration-150 flex items-center justify-center"
+                  className="h-8 w-8 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-colors duration-150 flex items-center justify-center"
                   title="More actions"
                 >
                   <MoreHorizontal className="w-4 h-4" />
@@ -671,7 +689,7 @@ export default function LeadsPage() {
                 {(() => {
                   const statusCfg = getStatus(lead.status);
                   return (
-                    <div className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-950/45 p-5 sm:p-6 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
+                    <div className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white/[0.03] p-5 sm:p-6 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
                       <div
                         aria-hidden="true"
                         className="pointer-events-none absolute inset-0"
@@ -690,10 +708,10 @@ export default function LeadsPage() {
                               src={lead.photoUrl}
                               alt={lead.name ?? ""}
                               sizes="(min-width: 640px) 80px, 64px"
-                              thumbClassName="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ring-1 ring-zinc-700/80 shadow-lg shadow-black/30"
+                              thumbClassName="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ring-1 ring-white/[0.12] shadow-lg shadow-black/30"
                             />
                           ) : (
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-200/80 dark:bg-zinc-800/80 flex items-center justify-center ring-1 ring-zinc-700/60 shadow-lg shadow-black/25">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-200/80 dark:bg-white/[0.07] flex items-center justify-center ring-1 ring-white/[0.12] shadow-lg shadow-black/25">
                               <span className="text-xl sm:text-2xl font-semibold text-zinc-600 dark:text-zinc-400">
                                 {getInitials(lead.name)}
                               </span>
@@ -727,12 +745,12 @@ export default function LeadsPage() {
                               <DropdownMenuContent
                                 align="start"
                                 sideOffset={6}
-                                className="w-50 bg-zinc-50 dark:bg-zinc-900 border-zinc-300/60 dark:border-zinc-700/60 shadow-xl shadow-black/40"
+                                className="w-50 border-zinc-300/60"
                               >
                                 <DropdownMenuLabel className="px-3 py-1.5 text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
                                   Change status
                                 </DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
+                                <DropdownMenuSeparator className="bg-zinc-200 dark:bg-white/[0.07]" />
                                 {LEAD_STATUS_KEYS.map((key) => {
                                   const cfg = STATUS_CONFIG[key];
                                   const isCurrent = key === lead.status;
@@ -762,7 +780,7 @@ export default function LeadsPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                             {lead.firecrawlEnriched && (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-200/60 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 ring-1 ring-zinc-700/60">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-200/60 dark:bg-white/[0.07] text-zinc-700 dark:text-zinc-300 ring-1 ring-white/[0.12]">
                                 Enriched
                               </span>
                             )}
@@ -785,7 +803,7 @@ export default function LeadsPage() {
                           {/* Quick facts row */}
                           <div className="flex flex-wrap items-center gap-2 mt-4 text-xs">
                             {lead.googleRating != null && (
-                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/50 px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
+                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/90 dark:bg-white/[0.03] px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
                                 <Star className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 fill-amber-600 dark:fill-amber-400" />
                                 <StatNumber
                                   value={lead.googleRating.toFixed(1)}
@@ -799,7 +817,7 @@ export default function LeadsPage() {
                               </div>
                             )}
                             {lead.services && lead.services.length > 0 && (
-                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/50 px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
+                              <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/90 dark:bg-white/[0.03] px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
                                 <Tag className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                 <StatNumber
                                   value={lead.services.length}
@@ -808,7 +826,7 @@ export default function LeadsPage() {
                                 <span className="text-zinc-500 dark:text-zinc-600">services</span>
                               </div>
                             )}
-                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/50 px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
+                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/90 dark:bg-white/[0.03] px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400">
                               <Radar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               <span className="text-zinc-500 capitalize">
                                 {lead.source.replace("_", " ")}
@@ -819,7 +837,7 @@ export default function LeadsPage() {
                       </div>
 
                       {/* Score card */}
-                      <div className="relative shrink-0 rounded-2xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/50 px-4 py-3 ring-1 ring-zinc-800/80 sm:text-right">
+                      <div className="relative shrink-0 rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/90 dark:bg-white/[0.03] px-4 py-3 ring-1 ring-white/[0.08] sm:text-right">
                         <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">
                           {t("score")}
                         </span>
@@ -840,7 +858,7 @@ export default function LeadsPage() {
 
                 {/* Score breakdown - 5 categories */}
                 {lead.scoreBreakdown?.categories && (
-                  <div className="border border-zinc-200 dark:border-zinc-800/70 bg-zinc-950/35 rounded-2xl p-5 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
+                  <div className="border border-zinc-200 dark:border-white/[0.08] bg-white/[0.03] rounded-2xl p-5 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
                     <div className="flex items-center justify-between gap-4 mb-5">
                       <div>
                         <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
@@ -1050,7 +1068,7 @@ export default function LeadsPage() {
                         <div
                           className={
                             lead.ownerName || lead.operatingHours
-                              ? "pt-2 border-t border-zinc-200/80 dark:border-zinc-800/60"
+                              ? "pt-2 border-t border-zinc-200/80 dark:border-white/[0.08]"
                               : ""
                           }
                         >
@@ -1062,7 +1080,7 @@ export default function LeadsPage() {
                             {lead.services.map((s) => (
                               <span
                                 key={s}
-                                className="text-[11px] bg-zinc-200/60 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 px-2 py-1 rounded-md ring-1 ring-zinc-700/60"
+                                className="text-[11px] bg-zinc-200/60 dark:bg-white/[0.07] text-zinc-700 dark:text-zinc-300 px-2 py-1 rounded-md ring-1 ring-white/[0.12]"
                               >
                                 {s}
                               </span>
@@ -1099,7 +1117,7 @@ export default function LeadsPage() {
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/80 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-900/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 overflow-hidden"
+                                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:border-zinc-300 dark:hover:border-white/[0.22] transition-all duration-150 overflow-hidden"
                                 title={url}
                               >
                                 <div
@@ -1174,7 +1192,7 @@ export default function LeadsPage() {
                     return (
                       <SectionCard title="Reviews" className="mb-6">
                         {/* Aggregate header */}
-                        <div className="flex items-center gap-4 pb-4 mb-4 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                        <div className="flex items-center gap-4 pb-4 mb-4 border-b border-zinc-200/80 dark:border-white/[0.08]">
                           <div className="flex items-baseline gap-1">
                             <span className="text-3xl text-zinc-900 dark:text-white font-semibold tabular-nums tracking-tight">
                               {avg.toFixed(1)}
@@ -1201,7 +1219,7 @@ export default function LeadsPage() {
                           {reviews.map((review, i) => (
                             <div
                               key={i}
-                              className="py-3 px-3.5 bg-zinc-50/80 dark:bg-zinc-900/40 rounded-lg border border-zinc-200/80 dark:border-zinc-800/60"
+                              className="py-3 px-3.5 bg-zinc-50/80 dark:bg-white/[0.03] rounded-lg border border-zinc-200/80 dark:border-white/[0.08]"
                             >
                               <div className="flex items-center justify-between mb-1.5">
                                 <div className="flex items-center gap-2">
@@ -1244,7 +1262,7 @@ export default function LeadsPage() {
                         .map((item, i) => (
                           <div
                             key={i}
-                            className="flex items-start gap-2.5 py-1.5 px-3 bg-zinc-200/30 dark:bg-zinc-800/30 rounded-lg"
+                            className="flex items-start gap-2.5 py-1.5 px-3 bg-zinc-200/30 dark:bg-white/[0.07] rounded-lg"
                           >
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 mt-1.5 shrink-0" />
                             <span className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
@@ -1257,7 +1275,7 @@ export default function LeadsPage() {
                 )}
 
                 {/* Metadata */}
-                <div className="pt-6 mt-2 border-t border-zinc-200 dark:border-zinc-800/70">
+                <div className="pt-6 mt-2 border-t border-zinc-200 dark:border-white/[0.08]">
                   <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider mb-4">
                     Details
                   </p>
@@ -1287,7 +1305,7 @@ export default function LeadsPage() {
                           {lead.teamMembers.map((m) => (
                             <span
                               key={m.name}
-                              className="text-xs bg-white dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-md"
+                              className="text-xs bg-white dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] px-2 py-1 rounded-md"
                             >
                               {m.name}
                               {m.role && (
@@ -1339,7 +1357,7 @@ function CopyRow({
     "flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white truncate transition-colors";
 
   return (
-    <div className="group flex items-center gap-2.5 -mx-2 px-2 py-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors">
+    <div className="group flex items-center gap-2.5 -mx-2 px-2 py-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors">
       <Icon className="w-4 h-4 text-zinc-500 shrink-0" />
       {linkHref ? (
         <a
@@ -1363,7 +1381,7 @@ function CopyRow({
         className={`shrink-0 p-1 rounded-md transition-all duration-150 ${
           isCopied
             ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 opacity-100"
-            : "text-zinc-500 dark:text-zinc-600 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 opacity-0 group-hover:opacity-100"
+            : "text-zinc-500 dark:text-zinc-600 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.11] opacity-0 group-hover:opacity-100"
         }`}
         title={isCopied ? "Copied!" : "Copy"}
         aria-label={isCopied ? "Copied" : `Copy ${copyKey}`}

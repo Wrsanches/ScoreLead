@@ -66,12 +66,7 @@ export async function generateMetadata({
     title: translation.title,
     description: translation.description,
     keywords: translation.keywords,
-    authors: [
-      {
-        name: "ScoreLead Editorial",
-        url: getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
-      },
-    ],
+    authors: [{ name: siteConfig.name, url: siteConfig.url }],
     creator: siteConfig.creator,
     publisher: siteConfig.name,
     alternates: {
@@ -87,9 +82,7 @@ export async function generateMetadata({
       description: translation.description,
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
-      authors: [
-        getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
-      ],
+      authors: [siteConfig.url],
       tags: translation.keywords,
       images: [
         { url: image, width: 1200, height: 630, alt: translation.title },
@@ -147,8 +140,8 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
         author: {
           "@type": "Organization",
           "@id": `${siteConfig.url}/#organization`,
-          name: "ScoreLead Editorial",
-          url: getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
+          name: siteConfig.name,
+          url: siteConfig.url,
         },
         publisher: {
           "@type": "Organization",
@@ -190,13 +183,13 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100">
+    <div className="marketing-canvas min-h-screen text-zinc-100">
       <JsonLd data={jsonLd} />
       <Navbar />
 
-      <main id="main" className="pt-16">
+      <main id="main" className="pt-20">
         <article>
-          <header className="border-b border-zinc-800/70 px-6 py-12 sm:py-20">
+          <header className="border-b border-white/[0.08] px-6 py-12 sm:py-20">
             <div className="mx-auto max-w-6xl">
               <Link
                 href="/blog"
@@ -213,7 +206,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                   <h1 className="mt-5 text-balance text-4xl font-medium leading-[1.06] tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl">
                     {translation.title}
                   </h1>
-                  <p className="mt-6 max-w-2xl text-pretty text-base leading-7 text-zinc-400 sm:text-lg">
+                  <p className="mt-6 max-w-[60ch] text-pretty text-base leading-7 text-zinc-300 sm:text-lg">
                     {translation.description}
                   </p>
                   <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-500">
@@ -235,29 +228,9 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                         {formatDate(post.updatedAt, normalizedLocale)}
                       </time>
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                      {ui.authoredBy}{" "}
-                      <Link
-                        href="/authors/scorelead-editorial"
-                        className="rounded-sm text-zinc-300 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-                      >
-                        ScoreLead Editorial
-                      </Link>
-                    </span>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                      {ui.reviewedBy}{" "}
-                      <Link
-                        href="/editorial-policy"
-                        className="rounded-sm text-zinc-300 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-                      >
-                        {ui.reviewerName}
-                      </Link>
-                    </span>
                   </div>
                 </div>
-                <div className="overflow-hidden rounded-2xl border border-zinc-800">
+                <div className="overflow-hidden rounded-2xl border border-white/[0.08]">
                   <BlogVisual post={post} category={translation.category} />
                 </div>
               </div>
@@ -294,10 +267,10 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                 >
                   {ui.decisionTable}
                 </h2>
-                <div className="mt-6 overflow-x-auto border-y border-zinc-800">
+                <div className="mt-6 overflow-x-auto border-y border-white/[0.08]">
                   <table className="w-full min-w-155 border-collapse text-left">
                     <thead>
-                      <tr className="border-b border-zinc-800 text-xs uppercase tracking-[0.14em] text-zinc-500">
+                      <tr className="border-b border-white/[0.08] text-xs uppercase tracking-[0.14em] text-zinc-500">
                         <th scope="col" className="w-2/5 px-4 py-4 font-medium">
                           {ui.decision}
                         </th>
@@ -306,7 +279,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800">
+                    <tbody className="divide-y divide-white/[0.08]">
                       {translation.sections.map((section) => (
                         <tr key={section.heading}>
                           <th
@@ -343,7 +316,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                     >
                       {section.heading}
                     </h2>
-                    <div className="mt-5 space-y-5 text-base leading-8 text-zinc-400 sm:text-[1.05rem]">
+                    <div className="mt-5 max-w-[62ch] space-y-5 text-base leading-8 text-zinc-300 sm:text-[1.05rem]">
                       {section.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}
@@ -353,7 +326,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                         {section.points.map((point) => (
                           <li
                             key={point}
-                            className="flex gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-300"
+                            className="flex gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm leading-6 text-zinc-300"
                           >
                             <span
                               className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald-400"
@@ -379,7 +352,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                   >
                     {ui.practicalChecklist}
                   </h2>
-                  <ul className="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
+                  <ul className="mt-6 divide-y divide-white/[0.08] border-y border-white/[0.08]">
                     {checklist.map((point, index) => (
                       <li
                         key={point}
@@ -396,7 +369,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
               ) : null}
 
               <section
-                className="mt-16 border-y border-zinc-800 py-7"
+                className="mt-16 border-y border-white/[0.08] py-7"
                 aria-labelledby="first-party-product-note"
               >
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
@@ -417,7 +390,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                 <h2 className="mt-4 text-2xl font-medium tracking-tight text-white">
                   {translation.conclusion.heading}
                 </h2>
-                <div className="mt-4 space-y-4 leading-7 text-zinc-400">
+                <div className="mt-4 max-w-[62ch] space-y-4 leading-7 text-zinc-300">
                   {translation.conclusion.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
@@ -432,7 +405,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
               </section>
 
               <section
-                className="mt-16 border-t border-zinc-800 pt-9"
+                className="mt-16 border-t border-white/[0.08] pt-9"
                 aria-labelledby="article-sources"
               >
                 <h2
@@ -444,7 +417,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                 <p className="mt-3 text-sm leading-6 text-zinc-500">
                   {ui.sourcesDescription}
                 </p>
-                <ol className="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
+                <ol className="mt-6 divide-y divide-white/[0.08] border-y border-white/[0.08]">
                   {post.sources.map((source, index) => (
                     <li
                       key={source.url}
@@ -469,20 +442,13 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                     </li>
                   ))}
                 </ol>
-                <Link
-                  href="/editorial-policy"
-                  className="mt-6 inline-flex items-center gap-2 rounded-sm text-sm text-zinc-500 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-                >
-                  {ui.editorialPolicy}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
               </section>
             </div>
           </div>
         </article>
 
         <section
-          className="border-y border-zinc-800/70 px-6 py-16 sm:py-20"
+          className="border-y border-white/[0.08] px-6 py-16 sm:py-20"
           aria-labelledby="related-heading"
         >
           <div className="mx-auto max-w-6xl">

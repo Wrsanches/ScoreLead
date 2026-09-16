@@ -46,6 +46,29 @@ async function getManageablePost(actorUserId: string, postId: string) {
   return access && !access.readOnly ? post : null
 }
 
+async function GETHandler(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = await params
+  const [post] = await db
+    .select()
+    .from(contentPost)
+    .where(eq(contentPost.id, id))
+  if (!post) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+  }
+  // Read-only viewers (platform admins) may open the editor in view mode.
+  const access = await getBusinessAccess(session.user.id, post.businessId)
+  if (!access) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+  }
+  return NextResponse.json({ post: (await attachPublications([post]))[0] })
+}
+
 async function PATCHHandler(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -104,5 +127,6 @@ async function DELETEHandler(
   return NextResponse.json({ success: true })
 }
 
+export async function GET(...args: Parameters<typeof GETHandler>) { return withPublishingErrors(() => GETHandler(...args)) }
 export async function PATCH(...args: Parameters<typeof PATCHHandler>) { return withPublishingErrors(() => PATCHHandler(...args)) }
 export async function DELETE(...args: Parameters<typeof DELETEHandler>) { return withPublishingErrors(() => DELETEHandler(...args)) }

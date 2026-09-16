@@ -101,7 +101,7 @@ function LinkRow({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-all duration-150"
+      className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-zinc-200/80 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-all duration-150"
     >
       <Icon className="w-4 h-4 text-zinc-500 shrink-0" />
       <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 truncate">{label}</span>
@@ -127,7 +127,7 @@ function ChipList({ items }: { items: string[] }) {
       {items.map((item) => (
         <span
           key={item}
-          className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-lg"
+          className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-white/[0.07] border border-zinc-200 dark:border-white/[0.08] px-2.5 py-1 rounded-lg"
         >
           {item}
         </span>
@@ -315,7 +315,7 @@ export default function BusinessDetailPage() {
             <div className="space-y-6">
               {/* Hero */}
               <div className="flex items-start gap-5">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center shrink-0">
                   {logo ? (
                     <Image
                       src={logo}
@@ -368,7 +368,7 @@ export default function BusinessDetailPage() {
                   <button
                     type="button"
                     onClick={() => setEditOpen(true)}
-                    className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
+                    className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 text-sm text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     {t("edit")}
@@ -471,7 +471,7 @@ export default function BusinessDetailPage() {
                           {data.brandFonts!.map((font) => (
                             <span
                               key={font}
-                              className="inline-flex items-center gap-1.5 text-sm text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-lg"
+                              className="inline-flex items-center gap-1.5 text-sm text-zinc-800 dark:text-zinc-200 bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] px-3 py-1.5 rounded-lg"
                               style={{ fontFamily: `"${font}", system-ui, sans-serif` }}
                             >
                               <Type className="w-3.5 h-3.5 text-zinc-500" />
@@ -491,7 +491,7 @@ export default function BusinessDetailPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center mb-3">
                       <Palette className="w-5 h-5 text-zinc-500 dark:text-zinc-600" />
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("noBrand")}</p>
@@ -508,7 +508,7 @@ export default function BusinessDetailPage() {
                     <button
                       type="button"
                       onClick={() => setEditOpen(true)}
-                      className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors px-2.5 py-1.5 rounded-md hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800"
+                      className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors px-2.5 py-1.5 rounded-md hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] border border-transparent hover:border-zinc-200 dark:hover:border-white/[0.18]"
                     >
                       <Pencil className="w-3 h-3" />
                       {t("edit")}
@@ -525,9 +525,9 @@ export default function BusinessDetailPage() {
                       {data.productImages.map((img) => (
                         <div
                           key={img.id}
-                          className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 overflow-hidden"
+                          className="rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] overflow-hidden"
                         >
-                          <div className="relative aspect-square bg-zinc-100 dark:bg-zinc-900">
+                          <div className="relative aspect-square bg-zinc-100 dark:bg-white/[0.05]">
                             <Image
                               src={img.url}
                               alt={img.description || ""}
@@ -548,7 +548,7 @@ export default function BusinessDetailPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center mb-3">
                       <ImageIcon className="w-5 h-5 text-zinc-500 dark:text-zinc-600" />
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">

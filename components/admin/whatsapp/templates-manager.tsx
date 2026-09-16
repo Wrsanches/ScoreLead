@@ -77,7 +77,7 @@ type GeneratedTemplateDraft = Pick<
 >
 
 const INPUT =
-  "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-60"
+  "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-60"
 
 const LANGUAGES = [
   "en_US",
@@ -367,7 +367,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
         title={t("templatesManagerTitle")}
         description={t("templatesManagerDescription")}
         breadcrumbs={[
-          { label: t("title"), href: "/admin/integrations" },
+          { label: t("title"), href: "/admin/integrations/whatsapp" },
           { label: t("manageTemplates") },
         ]}
         actions={!readOnly ? (
@@ -389,7 +389,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
       />
 
       <Link
-        href="/admin/integrations"
+        href="/admin/integrations/whatsapp"
         className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
@@ -401,7 +401,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
           <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
         </div>
       ) : templates.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 py-16 text-center">
+        <div className="mt-8 rounded-2xl border border-dashed border-zinc-300 dark:border-white/[0.14] py-16 text-center">
           <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {t("tplEmptyTitle")}
           </p>
@@ -418,7 +418,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
           {templates.map((row) => (
             <div
               key={row.id}
-              className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/30 px-4 py-3.5"
+              className="rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/60 dark:bg-white/[0.03] px-4 py-3.5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -480,9 +480,9 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="right"
-          className="max-w-lg! w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 p-0 flex flex-col"
+          className="max-w-lg! w-full text-zinc-800 dark:text-zinc-200 p-0 flex flex-col"
         >
-          <SheetHeader className="border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
+          <SheetHeader className="border-b border-zinc-200 dark:border-white/[0.08] px-5 py-4">
             <SheetTitle className="text-zinc-900 dark:text-white text-base">
               {editing ? t("editTemplate") : t("newTemplate")}
             </SheetTitle>
@@ -606,7 +606,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
             </div>
 
             {variableCount > 0 && (
-              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
+              <div className="rounded-xl border border-zinc-200 dark:border-white/[0.08] p-3">
                 <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium mb-2">
                   {t("tplExamples")}
                 </p>
@@ -664,7 +664,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
                 {form.buttons.map((b, i) => (
                   <div
                     key={i}
-                    className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-2.5 space-y-2"
+                    className="rounded-lg border border-zinc-200 dark:border-white/[0.08] p-2.5 space-y-2"
                   >
                     <div className="flex items-center gap-2">
                       <select
@@ -730,7 +730,7 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
             </div>
           </div>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-800 px-5 py-3 flex items-center justify-end gap-2">
+          <div className="border-t border-zinc-200 dark:border-white/[0.08] px-5 py-3 flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={() => setSheetOpen(false)}>
               {t("cancel")}
             </Button>

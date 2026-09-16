@@ -45,10 +45,10 @@ export function DayCell({
   const state = isOver
     ? "border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_32px_-12px_rgba(16,185,129,0.4)]"
     : isToday
-      ? "border-emerald-500/40 bg-zinc-50/80 dark:bg-zinc-900/40 ring-1 ring-emerald-500/30"
+      ? "border-emerald-500/40 bg-zinc-50/80 dark:bg-white/[0.03] ring-1 ring-emerald-500/30"
       : inMonth
-        ? "border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/50 dark:bg-zinc-900/20 hover:border-zinc-300/70 dark:hover:border-zinc-700/70 hover:bg-white/60 dark:hover:bg-zinc-900/40"
-        : "border-zinc-200/60 dark:border-zinc-900/60 bg-zinc-50/40 dark:bg-zinc-950/30"
+        ? "border-zinc-200 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-white/[0.03] hover:border-zinc-300/70 dark:hover:border-white/[0.22] hover:bg-white/60 dark:hover:bg-white/[0.06]"
+        : "border-zinc-200/60 dark:border-zinc-900/60 bg-zinc-50/40 dark:bg-black/25"
 
   return (
     <motion.div

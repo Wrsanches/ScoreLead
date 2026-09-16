@@ -20,7 +20,7 @@ import { routing } from "@/i18n/routing";
 
 describe("localized SEO content registry", () => {
   it("keeps every commercial page substantive in every supported locale", () => {
-    expect(marketingPages).toHaveLength(25);
+    expect(marketingPages).toHaveLength(18);
 
     for (const page of marketingPages) {
       for (const locale of supportedLocales) {
@@ -138,7 +138,7 @@ describe("localized SEO content registry", () => {
 
   it("includes every localized public URL with stable modification dates", () => {
     const entries = sitemap();
-    expect(entries).toHaveLength(126);
+    expect(entries).toHaveLength(105);
 
     for (const page of marketingPages) {
       const matches = entries.filter((entry) =>

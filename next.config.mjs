@@ -33,6 +33,28 @@ const nextConfig = {
   images: {
     remotePatterns: imageRemotePatterns,
   },
+  async redirects() {
+    // Thin marketing pages retired in 2026-09. Keep their URLs resolving so
+    // indexed links and backlinks land on the closest surviving page.
+    const retired = [
+      ["use-cases/b2b-sales-teams", "features/ai-lead-discovery"],
+      ["use-cases/b2b-startups", "features/ai-lead-discovery"],
+      ["use-cases/b2b-companies", "features/ai-lead-discovery"],
+      ["compare/manual-lead-research", "blog/manual-lead-research-vs-automation"],
+      ["compare/spreadsheets", "compare/sales-prospecting-software"],
+      ["compare/purchased-lead-lists", "features/ai-lead-discovery"],
+      ["editorial-policy", "about"],
+      ["authors/scorelead-editorial", "about"],
+    ];
+    return retired.flatMap(([from, to]) => [
+      { source: `/${from}`, destination: `/${to}`, permanent: true },
+      {
+        source: `/:locale(pt|es)/${from}`,
+        destination: `/:locale/${to}`,
+        permanent: true,
+      },
+    ]);
+  },
   async headers() {
     return [
       {

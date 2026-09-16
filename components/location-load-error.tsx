@@ -32,7 +32,7 @@ export function LocationLoadError({
         type="button"
         onClick={onRetry}
         disabled={retrying}
-        className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg border border-amber-600/30 bg-white/70 px-4 text-sm font-medium text-amber-900 transition-colors hover:bg-white disabled:cursor-wait disabled:opacity-60 dark:border-amber-400/25 dark:bg-zinc-950/40 dark:text-amber-100 dark:hover:bg-zinc-950/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950"
+        className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg border border-amber-600/30 bg-white/70 px-4 text-sm font-medium text-amber-900 transition-colors hover:bg-white disabled:cursor-wait disabled:opacity-60 dark:border-amber-400/25 dark:bg-black/25 dark:text-amber-100 dark:hover:bg-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950"
       >
         {retrying ? (
           <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />

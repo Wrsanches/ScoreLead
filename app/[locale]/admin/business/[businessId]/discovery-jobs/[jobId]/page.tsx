@@ -211,7 +211,7 @@ export default function DiscoveryJobDetailPage({
                 {keywords.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
                     {keywords.map((kw: string) => (
-                      <span key={kw} className="text-xs text-zinc-500 bg-zinc-200/50 dark:bg-zinc-800/50 px-2 py-1 rounded-lg">{kw}</span>
+                      <span key={kw} className="text-xs text-zinc-500 bg-zinc-200/50 dark:bg-white/[0.07] px-2 py-1 rounded-lg">{kw}</span>
                     ))}
                   </div>
                 )}
@@ -223,7 +223,7 @@ export default function DiscoveryJobDetailPage({
                 )}
 
                 {job.exhausted && (
-                  <div className="mt-4 flex items-center gap-2 p-3 bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-600 dark:text-zinc-400">
+                  <div className="mt-4 flex items-center gap-2 p-3 bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-600 dark:text-zinc-400">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-zinc-500" />
                     No more new leads to find in this area.
                   </div>
@@ -283,7 +283,7 @@ export default function DiscoveryJobDetailPage({
                                 <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                 <span className="text-xs text-zinc-500 tabular-nums">{count}</span>
                               </div>
-                              <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                              <div className="w-full h-2 bg-zinc-200 dark:bg-white/[0.07] rounded-full overflow-hidden">
                                 <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
                               </div>
                             </div>
@@ -310,7 +310,7 @@ export default function DiscoveryJobDetailPage({
                                     <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                     <span className="text-xs text-zinc-500 tabular-nums">{count} ({pct.toFixed(0)}%)</span>
                                   </div>
-                                  <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                  <div className="w-full h-1.5 bg-zinc-200 dark:bg-white/[0.07] rounded-full overflow-hidden">
                                     <div className="h-full bg-zinc-500 rounded-full" style={{ width: `${pct}%` }} />
                                   </div>
                                 </div>
@@ -331,7 +331,7 @@ export default function DiscoveryJobDetailPage({
                                   <span className="text-xs text-zinc-600 dark:text-zinc-400">{label}</span>
                                   <span className="text-xs text-zinc-500 tabular-nums">{count} ({pct.toFixed(0)}%)</span>
                                 </div>
-                                <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                <div className="w-full h-1.5 bg-zinc-200 dark:bg-white/[0.07] rounded-full overflow-hidden">
                                   <div className="h-full bg-zinc-500 rounded-full" style={{ width: `${pct}%` }} />
                                 </div>
                               </div>

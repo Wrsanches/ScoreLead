@@ -47,11 +47,11 @@ function Slot({
   const iconColor = accent === "emerald" ? "text-emerald-600 dark:text-emerald-400" : "text-sky-600 dark:text-sky-400"
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/70 ring-1 ${ring}`}
+      className={`flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-white/[0.08] ring-1 ${ring}`}
     >
       <div className="relative shrink-0">
         <div
-          className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-inner"
+          className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-white/[0.08] shadow-inner"
           style={{
             backgroundColor: value || "transparent",
             backgroundImage: value
@@ -60,7 +60,7 @@ function Slot({
           }}
         />
         <div
-          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center ${iconColor}`}
+          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white dark:bg-black/25 border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center ${iconColor}`}
         >
           <Icon className="w-2.5 h-2.5" />
         </div>
@@ -81,7 +81,7 @@ function Slot({
         <button
           type="button"
           onClick={onClear}
-          className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+          className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors"
           aria-label="Clear"
         >
           <X className="w-3.5 h-3.5" />
@@ -146,10 +146,10 @@ export function BrandColorPicker({
                 <button
                   type="button"
                   disabled={readOnly}
-                  className={`group flex items-center gap-2.5 p-2 pr-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-all duration-150 text-left ${ringClass}`}
+                  className={`group flex items-center gap-2.5 p-2 pr-2.5 rounded-xl border border-zinc-200/80 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-all duration-150 text-left ${ringClass}`}
                 >
                   <div
-                    className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0 shadow-inner relative"
+                    className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-white/[0.08] shrink-0 shadow-inner relative"
                     style={{ backgroundColor: color }}
                   >
                     {(isPrimary || isSecondary) && (

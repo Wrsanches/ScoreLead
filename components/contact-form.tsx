@@ -14,7 +14,7 @@ import {
 } from "@/lib/validations/contact"
 
 const inputClassName =
-  "w-full rounded-md border border-zinc-800 bg-zinc-900/40 px-3.5 py-3 text-base text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] placeholder:text-zinc-600 hover:border-zinc-700 focus:border-emerald-500/60 focus:bg-zinc-900/70 focus:ring-3 focus:ring-emerald-500/10 aria-invalid:border-red-400/60 aria-invalid:ring-3 aria-invalid:ring-red-500/10 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+  "w-full rounded-md border border-white/[0.08] bg-white/[0.03] px-3.5 py-3 text-base text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] placeholder:text-zinc-600 hover:border-white/[0.14] focus:border-emerald-500/60 focus:bg-white/[0.03] focus:ring-3 focus:ring-emerald-500/10 aria-invalid:border-red-400/60 aria-invalid:ring-3 aria-invalid:ring-red-500/10 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
 
 const MESSAGE_MAX_LENGTH = 5_000
 
@@ -113,7 +113,7 @@ export function ContactForm() {
           {t("inquiriesTitle")}
         </h2>
 
-        <div className="mt-4 border-y border-zinc-800/60" role="group" aria-label={t("inquiryType")}>
+        <div className="mt-4 border-y border-white/[0.08]" role="group" aria-label={t("inquiryType")}>
           {inquiryOptions.map((option) => {
             const active = inquiryValue === option.value
             return (
@@ -127,7 +127,7 @@ export function ContactForm() {
                     shouldDirty: true,
                   })
                 }
-                className="group flex w-full items-start justify-between gap-4 border-b border-zinc-800/60 py-5 text-left last:border-b-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald-400"
+                className="group flex w-full items-start justify-between gap-4 border-b border-white/[0.08] py-5 text-left last:border-b-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald-400"
               >
                 <span>
                   <span
@@ -354,7 +354,7 @@ export function ContactForm() {
               />
             </div>
 
-            <div className="flex flex-col-reverse gap-4 border-t border-zinc-800/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col-reverse gap-4 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
               <p id="contact-privacy" className="max-w-xs text-xs leading-5 text-zinc-600">
                 {t("privacy")}
               </p>

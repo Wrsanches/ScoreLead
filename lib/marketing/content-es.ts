@@ -202,6 +202,57 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Mantén descubrimiento, calificación y outreach en un mismo flujo.",
     ctaLabel: "Construir tu pipeline",
   },
+  "feature-ai-content-creation": {
+    eyebrow: "Función · Creación de contenido",
+    title: "Calendario de Contenido con IA para Instagram",
+    description:
+      "Planifica un mes de publicaciones, carruseles e historias de Instagram desde el perfil de tu negocio, genera imágenes con IA y publica a tiempo.",
+    answer:
+      "ScoreLead lee el perfil de tu negocio, tu audiencia y el estilo de tu marca, y redacta un mes de publicaciones de Instagram con ganchos, textos y hashtags. Cada publicación recibe imágenes generadas por IA en la paleta de tu marca, y las aprobadas se pueden programar directo en Instagram.",
+    highlights: [
+      "Redacta un mes completo de publicaciones, carruseles e historias con un clic.",
+      "Genera imágenes de marca para cada diapositiva, usando tus productos reales como referencia.",
+      "Aprueba, refina y programa en Instagram sin salir del calendario.",
+    ],
+    sections: [
+      {
+        heading: "Empieza por tu negocio, no por una página en blanco",
+        paragraphs: [
+          "El planificador lee perfil, servicios, audiencia y voz de marca, y reparte el mes en cinco pilares de contenido: educar, mostrar, contar, probar e interactuar. Cada publicación llega con una primera línea que detiene el scroll, un texto, hashtags y una idea visual editable.",
+        ],
+      },
+      {
+        heading: "Imágenes que se ven como tu marca",
+        paragraphs: [
+          "Cada publicación y cada diapositiva de carrusel se genera con el modelo GPT Image más reciente, en los colores y la tipografía de tu marca. Adjunta una foto real del producto y la IA la integra en la escena sin redibujarla. Cambia cualquier diapositiva con una frase o sube tu propia foto y sigue.",
+        ],
+        points: [
+          "Colores y tipografía de marca en cada imagen",
+          "Fotos reales de producto como referencia",
+          "Refina una diapositiva con una sola frase",
+          "Sube tus propias fotos cuando quieras",
+        ],
+      },
+      {
+        heading: "Revisa y publica a tiempo",
+        paragraphs: [
+          "Cada publicación se abre como una vista previa al estilo de Instagram, con imágenes, texto y hashtags. Márcala como aprobada cuando esté lista, elige fecha y hora, y ScoreLead la publica por la plataforma oficial de Meta aunque no estés conectado.",
+        ],
+      },
+      {
+        heading: "Reutiliza más allá de Instagram",
+        paragraphs: [
+          "Cada texto e imagen es tuyo. Descárgalos y vuelve a publicarlos en Facebook, TikTok o LinkedIn con el mismo sistema de marca. La programación directa está disponible para Instagram hoy.",
+        ],
+      },
+    ],
+    proofLabel: "Qué hace y qué no hace la IA",
+    proof:
+      "ScoreLead redacta y genera el contenido a partir de tu perfil; tú apruebas cada publicación antes de programarla. Publicar en Instagram requiere una cuenta Instagram Business o Creator conectada y sigue las reglas de la plataforma de Meta.",
+    ctaTitle: "Un mes de contenido, planificado en minutos.",
+    ctaDescription: "El calendario de contenido está incluido desde el plan Growth. Empieza gratis y conoce el planificador primero.",
+    ctaLabel: "Planificar mi contenido",
+  },
   "use-case-agencies": {
     eyebrow: "Caso de uso · Agencias",
     title: "Generación de Leads B2B para Agencias",
@@ -241,206 +292,6 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaTitle: "Ejecuta prospección enfocada para cada cliente.",
     ctaDescription: "Da a cada campaña su lógica y evidencia.",
     ctaLabel: "Crear flujo de agencia",
-  },
-  "use-case-b2b-sales-teams": {
-    eyebrow: "Caso de uso · Equipos de ventas",
-    title: "Prospección Compartida para Ventas B2B",
-    description:
-      "Alinea descubrimiento, calificación, scoring y outreach alrededor de una definición visible de buen prospecto.",
-    answer:
-      "ScoreLead ofrece un flujo común para decidir qué empresas merecen atención. Los representantes ven evidencia, entienden la puntuación y registran resultados que mejoran el targeting.",
-    highlights: [
-      "Estandariza la investigación sin eliminar el juicio.",
-      "Prioriza cuentas con dimensiones explicables.",
-      "Conecta respuestas y rechazos con el targeting.",
-    ],
-    sections: [
-      {
-        heading: "Haz utilizable el ICP",
-        paragraphs: [
-          "Convierte documentos de estrategia en filtros, criterios y descalificadores aplicables al trabajo semanal.",
-        ],
-      },
-      {
-        heading: "Crea una cola consistente",
-        paragraphs: [
-          "Usa scoring para ordenar y deja que cada representante verifique la evidencia y elija la siguiente acción.",
-        ],
-        points: ["Definición de cuenta", "Revisión", "Niveles de prioridad", "Feedback"],
-      },
-      {
-        heading: "Entrena con ejemplos reales",
-        paragraphs: [
-          "Cuentas aceptadas y rechazadas ayudan a calibrar el entendimiento de ajuste, preparación y relevancia.",
-        ],
-      },
-    ],
-    proofLabel: "Principio de adopción",
-    proof:
-      "Un flujo gana confianza cuando el equipo puede inspeccionarlo y corregirlo. ScoreLead mantiene visible el razonamiento.",
-    ctaTitle: "Da al equipo una definición compartida.",
-    ctaDescription: "Convierte criterios en trabajo comercial repetible.",
-    ctaLabel: "Configurar el equipo",
-  },
-  "use-case-b2b-startups": {
-    eyebrow: "Caso de uso · Startups",
-    title: "Generación de Leads para Startups B2B",
-    description:
-      "Prueba hipótesis B2B estrechas, encuentra empresas compatibles y conserva evidencia para aprender de las primeras conversaciones.",
-    answer:
-      "Los equipos iniciales necesitan velocidad de aprendizaje, no solo volumen. ScoreLead ayuda a definir segmentos comprobables y comparar respuestas reales con las hipótesis.",
-    highlights: [
-      "Prueba un segmento y una hipótesis a la vez.",
-      "Concentra atención en cuentas con más evidencia.",
-      "Registra aceptación, objeciones y conversiones.",
-    ],
-    sections: [
-      {
-        heading: "Empieza lo bastante estrecho para aprender",
-        paragraphs: [
-          "Un mercado limitado produce feedback interpretable. Define quién tiene el problema y qué señales hacen plausible la hipótesis.",
-        ],
-      },
-      {
-        heading: "Automatiza la repetición",
-        paragraphs: [
-          "Usa automatización para encontrar y organizar; reserva el tiempo del founder para verificar, posicionar y conversar.",
-        ],
-        points: ["Hipótesis", "Evidencia", "Revisión del founder", "Iteración semanal"],
-      },
-      {
-        heading: "Cambia una hipótesis cada vez",
-        paragraphs: [
-          "Compara respuestas, reuniones y objeciones por segmento para saber si el objetivo, la oferta o el mensaje deben cambiar.",
-        ],
-      },
-    ],
-    proofLabel: "Realidad inicial",
-    proof:
-      "Ninguna herramienta crea product-market fit. ScoreLead ayuda a ejecutar una búsqueda disciplinada y conservar evidencia.",
-    ctaTitle: "Convierte tu próxima hipótesis en una prueba.",
-    ctaDescription: "Encuentra un conjunto enfocado y aprende de la respuesta.",
-    ctaLabel: "Probar un mercado",
-  },
-  "use-case-b2b-companies": {
-    eyebrow: "Caso de uso · Empresas B2B",
-    title: "Descubrimiento de Cuentas B2B entre Equipos",
-    description:
-      "Expande la prospección B2B a nuevos segmentos o regiones conservando criterios compartidos, fuentes verificables y mensajes locales.",
-    answer:
-      "Las empresas B2B pueden hacer consistente la investigación sin borrar diferencias locales. Los criterios compartidos dan gobernanza; búsquedas y outreach localizados conservan contexto.",
-    highlights: [
-      "Aplica estándares de calificación entre regiones.",
-      "Mantén evidencia local e idioma visibles.",
-      "Exporta registros normalizados y sin duplicados.",
-    ],
-    sections: [
-      {
-        heading: "Separa reglas globales de señales locales",
-        paragraphs: [
-          "Mantén requisitos obligatorios y permite que geografía, idioma, servicios y madurez den forma al descubrimiento local.",
-        ],
-      },
-      {
-        heading: "Revisa antes de entrar al CRM",
-        paragraphs: [
-          "Normaliza identidad, conserva fuentes y resuelve duplicados antes de crear otro proyecto de limpieza.",
-        ],
-        points: ["ICP compartido", "Búsquedas regionales", "Revisión de calidad", "Exportación al CRM"],
-      },
-      {
-        heading: "Compara calidad por segmento",
-        paragraphs: [
-          "Mide aceptación, avance y conversión por región para invertir donde producto y mensaje tienen evidencia más fuerte.",
-        ],
-      },
-    ],
-    proofLabel: "Principio de gobernanza",
-    proof:
-      "Estandarizar debe mejorar la explicación, no eliminar el juicio local. ScoreLead conserva el contexto.",
-    ctaTitle: "Escala la investigación sin perder contexto.",
-    ctaDescription: "Crea flujos consistentes para cada mercado.",
-    ctaLabel: "Planear flujo regional",
-  },
-  "compare-manual-lead-research": {
-    eyebrow: "Comparación · Flujo",
-    title: "Investigación manual vs. flujo asistido por IA",
-    description:
-      "Compara control, velocidad, calidad de evidencia y mantenimiento entre investigación manual y descubrimiento asistido.",
-    answer:
-      "La investigación manual ofrece control, pero se vuelve cara e inconsistente a escala. La IA acelera búsquedas repetitivas, pero requiere un objetivo preciso, revisión de fuentes y juicio humano.",
-    highlights: [
-      "El trabajo manual es flexible pero difícil de estandarizar.",
-      "La automatización mejora velocidad y repetibilidad.",
-      "El mejor proceso combina automatización y revisión responsable.",
-    ],
-    sections: [
-      {
-        heading: "Dónde gana la investigación manual",
-        paragraphs: [
-          "Una persona experta interpreta mercados extraños y señales sutiles. Esa profundidad es valiosa para cuentas estratégicas.",
-        ],
-      },
-      {
-        heading: "Dónde aporta la automatización",
-        paragraphs: [
-          "Búsqueda, extracción, normalización, duplicados y primera puntuación son repetitivos y se benefician de un sistema consistente.",
-        ],
-        points: ["Velocidad", "Repetibilidad", "Evidencia", "Excepciones humanas"],
-      },
-      {
-        heading: "Adopta un modelo híbrido",
-        paragraphs: [
-          "Automatiza recopilación y triage y concentra investigación manual en cuentas prioritarias o inciertas.",
-        ],
-      },
-    ],
-    proofLabel: "Comparación justa",
-    proof:
-      "ScoreLead puede reducir trabajo repetitivo, pero el valor depende de complejidad, datos, revisión y coste actual.",
-    ctaTitle: "Lleva la investigación repetitiva a un sistema revisable.",
-    ctaDescription: "Mantén el juicio humano donde aporta más valor.",
-    ctaLabel: "Comparar con tu flujo",
-  },
-  "compare-spreadsheets": {
-    eyebrow: "Comparación · Operaciones",
-    title: "ScoreLead vs. Hojas de Cálculo B2B",
-    description:
-      "Entiende cuándo una hoja de cálculo basta y cuándo el descubrimiento, las fuentes, el scoring y el workflow de prospección B2B necesitan un sistema.",
-    answer:
-      "Las hojas son flexibles para listas pequeñas. Se vuelven frágiles con descubrimiento repetible, historial, puntuación consistente, duplicados y responsabilidad compartida.",
-    highlights: [
-      "Siguen siendo útiles para análisis y exportación.",
-      "Un flujo conectado reduce copias y fórmulas divergentes.",
-      "Fuentes y puntuación acompañan cada cuenta.",
-    ],
-    sections: [
-      {
-        heading: "Usa una hoja para trabajo simple",
-        paragraphs: [
-          "Una lista corta, temporal y de una persona puede no necesitar sistema. Columnas claras y fecha de revisión pueden bastar.",
-        ],
-      },
-      {
-        heading: "Observa fallos operativos",
-        paragraphs: [
-          "Versiones conflictivas, celdas sin explicación, fórmulas copiadas, duplicados y estados viejos muestran que la lista ya es un workflow.",
-        ],
-        points: ["Versiones", "Procedencia", "Scoring consistente", "Responsable y siguiente acción"],
-      },
-      {
-        heading: "Mantén la exportación",
-        paragraphs: [
-          "ScoreLead exporta CSV, pero gestiona descubrimiento, enriquecimiento, scoring y estado antes de que los datos salgan.",
-        ],
-      },
-    ],
-    proofLabel: "Principio de migración",
-    proof:
-      "No sustituyas una hoja solo porque existe software. Migra cuando errores y mantenimiento superen el valor de su flexibilidad.",
-    ctaTitle: "Descubre si tu hoja ya se convirtió en sistema.",
-    ctaDescription: "Usa workflow para consistencia y exporta cuando ayude.",
-    ctaLabel: "Probar flujo conectado",
   },
   "compare-sales-prospecting-software": {
     eyebrow: "Comparación · Guía de compra",
@@ -493,46 +344,6 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaDescription:
       "Ejecuta un descubrimiento enfocado e inspecciona la evidencia antes de decidir.",
     ctaLabel: "Iniciar evaluación gratis",
-  },
-  "compare-purchased-lead-lists": {
-    eyebrow: "Comparación · Estrategia de datos",
-    title: "Descubrimiento vs. Listas Compradas",
-    description:
-      "Compara listas estáticas con descubrimiento B2B basado en criterios, fuentes verificables, evidencia pública reciente y calificación de cuentas.",
-    answer:
-      "Las listas compradas ofrecen cobertura rápida, pero su origen, edad, permisos y ajuste pueden ser inciertos. El descubrimiento actual empieza con tu objetivo y recopila evidencia pública reciente.",
-    highlights: [
-      "Las listas pueden envejecer antes de llegar a ventas.",
-      "El descubrimiento mantiene criterios y evidencia visibles.",
-      "Ningún método elimina obligaciones de privacidad.",
-    ],
-    sections: [
-      {
-        heading: "Evalúa más que la cantidad",
-        paragraphs: [
-          "Pregunta cómo se recopilaron los datos, cuándo se verificaron, qué campos son inferidos y si el uso está permitido.",
-        ],
-      },
-      {
-        heading: "Empieza por la hipótesis de cuenta",
-        paragraphs: [
-          "El descubrimiento actual parte de las empresas que puedes ayudar y usa señales observables para decidir cuáles revisar.",
-        ],
-        points: ["Objetivo", "Fecha de observación", "Fuente", "Revisión legal"],
-      },
-      {
-        heading: "Mide cuentas utilizables",
-        paragraphs: [
-          "Compara cuentas aceptadas, alcanzables y bien segmentadas, no solo coste por fila.",
-        ],
-      },
-    ],
-    proofLabel: "Nota de cumplimiento",
-    proof:
-      "La disponibilidad pública no autoriza cualquier uso. Revisa privacidad, marketing directo, supresión y reglas de plataforma.",
-    ctaTitle: "Construye la lista desde tu mercado.",
-    ctaDescription: "Descubre empresas con criterios y fuentes adjuntos.",
-    ctaLabel: "Iniciar descubrimiento",
   },
   "compare-best-lead-scoring-software": {
     eyebrow: "Comparación · Lead scoring",
@@ -814,86 +625,6 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
     ctaTitle: "Descubre si el flujo encaja con tu mercado.",
     ctaDescription: "Empieza gratis o plantea un problema específico.",
     ctaLabel: "Probar ScoreLead",
-  },
-  "company-editorial-policy": {
-    eyebrow: "Estándares editoriales",
-    title: "Estándares Editoriales de ScoreLead",
-    description:
-      "Los estándares para afirmaciones, fuentes, asistencia de IA, traducciones, correcciones y evidencia de clientes.",
-    answer:
-      "ScoreLead publica contenido para mejorar decisiones de prospección. Separa comportamiento del producto de orientación general, cita fuentes primarias, divulga limitaciones y no inventa personas ni resultados.",
-    highlights: [
-      "Las afirmaciones deben ser trazables.",
-      "La IA puede ayudar, pero el estándar editorial controla la publicación.",
-      "Las traducciones preservan significado y claridad local.",
-    ],
-    sections: [
-      {
-        heading: "Quién, cómo y por qué",
-        paragraphs: [
-          "Cada artículo identifica organización, fechas y propósito. Los expertos se añaden solo con permiso y biografía real.",
-        ],
-      },
-      {
-        heading: "Fuentes y evidencia",
-        paragraphs: [
-          "Las afirmaciones regulatorias, técnicas y de plataforma priorizan fuentes primarias. Los resultados de clientes no se convierten en garantías.",
-        ],
-        points: ["Fuentes primarias", "Fechas visibles", "Metodología", "Correcciones"],
-      },
-      {
-        heading: "Correcciones y actualizaciones",
-        paragraphs: [
-          "Envía correcciones mediante la página de contacto de ScoreLead. Las correcciones materiales cambian la fecha; las fechas no se actualizan solo para parecer recientes.",
-        ],
-      },
-    ],
-    proofLabel: "Divulgación de IA",
-    proof:
-      "La IA puede apoyar estructura, traducción y edición. ScoreLead sigue siendo responsable del texto, fuentes y exactitud.",
-    ctaTitle: "¿Encontraste algo que corregir?",
-    ctaDescription: "Envía la fuente, URL y una explicación breve.",
-    ctaLabel: "Contactar a los editores",
-  },
-  "author-scorelead-editorial": {
-    eyebrow: "Autor",
-    title: "ScoreLead Editorial",
-    description:
-      "El equipo de producto e investigación responsable de guías sobre descubrimiento, calificación, scoring, enriquecimiento y outreach B2B.",
-    answer:
-      "ScoreLead Editorial es un autor organizacional usado cuando ninguna persona ha sido aprobada para publicación. Representa al equipo, no a una persona ficticia.",
-    highlights: [
-      "Cubre operaciones y flujos de ScoreLead.",
-      "Usa fechas, fuentes y metodología visibles.",
-      "Acepta correcciones mediante la página de contacto de ScoreLead.",
-    ],
-    sections: [
-      {
-        heading: "Áreas de enfoque",
-        paragraphs: [
-          "El equipo escribe sobre ICP, descubrimiento, enriquecimiento, scoring transparente, calidad de datos, pipeline y outreach responsable.",
-        ],
-      },
-      {
-        heading: "Estándar de revisión",
-        paragraphs: [
-          "Las afirmaciones de producto se comparan con su comportamiento actual. Las externas prefieren fuentes primarias y marcan la incertidumbre.",
-        ],
-        points: ["Exactitud", "Fuentes primarias", "Límites claros", "Traducción fiel"],
-      },
-      {
-        heading: "Política de identidad",
-        paragraphs: [
-          "Cuando un autor o revisor real esté disponible y consienta, ScoreLead usará un perfil identificado. Hasta entonces usa esta identidad organizacional.",
-        ],
-      },
-    ],
-    proofLabel: "Por qué no hay schema Person",
-    proof:
-      "Este perfil es una Organization en datos estructurados. Publicar una persona sin individuo real reduciría la confianza.",
-    ctaTitle: "Lee la investigación detrás del flujo.",
-    ctaDescription: "Explora las guías o envía una corrección.",
-    ctaLabel: "Explorar el blog",
   },
   "tool-icp-worksheet": {
     eyebrow: "Herramienta gratis · Hoja de ICP",

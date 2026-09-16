@@ -52,10 +52,10 @@ export function SettingsNav({
                   isActive
                     ? isDanger
                       ? "bg-red-500/10 text-red-700 dark:text-red-300"
-                      : "bg-zinc-200/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-zinc-100"
+                      : "bg-zinc-200/70 dark:bg-white/[0.07] text-zinc-900 dark:text-zinc-100"
                     : isDanger
                       ? "text-red-600/70 dark:text-red-400/70 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-500/5"
-                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/40"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.11]"
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />

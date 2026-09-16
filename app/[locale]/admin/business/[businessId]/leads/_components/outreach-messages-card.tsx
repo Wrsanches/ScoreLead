@@ -181,7 +181,7 @@ export function OutreachMessagesCard({
   // ── Loading skeleton ────────────────────────────────
   if (initialLoading) {
     return (
-      <div className="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/80 dark:bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
+      <div className="mb-6 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
         <OutreachHeader title={t("title")} subtitle="" />
         <div className="p-8 flex items-center justify-center">
           <Loader2 className="w-5 h-5 animate-spin text-zinc-500 dark:text-zinc-600" />
@@ -191,7 +191,7 @@ export function OutreachMessagesCard({
   }
 
   return (
-    <div className="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/80 dark:bg-zinc-900/40 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
+    <div className="mb-6 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] overflow-hidden">
       {/* Header with subtle emerald glow */}
       <OutreachHeader
         title={t("title")}
@@ -204,7 +204,7 @@ export function OutreachMessagesCard({
             <button
               type="button"
               onClick={handleCopyAll}
-              className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-all duration-150"
+              className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-all duration-150"
               title={t("copyAll")}
             >
               <Copy className="w-3.5 h-3.5" />
@@ -215,7 +215,7 @@ export function OutreachMessagesCard({
                 type="button"
                 onClick={generate}
                 disabled={loading}
-                className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150 disabled:opacity-50"
+                className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white rounded-md bg-white dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] transition-all duration-150 disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -270,7 +270,7 @@ export function OutreachMessagesCard({
                     <div className="relative flex flex-col items-center shrink-0">
                       <div className="relative z-10 w-9 h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-500/25 to-emerald-600/10 ring-1 ring-emerald-500/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_22px_-6px_rgba(16,185,129,0.65)]">
                         <Icon className="w-4 h-4" />
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-950 ring-1 ring-emerald-500/40 text-[9px] font-bold text-emerald-600 dark:text-emerald-300 flex items-center justify-center tabular-nums">
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-zinc-100 dark:bg-black/25 ring-1 ring-emerald-500/40 text-[9px] font-bold text-emerald-600 dark:text-emerald-300 flex items-center justify-center tabular-nums">
                           {msg.step}
                         </span>
                       </div>
@@ -286,9 +286,9 @@ export function OutreachMessagesCard({
                     </div>
 
                     {/* Message card */}
-                    <div className="group flex-1 rounded-xl border border-zinc-200/80 dark:border-zinc-800/70 bg-gradient-to-br from-white/70 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/30 overflow-hidden transition-all duration-200 hover:border-emerald-500/30 hover:shadow-[0_10px_30px_-14px_rgba(0,0,0,0.55)] hover:-translate-y-0.5">
+                    <div className="group flex-1 rounded-xl border border-zinc-200/80 dark:border-white/[0.08] bg-gradient-to-br from-white/70 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/30 overflow-hidden transition-all duration-200 hover:border-emerald-500/30 hover:shadow-[0_10px_30px_-14px_rgba(0,0,0,0.55)] hover:-translate-y-0.5">
                       {/* Card header */}
-                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-zinc-800/50">
+                      <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-white/[0.08]">
                         <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 truncate">
                           {msg.label}
                         </span>
@@ -328,7 +328,7 @@ export function OutreachMessagesCard({
                               if (e.key === "Escape") cancelEditing()
                             }}
                             rows={6}
-                            className="w-full resize-none rounded-lg bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 leading-relaxed placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/40 transition-all"
+                            className="w-full resize-none rounded-lg bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 leading-relaxed placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/40 transition-all"
                             autoFocus
                           />
                           <div className="flex items-center justify-between mt-2.5">
@@ -336,10 +336,10 @@ export function OutreachMessagesCard({
                               <span>{editValue.length}</span>
                               <span className="hidden sm:inline text-zinc-400 dark:text-zinc-700">·</span>
                               <span className="hidden sm:inline text-zinc-400 dark:text-zinc-700">
-                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-zinc-800/60 rounded text-[10px]">
+                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-white/[0.07] rounded text-[10px]">
                                   ⌘
                                 </kbd>{" "}
-                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-zinc-800/60 rounded text-[10px]">
+                                <kbd className="px-1 py-0.5 bg-zinc-200/60 dark:bg-white/[0.07] rounded text-[10px]">
                                   ↵
                                 </kbd>{" "}
                                 to save
@@ -350,7 +350,7 @@ export function OutreachMessagesCard({
                                 type="button"
                                 onClick={cancelEditing}
                                 disabled={saving}
-                                className="flex items-center gap-1 h-7 px-2.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors disabled:opacity-50"
+                                className="flex items-center gap-1 h-7 px-2.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors disabled:opacity-50"
                               >
                                 <X className="w-3.5 h-3.5" />
                                 {t("cancel")}
@@ -455,7 +455,7 @@ function OutreachHeader({
   children?: React.ReactNode
 }) {
   return (
-    <div className="relative px-5 py-4 border-b border-zinc-200/80 dark:border-zinc-800/60 overflow-hidden">
+    <div className="relative px-5 py-4 border-b border-zinc-200/80 dark:border-white/[0.08] overflow-hidden">
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.06] via-transparent to-transparent pointer-events-none"
@@ -548,7 +548,7 @@ function IconButton({
       className={`flex items-center gap-1 h-6 px-2 text-[11px] font-medium rounded-md transition-all duration-150 ${
         active
           ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
-          : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/70"
+          : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11]"
       } ${hoverReveal ? "opacity-0 group-hover:opacity-100 focus:opacity-100" : ""}`}
       title={label}
     >
@@ -594,7 +594,7 @@ function SendActions({
   }
 
   return (
-    <div className="px-4 py-2 border-t border-zinc-200/70 dark:border-zinc-800/50 flex items-center justify-between gap-2 bg-zinc-950/30">
+    <div className="px-4 py-2 border-t border-zinc-200/70 dark:border-white/[0.08] flex items-center justify-between gap-2 bg-white/[0.03]">
       <span className="text-[10px] text-zinc-500 dark:text-zinc-600 tabular-nums">{charCount}</span>
       {actions.length > 0 && (
         <div className="flex items-center gap-1">
@@ -606,7 +606,7 @@ function SendActions({
                 href={a.href}
                 target={a.href.startsWith("http") ? "_blank" : undefined}
                 rel={a.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-150"
+                className="flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-white/[0.11] border border-transparent hover:border-zinc-300 dark:hover:border-white/[0.22] transition-all duration-150"
                 title={`Send via ${a.label}`}
               >
                 <A className="w-3 h-3" />

@@ -313,15 +313,15 @@ export function WhatsAppAutomationPanel({
 
   if (!integrationEnabled) {
     return (
-      <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+      <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-white/[0.08]">
         <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-white/[0.07]">
             <Clock3 className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{t("automationTitle")}</h4>
-              <span className="rounded-full border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+              <span className="rounded-full border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500 dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-zinc-400">
                 {t("comingSoonBadge")}
               </span>
             </div>
@@ -334,7 +334,7 @@ export function WhatsAppAutomationPanel({
 
   if (loading) {
     return (
-      <div className="mt-6 flex items-center gap-2 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
+      <div className="mt-6 flex items-center gap-2 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-white/[0.08]">
         <Loader2 className="h-4 w-4 animate-spin" />
         {t("loadingAutomation")}
       </div>
@@ -342,7 +342,7 @@ export function WhatsAppAutomationPanel({
   }
 
   return (
-    <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+    <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-white/[0.08]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-700 dark:text-emerald-300">
@@ -371,7 +371,7 @@ export function WhatsAppAutomationPanel({
           </Button>
         </Notice>
       ) : consent?.status !== "granted" ? (
-        <div className="mt-6 grid gap-5 rounded-xl border border-zinc-200 bg-white/60 p-4 dark:border-zinc-800 dark:bg-zinc-950/30 sm:grid-cols-2">
+        <div className="mt-6 grid gap-5 rounded-xl border border-zinc-200 bg-white/60 p-4 dark:border-white/[0.08] dark:bg-black/25 sm:grid-cols-2">
           <div>
             <Label htmlFor={`wa-phone-${leadId}`}>{t("consentPhone")}</Label>
             <Input
@@ -389,7 +389,7 @@ export function WhatsAppAutomationPanel({
               id={`wa-source-${leadId}`}
               value={source}
               onChange={(event) => setSource(event.target.value)}
-              className="mt-2 h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+              className="mt-2 h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-white/[0.08] dark:bg-black/25 dark:text-zinc-100"
             >
               {["website_form", "written", "verbal", "qr_code", "other"].map((value) => (
                 <option key={value} value={value}>{t(`source_${value}`)}</option>
@@ -449,7 +449,7 @@ export function WhatsAppAutomationPanel({
       ) : (
         <div className="mt-6 space-y-6">
           {/* Send a single message now */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+          <div className="rounded-xl border border-zinc-200 dark:border-white/[0.08] p-4">
             <div className="flex items-center gap-2 mb-1">
               <Send className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <h4 className="text-sm font-medium text-zinc-900 dark:text-white">{t("sendNowTitle")}</h4>
@@ -458,7 +458,7 @@ export function WhatsAppAutomationPanel({
             <select
               value={sendTemplateId}
               onChange={(event) => setSendTemplateId(event.target.value)}
-              className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+              className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-white/[0.08] dark:bg-black/25 dark:text-zinc-100"
             >
               <option value="">{t("chooseTemplate")}</option>
               {templates.map((template) => (
@@ -466,7 +466,7 @@ export function WhatsAppAutomationPanel({
               ))}
             </select>
             {sendNowBody && (
-              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-600 dark:bg-white/[0.05] dark:text-zinc-400">
                 {sendNowBody}
               </p>
             )}
@@ -482,15 +482,15 @@ export function WhatsAppAutomationPanel({
           </div>
 
           <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-white/[0.07]" />
             {t("orScheduleSequence")}
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-white/[0.07]" />
           </div>
 
           <div className="space-y-3">
           {draftSteps.map((step, index) => (
-            <div key={index} className="grid gap-3 border-b border-zinc-200 py-4 first:pt-0 last:border-0 dark:border-zinc-800 sm:grid-cols-[2rem_minmax(0,1fr)_6rem_7rem] sm:items-end">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            <div key={index} className="grid gap-3 border-b border-zinc-200 py-4 first:pt-0 last:border-0 dark:border-white/[0.08] sm:grid-cols-[2rem_minmax(0,1fr)_6rem_7rem] sm:items-end">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-white/[0.07] dark:text-zinc-300">
                 {index + 1}
               </span>
               <div>
@@ -499,7 +499,7 @@ export function WhatsAppAutomationPanel({
                   id={`wa-template-${leadId}-${index}`}
                   value={step.templateId}
                   onChange={(event) => updateStep(index, { templateId: event.target.value })}
-                  className="mt-2 h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
+                  className="mt-2 h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500/30 dark:border-white/[0.08] dark:bg-black/25 dark:text-zinc-100"
                 >
                   <option value="">{t("chooseTemplate")}</option>
                   {templates.map((template) => (
@@ -579,7 +579,7 @@ function Notice({
   children: React.ReactNode
 }) {
   return (
-    <div className="mt-5 flex flex-col gap-3 rounded-lg bg-zinc-100/70 p-4 dark:bg-zinc-900/60 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mt-5 flex flex-col gap-3 rounded-lg bg-zinc-100/70 p-4 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-2.5 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
         <Icon className="h-4 w-4 shrink-0" />
         {text}
@@ -639,7 +639,7 @@ function SequenceView({
 
       <div className="space-y-3">
         {sequence.steps.map((step) => (
-          <div key={step.id} className="grid gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800 sm:grid-cols-[1fr_auto]">
+          <div key={step.id} className="grid gap-3 rounded-lg border border-zinc-200 p-4 dark:border-white/[0.08] sm:grid-cols-[1fr_auto]">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
@@ -673,7 +673,7 @@ function StepTimeline({ step }: { step: SequenceStep }) {
     { label: t("timelineFailed"), at: step.failedAt },
   ].filter((event): event is { label: string; at: string } => !!event.at)
   return (
-    <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-zinc-800">
+    <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-white/[0.08]">
       {events.map((event) => (
         <span key={event.label}>{event.label} {new Date(event.at).toLocaleString()}</span>
       ))}

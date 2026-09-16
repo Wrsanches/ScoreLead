@@ -52,9 +52,6 @@ export type BlogUi = {
   minRead: string
   published: string
   updated: string
-  authoredBy: string
-  reviewedBy: string
-  reviewerName: string
   backToBlog: string
   quickAnswer: string
   fieldNote: string
@@ -65,7 +62,6 @@ export type BlogUi = {
   sources: string
   sourcesDescription: string
   productGuide: string
-  editorialPolicy: string
   takeaway: string
   relatedTitle: string
   relatedDescription: string

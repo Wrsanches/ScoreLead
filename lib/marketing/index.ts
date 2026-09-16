@@ -40,10 +40,7 @@ const definitions: MarketingPageDefinition[] = [
       "ai-lead-generation-guide",
       "ideal-customer-profile-guide",
     ],
-    relatedMarketingPaths: [
-      "compare/sales-prospecting-software",
-      "use-cases/b2b-sales-teams",
-    ],
+    relatedMarketingPaths: ["compare/sales-prospecting-software"],
   },
   {
     id: "feature-lead-scoring",
@@ -114,6 +111,26 @@ const definitions: MarketingPageDefinition[] = [
     ],
   },
   {
+    id: "feature-ai-content-creation",
+    group: "features",
+    slug: "ai-content-creation",
+    pathname: "features/ai-content-creation",
+    updatedAt: SEO_UPDATED_AT,
+    keywords: [
+      "AI Instagram content calendar",
+      "AI social media post generator",
+      "Instagram content planner for small business",
+    ],
+    relatedBlogSlugs: [
+      "personalized-b2b-outreach",
+      "b2b-prospecting-guide",
+    ],
+    relatedMarketingPaths: [
+      "features/outreach-automation",
+      "features/ai-lead-discovery",
+    ],
+  },
+  {
     id: "use-case-agencies",
     group: "use-cases",
     slug: "agencies",
@@ -121,64 +138,6 @@ const definitions: MarketingPageDefinition[] = [
     updatedAt: SEO_UPDATED_AT,
     keywords: ["lead generation for agencies", "agency prospecting software"],
     relatedBlogSlugs: ["ai-lead-generation-guide", "personalized-b2b-outreach"],
-  },
-  {
-    id: "use-case-b2b-sales-teams",
-    group: "use-cases",
-    slug: "b2b-sales-teams",
-    pathname: "use-cases/b2b-sales-teams",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["B2B sales prospecting software", "sales team lead generation"],
-    relatedBlogSlugs: ["b2b-lead-scoring-model", "b2b-sales-pipeline-guide"],
-    relatedMarketingPaths: ["compare/sales-prospecting-software"],
-  },
-  {
-    id: "use-case-b2b-startups",
-    group: "use-cases",
-    slug: "b2b-startups",
-    pathname: "use-cases/b2b-startups",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["startup lead generation", "founder-led sales prospecting"],
-    relatedBlogSlugs: [
-      "ideal-customer-profile-guide",
-      "manual-lead-research-vs-automation",
-    ],
-  },
-  {
-    id: "use-case-b2b-companies",
-    group: "use-cases",
-    slug: "b2b-companies",
-    pathname: "use-cases/b2b-companies",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["B2B company lead generation", "multi-region sales prospecting"],
-    relatedBlogSlugs: [
-      "multilingual-b2b-prospecting",
-      "crm-data-quality-guide",
-    ],
-  },
-  {
-    id: "compare-manual-lead-research",
-    group: "compare",
-    slug: "manual-lead-research",
-    pathname: "compare/manual-lead-research",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["manual lead research vs automation", "AI lead research"],
-    relatedBlogSlugs: [
-      "manual-lead-research-vs-automation",
-      "sales-prospecting-automation",
-    ],
-  },
-  {
-    id: "compare-spreadsheets",
-    group: "compare",
-    slug: "spreadsheets",
-    pathname: "compare/spreadsheets",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: [
-      "lead generation spreadsheet alternative",
-      "sales prospecting software",
-    ],
-    relatedBlogSlugs: ["crm-data-quality-guide", "b2b-sales-pipeline-guide"],
   },
   {
     id: "compare-sales-prospecting-software",
@@ -199,17 +158,7 @@ const definitions: MarketingPageDefinition[] = [
     relatedMarketingPaths: [
       "features/ai-lead-discovery",
       "features/lead-scoring",
-      "compare/manual-lead-research",
     ],
-  },
-  {
-    id: "compare-purchased-lead-lists",
-    group: "compare",
-    slug: "purchased-lead-lists",
-    pathname: "compare/purchased-lead-lists",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["purchased lead lists alternative", "fresh B2B lead discovery"],
-    relatedBlogSlugs: ["lead-enrichment-guide", "ideal-customer-profile-guide"],
   },
   {
     id: "compare-best-lead-scoring-software",
@@ -290,24 +239,6 @@ const definitions: MarketingPageDefinition[] = [
     relatedBlogSlugs: ["ai-lead-generation-guide"],
   },
   {
-    id: "company-editorial-policy",
-    group: "company",
-    slug: "editorial-policy",
-    pathname: "editorial-policy",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["ScoreLead editorial policy", "ScoreLead content methodology"],
-    relatedBlogSlugs: ["ai-lead-generation-guide"],
-  },
-  {
-    id: "author-scorelead-editorial",
-    group: "company",
-    slug: "scorelead-editorial",
-    pathname: "authors/scorelead-editorial",
-    updatedAt: SEO_UPDATED_AT,
-    keywords: ["ScoreLead Editorial", "ScoreLead authors"],
-    relatedBlogSlugs: ["ai-lead-generation-guide", "b2b-lead-scoring-model"],
-  },
-  {
     id: "tool-icp-worksheet",
     group: "tools",
     slug: "icp-worksheet",
@@ -372,10 +303,6 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
       "Compare the workflow, evaluate the category, or try a practical tool.",
     viewPage: "View page",
     lastReviewed: "Last reviewed",
-    methodology: "Content methodology",
-    methodologyDescription:
-      "See how ScoreLead handles sources, updates, translations, and corrections.",
-    editorialPolicy: "Read the editorial policy",
     startFree: "Start free",
   },
   pt: {
@@ -392,10 +319,6 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
       "Compare o fluxo, avalie a categoria ou experimente uma ferramenta prática.",
     viewPage: "Ver página",
     lastReviewed: "Última revisão",
-    methodology: "Metodologia de conteúdo",
-    methodologyDescription:
-      "Veja como o ScoreLead trata fontes, atualizações, traduções e correções.",
-    editorialPolicy: "Ler a política editorial",
     startFree: "Começar grátis",
   },
   es: {
@@ -412,10 +335,6 @@ export const marketingUi: Record<MarketingLocale, MarketingUi> = {
       "Compara el flujo, evalúa la categoría o prueba una herramienta práctica.",
     viewPage: "Ver página",
     lastReviewed: "Última revisión",
-    methodology: "Metodología de contenido",
-    methodologyDescription:
-      "Consulta cómo ScoreLead gestiona fuentes, actualizaciones, traducciones y correcciones.",
-    editorialPolicy: "Leer la política editorial",
     startFree: "Empezar gratis",
   },
 };
@@ -476,12 +395,7 @@ export function generateMarketingMetadata(
     title: translation.title,
     description: translation.description,
     keywords: [...page.keywords, translation.title],
-    authors: [
-      {
-        name: "ScoreLead Editorial",
-        url: getLocalizedUrl(normalizedLocale, "authors/scorelead-editorial"),
-      },
-    ],
+    authors: [{ name: siteConfig.name, url: siteConfig.url }],
     creator: siteConfig.creator,
     publisher: siteConfig.name,
     alternates: {

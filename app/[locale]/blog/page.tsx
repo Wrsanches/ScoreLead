@@ -114,12 +114,12 @@ export default async function BlogPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100">
+    <div className="marketing-canvas min-h-screen text-zinc-100">
       <JsonLd data={jsonLd} />
       <Navbar />
 
-      <main id="main" className="pt-16">
-        <header className="relative overflow-hidden border-b border-zinc-800/70 px-6 py-20 sm:py-28">
+      <main id="main" className="pt-20">
+        <header className="relative overflow-hidden border-b border-white/[0.08] px-6 py-20 sm:py-28">
           <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_center,rgba(16,185,129,0.16),transparent_58%)]" />
           <div className="relative mx-auto max-w-6xl">
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-emerald-400">
@@ -140,11 +140,11 @@ export default async function BlogPage({
               <h2 id="featured-heading" className="text-sm font-medium text-zinc-300">
                 {ui.featured}
               </h2>
-              <div className="h-px flex-1 bg-zinc-800" />
+              <div className="h-px flex-1 bg-white/[0.07]" />
             </div>
             <Link
               href={`/blog/${featured.slug}`}
-              className="group grid overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/30 transition duration-300 hover:border-emerald-500/30 hover:bg-zinc-900/55 lg:grid-cols-[1.1fr_0.9fr] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+              className="glass-card group grid overflow-hidden rounded-3xl transition duration-300 hover:-translate-y-1 hover:ring-1 hover:ring-white/[0.14] lg:grid-cols-[1.1fr_0.9fr] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
             >
               <BlogVisual post={featured} category={featuredTranslation.category} />
               <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
@@ -175,13 +175,13 @@ export default async function BlogPage({
           </div>
         </section>
 
-        <section className="border-t border-zinc-800/70 px-6 py-16 sm:py-24" aria-labelledby="latest-heading">
+        <section className="border-t border-white/[0.08] px-6 py-16 sm:py-24" aria-labelledby="latest-heading">
           <div className="mx-auto max-w-6xl">
             <div className="mb-9 flex items-center gap-4">
               <h2 id="latest-heading" className="text-2xl font-medium tracking-tight text-white">
                 {ui.latest}
               </h2>
-              <div className="h-px flex-1 bg-zinc-800" />
+              <div className="h-px flex-1 bg-white/[0.07]" />
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {blogPosts.slice(1).map((post) => (
@@ -199,7 +199,7 @@ export default async function BlogPage({
         </section>
 
         <section className="px-6 pb-20 sm:pb-28">
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-emerald-500/20 bg-emerald-500/[0.06] p-8 sm:p-12">
+          <div className="glass-card mx-auto max-w-6xl overflow-hidden rounded-3xl ring-1 ring-emerald-500/25 p-8 sm:p-12">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
               {ui.ctaEyebrow}
             </p>
@@ -214,7 +214,7 @@ export default async function BlogPage({
                 href="/signup"
                 eventName="article_cta_click"
                 eventParams={{ article_slug: "blog-index" }}
-                className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+                className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
               >
                 {ui.ctaLabel}
                 <ArrowRight className="size-4" aria-hidden="true" />

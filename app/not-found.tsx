@@ -1,6 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Geist } from "next/font/google"
+import { ArrowRight, BookOpen, ChevronRight, CreditCard, Radar } from "lucide-react"
+import { ScoreLeadLogo } from "@/components/scorelead-logo"
 import "./globals.css"
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
 
 // This is the app's single 404 page (the localized [locale]/[...rest] catch-all
 // was removed because, with an async locale layout, its notFound() ran after
@@ -11,159 +16,125 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
+const destinations = [
+  {
+    href: "/features/ai-lead-discovery",
+    icon: Radar,
+    title: "Explore features",
+    description: "See how discovery, scoring and outreach fit together.",
+  },
+  {
+    href: "/pricing",
+    icon: CreditCard,
+    title: "See pricing",
+    description: "Start free, then pick the plan that clears your next limit.",
+  },
+  {
+    href: "/blog",
+    icon: BookOpen,
+    title: "Read the blog",
+    description: "Playbooks on finding and qualifying B2B leads.",
+  },
+]
+
+// Type scale mirrors the marketing hero so this page feels like the same site.
+const headingStyle = {
+  letterSpacing: "-0.0325em",
+  fontVariationSettings: '"opsz" 28',
+  fontWeight: 538,
+  lineHeight: 1.1,
+} as const
+
 export default function NotFound() {
   return (
-    <html lang="en">
-      <body className="bg-[#09090B] font-sans antialiased">
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              @keyframes float {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                25% { transform: translateY(-12px) rotate(5deg); }
-                75% { transform: translateY(8px) rotate(-3deg); }
-              }
-              @keyframes glitch {
-                0%, 100% { text-shadow: 2px 0 #10b981, -2px 0 #ef4444; }
-                25% { text-shadow: -2px -2px #10b981, 2px 2px #ef4444; }
-                50% { text-shadow: 2px 2px #10b981, -2px -2px #ef4444; clip-path: inset(20% 0 40% 0); }
-                75% { text-shadow: -2px 2px #10b981, 2px -2px #ef4444; clip-path: inset(60% 0 10% 0); }
-              }
-              @keyframes glitchBase {
-                0%, 100% { clip-path: inset(0 0 0 0); }
-                50% { clip-path: inset(0 0 0 0); }
-              }
-              @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-              }
-              @keyframes scanline {
-                0% { top: -10%; }
-                100% { top: 110%; }
-              }
-              @keyframes pulse {
-                0%, 100% { opacity: 0.4; transform: scale(1); }
-                50% { opacity: 0.8; transform: scale(1.05); }
-              }
-              @keyframes particle1 {
-                0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-                25% { transform: translate(30px, -40px) scale(0.6); opacity: 0.6; }
-                50% { transform: translate(-20px, -70px) scale(0.3); opacity: 0; }
-                75% { transform: translate(10px, 20px) scale(0.8); opacity: 0.1; }
-              }
-              @keyframes particle2 {
-                0%, 100% { transform: translate(0, 0) scale(0.5); opacity: 0.2; }
-                33% { transform: translate(-40px, -30px) scale(1); opacity: 0.5; }
-                66% { transform: translate(25px, -60px) scale(0.2); opacity: 0; }
-              }
-              @keyframes particle3 {
-                0%, 100% { transform: translate(0, 0) scale(0.8); opacity: 0.4; }
-                20% { transform: translate(50px, -20px) scale(0.4); opacity: 0.6; }
-                60% { transform: translate(-30px, -50px) scale(0.1); opacity: 0; }
-                80% { transform: translate(-10px, 10px) scale(0.6); opacity: 0.2; }
-              }
-              .glitch-404 {
-                animation: glitchBase 3s ease-in-out infinite;
-              }
-              .glitch-404::before,
-              .glitch-404::after {
-                content: "404";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                overflow: hidden;
-              }
-              .glitch-404::before {
-                animation: glitch 3s ease-in-out infinite;
-                color: transparent;
-              }
-              .glitch-404::after {
-                animation: glitch 3s ease-in-out infinite reverse;
-                color: transparent;
-              }
-            `,
-          }}
-        />
-        <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-          {/* Subtle background particles */}
-          <div
-            className="absolute w-2 h-2 rounded-full bg-emerald-500/30"
-            style={{ top: "20%", left: "25%", animation: "particle1 8s ease-in-out infinite" }}
-          />
-          <div
-            className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400/20"
-            style={{ top: "60%", right: "20%", animation: "particle2 10s ease-in-out infinite" }}
-          />
-          <div
-            className="absolute w-1 h-1 rounded-full bg-emerald-300/25"
-            style={{ top: "40%", left: "60%", animation: "particle3 7s ease-in-out infinite" }}
-          />
-          <div
-            className="absolute w-2.5 h-2.5 rounded-full bg-emerald-500/15"
-            style={{ bottom: "30%", left: "15%", animation: "particle2 9s ease-in-out infinite 2s" }}
-          />
-          <div
-            className="absolute w-1 h-1 rounded-full bg-zinc-500/30"
-            style={{ top: "15%", right: "35%", animation: "particle1 11s ease-in-out infinite 1s" }}
-          />
-
-          {/* Big glitchy 404 */}
-          <div className="relative mt-8 mb-6 select-none">
-            <h1
-              className="glitch-404 relative text-[10rem] sm:text-[14rem] font-black leading-none tracking-tighter bg-clip-text text-transparent"
-              style={{
-                backgroundImage: "linear-gradient(135deg, #ffffff 0%, #10b981 50%, #a1a1aa 100%)",
-                backgroundSize: "200% 200%",
-                animation: "glitchBase 3s ease-in-out infinite, gradientShift 6s ease infinite",
-              }}
-            >
-              404
-            </h1>
-            {/* Scanline overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none overflow-hidden rounded"
-              aria-hidden="true"
-            >
-              <div
-                className="absolute left-0 w-full h-0.5 bg-emerald-500/10"
-                style={{ animation: "scanline 4s linear infinite" }}
-              />
+    <html lang="en" className={`dark ${geist.variable}`}>
+      <body
+        className={`${geist.className} antialiased text-zinc-50`}
+        style={{
+          backgroundColor: "#09090b",
+          backgroundImage: `
+            radial-gradient(ellipse 50% 40% at 8% 0%, rgba(16,185,129,0.16), transparent 62%),
+            radial-gradient(ellipse 45% 40% at 100% 100%, rgba(6,182,212,0.1), transparent 60%),
+            radial-gradient(ellipse 35% 30% at 70% 20%, rgba(99,102,241,0.08), transparent 60%)
+          `,
+        }}
+      >
+        <div className="flex min-h-screen flex-col">
+          {/* Floating glass bar, same shape as the marketing navbar */}
+          <header className="fixed inset-x-3 top-3 z-50 flex justify-center sm:inset-x-6">
+            <div className="glass-strong flex h-14 w-full max-w-4xl items-center justify-between rounded-2xl px-4 sm:px-5">
+              <Link href="/" className="flex items-center gap-2">
+                <ScoreLeadLogo className="h-5 w-5 text-white" />
+                <span className="font-semibold text-white">ScoreLead</span>
+              </Link>
+              <Link
+                href="/"
+                className="text-sm text-zinc-400 transition-colors hover:text-white"
+              >
+                Back to home
+              </Link>
             </div>
-          </div>
+          </header>
 
-          {/* Text content */}
-          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-3">
-            Page not found
-          </h2>
-          <p className="text-sm text-zinc-500 mb-10 text-center max-w-sm leading-relaxed">
-            The page you are looking for does not exist or has been moved.
-          </p>
+          <main className="flex flex-1 flex-col justify-center px-6 pt-32 pb-24 sm:pt-40">
+            <div className="mx-auto w-full max-w-4xl">
+              <div className="mb-6 flex items-center gap-3">
+                <span className="h-px w-8 bg-zinc-500" aria-hidden="true" />
+                <p className="text-sm text-zinc-400">Error 404</p>
+              </div>
 
-          {/* Back home button with glow */}
-          <Link
-            href="/"
-            className="group relative px-6 py-3 text-sm font-medium text-white rounded-lg bg-zinc-800/80 border border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800 transition-all duration-300"
-          >
-            <span
-              className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, transparent 70%)",
-              }}
-            />
-            <span className="relative">Back to home</span>
-          </Link>
+              <h1
+                className="max-w-3xl text-3xl text-white sm:text-4xl md:text-5xl lg:text-[56px]"
+                style={headingStyle}
+              >
+                We couldn&apos;t find that page.
+              </h1>
+              <p className="mt-4 max-w-lg text-base text-zinc-400 sm:mt-6 sm:text-lg">
+                The link may be out of date, or the page may have moved. Head back to the
+                homepage, or pick one of the paths below.
+              </p>
 
-          {/* Ambient glow behind 404 */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-75 pointer-events-none z-0"
-            style={{
-              background: "radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, transparent 70%)",
-              animation: "pulse 5s ease-in-out infinite",
-            }}
-            aria-hidden="true"
-          />
+              <div className="mt-6 flex flex-wrap items-center gap-6 sm:mt-8">
+                <Link
+                  href="/"
+                  className="rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 shadow-[0_8px_24px_-12px_rgba(255,255,255,0.5)] transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                >
+                  Back to home
+                </Link>
+                <Link
+                  href="/contact"
+                  className="flex items-center gap-2 text-sm font-medium text-zinc-300 transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                >
+                  Contact support
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+
+              <div className="mt-16 grid gap-4 sm:mt-20 md:grid-cols-3">
+                {destinations.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="glass-card group flex flex-col rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:ring-1 hover:ring-white/[0.14] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                  >
+                    <span className="glass-pill flex h-10 w-10 items-center justify-center rounded-xl text-zinc-200">
+                      <item.icon className="h-4 w-4" aria-hidden="true" />
+                    </span>
+                    <div className="mt-6 flex flex-1 items-end justify-between gap-4">
+                      <div>
+                        <h2 className="text-base font-medium text-white md:text-lg">{item.title}</h2>
+                        <p className="mt-1.5 text-sm leading-6 text-zinc-500">{item.description}</p>
+                      </div>
+                      <ChevronRight
+                        className="mb-1 h-5 w-5 shrink-0 text-zinc-600 transition-all group-hover:translate-x-1 group-hover:text-zinc-300"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </main>
         </div>
       </body>
     </html>

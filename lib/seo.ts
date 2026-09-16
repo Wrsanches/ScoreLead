@@ -6,12 +6,7 @@ export const siteConfig = {
   url: "https://scorelead.io",
   email: "hello@scorelead.io",
   creator: "ScoreLead",
-  authors: [
-    {
-      name: "ScoreLead Editorial",
-      url: "https://scorelead.io/authors/scorelead-editorial",
-    },
-  ],
+  authors: [{ name: "ScoreLead", url: "https://scorelead.io" }],
   sameAs: [
     "https://x.com/scorelead_",
     "https://www.instagram.com/scorelead.io/",
@@ -211,7 +206,6 @@ export type PageKey =
   | "discovery"
   | "contentCalendar"
   | "businessProfile"
-  | "savedSearches"
   | "settings"
 
 type PageCopy = { title: string; description?: string }
@@ -264,7 +258,6 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     discovery: { title: "Lead discovery" },
     contentCalendar: { title: "Content calendar" },
     businessProfile: { title: "Business profile" },
-    savedSearches: { title: "Saved searches" },
     settings: { title: "Settings" },
   },
   pt: {
@@ -314,7 +307,6 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     discovery: { title: "Descoberta de leads" },
     contentCalendar: { title: "Calendario de conteudo" },
     businessProfile: { title: "Perfil do negocio" },
-    savedSearches: { title: "Buscas salvas" },
     settings: { title: "Configuracoes" },
   },
   es: {
@@ -364,7 +356,6 @@ const pageMetadata: Record<SupportedLocale, Record<PageKey, PageCopy>> = {
     discovery: { title: "Descubrimiento de leads" },
     contentCalendar: { title: "Calendario de contenido" },
     businessProfile: { title: "Perfil del negocio" },
-    savedSearches: { title: "Busquedas guardadas" },
     settings: { title: "Configuracion" },
   },
 }
@@ -430,6 +421,7 @@ export const siteViewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#09090B",
+  colorScheme: "dark",
 }
 
 export function getLanguageAlternates(pathname = "") {

@@ -149,25 +149,25 @@ function KanbanColumn({
       className={`flex flex-col w-70 shrink-0 rounded-xl border transition-all duration-150 ${
         isOver
           ? "border-emerald-500/40 bg-emerald-500/4 shadow-[0_0_32px_-8px_rgba(16,185,129,0.3)]"
-          : "border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/60 dark:bg-zinc-900/30"
+          : "border-zinc-200 dark:border-white/[0.08] bg-zinc-50/60 dark:bg-white/[0.03]"
       }`}
     >
       {/* Column header */}
-      <div className="flex items-center gap-2 px-3.5 py-3 border-b border-zinc-200/80 dark:border-zinc-800/60 shrink-0">
+      <div className="flex items-center gap-2 px-3.5 py-3 border-b border-zinc-200/80 dark:border-white/[0.08] shrink-0">
         <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
         <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
           {cfg.label}
         </h3>
         <StatNumber
           value={items.length}
-          className="ml-auto text-xs text-zinc-500 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-md px-1.5 py-0.5 min-w-6 text-center"
+          className="ml-auto text-xs text-zinc-500 bg-zinc-200/60 dark:bg-white/[0.07] rounded-md px-1.5 py-0.5 min-w-6 text-center"
         />
       </div>
 
       {/* Column body */}
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {items.length === 0 ? (
-          <div className="flex items-center justify-center h-16 text-xs text-zinc-400 dark:text-zinc-700 border border-dashed border-zinc-200/80 dark:border-zinc-800/60 rounded-lg">
+          <div className="flex items-center justify-center h-16 text-xs text-zinc-400 dark:text-zinc-700 border border-dashed border-zinc-200/80 dark:border-white/[0.08] rounded-lg">
             {isOver ? "Drop here" : "Empty"}
           </div>
         ) : (
@@ -216,7 +216,7 @@ function KanbanCard({
       onClick={() => {
         if (!isDragging) onCardClick?.(lead.id);
       }}
-      className={`group relative select-none rounded-lg border border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-900/60 p-2.5 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
+      className={`group relative select-none rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] p-2.5 hover:border-zinc-300 dark:hover:border-white/[0.22] hover:bg-zinc-50 dark:hover:bg-white/[0.09] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
         readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
       }`}
     >
@@ -233,7 +233,7 @@ function KanbanCard({
 
 function KanbanCardPreview({ lead }: { lead: Lead }) {
   return (
-    <div className="w-65 cursor-grabbing rounded-lg border border-emerald-500/40 bg-zinc-50 dark:bg-zinc-900 p-2.5 shadow-2xl shadow-emerald-500/20 ring-1 ring-emerald-500/20 rotate-2">
+    <div className="w-65 cursor-grabbing rounded-lg border border-emerald-500/40 bg-zinc-50 dark:bg-white/[0.05] p-2.5 shadow-2xl shadow-emerald-500/20 ring-1 ring-emerald-500/20 rotate-2">
       <CardContent lead={lead} />
     </div>
   );
@@ -254,11 +254,11 @@ function CardContent({ lead }: { lead: Lead }) {
           alt=""
           width={32}
           height={32}
-          className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-zinc-800"
+          className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-white/[0.08]"
           unoptimized
         />
       ) : (
-        <div className="w-8 h-8 rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/50 dark:ring-zinc-700/50">
+        <div className="w-8 h-8 rounded-lg bg-zinc-200 dark:bg-white/[0.07] flex items-center justify-center shrink-0 ring-1 ring-zinc-300/50 dark:ring-white/[0.12]">
           <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
             {getInitials(lead.name)}
           </span>
@@ -316,7 +316,7 @@ function ContactDot({
   return (
     <div
       title={title}
-      className={`w-5 h-5 rounded-md bg-zinc-200/70 dark:bg-zinc-800/70 flex items-center justify-center ${color}`}
+      className={`w-5 h-5 rounded-md bg-zinc-200/70 dark:bg-white/[0.07] flex items-center justify-center ${color}`}
     >
       <Icon className="w-2.5 h-2.5" />
     </div>

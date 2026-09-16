@@ -9,7 +9,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import type { ProductImage, ReferenceImagePref } from "@/lib/product-images";
-import { microLabelClass } from "./post-sheet/shared";
+import { microLabelClass } from "./post-editor/shared";
 
 interface ReferenceImagePickerProps {
   postId: string;
@@ -94,7 +94,7 @@ export function ReferenceImagePicker({
     `px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${
       active
         ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200"
+        : "border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/[0.22] hover:text-zinc-800 dark:hover:text-zinc-200"
     }`;
 
   return (
@@ -127,10 +127,10 @@ export function ReferenceImagePicker({
                 <button
                   type="button"
                   onClick={() => updatePref({ mode: "specific", imageId: img.id })}
-                  className={`relative shrink-0 w-11 h-11 rounded-lg overflow-hidden border-2 bg-zinc-100 dark:bg-zinc-900 transition-all ${
+                  className={`relative shrink-0 w-11 h-11 rounded-lg overflow-hidden border-2 bg-zinc-100 dark:bg-white/[0.05] transition-all ${
                     active
                       ? "border-emerald-500"
-                      : "border-transparent ring-1 ring-zinc-200 dark:ring-zinc-800 hover:ring-zinc-400 dark:hover:ring-zinc-600 opacity-80 hover:opacity-100"
+                      : "border-transparent ring-1 ring-zinc-200 dark:ring-white/[0.08] hover:ring-zinc-400 dark:hover:ring-zinc-600 opacity-80 hover:opacity-100"
                   }`}
                 >
                   <Image
@@ -146,9 +146,9 @@ export function ReferenceImagePicker({
               <HoverCardContent
                 side="top"
                 align="start"
-                className="w-60 p-2 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+                className="w-60 p-2"
               >
-                <div className="relative w-full h-56 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                <div className="relative w-full h-56 rounded-lg overflow-hidden bg-zinc-100 dark:bg-white/[0.05]">
                   <Image
                     src={img.url}
                     alt={img.description || ""}

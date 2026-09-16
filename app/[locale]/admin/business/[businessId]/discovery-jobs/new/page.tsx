@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react"
 import { useTranslations } from "next-intl"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useBusinessId } from "@/components/admin/business-context"
 import { usePlan } from "@/components/admin/plan-context"
 import {
@@ -14,7 +14,6 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
-  Bookmark,
 } from "lucide-react"
 import { SearchableSelect } from "@/components/searchable-select"
 import { LocationLoadError } from "@/components/location-load-error"
@@ -25,8 +24,6 @@ import { toast } from "sonner"
 export default function NewDiscoveryJobPage() {
   const t = useTranslations("dashboard")
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const savedSearchId = searchParams.get("savedSearchId")
   // The form always creates a job under the server-validated active business.
   const businessId = useBusinessId()
   const { openUpgrade, limits, can, loading: planLoading } = usePlan()
@@ -39,7 +36,6 @@ export default function NewDiscoveryJobPage() {
   const [keywordInput, setKeywordInput] = useState("")
   const [keywords, setKeywords] = useState<string[]>([])
   const [batchSize, setBatchSize] = useState(20)
-  const [savingSearch, setSavingSearch] = useState(false)
 
   // Suggested keywords
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([])
@@ -56,26 +52,9 @@ export default function NewDiscoveryJobPage() {
         if (!res.ok) return
         const biz = await res.json()
 
-        // Load saved search if ID is in URL
-        if (savedSearchId) {
-          try {
-            const ssRes = await fetch(`/api/discovery/saved-searches/${savedSearchId}`)
-            if (ssRes.ok) {
-              const ss = await ssRes.json()
-              setJobName(ss.name)
-              setCountryCode(ss.country)
-              if (ss.state) setStateCode(ss.state)
-              if (ss.city) setCityName(ss.city)
-              if (ss.keywords) setKeywords(ss.keywords)
-            }
-          } catch {
-            // Failed to load saved search
-          }
-        } else {
-          // Pre-fill keywords from last discovery job if available
-          if (biz.lastDiscoveryKeywords && biz.lastDiscoveryKeywords.length > 0) {
-            setKeywords(biz.lastDiscoveryKeywords)
-          }
+        // Pre-fill keywords from last discovery job if available
+        if (biz.lastDiscoveryKeywords && biz.lastDiscoveryKeywords.length > 0) {
+          setKeywords(biz.lastDiscoveryKeywords)
         }
 
         // Use cached suggestions if available, otherwise fetch from AI
@@ -89,7 +68,7 @@ export default function NewDiscoveryJobPage() {
       }
     }
     init()
-  }, [businessId, savedSearchId])
+  }, [businessId])
 
   async function fetchSuggestions(bizId: string) {
     setLoadingSuggestions(true)
@@ -193,35 +172,6 @@ export default function NewDiscoveryJobPage() {
 
   const locationOptionsLoading = loadingCountries || loadingStates || loadingCities
   const canSubmit = jobName.trim() && countryCode && keywords.length > 0 && businessId && !locationOptionsLoading && !locationLoadFailed && !isSubmitting
-  const canSave = jobName.trim() && countryCode && keywords.length > 0 && businessId && !locationOptionsLoading && !locationLoadFailed && !isSubmitting && !savingSearch
-
-  async function handleSaveSearch() {
-    if (!canSave) return
-    setSavingSearch(true)
-    try {
-      const res = await fetch("/api/discovery/saved-searches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessId,
-          name: jobName,
-          country: countryCode,
-          state: stateCode || null,
-          city: cityName || null,
-          location: buildLocation(),
-          keywords,
-        }),
-      })
-      if (res.ok) {
-        toast.success("Search saved")
-      } else {
-        toast.error("Failed to save search")
-      }
-    } catch {
-      toast.error("Failed to save search")
-    }
-    setSavingSearch(false)
-  }
 
   async function handleLaunch() {
     if (!canSubmit) return
@@ -284,7 +234,7 @@ export default function NewDiscoveryJobPage() {
             <div className="space-y-8">
               {/* Section: Basic info */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-white/[0.08]">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Basic Information</span>
                 </div>
 
@@ -298,7 +248,7 @@ export default function NewDiscoveryJobPage() {
                       onChange={(e) => setJobName(e.target.value)}
                       placeholder={t("jobNamePlaceholder")}
                       disabled={isSubmitting}
-                      className="w-full h-11 pl-11 pr-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700 transition-colors disabled:opacity-50"
+                      className="w-full h-11 pl-11 pr-4 bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-white/[0.22] transition-colors disabled:opacity-50"
                     />
                   </div>
                   <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Give your job a descriptive name so you can find it later.</p>
@@ -307,7 +257,7 @@ export default function NewDiscoveryJobPage() {
 
               {/* Section: Location */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-white/[0.08]">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("targetLocation")}</span>
                 </div>
 
@@ -355,7 +305,7 @@ export default function NewDiscoveryJobPage() {
 
               {/* Section: Keywords */}
               <div className="space-y-5">
-                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-white/[0.08]">
                   <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("keywords")}</span>
                 </div>
 
@@ -384,7 +334,7 @@ export default function NewDiscoveryJobPage() {
                               className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 disabled:opacity-50 ${
                                 isSelected
                                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                                  : "bg-transparent border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300"
+                                  : "bg-transparent border-dashed border-zinc-300 dark:border-white/[0.14] text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300"
                               }`}
                             >
                               {isSelected && <CheckCircle2 className="w-3 h-3" />}
@@ -400,14 +350,14 @@ export default function NewDiscoveryJobPage() {
                 {/* Custom keywords input */}
                 <div>
                   <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">{t("keywords")}</label>
-                  <div className="min-h-11 flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl focus-within:border-zinc-400 dark:focus-within:border-zinc-700 transition-colors">
+                  <div className="min-h-11 flex flex-wrap items-center gap-2 px-3.5 py-2.5 bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] rounded-xl focus-within:border-zinc-400 dark:focus-within:border-white/[0.22] transition-colors">
                     {keywords.map((kw) => (
                       <span
                         key={kw}
                         className={`inline-flex items-center gap-1 text-xs pl-2.5 pr-1.5 py-1 rounded-lg ${
                           suggestedKeywords.includes(kw)
                             ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/10"
-                            : "text-zinc-700 dark:text-zinc-300 bg-zinc-200 dark:bg-zinc-800"
+                            : "text-zinc-700 dark:text-zinc-300 bg-zinc-200 dark:bg-white/[0.07]"
                         }`}
                       >
                         {kw}
@@ -451,7 +401,7 @@ export default function NewDiscoveryJobPage() {
                       className={`h-10 px-5 text-sm font-medium rounded-xl border transition-colors disabled:opacity-50 ${
                         batchSize === n
                           ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
+                          : "border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/[0.22]"
                       }`}
                     >
                       {n}
@@ -478,7 +428,7 @@ export default function NewDiscoveryJobPage() {
 
               {/* Summary card */}
               {canSubmit && (
-                <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5">
+                <div className="bg-zinc-50 dark:bg-white/[0.05] rounded-2xl border border-zinc-200 dark:border-white/[0.08] p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Info className="w-4 h-4 text-zinc-500" />
                     <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Summary</span>
@@ -501,7 +451,7 @@ export default function NewDiscoveryJobPage() {
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-200/80 dark:border-zinc-800/60">
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-200/80 dark:border-white/[0.08]">
                 <button
                   onClick={() => router.back()}
                   disabled={isSubmitting}
@@ -510,18 +460,6 @@ export default function NewDiscoveryJobPage() {
                   Cancel
                 </button>
                 <div className="flex items-center gap-2">
-                <button
-                  onClick={handleSaveSearch}
-                  disabled={!canSave}
-                  className="h-10 px-4 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {savingSearch ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Bookmark className="w-4 h-4" />
-                  )}
-                  Save
-                </button>
                 <button
                   onClick={handleLaunch}
                   disabled={!canSubmit}

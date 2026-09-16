@@ -53,14 +53,15 @@ export default async function LocaleLayout({
       lang={getLocaleConfig(locale).htmlLang}
       data-scroll-behavior="smooth"
       className={`${geist.variable} ${geistMono.variable}`}
+      style={{ backgroundColor: "#09090b", colorScheme: "dark" }}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased bg-[#09090B]">
         <NextTopLoader
-          color="#34d399"
-          height={3}
+          color="linear-gradient(90deg, #059669 0%, #34d399 60%, #a7f3d0 100%)"
+          height={2}
           showSpinner={false}
-          shadow="0 0 10px rgba(52, 211, 153, 0.6)"
+          shadow="0 0 14px rgba(52, 211, 153, 0.45)"
           zIndex={2000}
           showForHashAnchor={false}
         />

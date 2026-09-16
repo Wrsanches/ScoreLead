@@ -141,7 +141,6 @@ export async function generateContentPlan(
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.8,
       max_completion_tokens: 8000,
     })
 

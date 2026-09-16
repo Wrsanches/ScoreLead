@@ -68,7 +68,7 @@ export function BillingSection() {
       : []
 
   return (
-    <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+    <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
           <div
@@ -121,7 +121,7 @@ export function BillingSection() {
                   </span>
                 </div>
                 {!unlimited && (
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/70 dark:bg-zinc-800/70">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/70 dark:bg-white/[0.07]">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${barColor}`}
                       style={{ width: `${pct}%` }}

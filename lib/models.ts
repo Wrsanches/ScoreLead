@@ -3,22 +3,23 @@
  * Bump here and every service picks it up.
  */
 
-export const OPENAI_TEXT_MODEL = "gpt-5.4"
+/**
+ * OpenAI text model for planning, extraction, and drafting. The GPT-6 family
+ * is exposed by the API under variant ids; "gpt-6-astra" is the general one.
+ */
+export const OPENAI_TEXT_MODEL = "gpt-6-astra"
 
 /**
- * Gemini image-generation model. MUST be an image-output variant. Text-only
- * models like "gemini-3.1-flash-lite-preview" accept images as input but never
- * produce image data - they'll silently return text and break generation.
+ * OpenAI GPT Image model used for content-calendar slide generation and
+ * image-to-image refinement (both go through the Images API).
  *
- * Valid image-output models:
- *   - "gemini-3.1-flash-image-preview" Nano Banana 2. Best balance of cost/quality. 1K-4K, imageConfig supported.
- *   - "gemini-3-pro-image-preview"     Nano Banana Pro. High-end. 1K-4K + search grounding + "Thinking" reasoning.
- *   - "gemini-2.5-flash-image"         Older Nano Banana. 1024px only, cheapest.
+ * Default is GPT Image 2.5 Sunburst (the higher-quality 2.5 variant; "flare"
+ * is the faster sibling). Set OPENAI_IMAGE_MODEL in the environment to swap
+ * models without a code change.
  *
- * All three accept imageConfig (aspectRatio, imageSize) and require
- * responseModalities to include IMAGE.
+ * GPT Image 2.x accepts arbitrary WIDTHxHEIGHT sizes (divisible by 16, aspect
+ * between 1:3 and 3:1), always processes input images at high fidelity, and
+ * returns base64 PNG/WebP/JPEG.
  */
-export const GEMINI_IMAGE_MODEL = "gemini-3-pro-image-preview"
-
-/** Image-to-image refinement. Same model as generation; edit uses inline image in contents. */
-export const GEMINI_IMAGE_EDIT_MODEL = "gemini-3-pro-image-preview"
+export const OPENAI_IMAGE_MODEL =
+  process.env.OPENAI_IMAGE_MODEL || "gpt-image-2.5-sunburst"

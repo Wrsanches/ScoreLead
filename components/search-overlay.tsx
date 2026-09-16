@@ -215,10 +215,10 @@ function SearchOverlay({
             exit={{ opacity: 0, scale: 0.98, y: -8 }}
             transition={{ duration: 0.15 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/60 rounded-xl shadow-2xl shadow-black/50 overflow-hidden ring-1 ring-emerald-500/10"
+            className="glass-strong relative w-full max-w-lg rounded-2xl overflow-hidden"
           >
             {/* Input */}
-            <div className="flex items-center gap-3 px-4 h-14 border-b border-zinc-800">
+            <div className="flex items-center gap-3 px-4 h-14 border-b border-white/[0.08]">
               <Search className="w-4.5 h-4.5 text-zinc-500 shrink-0" />
               <input
                 ref={inputRef}
@@ -236,7 +236,7 @@ function SearchOverlay({
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-              <kbd className="text-[11px] text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded font-medium border border-zinc-700/50">
+              <kbd className="text-[11px] text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded font-medium border border-white/[0.14]">
                 ESC
               </kbd>
             </div>
@@ -246,7 +246,7 @@ function SearchOverlay({
               <div className="max-h-80 overflow-auto">
                 {loading || !hasSearched ? (
                   <div className="px-4 py-8 flex items-center justify-center">
-                    <div className="w-4 h-4 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white/[0.14] border-t-zinc-400 rounded-full animate-spin" />
                   </div>
                 ) : results.length === 0 ? (
                   <div className="px-4 py-8 text-center">

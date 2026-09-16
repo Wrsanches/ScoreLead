@@ -65,7 +65,7 @@ export function LeadDetailModal({
   if (!lead) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800" />
+        <DialogContent className="max-w-xl" />
       </Dialog>
     )
   }
@@ -78,7 +78,7 @@ export function LeadDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 p-0 flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden p-0 flex flex-col">
         <VisuallyHidden.Root>
           <DialogTitle>{lead.name || "Lead detail"}</DialogTitle>
           <DialogDescription>
@@ -87,17 +87,17 @@ export function LeadDetailModal({
         </VisuallyHidden.Root>
 
         {/* Header */}
-        <div className="relative px-6 pt-6 pb-5 border-b border-zinc-200 dark:border-zinc-800/70">
+        <div className="relative px-6 pt-6 pb-5 border-b border-zinc-200 dark:border-white/[0.08]">
           <div className="flex items-start gap-4">
             {lead.photoUrl ? (
               <ZoomableImage
                 src={lead.photoUrl}
                 alt={lead.name ?? ""}
                 sizes="64px"
-                thumbClassName="w-16 h-16 rounded-2xl ring-1 ring-zinc-700/80 shadow-lg shadow-black/30 shrink-0"
+                thumbClassName="w-16 h-16 rounded-2xl ring-1 ring-white/[0.12] shadow-lg shadow-black/30 shrink-0"
               />
             ) : (
-              <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-zinc-700/60">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-white/[0.07] flex items-center justify-center shrink-0 ring-1 ring-zinc-300/60 dark:ring-white/[0.12]">
                 <span className="text-xl font-semibold text-zinc-600 dark:text-zinc-400">
                   {getInitials(lead.name)}
                 </span>
@@ -179,7 +179,7 @@ export function LeadDetailModal({
 
           {/* Score breakdown */}
           {lead.scoreBreakdown?.categories && (
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-white/70 dark:bg-zinc-950/40 p-4">
+            <div className="rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white/70 dark:bg-black/25 p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">
                   Score breakdown
@@ -264,7 +264,7 @@ export function LeadDetailModal({
                 {lead.services.slice(0, 10).map((s) => (
                   <span
                     key={s}
-                    className="text-[11px] text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded-md"
+                    className="text-[11px] text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-white/[0.07] border border-zinc-200 dark:border-white/[0.08] px-2 py-0.5 rounded-md"
                   >
                     {s}
                   </span>
@@ -285,7 +285,7 @@ export function LeadDetailModal({
           )}
         </div>
 
-        <div className="border-t border-zinc-200 dark:border-zinc-800 px-6 py-3 flex items-center justify-between">
+        <div className="border-t border-zinc-200 dark:border-white/[0.08] px-6 py-3 flex items-center justify-between">
           <span className="text-[11px] text-zinc-500 dark:text-zinc-600 capitalize">
             {lead.source.replace("_", " ")}
             {lead.firecrawlEnriched && (
@@ -322,7 +322,7 @@ function ContactRow({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group flex items-center gap-2.5 px-3 py-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/40 transition-colors"
+      className="group flex items-center gap-2.5 px-3 py-2 rounded-lg border border-zinc-200/80 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] hover:bg-zinc-100/60 dark:hover:bg-white/[0.06] transition-colors"
     >
       <Icon className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
       <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 truncate">{label}</span>

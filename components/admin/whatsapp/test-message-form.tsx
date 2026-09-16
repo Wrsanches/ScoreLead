@@ -149,7 +149,7 @@ export function WhatsAppTestMessageForm({ businessId }: { businessId: string }) 
 
   return (
     <section
-      className="border-t border-zinc-200 pt-8 dark:border-zinc-800"
+      className="border-t border-zinc-200 pt-8 dark:border-white/[0.08]"
       aria-labelledby="whatsapp-test-title"
     >
       <div className="max-w-2xl">
@@ -219,7 +219,7 @@ export function WhatsAppTestMessageForm({ businessId }: { businessId: string }) 
           </div>
 
           {variables.length > 0 && (
-            <fieldset className="space-y-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+            <fieldset className="space-y-3 rounded-xl border border-zinc-200 p-4 dark:border-white/[0.08]">
               <legend className="px-1 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {t("testVariables")}
               </legend>
@@ -248,7 +248,7 @@ export function WhatsAppTestMessageForm({ businessId }: { businessId: string }) 
           )}
 
           {preview && (
-            <div className="rounded-xl bg-zinc-100 p-4 dark:bg-zinc-900/70">
+            <div className="rounded-xl bg-zinc-100 p-4 dark:bg-white/[0.03]">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                 {t("testPreview")}
               </p>
@@ -258,7 +258,7 @@ export function WhatsAppTestMessageForm({ businessId }: { businessId: string }) 
             </div>
           )}
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 p-4 text-sm leading-5 text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 p-4 text-sm leading-5 text-zinc-700 dark:border-white/[0.08] dark:text-zinc-300">
             <input
               name="consentConfirmed"
               type="checkbox"

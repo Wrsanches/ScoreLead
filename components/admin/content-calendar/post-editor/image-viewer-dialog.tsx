@@ -35,7 +35,7 @@ export function ImageViewerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="p-0 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 max-w-3xl"
+        className="p-0 max-w-3xl"
       >
         <VisuallyHidden.Root>
           <DialogTitle>{currentImage?.headline || t("postImage")}</DialogTitle>
@@ -61,7 +61,7 @@ export function ImageViewerDialog({
                     onClick={() =>
                       onIndexChange((index - 1 + images.length) % images.length)
                     }
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-black/25 hover:bg-zinc-50 dark:hover:bg-white/[0.09] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                     aria-label={t("slidePrev")}
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -69,7 +69,7 @@ export function ImageViewerDialog({
                   <button
                     type="button"
                     onClick={() => onIndexChange((index + 1) % images.length)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-black/25 hover:bg-zinc-50 dark:hover:bg-white/[0.09] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                     aria-label={t("slideNext")}
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -79,13 +79,13 @@ export function ImageViewerDialog({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200"
+                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-black/25 hover:bg-zinc-50 dark:hover:bg-white/[0.09] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center text-zinc-800 dark:text-zinc-200"
                 aria-label={t("close")}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="px-5 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
+            <div className="px-5 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-white/[0.08]">
               <p className="text-sm text-zinc-700 dark:text-zinc-300 italic truncate max-w-[60%]">
                 &ldquo;{currentImage.headline}&rdquo;
               </p>

@@ -202,6 +202,57 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaDescription: "Keep discovery, qualification, and outreach in one traceable workflow.",
     ctaLabel: "Build your pipeline",
   },
+  "feature-ai-content-creation": {
+    eyebrow: "Feature · Content creation",
+    title: "AI Instagram Content Calendar for Business",
+    description:
+      "Plan a month of Instagram posts, carousels, and stories from your business profile, generate on-brand images with AI, and publish on schedule.",
+    answer:
+      "ScoreLead reads your business profile, audience, and brand style, then drafts a month of Instagram posts with hooks, captions, and hashtags. Every post gets AI-generated images in your brand palette, and approved posts can be scheduled straight to Instagram.",
+    highlights: [
+      "Draft a full month of posts, carousels, and stories in one click.",
+      "Generate on-brand images for every slide, using your real products as references.",
+      "Approve, refine, and schedule to Instagram without leaving the calendar.",
+    ],
+    sections: [
+      {
+        heading: "Start from your business, not a blank page",
+        paragraphs: [
+          "The planner reads your profile, services, audience, and brand voice, then maps the month across five content pillars: educate, showcase, story, proof, and engagement. Each post arrives with a scroll-stopping first line, a caption, hashtags, and a visual idea you can edit.",
+        ],
+      },
+      {
+        heading: "Images that look like your brand",
+        paragraphs: [
+          "Every post and carousel slide is rendered with the latest GPT Image model in your brand colors and typography. Attach a real product photo and the AI blends it into the scene without redrawing it. Change any slide with one sentence, or upload your own photo and keep going.",
+        ],
+        points: [
+          "Brand colors and typography on every image",
+          "Real product photos used as references",
+          "Refine a slide with a single sentence",
+          "Upload your own photos anytime",
+        ],
+      },
+      {
+        heading: "Review, then publish on schedule",
+        paragraphs: [
+          "Each post opens as an Instagram-style preview with its images, caption, and hashtags. Mark it approved when it is ready, pick the date and time, and ScoreLead publishes it through Meta's official platform even when you are not logged in.",
+        ],
+      },
+      {
+        heading: "Reuse beyond Instagram",
+        paragraphs: [
+          "Every caption and image is yours. Download them and repost on Facebook, TikTok, or LinkedIn in the same brand system. Direct scheduling is available for Instagram today.",
+        ],
+      },
+    ],
+    proofLabel: "What the AI does and does not do",
+    proof:
+      "ScoreLead drafts and renders content from your profile; you approve every post before it is scheduled. Instagram publishing requires a connected Instagram Business or Creator account and follows Meta's platform rules.",
+    ctaTitle: "A month of content, planned in minutes.",
+    ctaDescription: "The content calendar is included from the Growth plan. Start free and see the planner first.",
+    ctaLabel: "Plan my content",
+  },
   "use-case-agencies": {
     eyebrow: "Use case · Agencies",
     title: "B2B Lead Generation for Agencies",
@@ -241,206 +292,6 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaTitle: "Run focused prospecting for every client.",
     ctaDescription: "Give each campaign its own market logic and evidence trail.",
     ctaLabel: "Start an agency workflow",
-  },
-  "use-case-b2b-sales-teams": {
-    eyebrow: "Use case · Sales teams",
-    title: "A shared prospecting system for B2B sales teams",
-    description:
-      "Align account discovery, qualification, scoring, and outreach around one visible definition of a good prospect.",
-    answer:
-      "ScoreLead gives sales teams a common workflow for deciding which companies deserve attention. Representatives can see the evidence behind an account, understand its score, and record outcomes that improve future targeting.",
-    highlights: [
-      "Standardize research without removing representative judgment.",
-      "Prioritize accounts with explainable score dimensions.",
-      "Connect replies and rejection reasons to targeting decisions.",
-    ],
-    sections: [
-      {
-        heading: "Make the ICP usable",
-        paragraphs: [
-          "Convert strategy documents into search filters, review criteria, and disqualifiers that representatives can apply during weekly work.",
-        ],
-      },
-      {
-        heading: "Create a consistent review queue",
-        paragraphs: [
-          "Use scoring to order work, then let representatives verify the evidence and choose the appropriate next action.",
-        ],
-        points: ["Target-account definition", "Evidence review", "Priority tiers", "Outcome feedback"],
-      },
-      {
-        heading: "Coach with real examples",
-        paragraphs: [
-          "Accepted and rejected accounts give managers concrete examples for calibrating the team’s understanding of fit, readiness, and message relevance.",
-        ],
-      },
-    ],
-    proofLabel: "Adoption principle",
-    proof:
-      "A workflow earns trust when representatives can inspect and correct it. ScoreLead keeps reasoning visible so the team can improve the system rather than work around it.",
-    ctaTitle: "Give your team one definition of a strong account.",
-    ctaDescription: "Turn targeting criteria into repeatable daily sales work.",
-    ctaLabel: "Set up your sales team",
-  },
-  "use-case-b2b-startups": {
-    eyebrow: "Use case · Startups",
-    title: "Founder-Led B2B Lead Generation",
-    description:
-      "Test narrow B2B market hypotheses, find companies that match, and preserve the evidence needed to learn from early sales conversations.",
-    answer:
-      "Early-stage teams need learning speed more than list volume. ScoreLead helps founders define a testable segment, research accounts consistently, and compare real responses with the assumptions behind the search.",
-    highlights: [
-      "Test one segment and problem hypothesis at a time.",
-      "Spend founder attention on higher-confidence accounts.",
-      "Record acceptance, objections, and conversion evidence.",
-    ],
-    sections: [
-      {
-        heading: "Start narrow enough to learn",
-        paragraphs: [
-          "A constrained market makes feedback interpretable. Define who has the problem, where to find them, and which observable signals suggest the problem matters.",
-        ],
-      },
-      {
-        heading: "Automate repetition, keep discovery calls human",
-        paragraphs: [
-          "Use automation for finding and organizing accounts, then use founder time for verification, positioning, and direct conversations.",
-        ],
-        points: ["Market hypothesis", "Account evidence", "Founder review", "Weekly iteration"],
-      },
-      {
-        heading: "Change one assumption at a time",
-        paragraphs: [
-          "Compare replies, meetings, and objections by segment. Controlled changes make it easier to learn whether the target, offer, or message needs revision.",
-        ],
-      },
-    ],
-    proofLabel: "Early-stage reality",
-    proof:
-      "No prospecting tool can create product-market fit. ScoreLead helps startups run a more disciplined search and preserve the evidence needed to make better go-to-market decisions.",
-    ctaTitle: "Turn your next market hypothesis into a test.",
-    ctaDescription: "Find a focused account set and learn from the response.",
-    ctaLabel: "Test a market",
-  },
-  "use-case-b2b-companies": {
-    eyebrow: "Use case · Established B2B companies",
-    title: "B2B Account Discovery Across Teams",
-    description:
-      "Expand B2B prospecting into new segments or geographies while preserving qualification standards, source context, and local messaging.",
-    answer:
-      "Established B2B companies can use ScoreLead to make account research consistent across regions without flattening local differences. Shared criteria provide governance while localized searches and outreach preserve market context.",
-    highlights: [
-      "Apply shared qualification standards across regions.",
-      "Keep localized market evidence and language visible.",
-      "Export normalized, deduplicated account records.",
-    ],
-    sections: [
-      {
-        heading: "Separate global rules from local signals",
-        paragraphs: [
-          "Keep non-negotiable fit requirements consistent, then allow geography, language, service patterns, and market maturity to shape local discovery.",
-        ],
-      },
-      {
-        heading: "Make data reviewable before CRM entry",
-        paragraphs: [
-          "Normalize identity fields, retain source evidence, and resolve duplicates before records become another cleanup project.",
-        ],
-        points: ["Shared ICP", "Regional searches", "Quality review", "CRM-ready export"],
-      },
-      {
-        heading: "Compare quality by segment",
-        paragraphs: [
-          "Measure acceptance, progression, and conversion by region or segment. Differences help teams invest where the product and message have stronger evidence.",
-        ],
-      },
-    ],
-    proofLabel: "Governance principle",
-    proof:
-      "Standardization should improve explainability, not erase local judgment. ScoreLead keeps market context attached to the account so regional teams can review it.",
-    ctaTitle: "Scale account research without losing context.",
-    ctaDescription: "Create consistent workflows for every market you serve.",
-    ctaLabel: "Plan a regional workflow",
-  },
-  "compare-manual-lead-research": {
-    eyebrow: "Comparison · Workflow",
-    title: "Manual lead research vs. an AI-assisted workflow",
-    description:
-      "Compare the control, speed, evidence quality, and maintenance tradeoffs of manual B2B research and AI-assisted account discovery.",
-    answer:
-      "Manual research offers close control but becomes inconsistent and expensive at scale. AI assistance is faster at repetitive search and normalization, but it still requires a precise target, source-aware review, and human judgment before outreach.",
-    highlights: [
-      "Manual work is flexible but difficult to standardize.",
-      "Automation improves throughput and repeatability.",
-      "The strongest process combines automation with accountable review.",
-    ],
-    sections: [
-      {
-        heading: "Where manual research is strongest",
-        paragraphs: [
-          "A skilled researcher can interpret unusual markets, validate nuanced signals, and adapt quickly. That depth is valuable for strategic accounts and poorly documented segments.",
-        ],
-      },
-      {
-        heading: "Where automation earns its place",
-        paragraphs: [
-          "Search, field extraction, normalization, duplicate checks, and first-pass scoring are repetitive. A structured system performs those steps more consistently and preserves the method.",
-        ],
-        points: ["Discovery speed", "Repeatability", "Evidence retention", "Human exception handling"],
-      },
-      {
-        heading: "Choose a hybrid operating model",
-        paragraphs: [
-          "Automate broad collection and triage, then concentrate manual research on high-priority or uncertain accounts. Measure accepted-account cost rather than raw records per hour.",
-        ],
-      },
-    ],
-    proofLabel: "Fair comparison",
-    proof:
-      "ScoreLead can reduce repetitive work, but the value depends on market complexity, data availability, review quality, and the cost of your current process.",
-    ctaTitle: "Move repetitive research into a reviewable system.",
-    ctaDescription: "Keep human judgment where it creates the most value.",
-    ctaLabel: "Compare with your workflow",
-  },
-  "compare-spreadsheets": {
-    eyebrow: "Comparison · Operations",
-    title: "ScoreLead vs. spreadsheets for B2B prospecting",
-    description:
-      "Understand when a spreadsheet is enough and when discovery, provenance, scoring, deduplication, and workflow need a connected system.",
-    answer:
-      "Spreadsheets are flexible and familiar for small, temporary lists. They become fragile when teams need repeatable discovery, source history, consistent scoring, duplicate control, status changes, and multi-user accountability.",
-    highlights: [
-      "Spreadsheets remain useful for ad hoc analysis and export.",
-      "A connected workflow reduces manual copying and formula drift.",
-      "Source context and scoring logic stay attached to each account.",
-    ],
-    sections: [
-      {
-        heading: "Use a spreadsheet for simple, bounded work",
-        paragraphs: [
-          "A short list owned by one person may not need a system. Clear columns and a defined review date can be entirely sufficient.",
-        ],
-      },
-      {
-        heading: "Watch for operational failure points",
-        paragraphs: [
-          "Conflicting versions, unexplained cells, copied formulas, duplicates, missing provenance, and stale statuses signal that the list has become a workflow.",
-        ],
-        points: ["Version control", "Data provenance", "Scoring consistency", "Ownership and next action"],
-      },
-      {
-        heading: "Keep exports, replace manual coordination",
-        paragraphs: [
-          "ScoreLead still supports CSV export. The difference is that discovery, enrichment, scoring, and status are managed before the data leaves the system.",
-        ],
-      },
-    ],
-    proofLabel: "Migration principle",
-    proof:
-      "Do not replace a spreadsheet merely because software exists. Move when coordination errors and maintenance cost exceed the value of spreadsheet flexibility.",
-    ctaTitle: "See whether your lead sheet has become a system.",
-    ctaDescription: "Use the workflow where consistency matters and export when flexibility helps.",
-    ctaLabel: "Try a connected workflow",
   },
   "compare-sales-prospecting-software": {
     eyebrow: "Comparison · Buying guide",
@@ -493,46 +344,6 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaDescription:
       "Run a focused discovery workflow and inspect the evidence before deciding.",
     ctaLabel: "Start a free evaluation",
-  },
-  "compare-purchased-lead-lists": {
-    eyebrow: "Comparison · Data strategy",
-    title: "Fresh account discovery vs. purchased lead lists",
-    description:
-      "Compare static third-party lists with search criteria, source context, current public evidence, and account-level qualification.",
-    answer:
-      "Purchased lists can provide quick coverage, but their origin, age, permissions, and fit are often unclear. Fresh discovery starts from your target definition and gathers current public company evidence, although every contact decision still requires review and lawful use.",
-    highlights: [
-      "Static lists may age before they reach the sales team.",
-      "Fresh discovery keeps the target criteria and evidence visible.",
-      "Neither method removes consent, privacy, or verification obligations.",
-    ],
-    sections: [
-      {
-        heading: "Evaluate a list beyond record count",
-        paragraphs: [
-          "Ask how data was collected, when it was verified, which fields are inferred, how opt-outs are handled, and whether the provider permits your intended use.",
-        ],
-      },
-      {
-        heading: "Build from the account hypothesis",
-        paragraphs: [
-          "Fresh discovery begins with the companies you can help and uses current observable evidence to determine whether each account deserves review.",
-        ],
-        points: ["Target definition", "Observation date", "Source context", "Contact-law review"],
-      },
-      {
-        heading: "Measure usable accounts",
-        paragraphs: [
-          "Compare accepted, reachable, correctly targeted accounts—not just price per row. Cheap records are expensive when representatives must re-research or repair them.",
-        ],
-      },
-    ],
-    proofLabel: "Compliance note",
-    proof:
-      "Public availability does not automatically authorize every use. Review applicable privacy, direct-marketing, suppression, and platform requirements before contacting people.",
-    ctaTitle: "Build a list around your market—not a vendor catalog.",
-    ctaDescription: "Discover companies with the criteria and source context attached.",
-    ctaLabel: "Start fresh discovery",
   },
   "compare-best-lead-scoring-software": {
     eyebrow: "Comparison · Lead scoring",
@@ -814,86 +625,6 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
     ctaTitle: "See whether the workflow fits your market.",
     ctaDescription: "Start free or contact the team with a specific prospecting problem.",
     ctaLabel: "Try ScoreLead",
-  },
-  "company-editorial-policy": {
-    eyebrow: "Editorial standards",
-    title: "ScoreLead Editorial Standards",
-    description:
-      "The standards used for product claims, educational guidance, sources, AI assistance, translations, corrections, and customer evidence.",
-    answer:
-      "ScoreLead publishes content to help B2B teams make better prospecting decisions. Articles separate product behavior from general advice, cite primary sources where they matter, disclose limitations, and avoid inventing people, customer outcomes, or authority signals.",
-    highlights: [
-      "Claims should be traceable to product behavior or an identified source.",
-      "AI may assist drafting, but a human-owned editorial standard controls publication.",
-      "Translations preserve meaning and are reviewed for locale-specific clarity.",
-    ],
-    sections: [
-      {
-        heading: "Who, how, and why",
-        paragraphs: [
-          "Each article identifies the publishing organization, the publication and review date, and the reason the content exists. Named experts are added only with permission and a real biography.",
-        ],
-      },
-      {
-        heading: "Sources and customer evidence",
-        paragraphs: [
-          "Regulatory, platform, and technical claims favor primary sources. Customer outcomes describe the measurement window and disclosure status, and they are not generalized into guarantees.",
-        ],
-        points: ["Primary sources", "Visible update dates", "Methodology notes", "Correction path"],
-      },
-      {
-        heading: "Corrections and updates",
-        paragraphs: [
-          "Readers can send corrections through the ScoreLead contact page. Material corrections update the visible review date; dates are not changed merely to make old content look fresh.",
-        ],
-      },
-    ],
-    proofLabel: "AI assistance disclosure",
-    proof:
-      "AI tools may support outlining, translation, and editing. ScoreLead remains responsible for the published text, source selection, product accuracy, and removal of unsupported claims.",
-    ctaTitle: "Found something that needs correction?",
-    ctaDescription: "Send the source, affected URL, and a short explanation to the team.",
-    ctaLabel: "Contact the editors",
-  },
-  "author-scorelead-editorial": {
-    eyebrow: "Author",
-    title: "ScoreLead Editorial",
-    description:
-      "The product and research team responsible for ScoreLead’s guides to B2B account discovery, qualification, scoring, enrichment, and outreach.",
-    answer:
-      "ScoreLead Editorial is an organization author used when a named individual has not been approved for publication. It represents the team maintaining product documentation and educational content—not a fictional person.",
-    highlights: [
-      "Covers B2B prospecting operations and ScoreLead product workflows.",
-      "Uses visible publication dates, sources, and methodology notes.",
-      "Accepts corrections through the ScoreLead contact page.",
-    ],
-    sections: [
-      {
-        heading: "Areas of focus",
-        paragraphs: [
-          "The team writes about ideal-customer definition, account discovery, enrichment, transparent scoring, data quality, pipeline design, and responsible outreach.",
-        ],
-      },
-      {
-        heading: "Review standard",
-        paragraphs: [
-          "Product claims are checked against current application behavior. External claims favor primary documentation, and uncertain evidence is labeled rather than strengthened through vague wording.",
-        ],
-        points: ["Product accuracy", "Primary sources", "Clear limitations", "Meaning-preserving translation"],
-      },
-      {
-        heading: "Identity policy",
-        paragraphs: [
-          "When a real author or expert reviewer is available and consents to publication, ScoreLead will use a named profile with relevant experience and links. Until then, articles use this transparent organization identity.",
-        ],
-      },
-    ],
-    proofLabel: "Why there is no Person schema",
-    proof:
-      "This profile is represented as an Organization in structured data. Publishing a Person entity without a real, consenting individual would weaken trust rather than improve it.",
-    ctaTitle: "Read the research behind the workflow.",
-    ctaDescription: "Explore practical guides or send the team a correction.",
-    ctaLabel: "Explore the blog",
   },
   "tool-icp-worksheet": {
     eyebrow: "Free tool · ICP worksheet",

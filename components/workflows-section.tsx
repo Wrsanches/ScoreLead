@@ -160,7 +160,7 @@ function CSVExportMockup() {
   return (
     <div className="flex items-center justify-center h-full">
       <div className="flex flex-col items-center gap-3">
-        <div className="bg-zinc-800/50 rounded-lg px-4 py-3 border border-zinc-700/50">
+        <div className="bg-zinc-800/50 rounded-lg px-4 py-3 border border-white/[0.14]">
           <div className="flex items-center gap-2 mb-2">
             <FileDown className="w-4 h-4 text-zinc-400" />
             <span className="text-xs font-mono text-zinc-400">leads_export.csv</span>
@@ -189,7 +189,7 @@ function EmailOutreachMockup() {
               "bg-emerald-500/20 text-emerald-400"
             }`}>{step}</div>
             <Mail className="w-4 h-4 text-zinc-500" />
-            <div className="w-24 h-2 bg-zinc-800 rounded" />
+            <div className="w-24 h-2 bg-white/[0.07] rounded" />
           </div>
         ))}
       </div>
@@ -200,7 +200,7 @@ function EmailOutreachMockup() {
 function RestAPIMockup() {
   return (
     <div className="flex items-center justify-center h-full">
-      <div className="bg-zinc-800/50 rounded-lg px-4 py-3 border border-zinc-700/50">
+      <div className="bg-zinc-800/50 rounded-lg px-4 py-3 border border-white/[0.14]">
         <div className="flex items-center gap-2 mb-2">
           <Code className="w-4 h-4 text-zinc-400" />
           <span className="text-xs font-mono text-zinc-400">SCORELEAD API</span>
@@ -290,7 +290,7 @@ export function WorkflowsSection() {
           >
             {translatedCards.map((card) => (
               <div key={card.id} className="shrink-0 w-[calc(25%-12px)] min-w-70">
-                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl overflow-hidden h-85 flex flex-col">
+                <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl overflow-hidden h-85 flex flex-col">
                   <div className="flex-1 relative overflow-hidden">
                     <CardMockup type={card.mockup} />
                     <div
@@ -301,13 +301,13 @@ export function WorkflowsSection() {
                     />
                   </div>
 
-                  <div className="p-4 border-t border-zinc-800/30">
+                  <div className="p-4 border-t border-white/[0.08]">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-zinc-500 mb-1">{card.category}</p>
                         <p className="text-sm text-zinc-200 leading-snug">{card.title}</p>
                       </div>
-                      <button className="shrink-0 w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:border-zinc-600 transition-colors">
+                      <button className="shrink-0 w-8 h-8 rounded-full border border-white/[0.14] flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:border-zinc-600 transition-colors">
                         <card.icon className="w-4 h-4" />
                       </button>
                     </div>
@@ -321,14 +321,14 @@ export function WorkflowsSection() {
         <div className="flex items-center justify-center gap-2 mt-8">
           <button
             onClick={scrollLeft}
-            className="w-10 h-10 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-full border border-white/[0.14] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/[0.22] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             disabled={scrollPosition === 0}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={scrollRight}
-            className="w-10 h-10 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-full border border-white/[0.14] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/[0.22] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             disabled={scrollPosition >= carouselCards.length - 4}
           >
             <ChevronRight className="w-5 h-5" />

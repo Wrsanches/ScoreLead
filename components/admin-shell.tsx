@@ -59,10 +59,10 @@ export function AdminShell({
   return (
     <PlanProvider initialStatus={planStatus}>
     <SearchProvider>
-      <div className="flex h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+      <div className="glass-canvas relative flex h-full w-full overflow-hidden">
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -80,26 +80,11 @@ export function AdminShell({
           isPlatformAdmin={isPlatformAdmin}
         />
 
-        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-2 lg:p-3 lg:pl-0">
-          <div className="relative flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/50 shadow-[0_1px_2px_0_rgba(0,0,0,0.04),0_1px_0_0_rgba(255,255,255,1)_inset] dark:shadow-[0_0_0_1px_rgba(0,0,0,0.45),0_1px_0_0_rgba(255,255,255,0.04)_inset]">
-            {/* Ambient emerald glow - dark only; on white it reads as a sickly tint */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-0 hidden dark:block"
-              style={{
-                backgroundImage: `
-                  radial-gradient(ellipse 60% 50% at top left, rgba(16,185,129,0.08), transparent 55%),
-                  radial-gradient(ellipse 70% 60% at bottom right, rgba(16,185,129,0.045), transparent 60%),
-                  radial-gradient(ellipse 40% 30% at 80% 10%, rgba(52,211,153,0.035), transparent 55%)
-                `,
-              }}
-            />
-            <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
-              <MobileMenuContext.Provider value={() => setSidebarOpen(true)}>
-                {children}
-              </MobileMenuContext.Provider>
-            </div>
-          </div>
+        {/* Content sits directly on the canvas; only the sidebar floats. */}
+        <div className="relative flex-1 min-w-0 flex flex-col overflow-hidden">
+          <MobileMenuContext.Provider value={() => setSidebarOpen(true)}>
+            {children}
+          </MobileMenuContext.Provider>
         </div>
       </div>
     </SearchProvider>

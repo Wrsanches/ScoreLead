@@ -4,31 +4,26 @@ import type { BlogPost, BlogTranslation } from "@/lib/blog"
 
 const accentStyles = {
   emerald: {
-    border: "group-hover:border-emerald-500/35",
     text: "text-emerald-400",
     glow: "bg-emerald-400",
     line: "bg-emerald-400/50",
   },
   cyan: {
-    border: "group-hover:border-cyan-500/35",
     text: "text-cyan-400",
     glow: "bg-cyan-400",
     line: "bg-cyan-400/50",
   },
   violet: {
-    border: "group-hover:border-violet-500/35",
     text: "text-violet-400",
     glow: "bg-violet-400",
     line: "bg-violet-400/50",
   },
   amber: {
-    border: "group-hover:border-amber-500/35",
     text: "text-amber-400",
     glow: "bg-amber-400",
     line: "bg-amber-400/50",
   },
   rose: {
-    border: "group-hover:border-rose-500/35",
     text: "text-rose-400",
     glow: "bg-rose-400",
     line: "bg-rose-400/50",
@@ -49,7 +44,7 @@ export function BlogVisual({
   return (
     <div
       aria-hidden="true"
-      className={`relative overflow-hidden border-b border-zinc-800 bg-zinc-950 ${
+      className={`relative overflow-hidden border-b border-white/[0.06] bg-black/20 ${
         compact ? "h-44" : "min-h-72 sm:min-h-80"
       }`}
     >
@@ -94,7 +89,7 @@ export function BlogCard({
     <article className="h-full">
       <Link
         href={`/blog/${post.slug}`}
-        className={`group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/35 transition duration-300 hover:-translate-y-1 hover:bg-zinc-900/60 ${accent.border} focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400`}
+        className="glass-card group flex h-full flex-col overflow-hidden rounded-3xl transition duration-300 hover:-translate-y-1 hover:ring-1 hover:ring-white/[0.14] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
       >
         <BlogVisual post={post} category={translation.category} compact />
         <div className="flex flex-1 flex-col p-6">

@@ -39,15 +39,17 @@ Expected columns:
 
 Then visit `/admin/content-calendar` and click **Generate with AI**.
 
-## Image generation (Nano Banana Pro)
+## Image generation (OpenAI GPT Image)
 
-Post images are rendered with Google's `gemini-3-pro-image-preview` (Nano Banana Pro). Requirements:
+Post images are rendered with OpenAI's GPT Image model via the Images API (`gpt-image-2.5-sunburst` by default, override with `OPENAI_IMAGE_MODEL`). Requirements:
 
-- `GEMINI_API_KEY` set in `.env.local` (already present).
-- Generated PNGs are written to `public/generated/content-images/{postId}-{slideIndex}-{timestamp}.png` and referenced via relative URL inside the `content_post.images` jsonb array.
-- Aspect ratio follows post type: `single`/`carousel` → 4:5, `reel`/`story` → 9:16. Resolution is 2K.
-- For **carousels**, the caption is first split into 4-7 slide headlines by GPT (cover + body slides + optional CTA). Each slide gets its own Gemini call, all fired in parallel, with an enforced cohesion clause so they feel like one shoot.
+- `OPENAI_API_KEY` set in `.env.local` (already present, shared with the text models).
+- Generated PNGs are uploaded to S3 and referenced by URL inside the `content_post.images` jsonb array.
+- Aspect ratio follows post type: `single`/`carousel` → 4:5 (1280x1600), `reel`/`story` → 9:16 (1152x2048). Quality is `high`.
+- For **carousels**, the caption is first split into 4-7 slide headlines by GPT (cover + body slides + optional CTA). Each slide gets its own image call, all fired in parallel, with an enforced cohesion clause so they feel like one shoot.
+- Refinements and product/user reference images go through the edit endpoint with the prior slide and the reference passed as input images.
+- The prompt follows an Apple-style art direction (one subject, one line of type, generous negative space, neutral palette with one brand accent) with six rotating creative directions.
 - For single/reel posts, the `images` array has exactly one entry.
-- `images[i]` stores `{ url, headline, prompt }`: the PNG URL, the headline overlaid on that slide, and the full prompt sent to Gemini.
+- `images[i]` stores `{ url, headline, prompt }`: the PNG URL, the headline overlaid on that slide, and the full prompt sent to the model.
 
 Open any post in the calendar and click **Generate image** in the sheet. Regenerating overwrites the DB row and saves a new file (old files are not auto-cleaned — safe to delete `public/generated/content-images/` contents anytime to reclaim disk space).

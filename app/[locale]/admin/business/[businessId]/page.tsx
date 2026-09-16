@@ -408,7 +408,7 @@ export default function AdminPage({
                               {count} ({pct.toFixed(0)}%)
                             </span>
                           </div>
-                          <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-zinc-200 dark:bg-white/[0.07] rounded-full overflow-hidden">
                             <div
                               className="h-full bg-zinc-500 rounded-full"
                               style={{ width: `${pct}%` }}
@@ -438,7 +438,7 @@ export default function AdminPage({
                       <Link
                         key={job.id}
                         href={`/admin/discovery-jobs/${job.id}`}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors group"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors group"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
@@ -475,7 +475,7 @@ export default function AdminPage({
                   {stats.recentLeads.map((lead) => (
                     <div
                       key={lead.id}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors group"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors group"
                     >
                       {lead.photoUrl ? (
                         <Image
@@ -483,11 +483,11 @@ export default function AdminPage({
                           alt=""
                           width={32}
                           height={32}
-                          className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-zinc-800"
+                          className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-white/[0.08]"
                           unoptimized
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ring-1 ring-zinc-300/50 dark:ring-zinc-700/50">
+                        <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-white/[0.07] flex items-center justify-center shrink-0 ring-1 ring-zinc-300/50 dark:ring-white/[0.12]">
                           <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
                             {getInitials(lead.name)}
                           </span>

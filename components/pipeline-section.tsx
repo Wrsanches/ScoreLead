@@ -42,7 +42,7 @@ export function PipelineSection() {
           {t("heading")}
         </h2>
 
-        <p className="mb-4 max-w-md text-lg text-zinc-400">
+        <p className="mb-4 max-w-md text-lg text-zinc-300">
           {t("description")}
         </p>
 
@@ -62,7 +62,7 @@ export function PipelineSection() {
           >
             <div className="relative h-100">
               <div
-                className="absolute w-px bg-zinc-600/50"
+                className="absolute w-px bg-white/[0.12]"
                 style={{
                   height: "600px",
                   left: "55%",
@@ -77,7 +77,7 @@ export function PipelineSection() {
                   {Array.from({ length: 60 }).map((_, i) => (
                     <div
                       key={i}
-                      className="bg-zinc-600/60"
+                      className="bg-white/[0.16]"
                       style={{
                         width: "1px",
                         height: i % 7 === 0 ? "16px" : "8px",
@@ -100,7 +100,7 @@ export function PipelineSection() {
                 {t("stageEnrichment")}
               </div>
               <div
-                className="absolute px-2 sm:px-3 py-1 rounded-md bg-zinc-700/80 text-zinc-300 text-[10px] sm:text-sm font-medium"
+                className="absolute px-2 sm:px-3 py-1 rounded-md glass-pill text-zinc-200 text-[10px] sm:text-sm font-medium"
                 style={{ left: "42%", top: "15px" }}
               >
                 {t("stageScored")}
@@ -207,7 +207,7 @@ export function PipelineSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="border-t border-b md:border-r border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
+          <div className="border-t border-b md:border-r border-white/[0.08] pt-8 px-6 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
             <h3 className="text-xl font-medium text-zinc-200 mb-3">
               {t("discoveryTitle")}
             </h3>
@@ -215,7 +215,7 @@ export function PipelineSection() {
               {t("discoveryDesc")}
             </p>
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+            <div className="surface-card rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-medium text-zinc-200">
                   San Francisco, CA - Yoga Studios
@@ -225,7 +225,7 @@ export function PipelineSection() {
                 </span>
               </div>
 
-              <div className="w-full h-2 bg-zinc-800 rounded-full mb-3 overflow-hidden">
+              <div className="w-full h-2 bg-white/[0.07] rounded-full mb-3 overflow-hidden">
                 <div
                   className="h-full bg-blue-500 rounded-full"
                   style={{ width: "73%" }}
@@ -233,7 +233,7 @@ export function PipelineSection() {
               </div>
               <span className="text-zinc-500 text-xs">{t("complete")}</span>
 
-              <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-800/50">
+              <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.08]">
                 <div>
                   <p className="text-zinc-200 font-mono text-lg">142</p>
                   <p className="text-zinc-500 text-[10px]">{t("found")}</p>
@@ -252,7 +252,7 @@ export function PipelineSection() {
             </div>
           </div>
 
-          <div className="border-b md:border-t border-zinc-800 pt-8 px-6 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
+          <div className="border-b md:border-t border-white/[0.08] pt-8 px-6 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
             <h3 className="text-xl font-medium text-zinc-200 mb-3">
               {t("deduplicationTitle")}
             </h3>
@@ -262,7 +262,7 @@ export function PipelineSection() {
 
             <div className="relative h-48">
               <div
-                className="absolute rounded-lg bg-zinc-800/40 border border-red-500/20 px-4 py-3"
+                className="absolute rounded-xl bg-white/[0.03] ring-1 ring-inset ring-red-500/25 backdrop-blur-[2px] px-4 py-3"
                 style={{ top: 0, left: "10%", width: "80%" }}
               >
                 <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export function PipelineSection() {
               </div>
 
               <div
-                className="absolute rounded-lg bg-zinc-800/60 border border-amber-500/20 px-4 py-3"
+                className="absolute rounded-xl bg-white/[0.04] ring-1 ring-inset ring-amber-500/25 backdrop-blur-[2px] px-4 py-3"
                 style={{ top: "35px", left: "5%", width: "85%" }}
               >
                 <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export function PipelineSection() {
               </div>
 
               <div
-                className="absolute rounded-xl bg-zinc-800/90 border border-emerald-500/30 px-5 py-4"
+                className="absolute rounded-2xl bg-white/[0.05] ring-1 ring-inset ring-emerald-500/35 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_12px_32px_-16px_rgba(0,0,0,0.6)] backdrop-blur-[3px] px-5 py-4"
                 style={{ top: "75px", left: 0, width: "95%" }}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -309,13 +309,13 @@ export function PipelineSection() {
                 </div>
                 <p className="text-zinc-300 text-sm mb-2">Sunset Yoga Studio</p>
                 <div className="flex items-center gap-2 text-[10px]">
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                  <span className="bg-white/[0.07] text-zinc-400 px-1.5 py-0.5 rounded">
                     {t("sameWebsite")}
                   </span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                  <span className="bg-white/[0.07] text-zinc-400 px-1.5 py-0.5 rounded">
                     {t("similarName")}
                   </span>
-                  <span className="bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+                  <span className="bg-white/[0.07] text-zinc-400 px-1.5 py-0.5 rounded">
                     {t("sameLocation")}
                   </span>
                 </div>

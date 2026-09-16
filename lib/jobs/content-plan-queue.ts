@@ -1,4 +1,4 @@
-import { and, eq, gte, isNull, lt, sql } from "drizzle-orm"
+import { and, eq, gte, isNull, lt, sql, inArray } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { business, contentPlanJob, contentPost } from "@/lib/db/schema"
 import { generateContentPlan } from "@/lib/services/content-calendar-generator"
@@ -122,9 +122,10 @@ async function claimNextJob(): Promise<string | null> {
 }
 
 /**
- * Drop this month's untouched AI drafts so a regeneration replaces them.
+ * Drop this month's untouched AI posts so a regeneration replaces them.
  *
- * "Untouched" means aiGenerated, still draft, no images, and never edited
+ * "Untouched" means aiGenerated, still in its generated status (posts are
+ * inserted approved; older runs inserted drafts), no images, and never edited
  * beyond the original insert (updatedAt within ~30s of createdAt). Anything the
  * user actually worked on survives a regenerate.
  */
@@ -138,7 +139,7 @@ async function clearUntouchedDrafts(
     eq(contentPost.userId, userId),
     eq(contentPost.businessId, businessId),
     eq(contentPost.aiGenerated, true),
-    eq(contentPost.status, "draft"),
+    inArray(contentPost.status, ["draft", "approved"]),
     isNull(contentPost.images),
     gte(contentPost.scheduledFor, start),
     lt(contentPost.scheduledFor, end),
@@ -254,7 +255,8 @@ async function executeJob(jobId: string) {
       hashtags: p.hashtags,
       visualIdea: p.visualIdea,
       callToAction: p.callToAction,
-      status: "draft",
+      // Generated posts land ready to publish; users refine by tapping a post.
+      status: "approved",
       aiGenerated: true,
     }))
 

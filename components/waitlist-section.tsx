@@ -38,7 +38,7 @@ export function WaitlistSection() {
   }
 
   return (
-    <section id="waitlist" className="relative py-32 px-6 overflow-hidden" style={{ backgroundColor: "#09090B" }}>
+    <section id="waitlist" className="relative py-32 px-6 overflow-hidden">
       <div
         className="absolute pointer-events-none"
         style={{
@@ -51,26 +51,26 @@ export function WaitlistSection() {
         }}
       />
 
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
       <div className="relative max-w-2xl mx-auto text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-8">
+          <span className="glass-pill inline-flex items-center gap-2 px-3 py-1 rounded-full text-zinc-300 text-xs font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {t("badge")}
           </span>
         </motion.div>
 
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-medium text-white tracking-tight mb-6"
           style={{
             letterSpacing: "-0.0325em",
@@ -83,25 +83,25 @@ export function WaitlistSection() {
         </motion.h2>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-zinc-400 text-lg mb-12 max-w-md mx-auto"
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
+          className="text-zinc-300 text-lg mb-12 max-w-md mx-auto"
         >
           {t("description")}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.3, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
         >
           <div className="max-w-md mx-auto">
             <div role="status" aria-live="polite">
               {submitted ? (
-                <div className="flex items-center justify-center gap-3 py-5 px-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                <div className="surface-card flex items-center justify-center gap-3 py-5 px-6 rounded-2xl ring-1 ring-emerald-500/25">
                   <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                       <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
@@ -111,7 +111,7 @@ export function WaitlistSection() {
                 </div>
               ) : (
                 <>
-                  <form onSubmit={handleSubmit(onSubmit)} className="flex items-stretch gap-2 p-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50">
+                  <form onSubmit={handleSubmit(onSubmit)} className="glass-strong flex items-stretch gap-2 p-1.5 rounded-2xl">
                     <label htmlFor="contact-email" className="sr-only">{t("placeholder")}</label>
                     <div className="relative flex-1">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
@@ -136,7 +136,7 @@ export function WaitlistSection() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-5 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-medium rounded-lg transition-colors text-sm shrink-0 disabled:opacity-50 flex items-center gap-2"
+                      className="press px-5 py-3 bg-white hover:bg-zinc-100 text-zinc-900 font-medium rounded-[10px] text-sm shrink-0 disabled:opacity-50 flex items-center gap-2 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)]"
                     >
                       {loading ? t("sending") : t("ctaSales")}
                       {!loading && <Send className="w-3.5 h-3.5" />}

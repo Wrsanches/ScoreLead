@@ -1,33 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   useBusinessAccess,
   useBusinessId,
 } from "@/components/admin/business-context";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
-  AtSign,
   Loader2,
   Plus,
 } from "lucide-react";
+import { useRouter } from "@/i18n/routing";
 import { PageHeader, ContentWrapper, LoadingState } from "@/components/admin";
-import { MonthGrid } from "@/components/admin/content-calendar/month-grid";
 import {
-  PostSheet,
-  type PostFormValues,
-} from "@/components/admin/content-calendar/post-sheet";
-import { GenerateBanner } from "@/components/admin/content-calendar/generate-banner";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { MonthGrid } from "@/components/admin/content-calendar/month-grid";
 import { CalendarEmptyState } from "@/components/admin/content-calendar/empty-state";
 import type { ContentPostRow } from "@/components/admin/content-calendar/types";
 import type { ContentPlanJobView } from "@/lib/jobs/content-plan-queue";
-import { uploadImage } from "@/lib/upload-client";
-import { Link } from "@/i18n/routing";
+import { InstagramStatusButton } from "@/components/admin/integrations/instagram-status-button";
 import { publicationLocksPost } from "@/lib/instagram/status";
-import type { PublicationView } from "@/lib/instagram/data";
 import { usePlan } from "@/components/admin/plan-context";
 
 function monthStartUtc(d: Date): Date {
@@ -44,9 +47,9 @@ function monthParam(d: Date): string {
 
 export default function ContentCalendarPage() {
   const t = useTranslations("contentCalendar");
-  const ti = useTranslations("instagram");
   const tb = useTranslations("billing");
   const locale = useLocale();
+  const router = useRouter();
   const businessId = useBusinessId();
   const { readOnly } = useBusinessAccess();
   const { openUpgrade, limits } = usePlan();
@@ -61,9 +64,6 @@ export default function ContentCalendarPage() {
   const [posts, setPosts] = useState<ContentPostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [recentGenerationIds, setRecentGenerationIds] = useState<
-    string[] | null
-  >(null);
   /**
    * The month's generation job, as reported by the server. This is what makes
    * generation survive leaving the page: the state lives in the database, not
@@ -72,11 +72,7 @@ export default function ContentCalendarPage() {
   const [job, setJob] = useState<ContentPlanJobView | null>(null);
   const publishing = posts.some(post => post.publication && ["scheduled", "publishing"].includes(post.publication.status));
   const generating = job?.status === "queued" || job?.status === "running";
-  /** Job ids we have already surfaced, so the banner fires once per run. */
-  const announcedJobRef = useRef<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<ContentPostRow | null>(null);
-  const [draftDate, setDraftDate] = useState<Date | null>(null);
+  const [regenerateOpen, setRegenerateOpen] = useState(false);
 
   const monthStart = useMemo(() => monthStartUtc(cursor), [cursor]);
   const monthEnd = useMemo(() => monthEndUtc(cursor), [cursor]);
@@ -122,18 +118,6 @@ export default function ContentCalendarPage() {
         setPosts((body.posts as ContentPostRow[]) ?? []);
         const incoming = (body.job as ContentPlanJobView | null) ?? null;
         setJob(incoming);
-
-        // A run that finished while we were away (or on another device) still
-        // gets its banner, so the drafts are never dropped in silently.
-        if (
-          incoming &&
-          incoming.status === "completed" &&
-          incoming.postIds.length > 0 &&
-          announcedJobRef.current !== incoming.id
-        ) {
-          announcedJobRef.current = incoming.id;
-          setRecentGenerationIds(incoming.postIds);
-        }
         if (incoming?.status === "failed") {
           setError(incoming.errorMessage || "Generation failed");
         }
@@ -164,17 +148,8 @@ export default function ContentCalendarPage() {
           if (!body) return;
           const received = (body.posts as ContentPostRow[]) ?? [];
           setPosts(received);
-          setEditingPost(previous => previous ? received.find(post => post.id === previous.id) ?? previous : null);
           const incoming = (body.job as ContentPlanJobView | null) ?? null;
           setJob(incoming);
-          if (
-            incoming?.status === "completed" &&
-            incoming.postIds.length > 0 &&
-            announcedJobRef.current !== incoming.id
-          ) {
-            announcedJobRef.current = incoming.id;
-            setRecentGenerationIds(incoming.postIds);
-          }
           if (incoming?.status === "failed") {
             setError(incoming.errorMessage || "Generation failed");
           }
@@ -184,18 +159,23 @@ export default function ContentCalendarPage() {
     return () => clearInterval(id);
   }, [generating, publishing, businessId, cursor]);
 
-  async function handleGenerate() {
+  function handleGenerate() {
     if (generating) return;
     if (contentLocked) {
       openUpgrade("contentPlan");
       return;
     }
+    // Regenerating over an existing month replaces untouched AI drafts, so it
+    // asks first. An empty month starts right away.
     if (posts.length > 0) {
-      const ok = window.confirm(
-        "This will replace untouched AI drafts for this month. Posts you've edited or that already have images will be kept. Continue?",
-      );
-      if (!ok) return;
+      setRegenerateOpen(true);
+      return;
     }
+    void runGenerate();
+  }
+
+  async function runGenerate() {
+    setRegenerateOpen(false);
     setError(null);
     // Optimistic in-progress state: the response only carries the queued job,
     // and the poller below drives it from here.
@@ -236,40 +216,6 @@ export default function ContentCalendarPage() {
     }
   }
 
-  async function handleUndoGeneration() {
-    if (!recentGenerationIds) return;
-    const ids = recentGenerationIds;
-    setRecentGenerationIds(null);
-    setPosts((prev) => prev.filter((p) => !ids.includes(p.id)));
-    await Promise.all(
-      ids.map((id) =>
-        fetch(`/api/content-calendar/${id}`, { method: "DELETE" }).catch(
-          () => null,
-        ),
-      ),
-    );
-  }
-
-  async function handleApproveAll() {
-    if (!recentGenerationIds) return;
-    const ids = recentGenerationIds;
-    setRecentGenerationIds(null);
-    setPosts((prev) =>
-      prev.map((p) =>
-        ids.includes(p.id) ? { ...p, status: "approved" as const } : p,
-      ),
-    );
-    await Promise.all(
-      ids.map((id) =>
-        fetch(`/api/content-calendar/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "approved" }),
-        }).catch(() => null),
-      ),
-    );
-  }
-
   async function handleReschedule(postId: string, newDate: Date) {
     if (publicationLocksPost(posts.find(post => post.id === postId)?.publication?.status)) return;
     const previous = posts;
@@ -290,150 +236,14 @@ export default function ContentCalendarPage() {
     }
   }
 
+  // The editor is a full page. New posts carry the picked day so the form
+  // opens with that date already set.
   function openNew(date: Date) {
-    setEditingPost(null);
-    setDraftDate(date);
-    setSheetOpen(true);
+    router.push(`/admin/content-calendar/new?date=${encodeURIComponent(date.toISOString())}`);
   }
 
   function openEdit(id: string) {
-    const post = posts.find((p) => p.id === id);
-    if (!post) return;
-    setEditingPost(post);
-    setDraftDate(null);
-    setSheetOpen(true);
-  }
-
-  async function handleSave(values: PostFormValues, keepOpen = false): Promise<ContentPostRow> {
-    const response = await fetch(editingPost ? `/api/content-calendar/${editingPost.id}` : "/api/content-calendar", {
-      method: editingPost ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingPost ? values : { ...values, businessId }),
-    });
-    const body = await response.json();
-    if (!response.ok || !body.post) throw new Error(body.code || "SAVE_FAILED");
-    const saved = body.post as ContentPostRow;
-    setPosts(previous => editingPost ? previous.map(post => post.id === saved.id ? saved : post) : [...previous, saved]);
-    setEditingPost(saved);
-    // Keep a new post open so the user can immediately upload its images.
-    if (editingPost && !keepOpen) setSheetOpen(false);
-    return saved;
-  }
-
-  function handlePublicationChange(publication: PublicationView | null) {
-    if (!editingPost) return;
-    const update = (post: ContentPostRow): ContentPostRow => ({ ...post, publication,
-      ...(publication?.status === "scheduled" ? { scheduledFor: publication.scheduledAt, status: "approved" as const } : {}) });
-    setPosts(previous => previous.map(post => post.id === editingPost.id ? update(post) : post));
-    setEditingPost(previous => previous ? update(previous) : previous);
-  }
-
-  async function handleGenerateImage(postId: string, referenceFile?: File) {
-    const referenceUpload = referenceFile
-      ? await uploadImage(referenceFile, {
-          kind: "content-reference",
-          postId,
-          slideIndex: 0,
-          maxBytes: 4 * 1024 * 1024,
-        })
-      : null;
-    const res = await fetch(`/api/content-calendar/${postId}/image`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ referenceKey: referenceUpload?.key }),
-    });
-    if (res.status === 402) {
-      const body = await res.json().catch(() => ({}));
-      openUpgrade(body?.action);
-      throw new Error("PLAN_LIMIT");
-    }
-    if (!res.ok) throw new Error("Failed");
-    const body = await res.json();
-    if (body.post) {
-      const updated = body.post as ContentPostRow;
-      setPosts((prev) => prev.map((p) => (p.id === postId ? updated : p)));
-      setEditingPost((prev) => (prev?.id === postId ? updated : prev));
-    }
-    const failures = Array.isArray(body.failures) ? body.failures : [];
-    return {
-      failureIndexes: failures
-        .map((f: { index?: number }) => f?.index)
-        .filter((n: unknown): n is number => typeof n === "number"),
-    };
-  }
-
-  async function handleRegenerateSlide(
-    postId: string,
-    slideIndex: number,
-    refinementPrompt?: string,
-    referenceFile?: File,
-  ) {
-    const referenceUpload = referenceFile
-      ? await uploadImage(referenceFile, {
-          kind: "content-reference",
-          postId,
-          slideIndex,
-          maxBytes: 4 * 1024 * 1024,
-        })
-      : null;
-    const res = await fetch(
-      `/api/content-calendar/${postId}/image/${slideIndex}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          refinementPrompt,
-          referenceKey: referenceUpload?.key,
-        }),
-      },
-    );
-    if (res.status === 402) {
-      const body = await res.json().catch(() => ({}));
-      openUpgrade(body?.action);
-      throw new Error("PLAN_LIMIT");
-    }
-    if (!res.ok) throw new Error("Failed");
-    const body = await res.json();
-    if (body.post) {
-      const updated = body.post as ContentPostRow;
-      setPosts((prev) => prev.map((p) => (p.id === postId ? updated : p)));
-      setEditingPost((prev) => (prev?.id === postId ? updated : prev));
-    }
-  }
-
-  async function handleUploadSlide(
-    postId: string,
-    slideIndex: number,
-    file: File,
-    headline: string,
-  ) {
-    const { key } = await uploadImage(file, {
-      kind: "content-slide",
-      postId,
-      slideIndex,
-    });
-    const res = await fetch(
-      `/api/content-calendar/${postId}/image/${slideIndex}/upload`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, headline }),
-      },
-    );
-    if (!res.ok) throw new Error("Failed");
-    const body = await res.json();
-    if (body.post) {
-      const updated = body.post as ContentPostRow;
-      setPosts((prev) => prev.map((p) => (p.id === postId ? updated : p)));
-      setEditingPost((prev) => (prev?.id === postId ? updated : prev));
-    }
-  }
-
-  async function handleDelete(id: string) {
-    const response = await fetch(`/api/content-calendar/${id}`, { method: "DELETE" });
-    if (!response.ok) throw new Error("SAVE_FAILED");
-    setPosts(previous => previous.filter(post => post.id !== id));
-    setSheetOpen(false);
+    router.push(`/admin/content-calendar/${id}`);
   }
 
   const monthLabel = cursor.toLocaleString(undefined, {
@@ -448,12 +258,9 @@ export default function ContentCalendarPage() {
 
       <div className="flex-1 overflow-auto">
         <ContentWrapper>
-          <div className="mb-4 flex justify-end">
-            <Link href={`/admin/business/${businessId}/integrations`} className="text-sm text-emerald-700 underline underline-offset-4 dark:text-emerald-400">{ti("manageConnection")}</Link>
-          </div>
           {/* Sticky header: month nav + provider + generate */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800/70 bg-zinc-50/60 dark:bg-zinc-900/30 p-1">
+            <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/60 dark:bg-white/[0.03] p-1">
               <button
                 type="button"
                 onClick={() =>
@@ -467,7 +274,7 @@ export default function ContentCalendarPage() {
                     ),
                   )
                 }
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors"
                 aria-label={t("monthPrev")}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -488,7 +295,7 @@ export default function ContentCalendarPage() {
                     ),
                   )
                 }
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors"
                 aria-label={t("monthNext")}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -498,7 +305,7 @@ export default function ContentCalendarPage() {
             <button
               type="button"
               onClick={() => setCursor(monthStartUtc(new Date()))}
-              className="px-3 h-10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50/60 dark:bg-zinc-900/30 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800/70 rounded-xl transition-colors"
+              className="px-3 h-10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50/60 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] border border-zinc-200 dark:border-white/[0.08] rounded-xl transition-colors"
             >
               {t("today")}
             </button>
@@ -512,16 +319,13 @@ export default function ContentCalendarPage() {
                     const today = new Date();
                     openNew(monthParam(cursor) === monthParam(today) ? today : monthStart);
                   }}
-                  className="inline-flex items-center gap-2 h-10 px-4 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-semibold text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center gap-2 h-10 px-4 border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm font-semibold text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.11] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Plus className="w-4 h-4" aria-hidden="true" />
                   {t("addPost")}
                 </button>
               )}
-              <div className="inline-flex items-center gap-1.5 px-2.5 h-10 bg-zinc-50/60 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800/70 rounded-xl text-xs text-zinc-700 dark:text-zinc-300">
-                <AtSign className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                {t("provider")}
-              </div>
+              <InstagramStatusButton businessId={businessId} />
               {posts.length > 0 && !readOnly && (
                 <button
                   type="button"
@@ -556,24 +360,11 @@ export default function ContentCalendarPage() {
             </div>
           )}
 
-          <AnimatePresence>
-            {!readOnly && recentGenerationIds && recentGenerationIds.length > 0 && (
-              <div className="mb-4">
-                <GenerateBanner
-                  count={recentGenerationIds.length}
-                  onUndo={handleUndoGeneration}
-                  onApproveAll={handleApproveAll}
-                  onDismiss={() => setRecentGenerationIds(null)}
-                />
-              </div>
-            )}
-          </AnimatePresence>
-
           {loading ? (
             <LoadingState />
           ) : posts.length === 0 ? (
             <CalendarEmptyState
-              onGenerate={handleGenerate}
+              onGenerate={() => void runGenerate()}
               isGenerating={generating}
               readOnly={readOnly}
               locked={contentLocked}
@@ -605,20 +396,25 @@ export default function ContentCalendarPage() {
         </ContentWrapper>
       </div>
 
-      <PostSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        businessId={businessId}
-        post={editingPost}
-        draftDate={draftDate}
-        onSave={handleSave}
-        onPublicationChange={handlePublicationChange}
-        onDelete={handleDelete}
-        onGenerateImage={handleGenerateImage}
-        onRegenerateSlide={handleRegenerateSlide}
-        onUploadSlide={handleUploadSlide}
-        readOnly={readOnly}
-      />
+      <AlertDialog open={regenerateOpen} onOpenChange={setRegenerateOpen}>
+        <AlertDialogContent className="glass-strong rounded-2xl border-transparent">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("regenerateConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("regenerateConfirmBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => void runGenerate()}
+              className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+            >
+              {t("regenerateConfirmAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

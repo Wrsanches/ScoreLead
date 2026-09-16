@@ -42,16 +42,20 @@ export function isProductionAnalyticsHostname(hostname: string) {
   )
 }
 
-export function getAuthClientBaseUrl(currentOrigin: string) {
-  const currentUrl = new URL(currentOrigin)
-  const hostname = currentUrl.hostname.toLowerCase()
-  const isLocalhost =
+function isLocalhostHostname(hostname: string) {
+  return (
     hostname === "localhost" ||
     hostname.endsWith(".localhost") ||
     hostname === "127.0.0.1" ||
     hostname === "::1"
+  )
+}
 
-  if (isLocalhost) return currentUrl.origin
+export function getAuthClientBaseUrl(currentOrigin: string) {
+  const currentUrl = new URL(currentOrigin)
+  const hostname = currentUrl.hostname.toLowerCase()
+
+  if (isLocalhostHostname(hostname)) return currentUrl.origin
 
   return hostname === getUrlHostname(publicSiteUrl)
     ? appSiteUrl
@@ -60,6 +64,26 @@ export function getAuthClientBaseUrl(currentOrigin: string) {
 
 export function getLocalizedAppUrl(pathname: string, locale = "en") {
   return `${appSiteUrl}${getLocalizedAppPath(pathname, locale)}`
+}
+
+/**
+ * Href for a link into the app (login, signup, admin) from marketing chrome.
+ * On the production marketing host the app lives on its own origin, so the
+ * link must be absolute. Everywhere else - the app host itself, localhost, or
+ * a preview deploy - the app is served from the current origin, so a plain
+ * path keeps the visitor on the host they are already using.
+ */
+export function getAppLinkHref(
+  pathname: string,
+  locale: string,
+  currentOrigin?: string,
+) {
+  if (!currentOrigin) return getLocalizedAppUrl(pathname, locale)
+
+  const currentHostname = getUrlHostname(currentOrigin)
+  return currentHostname === getUrlHostname(publicSiteUrl)
+    ? getLocalizedAppUrl(pathname, locale)
+    : getLocalizedAppPath(pathname, locale)
 }
 
 export function getLocalizedAppPath(pathname: string, locale = "en") {

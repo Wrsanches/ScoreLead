@@ -1,10 +1,9 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check, Minus } from "lucide-react";
 import { JsonLd } from "@/components/json-ld";
 import { Navbar } from "@/components/navbar";
 import { TrackedLink } from "@/components/tracked-link";
 import { WaitlistFooter } from "@/components/waitlist-footer";
 import { Link } from "@/i18n/routing";
-import { getBlogPost, getBlogTranslation } from "@/lib/blog";
 import {
   getMarketingPlatformImage,
   getMarketingTranslation,
@@ -13,8 +12,9 @@ import {
 } from "@/lib/marketing";
 import {
   getPricingUi,
+  type PricingCell,
   type PricingPlanCopy,
-  type PricingRow,
+  type PricingUi,
 } from "@/lib/marketing/pricing";
 import {
   getLocaleConfig,
@@ -23,96 +23,91 @@ import {
   siteConfig,
 } from "@/lib/seo";
 
-function formatDate(date: string, locale: string) {
-  return new Intl.DateTimeFormat(getLocaleConfig(locale).htmlLang, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${date}T12:00:00Z`));
-}
 
+/* ── Plan card ─────────────────────────────────────────────────────────
+   Price, one line of positioning, four bullets, one button. The full
+   matrix lives in the comparison table below, so the cards stay short. */
 function PlanCard({
   plan,
   page,
-  rows,
   highlighted,
   footnote,
-  className,
 }: {
   plan: PricingPlanCopy;
   page: MarketingPage;
-  rows: PricingRow[];
   highlighted?: boolean;
-  footnote?: string;
-  className?: string;
+  footnote: string;
 }) {
   return (
     <article
-      className={`relative flex flex-col rounded-2xl border p-6 sm:p-7 ${
+      className={`relative flex flex-col rounded-3xl p-6 sm:p-7 ${
         highlighted
-          ? "border-emerald-400/40 bg-emerald-500/4"
-          : "border-zinc-800 bg-zinc-900/30"
-      }${className ? ` ${className}` : ""}`}
+          ? "glass-strong ring-1 ring-emerald-500/40 shadow-[0_30px_80px_-40px_rgba(16,185,129,0.6)]"
+          : "glass-card"
+      }`}
     >
-      {plan.badge ? (
-        <p className="absolute -top-3 left-6 rounded-full bg-emerald-400 px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-950 sm:left-7">
-          {plan.badge}
-        </p>
+      {highlighted ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-t-3xl bg-gradient-to-b from-emerald-500/[0.12] to-transparent"
+        />
       ) : null}
 
-      <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
-        {plan.name}
-      </h3>
-      <p className="mt-4 flex flex-wrap items-baseline gap-x-2">
-        <span className="text-4xl font-medium tracking-[-0.03em] text-white">
+      <div className="relative flex items-center justify-between gap-3">
+        <h3 className="text-lg font-medium text-white">{plan.name}</h3>
+        {plan.badge ? (
+          <span
+            className={
+              highlighted
+                ? "inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-zinc-950"
+                : "glass-pill inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold text-zinc-200"
+            }
+          >
+            {plan.badge}
+          </span>
+        ) : null}
+      </div>
+
+      <p className="relative mt-6 flex flex-wrap items-baseline gap-x-2">
+        <span className="text-5xl font-semibold tabular-nums tracking-tight text-white">
           {plan.price}
         </span>
         <span className="text-sm text-zinc-500">{plan.cadence}</span>
       </p>
-      {/* Reserve the line on every card so the price rows stay aligned. */}
-      <p className="mt-1 min-h-4 text-xs leading-4 text-emerald-400/90">
-        {plan.priceNote ?? "\u00A0"}
+      {/* Reserved on every card so the taglines share a baseline. */}
+      <p className="relative mt-2 min-h-4 text-xs leading-4 text-emerald-400/90">
+        {plan.priceNote ?? " "}
       </p>
-      <p className="mt-3 text-pretty text-sm leading-6 text-zinc-400 lg:min-h-24">
+
+      <p className="relative mt-4 text-pretty text-sm leading-6 text-zinc-400 lg:min-h-18">
         {plan.tagline}
       </p>
 
-      <dl className="mt-6 divide-y divide-zinc-800/80 border-t border-zinc-800">
-        {rows.map((row) => {
-          const cell = row.values[plan.id];
-          return (
-            <div
-              key={row.label}
-              className="flex items-baseline justify-between gap-3 py-3"
+      <div className="relative my-6 h-px bg-white/[0.08]" />
+
+      <ul className="relative space-y-3">
+        {plan.perks.map((perk) => (
+          <li
+            key={perk}
+            className="flex items-start gap-2.5 text-sm leading-5 text-zinc-300"
+          >
+            <span
+              className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full ${
+                highlighted
+                  ? "bg-emerald-500/20 text-emerald-300"
+                  : "bg-white/[0.07] text-zinc-400"
+              }`}
             >
-              <dt className="text-xs leading-5 text-zinc-400">{row.label}</dt>
-              <dd className="shrink-0 text-right">
-                <span
-                  className={
-                    cell.muted
-                      ? "font-mono text-xs text-zinc-600"
-                      : "font-mono text-xs text-zinc-100"
-                  }
-                >
-                  {cell.value}
-                </span>
-                {cell.note ? (
-                  <span className="block text-[11px] leading-4 text-zinc-500">
-                    {cell.note}
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
+              <Check className="size-2.5" strokeWidth={3} aria-hidden="true" />
+            </span>
+            {perk}
+          </li>
+        ))}
+      </ul>
 
-      {footnote ? (
-        <p className="mt-3 text-xs leading-5 text-zinc-600">{footnote}</p>
-      ) : null}
+      <p className="relative mt-5 text-xs leading-5 text-zinc-600">{footnote}</p>
 
-      <div className="mt-auto pt-8">
+      <div className="relative mt-auto pt-6">
         <TrackedLink
           href="/signup"
           eventName="commercial_cta_click"
@@ -123,8 +118,8 @@ function PlanCard({
           }}
           className={
             highlighted
-              ? "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
-              : "inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 py-3 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+              ? "press inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-medium text-zinc-950 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+              : "glass-pill press inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-zinc-100 transition-[transform,filter] ease-[cubic-bezier(0.23,1,0.32,1)] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
           }
         >
           {plan.cta}
@@ -132,6 +127,121 @@ function PlanCard({
         </TrackedLink>
       </div>
     </article>
+  );
+}
+
+/* ── Comparison table ─────────────────────────────────────────────────
+   One row per capability, one column per plan. "Included" renders as a
+   check and "Not included" as a dash so the eye can scan the matrix. */
+function CompareCell({
+  cell,
+  pricing,
+  highlighted,
+}: {
+  cell: PricingCell;
+  pricing: PricingUi;
+  highlighted: boolean;
+}) {
+  if (cell.muted) {
+    return (
+      <span className="inline-flex items-center justify-center text-zinc-700">
+        <Minus className="size-4" aria-hidden="true" />
+        <span className="sr-only">{pricing.notIncludedLabel}</span>
+      </span>
+    );
+  }
+  if (cell.value === pricing.includedLabel) {
+    return (
+      <span
+        className={`inline-flex size-6 items-center justify-center rounded-full ${
+          highlighted
+            ? "bg-emerald-500/20 text-emerald-300"
+            : "bg-white/[0.07] text-zinc-200"
+        }`}
+      >
+        <Check className="size-3.5" strokeWidth={2.5} aria-hidden="true" />
+        <span className="sr-only">{pricing.includedLabel}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="block">
+      <span className="text-sm tabular-nums text-zinc-100">{cell.value}</span>
+      {cell.note ? (
+        <span className="mt-0.5 block text-[11px] leading-4 text-zinc-500">
+          {cell.note}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function ComparisonTable({ pricing }: { pricing: PricingUi }) {
+  return (
+    <div className="glass-card overflow-hidden rounded-3xl">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[44rem] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-white/[0.08]">
+              <th scope="col" className="w-[30%] px-5 py-5 sm:px-7">
+                <span className="sr-only">{pricing.compareHeading}</span>
+              </th>
+              {pricing.plans.map((plan) => {
+                const highlighted = plan.id === "growth";
+                return (
+                  <th
+                    key={plan.id}
+                    scope="col"
+                    className={`px-4 py-5 text-center align-bottom ${
+                      highlighted ? "bg-emerald-500/[0.06]" : ""
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-white">
+                      {plan.name}
+                    </span>
+                    <span className="mt-1 block text-xs text-zinc-500">
+                      {plan.price}{" "}
+                      <span className="text-zinc-600">{plan.cadence}</span>
+                    </span>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/[0.06]">
+            {pricing.rows.map((row) => (
+              <tr key={row.label}>
+                <th
+                  scope="row"
+                  className="px-5 py-4 text-sm font-normal text-zinc-300 sm:px-7"
+                >
+                  {row.label}
+                </th>
+                {pricing.plans.map((plan) => {
+                  const highlighted = plan.id === "growth";
+                  return (
+                    <td
+                      key={plan.id}
+                      className={`px-4 py-4 text-center align-middle ${
+                        highlighted ? "bg-emerald-500/[0.06]" : ""
+                      }`}
+                    >
+                      <div className="flex justify-center">
+                        <CompareCell
+                          cell={row.values[plan.id]}
+                          pricing={pricing}
+                          highlighted={highlighted}
+                        />
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -149,20 +259,10 @@ export function PricingPageView({
   const canonical = getLocalizedUrl(normalizedLocale, page.pathname);
   const platformImage = getMarketingPlatformImage(page.id);
   const platformImageUrl = `${siteConfig.url}${platformImage.src}`;
-  const termsSection = translation.sections.at(-1);
-  const relatedPosts = page.relatedBlogSlugs
-    .map((slug) => getBlogPost(slug))
-    .filter((post) => post !== undefined);
 
   const breadcrumbs = [
-    {
-      name: ui.home,
-      item: getLocalizedUrl(normalizedLocale),
-    },
-    {
-      name: translation.eyebrow,
-      item: canonical,
-    },
+    { name: ui.home, item: getLocalizedUrl(normalizedLocale) },
+    { name: translation.title, item: canonical },
   ];
 
   const jsonLd = {
@@ -190,16 +290,31 @@ export function PricingPageView({
           item: breadcrumb.item,
         })),
       },
+      {
+        "@type": "FAQPage",
+        "@id": `${canonical}#faq`,
+        mainEntity: pricing.faq.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        })),
+      },
     ],
   };
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100">
+    <div className="marketing-canvas min-h-screen text-zinc-100">
       <JsonLd data={jsonLd} />
       <Navbar />
 
-      <main id="main" className="pt-16">
-        <header className="px-6 pt-12 sm:pt-20">
+      <main id="main" className="relative pt-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(ellipse_70%_60%_at_40%_0%,rgba(16,185,129,0.11),transparent_72%)]"
+        />
+
+        {/* ── Hero ────────────────────────────────────────────── */}
+        <header className="relative px-6 pt-12 sm:pt-20">
           <div className="mx-auto max-w-6xl">
             <nav
               aria-label="Breadcrumb"
@@ -212,44 +327,23 @@ export function PricingPageView({
                 {ui.home}
               </Link>
               <span aria-hidden="true">/</span>
-              <span className="text-zinc-400">{translation.eyebrow}</span>
+              <span className="truncate text-zinc-400">{translation.title}</span>
             </nav>
 
-            <div className="mt-10 grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.2em] text-emerald-400">
-                  {translation.eyebrow}
-                </p>
-                <h1 className="mt-5 max-w-4xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.045em] text-white sm:text-6xl">
-                  {translation.title}
-                </h1>
-                <p className="mt-7 max-w-3xl text-pretty text-lg leading-8 text-zinc-400">
-                  {translation.description}
-                </p>
-              </div>
-              <div className="border-y border-zinc-800 py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
-                <p className="text-xs uppercase tracking-[0.15em] text-zinc-600">
-                  {ui.lastReviewed}
-                </p>
-                <time
-                  dateTime={page.updatedAt}
-                  className="mt-2 block text-sm font-medium text-zinc-300"
-                >
-                  {formatDate(page.updatedAt, normalizedLocale)}
-                </time>
-                <Link
-                  href="/authors/scorelead-editorial"
-                  className="mt-5 inline-block rounded-sm text-sm text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-                >
-                  ScoreLead Editorial
-                </Link>
-              </div>
+            <div className="mt-10">
+              <h1 className="max-w-3xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.045em] text-white sm:text-6xl">
+                {translation.title}
+              </h1>
+              <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-zinc-400">
+                {translation.description}
+              </p>
             </div>
           </div>
         </header>
 
+        {/* ── Plan cards ───────────────────────────────────────── */}
         <section
-          className="px-6 pb-16 pt-14 sm:pb-20"
+          className="relative px-6 pb-16 pt-14 sm:pb-20"
           aria-label={pricing.plansHeading}
         >
           <div className="mx-auto grid max-w-7xl items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -258,7 +352,6 @@ export function PricingPageView({
                 key={plan.id}
                 plan={plan}
                 page={page}
-                rows={pricing.rows}
                 highlighted={plan.id === "growth"}
                 footnote={
                   plan.id === "free"
@@ -273,69 +366,73 @@ export function PricingPageView({
           </p>
         </section>
 
+        {/* ── Comparison ──────────────────────────────────────── */}
         <section
-          className="border-y border-zinc-800/70 px-6 py-14 sm:py-16"
-          aria-labelledby="direct-answer"
+          className="border-t border-white/[0.06] px-6 py-16 sm:py-20"
+          aria-labelledby="compare-plans"
         >
-          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.72fr_1.28fr]">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
-                {ui.overview}
-              </p>
+          <div className="mx-auto max-w-6xl">
+            <div className="max-w-2xl">
               <h2
-                id="direct-answer"
-                className="mt-4 text-2xl font-medium tracking-tight text-white"
+                id="compare-plans"
+                className="text-2xl font-medium tracking-tight text-white sm:text-3xl"
               >
-                {translation.title}
+                {pricing.compareHeading}
               </h2>
-            </div>
-            <p className="max-w-3xl text-pretty text-lg leading-8 text-zinc-300">
-              {translation.answer}
-            </p>
-          </div>
-        </section>
-
-        <section
-          className="px-6 py-12 sm:py-14"
-          aria-labelledby="pricing-terms"
-        >
-          <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2">
-            {termsSection ? (
-              <div>
-                <h2
-                  id="pricing-terms"
-                  className="text-sm font-medium text-zinc-300"
-                >
-                  {termsSection.heading}
-                </h2>
-                {termsSection.paragraphs.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className="mt-3 max-w-xl text-sm leading-6 text-zinc-500"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            ) : null}
-            <div>
-              <h2 className="text-sm font-medium text-zinc-300">
-                {translation.proofLabel}
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
-                {translation.proof}
+              <p className="mt-3 text-pretty text-base leading-7 text-zinc-400">
+                {pricing.compareIntro}
               </p>
             </div>
+            <div className="mt-10">
+              <ComparisonTable pricing={pricing} />
+            </div>
           </div>
         </section>
 
-        <section className="border-t border-zinc-800/70 px-6 py-16 sm:py-22">
+        {/* ── FAQ ─────────────────────────────────────────────── */}
+        <section
+          className="border-t border-white/[0.06] px-6 py-16 sm:py-20"
+          aria-labelledby="pricing-faq"
+        >
+          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-16">
+            <div>
+              <h2
+                id="pricing-faq"
+                className="text-2xl font-medium tracking-tight text-white sm:text-3xl"
+              >
+                {pricing.faqHeading}
+              </h2>
+              <p className="mt-3 text-pretty text-base leading-7 text-zinc-400">
+                {pricing.faqIntro}
+              </p>
+            </div>
+            <div className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
+              {pricing.faq.map((item) => (
+                <details key={item.question} className="group py-1">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-lg px-1 py-4 text-left text-[0.9375rem] font-medium text-zinc-200 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400 [&::-webkit-details-marker]:hidden">
+                    {item.question}
+                    <span
+                      aria-hidden="true"
+                      className="glass-pill relative inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-transform group-open:rotate-45"
+                    >
+                      <span className="absolute h-px w-3 bg-current" />
+                      <span className="absolute h-3 w-px bg-current" />
+                    </span>
+                  </summary>
+                  <p className="px-1 pb-5 text-pretty text-sm leading-7 text-zinc-400">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Closing CTA ──────────────────────────────────────── */}
+        <section className="border-t border-white/[0.06] px-6 py-16 sm:py-22">
           <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-400">
-                ScoreLead
-              </p>
-              <h2 className="mt-4 max-w-3xl text-balance text-3xl font-medium tracking-tight text-white sm:text-5xl">
+              <h2 className="max-w-3xl text-balance text-3xl font-medium tracking-tight text-white sm:text-5xl">
                 {translation.ctaTitle}
               </h2>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
@@ -346,86 +443,13 @@ export function PricingPageView({
               href="/signup"
               eventName="commercial_cta_click"
               eventParams={{ page_id: page.id, page_group: page.group }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+              className="press inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
             >
               {translation.ctaLabel}
               <ArrowRight className="size-4" aria-hidden="true" />
             </TrackedLink>
           </div>
         </section>
-
-        {relatedPosts.length ? (
-          <section
-            className="border-t border-zinc-800/70 px-6 py-14 sm:py-16"
-            aria-labelledby="related-guides"
-          >
-            <div className="mx-auto max-w-6xl">
-              <h2
-                id="related-guides"
-                className="text-sm font-medium text-zinc-400"
-              >
-                {ui.relatedGuides}
-              </h2>
-              <div className="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
-                {relatedPosts.map((post) => {
-                  const postTranslation = getBlogTranslation(
-                    post,
-                    normalizedLocale,
-                  );
-                  return (
-                    <Link
-                      key={post.slug}
-                      href={`/blog/${post.slug}`}
-                      className="group grid gap-4 py-6 transition-colors hover:bg-zinc-900/35 sm:grid-cols-[1fr_auto] sm:items-center sm:px-4"
-                    >
-                      <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-400">
-                          {postTranslation.category}
-                        </p>
-                        <h3 className="mt-2 text-lg font-medium text-zinc-200 transition-colors group-hover:text-white">
-                          {postTranslation.title}
-                        </h3>
-                      </div>
-                      <span className="inline-flex items-center gap-2 text-sm text-zinc-500 group-hover:text-zinc-200">
-                        {ui.readGuide}
-                        <ArrowRight
-                          className="size-4 transition-transform group-hover:translate-x-1"
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        ) : null}
-
-        <aside
-          className="border-t border-zinc-800/70 px-6 py-10"
-          aria-labelledby="methodology"
-        >
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2
-                id="methodology"
-                className="text-sm font-medium text-zinc-300"
-              >
-                {ui.methodology}
-              </h2>
-              <p className="mt-1 text-sm text-zinc-600">
-                {ui.methodologyDescription}
-              </p>
-            </div>
-            <Link
-              href="/editorial-policy"
-              className="inline-flex items-center gap-2 rounded-sm text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
-            >
-              {ui.editorialPolicy}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </aside>
       </main>
 
       <WaitlistFooter />

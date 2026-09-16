@@ -1,3 +1,3 @@
 export default function Loading() {
-  return <div className="min-h-screen bg-[#09090B]" />
+  return <div className="marketing-canvas min-h-screen" />
 }

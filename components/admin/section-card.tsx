@@ -1,11 +1,13 @@
 export type SectionAccent = "none" | "emerald" | "sky" | "violet" | "amber"
 
+// Accents tint the glass with a soft top-down wash and a colored edge. The
+// ring composes with glass-card's inset edge instead of replacing it.
 const ACCENT_CLASSES: Record<SectionAccent, string> = {
-  none:    "border-zinc-200/80 dark:border-zinc-800/60",
-  emerald: "border-emerald-500/25 bg-gradient-to-b from-emerald-500/[0.04] to-transparent",
-  sky:     "border-sky-500/25 bg-gradient-to-b from-sky-500/[0.04] to-transparent",
-  violet:  "border-violet-500/25 bg-gradient-to-b from-violet-500/[0.04] to-transparent",
-  amber:   "border-amber-500/25 bg-gradient-to-b from-amber-500/[0.04] to-transparent",
+  none:    "",
+  emerald: "ring-1 ring-emerald-500/20 bg-gradient-to-b from-emerald-500/[0.06] to-transparent",
+  sky:     "ring-1 ring-sky-500/20 bg-gradient-to-b from-sky-500/[0.06] to-transparent",
+  violet:  "ring-1 ring-violet-500/20 bg-gradient-to-b from-violet-500/[0.06] to-transparent",
+  amber:   "ring-1 ring-amber-500/20 bg-gradient-to-b from-amber-500/[0.06] to-transparent",
 }
 
 interface SectionCardProps {
@@ -25,7 +27,7 @@ export function SectionCard({
 }: SectionCardProps) {
   return (
     <div
-      className={`border rounded-xl p-5 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset] ${ACCENT_CLASSES[accent]} ${className || ""}`}
+      className={`glass-card rounded-2xl p-5 ${ACCENT_CLASSES[accent]} ${className || ""}`}
     >
       {(title || actions) && (
         <div className="flex items-center justify-between mb-4">

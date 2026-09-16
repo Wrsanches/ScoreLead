@@ -8,7 +8,8 @@ import {
   type MarketingEventName,
 } from "@/lib/analytics-events"
 import { isAppPath } from "@/lib/host-routing"
-import { getLocalizedAppUrl } from "@/lib/site-urls"
+import { getAppLinkHref } from "@/lib/site-urls"
+import { useCurrentOrigin } from "@/lib/use-current-origin"
 
 type TrackedLinkProps = ComponentProps<typeof Link> & {
   eventName: MarketingEventName
@@ -22,6 +23,7 @@ export function TrackedLink({
   ...props
 }: TrackedLinkProps) {
   const locale = useLocale()
+  const origin = useCurrentOrigin()
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     trackMarketingEvent(eventName, eventParams)
@@ -43,7 +45,7 @@ export function TrackedLink({
     return (
       <a
         {...(anchorProps as ComponentProps<"a">)}
-        href={getLocalizedAppUrl(props.href, locale)}
+        href={getAppLinkHref(props.href, locale, origin)}
         onClick={handleClick}
       />
     )

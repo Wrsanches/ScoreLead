@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
-import { ChevronRight } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
 
 export function ContactSection() {
@@ -14,11 +13,10 @@ export function ContactSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="mb-6 flex items-center gap-2"
+        className="mb-6 flex items-center gap-3"
       >
-        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+        <span className="h-px w-8 bg-zinc-500" aria-hidden="true" />
         <span className="text-sm text-zinc-400">{t("eyebrow")}</span>
-        <ChevronRight className="h-4 w-4 text-zinc-500" aria-hidden="true" />
       </motion.div>
 
       <motion.h1
@@ -49,7 +47,7 @@ export function ContactSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="mt-12 border-t border-zinc-800/60 pt-10 sm:mt-16 sm:pt-12"
+        className="mt-12 border-t border-white/[0.08] pt-10 sm:mt-16 sm:pt-12"
       >
         <ContactForm />
       </motion.div>

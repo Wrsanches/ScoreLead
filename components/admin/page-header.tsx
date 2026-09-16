@@ -19,6 +19,8 @@ interface PageHeaderBarProps {
   title: string
   breadcrumbs?: Breadcrumb[]
   backHref?: string
+  /** Runs instead of navigating to backHref, e.g. to confirm unsaved changes. */
+  onBack?: () => void
   actions?: React.ReactNode
 }
 
@@ -100,13 +102,15 @@ export function PageHeader(props: PageHeaderProps) {
   // Bar variant
   const barProps = props as PageHeaderBarProps
   return (
-    <div className="px-6 h-14 flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/60 shrink-0">
+    <div className="px-6 h-14 flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.06] shrink-0">
       <div className="flex items-center gap-3 min-w-0">
         <MobileMenuButton />
         {barProps.backHref && (
           <>
             <button
-              onClick={() => router.push(barProps.backHref!)}
+              onClick={() =>
+                barProps.onBack ? barProps.onBack() : router.push(barProps.backHref!)
+              }
               className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />

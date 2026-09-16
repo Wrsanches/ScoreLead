@@ -28,10 +28,10 @@ export default async function ContactPage({
   setRequestLocale(locale)
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100">
+    <div className="marketing-canvas min-h-screen text-zinc-100">
       <Navbar />
 
-      <main id="main" className="pt-16">
+      <main id="main" className="pt-20">
         <ContactSection />
       </main>
 

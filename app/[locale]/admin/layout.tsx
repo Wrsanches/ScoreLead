@@ -58,7 +58,7 @@ export default async function AdminLayout({
   // route (dashboard, business sections, settings, support), and this provider
   // gives every clean route the same server-validated business selection.
   return (
-    <div className="h-screen w-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+    <div className="glass-canvas h-screen w-screen overflow-hidden">
       <BusinessProvider
         businessId={access?.businessId ?? null}
         readOnly={access?.readOnly ?? false}

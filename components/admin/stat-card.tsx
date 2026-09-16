@@ -53,10 +53,10 @@ const ACCENTS: Record<StatAccent, {
   },
   zinc: {
     icon: "text-zinc-600 dark:text-zinc-400",
-    iconBg: "bg-zinc-200/60 dark:bg-zinc-800/60 ring-zinc-300/50 dark:ring-zinc-700/50",
+    iconBg: "bg-black/[0.04] dark:bg-white/[0.06] ring-black/[0.06] dark:ring-white/[0.1]",
     gradient: "",
-    ring: "ring-1 ring-zinc-800/60",
-    hoverRing: "hover:ring-zinc-700/70",
+    ring: "",
+    hoverRing: "hover:ring-1 hover:ring-black/[0.08] dark:hover:ring-white/[0.14]",
     hoverShadow: "",
   },
 }
@@ -83,7 +83,7 @@ export function StatCard({
 
   const content = (
     <div
-      className={`relative overflow-hidden rounded-xl p-5 transition-all duration-200 ${a.gradient} ${a.ring} ${
+      className={`glass-card relative overflow-hidden rounded-2xl p-5 transition-all duration-200 ${a.gradient} ${a.ring} ${
         isLinked ? `${a.hoverRing} ${a.hoverShadow} hover:-translate-y-0.5` : ""
       }`}
     >

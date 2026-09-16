@@ -136,8 +136,8 @@ export function SearchableSelect({
         className={`
           w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-left transition-all duration-200
           ${disabled
-            ? "bg-zinc-800/10 border border-zinc-800/40 cursor-not-allowed opacity-40"
-            : "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 focus:outline-none focus:border-zinc-700 cursor-pointer"
+            ? "bg-zinc-800/10 border border-white/[0.08] cursor-not-allowed opacity-40"
+            : "bg-zinc-900 border border-white/[0.08] hover:border-zinc-700 focus:outline-none focus:border-zinc-700 cursor-pointer"
           }
         `}
         aria-haspopup="listbox"
@@ -163,12 +163,12 @@ export function SearchableSelect({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: openUpward ? 4 : -4, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className={`absolute z-50 w-full bg-zinc-900 border border-zinc-700/50 rounded-xl overflow-hidden shadow-2xl shadow-black/40 ${
+            className={`absolute z-50 w-full bg-zinc-900 border border-white/[0.14] rounded-xl overflow-hidden shadow-2xl shadow-black/40 ${
               openUpward ? "bottom-full mb-2" : "top-full mt-2"
             }`}
           >
             {/* Search input */}
-            <div className="p-2 border-b border-zinc-800/60">
+            <div className="p-2 border-b border-white/[0.08]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
                 <input

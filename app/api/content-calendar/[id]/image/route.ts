@@ -148,7 +148,7 @@ async function POSTHandler(
 
   if (result.slides.length === 0) {
     return NextResponse.json(
-      { error: "Image generation failed. Check GEMINI_API_KEY and try again." },
+      { error: "Image generation failed. Check OPENAI_API_KEY and try again." },
       { status: 502 },
     )
   }

@@ -1,7 +1,12 @@
 import type { MarketingLocale } from "./types";
 
 export type PlatformImageVariant =
-  "dashboard" | "discovery" | "pipeline" | "leads" | "case-study";
+  | "dashboard"
+  | "discovery"
+  | "pipeline"
+  | "leads"
+  | "content"
+  | "case-study";
 
 export type PlatformImageAsset = {
   variant: PlatformImageVariant;
@@ -40,6 +45,12 @@ const assets: Record<PlatformImageVariant, PlatformImageAsset> = {
     width: 3840,
     height: 2400,
   },
+  content: {
+    variant: "content",
+    src: "/images/platform/ceramik-content.webp",
+    width: 2288,
+    height: 1154,
+  },
   "case-study": {
     variant: "case-study",
     src: "/images/platform/ceramik-case-study.webp",
@@ -54,22 +65,15 @@ const pageVariants: Record<string, PlatformImageVariant> = {
   "feature-lead-enrichment": "leads",
   "feature-outreach-automation": "leads",
   "feature-sales-pipeline": "pipeline",
+  "feature-ai-content-creation": "content",
   "use-case-agencies": "dashboard",
-  "use-case-b2b-sales-teams": "leads",
-  "use-case-b2b-startups": "discovery",
-  "use-case-b2b-companies": "pipeline",
-  "compare-manual-lead-research": "leads",
-  "compare-spreadsheets": "pipeline",
   "compare-sales-prospecting-software": "discovery",
-  "compare-purchased-lead-lists": "discovery",
   "compare-best-lead-scoring-software": "leads",
   "compare-b2b-lead-enrichment-tools": "leads",
   "case-study-ceramik": "case-study",
   "company-pricing": "dashboard",
   "company-security": "dashboard",
   "company-about": "case-study",
-  "company-editorial-policy": "dashboard",
-  "author-scorelead-editorial": "dashboard",
   "tool-icp-worksheet": "discovery",
   "tool-lead-scoring-calculator": "leads",
   "tool-enrichment-checklist": "leads",
@@ -81,6 +85,11 @@ export const platformImageCopy: Record<
   Record<PlatformImageVariant, PlatformImageCopy>
 > = {
   en: {
+    content: {
+      alt: "ScoreLead content calendar for Ceramik showing a month of planned Instagram posts and an AI-generated post preview.",
+      caption:
+        "Product demo based on Ceramik's content calendar, with AI-drafted posts and generated images in the studio's brand style.",
+    },
     dashboard: {
       alt: "Ceramik's ScoreLead dashboard showing lead volume, average score, discovery jobs, enrichment coverage, and performance charts.",
       caption:
@@ -108,6 +117,11 @@ export const platformImageCopy: Record<
     },
   },
   pt: {
+    content: {
+      alt: "Calendário de conteúdo do ScoreLead para a Ceramik com um mês de posts do Instagram planejados e a prévia de um post gerado por IA.",
+      caption:
+        "Demo baseado no calendário de conteúdo da Ceramik, com posts rascunhados por IA e imagens geradas no estilo da marca do estúdio.",
+    },
     dashboard: {
       alt: "Dashboard do ScoreLead da Ceramik com volume de leads, score médio, buscas, cobertura de enriquecimento e gráficos de desempenho.",
       caption:
@@ -135,6 +149,11 @@ export const platformImageCopy: Record<
     },
   },
   es: {
+    content: {
+      alt: "Calendario de contenido de ScoreLead para Ceramik con un mes de publicaciones de Instagram planificadas y la vista previa de una publicación generada por IA.",
+      caption:
+        "Demo basada en el calendario de contenido de Ceramik, con publicaciones redactadas por IA e imágenes generadas al estilo de la marca del estudio.",
+    },
     dashboard: {
       alt: "Panel de ScoreLead de Ceramik con volumen de leads, puntuación media, búsquedas, cobertura de enriquecimiento y gráficos de rendimiento.",
       caption:

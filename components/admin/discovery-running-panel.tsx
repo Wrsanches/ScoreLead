@@ -106,7 +106,7 @@ export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
             {target ? ` / ${target}` : ""}
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200/70 dark:bg-zinc-800/70">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200/70 dark:bg-white/[0.07]">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
             animate={{ width: `${pct}%` }}

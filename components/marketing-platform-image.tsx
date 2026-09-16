@@ -3,7 +3,9 @@ import {
   Building2,
   CalendarDays,
   Check,
+  ChevronDown,
   ChevronRight,
+  Columns3,
   CircleCheck,
   Clock3,
   Globe2,
@@ -13,6 +15,7 @@ import {
   MapPin,
   MessageCircle,
   Phone,
+  Puzzle,
   Radar,
   Search,
   ShieldCheck,
@@ -23,6 +26,7 @@ import {
   Users,
   Workflow,
 } from "lucide-react";
+import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
 import {
   type MarketingLocale,
@@ -34,6 +38,7 @@ type DemoVariant =
   | "discovery"
   | "scoring"
   | "enrichment"
+  | "content"
   | "outreach"
   | "pipeline"
   | "case-study";
@@ -48,6 +53,8 @@ type DemoCopy = {
     discover: string;
     pipeline: string;
     outreach: string;
+    content: string;
+    integrations: string;
     leads: string;
     averageScore: string;
     discoveryJobs: string;
@@ -100,6 +107,16 @@ type DemoCopy = {
     organized: string;
     evidenceNote: string;
     updated: string;
+    contentCalendar: string;
+    planned: string;
+    approved: string;
+    scheduled: string;
+    generatePlan: string;
+    postPreview: string;
+    carousel: string;
+    demoCaption: string;
+    demoHashtags: string;
+    scheduledFor: string;
   };
 };
 
@@ -114,19 +131,12 @@ const pageDemoVariants: Record<string, DemoVariant> = {
   "feature-lead-enrichment": "enrichment",
   "feature-outreach-automation": "outreach",
   "feature-sales-pipeline": "pipeline",
+  "feature-ai-content-creation": "content",
   "use-case-agencies": "dashboard",
-  "use-case-b2b-sales-teams": "outreach",
-  "use-case-b2b-startups": "discovery",
-  "use-case-b2b-companies": "pipeline",
-  "compare-manual-lead-research": "enrichment",
-  "compare-spreadsheets": "pipeline",
-  "compare-purchased-lead-lists": "discovery",
   "case-study-ceramik": "case-study",
   "company-pricing": "dashboard",
   "company-security": "dashboard",
   "company-about": "case-study",
-  "company-editorial-policy": "dashboard",
-  "author-scorelead-editorial": "dashboard",
   "tool-icp-worksheet": "discovery",
   "tool-lead-scoring-calculator": "scoring",
   "tool-enrichment-checklist": "enrichment",
@@ -140,6 +150,7 @@ const demoViewportHeight: Record<DemoVariant, string> = {
   enrichment: "h-[34rem] sm:h-[39rem] lg:h-[27rem]",
   outreach: "h-[29rem] lg:h-[28rem]",
   pipeline: "h-[27rem] sm:h-[26rem]",
+  content: "h-[40rem] sm:h-[37rem] lg:h-[36rem]",
   "case-study": "h-[27rem] sm:h-[26rem]",
 };
 
@@ -154,6 +165,7 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       enrichment: "Account enrichment",
       outreach: "Outreach workflow",
       pipeline: "Sales pipeline",
+      content: "Content calendar",
       "case-study": "Customer workflow",
     },
     labels: {
@@ -162,6 +174,8 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       discover: "Discover",
       pipeline: "Pipeline",
       outreach: "Outreach",
+      content: "Content",
+      integrations: "Integrations",
       leads: "Leads",
       averageScore: "Average score",
       discoveryJobs: "Discovery jobs",
@@ -214,6 +228,16 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       organized: "Organized",
       evidenceNote: "Public business data only",
       updated: "Updated now",
+      contentCalendar: "Content",
+      planned: "planned posts",
+      approved: "Approved",
+      scheduled: "Scheduled",
+      generatePlan: "Generate with AI",
+      postPreview: "Post preview",
+      carousel: "Carousel",
+      demoCaption: "Fill every wheel this fall. Our 6-week beginner course opens Monday, and the first session is on us.",
+      demoHashtags: "#pottery #ceramics #sanfrancisco",
+      scheduledFor: "Scheduled · Oct 3, 11:00",
     },
   },
   pt: {
@@ -226,6 +250,7 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       enrichment: "Enriquecimento de contas",
       outreach: "Fluxo de abordagem",
       pipeline: "Pipeline de vendas",
+      content: "Calendário de conteúdo",
       "case-study": "Fluxo do cliente",
     },
     labels: {
@@ -234,6 +259,8 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       discover: "Descobrir",
       pipeline: "Pipeline",
       outreach: "Abordagem",
+      content: "Conteúdo",
+      integrations: "Integrações",
       leads: "Leads",
       averageScore: "Score médio",
       discoveryJobs: "Buscas realizadas",
@@ -286,6 +313,16 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       organized: "Organizados",
       evidenceNote: "Somente dados públicos de empresas",
       updated: "Atualizado agora",
+      contentCalendar: "Conteúdo",
+      planned: "posts planejados",
+      approved: "Aprovado",
+      scheduled: "Agendado",
+      generatePlan: "Gerar com IA",
+      postPreview: "Prévia do post",
+      carousel: "Carrossel",
+      demoCaption: "Todas as rodas ocupadas neste outono. Nosso curso de 6 semanas para iniciantes abre segunda, e a primeira aula é por nossa conta.",
+      demoHashtags: "#ceramica #pottery #saopaulo",
+      scheduledFor: "Agendado · 3 out, 11:00",
     },
   },
   es: {
@@ -298,6 +335,7 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       enrichment: "Enriquecimiento de cuentas",
       outreach: "Flujo de contacto",
       pipeline: "Pipeline de ventas",
+      content: "Calendario de contenido",
       "case-study": "Flujo del cliente",
     },
     labels: {
@@ -306,6 +344,8 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       discover: "Descubrir",
       pipeline: "Pipeline",
       outreach: "Contacto",
+      content: "Contenido",
+      integrations: "Integraciones",
       leads: "Leads",
       averageScore: "Puntuación media",
       discoveryJobs: "Búsquedas realizadas",
@@ -358,6 +398,16 @@ const demoCopy: Record<MarketingLocale, DemoCopy> = {
       organized: "Organizados",
       evidenceNote: "Solo datos públicos de empresas",
       updated: "Actualizado ahora",
+      contentCalendar: "Contenido",
+      planned: "publicaciones planificadas",
+      approved: "Aprobado",
+      scheduled: "Programado",
+      generatePlan: "Generar con IA",
+      postPreview: "Vista previa",
+      carousel: "Carrusel",
+      demoCaption: "Todos los tornos ocupados este otoño. Nuestro curso de 6 semanas para principiantes abre el lunes, y la primera clase va por nuestra cuenta.",
+      demoHashtags: "#ceramica #pottery #madrid",
+      scheduledFor: "Programado · 3 oct, 11:00",
     },
   },
 };
@@ -367,6 +417,11 @@ const demoDescriptions: Record<
   Record<DemoVariant, DemoDescription>
 > = {
   en: {
+    content: {
+      alt: "ScoreLead content calendar recreated from the Ceramik workspace: a month of planned Instagram posts by content pillar, and an AI-generated carousel preview ready to schedule.",
+      caption:
+        "Product demo based on Ceramik's content calendar, with AI-drafted posts and generated images in the studio's brand style.",
+    },
     dashboard: {
       alt: "ScoreLead performance overview recreated from the Ceramik workspace, with lead volume, average score, discovery activity, enrichment, and source coverage.",
       caption:
@@ -404,6 +459,11 @@ const demoDescriptions: Record<
     },
   },
   pt: {
+    content: {
+      alt: "Calendário de conteúdo do ScoreLead recriado a partir do workspace da Ceramik: um mês de posts do Instagram por pilar de conteúdo e a prévia de um carrossel gerado por IA pronto para agendar.",
+      caption:
+        "Demo baseado no calendário de conteúdo da Ceramik, com posts rascunhados por IA e imagens geradas no estilo da marca do estúdio.",
+    },
     dashboard: {
       alt: "Visão de desempenho do ScoreLead recriada a partir do workspace da Ceramik, com volume de leads, score, buscas, enriquecimento e cobertura de fontes.",
       caption:
@@ -441,6 +501,11 @@ const demoDescriptions: Record<
     },
   },
   es: {
+    content: {
+      alt: "Calendario de contenido de ScoreLead recreado desde el espacio de Ceramik: un mes de publicaciones de Instagram por pilar de contenido y la vista previa de un carrusel generado por IA listo para programar.",
+      caption:
+        "Demo basada en el calendario de contenido de Ceramik, con publicaciones redactadas por IA e imágenes generadas al estilo de la marca del estudio.",
+    },
     dashboard: {
       alt: "Resumen de rendimiento de ScoreLead recreado a partir del espacio de Ceramik, con leads, puntuación, búsquedas, enriquecimiento y fuentes.",
       caption:
@@ -521,10 +586,10 @@ function Metric({
 
   return (
     <div
-      className={`min-w-0 rounded-xl bg-gradient-to-br to-transparent p-3.5 ring-1 ${styles.card}`}
+      className={`glass-card min-w-0 rounded-2xl bg-gradient-to-br to-transparent p-3.5 ring-1 ${styles.card}`}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.11em] text-zinc-500">
+        <p className="truncate text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
           {label}
         </p>
         <span
@@ -533,7 +598,7 @@ function Metric({
           <Icon className="size-3" />
         </span>
       </div>
-      <p className="mt-1.5 text-2xl font-semibold tracking-[-0.04em] text-zinc-100">
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-white">
         {value}
       </p>
       {note ? (
@@ -569,7 +634,7 @@ function ProgressRow({
           {suffix ?? `/${total}`}
         </span>
       </div>
-      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-800">
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/[0.07]">
         <div className={`h-full rounded-full ${color}`} style={{ width }} />
       </div>
     </div>
@@ -583,77 +648,83 @@ function DemoSidebar({
   active: DemoVariant;
   labels: DemoCopy["labels"];
 }) {
-  const primaryItems = [
+  // Mirrors components/admin-sidebar.tsx: Dashboard, All leads, Pipeline,
+  // Content, Integrations. Discovery, enrichment, and outreach views all live
+  // under Leads in the product, so they highlight that item.
+  const items = [
     { id: "dashboard", icon: LayoutDashboard, label: labels.overview },
-    { id: "scoring", icon: Users, label: labels.allLeads },
-    { id: "pipeline", icon: Workflow, label: labels.pipeline },
+    { id: "leads", icon: Users, label: labels.allLeads },
+    { id: "pipeline", icon: Columns3, label: labels.pipeline },
+    { id: "content", icon: CalendarDays, label: labels.content },
+    { id: "integrations", icon: Puzzle, label: labels.integrations },
   ] as const;
   const activeId =
     active === "case-study"
       ? "dashboard"
-      : active === "enrichment" || active === "outreach"
-        ? "scoring"
-        : active;
-
-  function SidebarItem({
-    id,
-    icon: Icon,
-    label,
-  }: {
-    id: string;
-    icon: typeof LayoutDashboard;
-    label: string;
-  }) {
-    const isActive = id === activeId;
-    return (
-      <div
-        className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${
-          isActive
-            ? "bg-emerald-500/[0.08] text-zinc-100"
-            : "text-zinc-500"
-        }`}
-      >
-        <Icon
-          className={`size-3.5 ${
-            isActive ? "text-emerald-400" : "text-zinc-600"
-          }`}
-        />
-        <span className="truncate">{label}</span>
-      </div>
-    );
-  }
+      : active === "pipeline" || active === "dashboard" || active === "content"
+        ? active
+        : "leads";
 
   return (
-    <aside className="hidden bg-[#090a09] p-2.5 md:block">
-      <div className="flex items-center gap-2 px-1.5 py-1">
+    <aside className="glass-strong m-2 mr-0 hidden flex-col rounded-2xl p-2 md:flex">
+      <div className="flex items-center gap-2 px-1.5 pb-1.5 pt-1">
         <ScoreLeadLogo className="size-4 text-zinc-100" />
-        <span className="text-[11px] font-semibold text-zinc-100">
+        <span className="text-[11px] font-semibold tracking-tight text-zinc-100">
           ScoreLead
         </span>
       </div>
-      <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-2">
-        <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-[#b86f52] text-white">
-          <Building2 className="size-3" />
-        </span>
-        <span className="min-w-0 flex-1 truncate text-[9px] font-medium text-zinc-300">
+      <div className="glass-pill mt-1.5 flex items-center gap-2 rounded-lg px-2 py-1.5">
+        <Image
+          src="/images/ceramik-logo.png"
+          alt=""
+          width={20}
+          height={20}
+          className="size-5 shrink-0 rounded-md object-cover"
+        />
+        <span className="min-w-0 flex-1 truncate text-[9px] font-medium text-zinc-200">
           Ceramik
         </span>
-        <ChevronRight className="size-3 text-zinc-600" />
+        <ChevronDown className="size-3 text-zinc-500" />
       </div>
-      <div className="mt-2 flex items-center gap-2 rounded-lg bg-zinc-900/80 px-2 py-1.5 text-[9px] text-zinc-600">
+      <div className="mt-1.5 flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] text-zinc-500 ring-1 ring-inset ring-white/[0.06]">
         <Search className="size-3" />
-        <span className="truncate">Search leads...</span>
+        <span className="min-w-0 flex-1 truncate">Search leads...</span>
+        <span className="rounded bg-white/[0.07] px-1 py-px text-[7px] font-medium text-zinc-400">
+          &#8984;K
+        </span>
       </div>
       <nav className="mt-2 space-y-0.5">
-        {primaryItems.map((item) => (
-          <SidebarItem key={item.id} {...item} />
-        ))}
-        <SidebarItem id="outreach" icon={CalendarDays} label={labels.outreach} />
-        <p className="px-2 pb-1 pt-4 text-[8px] font-semibold uppercase tracking-[0.15em] text-zinc-700">
-          Discovery
-        </p>
-        <SidebarItem id="discovery" icon={Radar} label={labels.discover} />
+        {items.map(({ id, icon: Icon, label }) => {
+          const isActive = id === activeId;
+          return (
+            <div
+              key={id}
+              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${
+                isActive ? "glass-pill text-zinc-100" : "text-zinc-400"
+              }`}
+            >
+              <Icon
+                className={`size-3.5 shrink-0 ${
+                  isActive ? "text-emerald-400" : "text-zinc-500"
+                }`}
+              />
+              <span className="truncate">{label}</span>
+            </div>
+          );
+        })}
       </nav>
+      <div className="mt-auto flex items-center gap-2 px-1.5 pb-0.5 pt-2">
+        <Image
+          src="/images/ceramik-logo.png"
+          alt=""
+          width={20}
+          height={20}
+          className="size-5 shrink-0 rounded-full object-cover ring-1 ring-white/[0.08]"
+        />
+        <span className="min-w-0 flex-1 truncate text-[9px] text-zinc-400">
+          Ceramik
+        </span>
+      </div>
     </aside>
   );
 }
@@ -670,19 +741,19 @@ function ViewHeader({
   icon?: typeof Sparkles;
 }) {
   return (
-    <header className="flex items-start justify-between gap-4 border-b border-white/[0.06] bg-[#090a09]/80 px-4 py-3.5 sm:px-5 sm:py-4">
+    <header className="flex items-start justify-between gap-4 px-4 pb-1 pt-4 sm:px-5 sm:pt-5">
       <div className="min-w-0">
-        <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-emerald-400">
+        <p className="text-[9px] font-semibold uppercase tracking-widest text-emerald-400/80">
           {eyebrow}
         </p>
-        <h3 className="mt-1 truncate text-sm font-semibold tracking-tight text-zinc-100 sm:text-base">
+        <h3 className="mt-1 truncate text-sm font-semibold tracking-tight text-white sm:text-base">
           {title}
         </h3>
         {detail ? (
-          <p className="mt-0.5 truncate text-[10px] text-zinc-500">{detail}</p>
+          <p className="mt-0.5 truncate text-[10px] text-zinc-400">{detail}</p>
         ) : null}
       </div>
-      <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-zinc-800/80 bg-zinc-900/70 text-emerald-300">
+      <span className="glass-pill grid size-8 shrink-0 place-items-center rounded-xl text-emerald-300">
         <Icon className="size-4" />
       </span>
     </header>
@@ -729,9 +800,9 @@ function SectionPanel({
 }) {
   return (
     <div
-      className={`rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-3.5 ${className}`}
+      className={`glass-card rounded-2xl p-3.5 ${className}`}
     >
-      <p className="text-[9px] font-semibold uppercase tracking-[0.11em] text-zinc-500">
+      <p className="text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
         {title}
       </p>
       {children}
@@ -740,23 +811,41 @@ function SectionPanel({
 }
 
 function ScoreDistribution({ label }: { label: string }) {
+  // Five score buckets, matching the real dashboard's bar chart shape.
+  const buckets: Array<[string, number]> = [
+    ["<3.0", 0],
+    ["3.0", 0],
+    ["3.5", 0],
+    ["4.0", 1],
+    ["4.5+", 9],
+  ];
+  const max = Math.max(...buckets.map(([, value]) => value));
   return (
     <SectionPanel title={label}>
       <div className="relative mt-3 h-22">
-        <div className="absolute inset-0 flex flex-col justify-between">
+        <div className="absolute inset-x-0 inset-y-0 flex flex-col justify-between">
           {[0, 1, 2, 3].map((line) => (
             <span
               key={line}
-              className="block border-t border-dashed border-zinc-800/80"
+              className="block border-t border-dashed border-white/[0.08]"
             />
           ))}
         </div>
-        <div className="absolute inset-x-[18%] bottom-0 top-3 flex items-end justify-center">
-          <div className="h-[86%] w-[64%] rounded-t bg-emerald-500/80" />
+        <div className="absolute inset-x-2 bottom-0 top-3 grid grid-cols-5 items-end gap-3">
+          {buckets.map(([bucket, value]) => (
+            <div key={bucket} className="flex h-full flex-col justify-end">
+              <div
+                className={`rounded-t ${value > 0 ? "bg-emerald-500/80" : "bg-white/[0.06]"}`}
+                style={{ height: `${value > 0 ? Math.max(8, (value / max) * 100) : 4}%` }}
+              />
+            </div>
+          ))}
         </div>
-        <span className="absolute inset-x-0 -bottom-3 text-center text-[8px] text-zinc-600">
-          4.5–5.0
-        </span>
+        <div className="absolute inset-x-2 -bottom-3.5 grid grid-cols-5 gap-3 text-center text-[8px] text-zinc-600">
+          {buckets.map(([bucket]) => (
+            <span key={bucket}>{bucket}</span>
+          ))}
+        </div>
       </div>
     </SectionPanel>
   );
@@ -815,9 +904,9 @@ function DashboardScene({ copy }: { copy: DemoCopy }) {
             </div>
           </SectionPanel>
         </div>
-        <div className="mt-3 hidden overflow-hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45 sm:block">
+        <div className="mt-3 hidden overflow-hidden surface-card rounded-xl sm:block">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.11em] text-zinc-500">
+            <p className="text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
               {l.recentLeads}
             </p>
             <ChevronRight className="size-3 text-zinc-600" />
@@ -884,7 +973,7 @@ function DiscoveryScene({ copy }: { copy: DemoCopy }) {
                   <span className="truncate">{label}</span>
                   <span>{value}</span>
                 </div>
-                <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-800">
+                <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/[0.07]">
                   <div
                     className={`h-full rounded-full ${color}`}
                     style={{ width: value === 10 ? "100%" : "0%" }}
@@ -911,7 +1000,7 @@ function DiscoveryScene({ copy }: { copy: DemoCopy }) {
                 suffix="/10"
               />
             </div>
-            <div className="mt-4 flex items-center gap-2 border-t border-zinc-800/70 pt-3">
+            <div className="mt-4 flex items-center gap-2 border-t border-white/[0.08] pt-3">
               <ShieldCheck className="size-3.5 text-emerald-400" />
               <span className="text-[9px] text-zinc-500">
                 {l.evidenceNote}
@@ -944,7 +1033,7 @@ function ScoringScene({ copy }: { copy: DemoCopy }) {
         icon={Target}
       />
       <div className="space-y-3 p-3.5 sm:p-5">
-        <div className="flex items-center gap-3 rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-3.5">
+        <div className="flex items-center gap-3 surface-card rounded-xl p-3.5">
           <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[#49372e] text-[#d9aa91] ring-1 ring-white/[0.08]">
             <Building2 className="size-5" />
           </span>
@@ -966,21 +1055,21 @@ function ScoringScene({ copy }: { copy: DemoCopy }) {
               San Francisco, United States
             </p>
             <div className="mt-2 hidden flex-wrap gap-1.5 sm:flex">
-              <span className="rounded-lg border border-zinc-800 bg-zinc-900/70 px-2 py-1 text-[8px] text-zinc-400">
+              <span className="glass-pill rounded-lg px-2 py-1 text-[8px] text-zinc-400">
                 <Star className="mr-1 inline size-2.5 text-amber-400" />
                 4.6 (20)
               </span>
-              <span className="rounded-lg border border-zinc-800 bg-zinc-900/70 px-2 py-1 text-[8px] text-zinc-400">
+              <span className="glass-pill rounded-lg px-2 py-1 text-[8px] text-zinc-400">
                 <ListChecks className="mr-1 inline size-2.5 text-emerald-400" />
                 12 {l.services}
               </span>
-              <span className="rounded-lg border border-zinc-800 bg-zinc-900/70 px-2 py-1 text-[8px] text-zinc-400">
+              <span className="glass-pill rounded-lg px-2 py-1 text-[8px] text-zinc-400">
                 <Radar className="mr-1 inline size-2.5 text-emerald-400" />
                 Google Places
               </span>
             </div>
           </div>
-          <div className="shrink-0 rounded-xl border border-zinc-800/70 bg-zinc-900/50 px-3 py-2 text-right ring-1 ring-zinc-800/70">
+          <div className="shrink-0 glass-pill rounded-xl px-3 py-2 text-right">
             <span className="block text-[8px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
               Score
             </span>
@@ -1061,7 +1150,7 @@ function StatusLine({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-white/[0.05] py-2.5 last:border-0">
-      <span className="grid size-7 place-items-center rounded-lg bg-zinc-900 text-zinc-500 ring-1 ring-zinc-800/70">
+      <span className="grid size-7 place-items-center rounded-lg bg-zinc-900 text-zinc-500 ring-1 ring-white/[0.08]">
         <Icon className="size-3.5" />
       </span>
       <span className="flex-1 text-[10px] text-zinc-300">{label}</span>
@@ -1088,7 +1177,7 @@ function EnrichmentScene({ copy }: { copy: DemoCopy }) {
         icon={Sparkles}
       />
       <div className="grid gap-3 p-3.5 sm:p-5 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-4">
+        <div className="surface-card rounded-xl p-4">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-medium text-zinc-200">
               {l.companySignals}
@@ -1110,7 +1199,7 @@ function EnrichmentScene({ copy }: { copy: DemoCopy }) {
           </div>
         </div>
         <div className="space-y-3">
-          <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-4">
+          <div className="surface-card rounded-xl p-4">
             <p className="text-[11px] font-medium text-zinc-200">
               {l.serviceTags}
             </p>
@@ -1125,14 +1214,14 @@ function EnrichmentScene({ copy }: { copy: DemoCopy }) {
               ].map((service) => (
                 <span
                   key={service}
-                  className="rounded-md border border-zinc-800 bg-zinc-900/70 px-2 py-1.5 text-[9px] text-zinc-400"
+                  className="glass-pill rounded-md px-2 py-1.5 text-[9px] text-zinc-400"
                 >
                   {service}
                 </span>
               ))}
             </div>
           </div>
-          <div className="hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-4 sm:block">
+          <div className="hidden surface-card rounded-xl p-4 sm:block">
             <p className="text-[11px] font-medium text-zinc-200">
               {l.sourceCoverage}
             </p>
@@ -1140,7 +1229,7 @@ function EnrichmentScene({ copy }: { copy: DemoCopy }) {
               {["Google Places", l.website, l.companySignals].map((source) => (
                 <div
                   key={source}
-                  className="rounded-lg border border-zinc-800/70 bg-zinc-900/40 p-3 text-center"
+                  className="glass-pill rounded-lg p-3 text-center"
                 >
                   <CircleCheck className="mx-auto size-4 text-emerald-400" />
                   <p className="mt-2 truncate text-[8px] text-zinc-500">
@@ -1170,7 +1259,7 @@ function OutreachScene({ copy }: { copy: DemoCopy }) {
         icon={MessageCircle}
       />
       <div className="grid gap-3 p-3.5 sm:p-5 lg:grid-cols-[0.7fr_1.3fr]">
-        <div className="hidden overflow-hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45 lg:block">
+        <div className="hidden overflow-hidden surface-card rounded-xl lg:block">
           <div className="border-b border-white/[0.06] px-3 py-2.5 text-[10px] font-medium text-zinc-400">
             {l.outreachQueue}
           </div>
@@ -1199,7 +1288,7 @@ function OutreachScene({ copy }: { copy: DemoCopy }) {
             </div>
           ))}
         </div>
-        <div className="overflow-hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45">
+        <div className="overflow-hidden surface-card rounded-xl">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
             <div>
               <p className="text-[10px] font-medium text-zinc-200">
@@ -1217,9 +1306,9 @@ function OutreachScene({ copy }: { copy: DemoCopy }) {
             {[1, 2, 3].map((step, index) => (
               <div
                 key={step}
-                className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 rounded-lg border border-zinc-800/70 bg-zinc-950/70 p-3"
+                className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 surface-card rounded-lg p-3"
               >
-                <span className="grid size-7 place-items-center rounded-lg border border-zinc-800 text-[9px] font-medium text-zinc-500">
+                <span className="grid size-7 place-items-center glass-pill rounded-lg text-[9px] font-medium text-zinc-500">
                   {step}
                 </span>
                 <span className="min-w-0">
@@ -1260,7 +1349,7 @@ function PipelineCard({
   score: string;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800/70 bg-zinc-900/60 p-2.5">
+    <div className="glass-pill rounded-lg p-2.5">
       <div className="flex items-start gap-2">
         <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[#49372e] text-[#d9aa91]">
           <Building2 className="size-3.5" />
@@ -1308,11 +1397,11 @@ function PipelineScene({ copy }: { copy: DemoCopy }) {
         {columns.map((column, columnIndex) => (
           <div
             key={column.label}
-            className={`overflow-hidden rounded-xl border border-zinc-800/70 bg-zinc-900/30 ${
+            className={`overflow-hidden glass-card rounded-xl ${
               columnIndex === 2 ? "hidden sm:block" : ""
             }`}
           >
-            <div className="flex items-center justify-between border-b border-zinc-800/60 px-3 py-2.5">
+            <div className="flex items-center justify-between border-b border-white/[0.08] px-3 py-2.5">
               <span className="flex items-center gap-2 text-[10px] font-medium text-zinc-300">
                 <span
                   className={`size-1.5 rounded-full ${
@@ -1335,7 +1424,7 @@ function PipelineScene({ copy }: { copy: DemoCopy }) {
                   <PipelineCard key={lead} name={lead} score="5.0" />
                 ))
               ) : (
-                <div className="grid h-14 place-items-center rounded-lg border border-dashed border-zinc-800/70 text-[8px] text-zinc-700">
+                <div className="grid h-14 place-items-center rounded-lg border border-dashed border-white/[0.08] text-[8px] text-zinc-700">
                   Empty
                 </div>
               )}
@@ -1365,7 +1454,7 @@ function WorkflowStep({
           <Icon className="size-3.5" />
         </span>
         {!last ? (
-          <span className="mx-2 h-px flex-1 bg-zinc-800 sm:mx-3" />
+          <span className="mx-2 h-px flex-1 bg-white/[0.07] sm:mx-3" />
         ) : null}
       </div>
       <p className="mt-3 text-[9px] font-medium text-zinc-300">{label}</p>
@@ -1373,6 +1462,136 @@ function WorkflowStep({
         {value}
       </p>
     </div>
+  );
+}
+
+/* ── Content calendar scene ───────────────────────────────────────────
+   A month grid with posts by pillar on the left, and the Instagram-style
+   preview of one AI-generated carousel on the right. */
+const CONTENT_PILLAR_CHIP: Record<string, string> = {
+  educate: "bg-emerald-500/15 text-emerald-200 ring-emerald-500/25",
+  showcase: "bg-sky-500/15 text-sky-200 ring-sky-500/25",
+  story: "bg-violet-500/15 text-violet-200 ring-violet-500/25",
+  proof: "bg-amber-500/15 text-amber-200 ring-amber-500/25",
+  engagement: "bg-rose-500/15 text-rose-200 ring-rose-500/25",
+};
+
+const CONTENT_POSTS: Record<number, { pillar: keyof typeof CONTENT_PILLAR_CHIP; label: string; image?: string; approved?: boolean }> = {
+  1: { pillar: "educate", label: "3 glaze mistakes", approved: true },
+  3: { pillar: "showcase", label: "Fill every wheel", image: "/images/platform/ceramik-post-cover.jpg", approved: true },
+  6: { pillar: "story", label: "Meet Ana, resident potter" },
+  8: { pillar: "engagement", label: "Mug or bowl?", approved: true },
+  10: { pillar: "proof", label: "42 students, 6 weeks", approved: true },
+  13: { pillar: "educate", label: "Centering in 30 seconds" },
+  15: { pillar: "showcase", label: "Open studio, Saturdays", image: "/images/platform/ceramik-post-slide.jpg", approved: true },
+  17: { pillar: "story", label: "Kiln night" },
+  20: { pillar: "engagement", label: "Guess the glaze" },
+  22: { pillar: "educate", label: "Trim like a pro", approved: true },
+  24: { pillar: "proof", label: "Before and after" },
+  27: { pillar: "showcase", label: "New fall pieces", approved: true },
+  29: { pillar: "engagement", label: "Your first pot?" },
+};
+
+function ContentScene({ copy }: { copy: DemoCopy }) {
+  const l = copy.labels;
+  const days = Array.from({ length: 35 }, (_, i) => i - 2); // October 2026 starts on a Thursday
+  const dayNames = ["S", "M", "T", "W", "T", "F", "S"];
+  const plannedCount = Object.keys(CONTENT_POSTS).length;
+  return (
+    <>
+      <ViewHeader
+        eyebrow={l.contentCalendar}
+        title={copy.views.content}
+        detail={`${plannedCount} ${l.planned}`}
+        icon={CalendarDays}
+      />
+      <div className="p-3.5 sm:p-5">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_15.5rem] lg:items-stretch">
+          <div className="min-w-0">
+            <div className="glass-card flex h-full flex-col rounded-2xl p-3.5">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-semibold text-zinc-200">October 2026</p>
+                <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-2 py-1 text-[9px] font-semibold text-zinc-950">
+                  <Sparkles className="size-3" />
+                  {l.generatePlan}
+                </span>
+              </div>
+              <div className="mt-3 grid grid-cols-7 gap-1.5 text-center text-[9px] font-medium text-zinc-600">
+                {dayNames.map((d, i) => (
+                  <span key={i}>{d}</span>
+                ))}
+              </div>
+              <div className="mt-1.5 grid flex-1 grid-cols-7 grid-rows-5 gap-1.5">
+                {days.map((day, i) => {
+                  const inMonth = day >= 1 && day <= 31;
+                  const post = inMonth ? CONTENT_POSTS[day] : undefined;
+                  return (
+                    <div
+                      key={i}
+                      className={`flex min-h-12 flex-col rounded-lg p-1.5 ring-1 ring-inset ${
+                        inMonth ? "ring-white/[0.06]" : "ring-transparent"
+                      }`}
+                    >
+                      {inMonth ? (
+                        <span className={`block text-[9px] tabular-nums ${post ? "text-zinc-400" : "text-zinc-700"}`}>
+                          {day}
+                        </span>
+                      ) : null}
+                      {post ? (
+                        <span
+                          className={`mt-auto flex items-center gap-1 truncate rounded-md px-1.5 py-1 text-[8px] font-medium ring-1 ${CONTENT_PILLAR_CHIP[post.pillar]}`}
+                        >
+                          {post.image ? (
+                            <Image src={post.image} alt="" width={12} height={12} className="size-3 shrink-0 rounded-[3px] object-cover" />
+                          ) : null}
+                          <span className="truncate">{post.label}</span>
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Instagram-style preview of one carousel */}
+          <div className="glass-card overflow-hidden rounded-2xl">
+            <div className="flex items-center gap-2 px-3 py-2">
+              <Image src="/images/ceramik-logo.png" alt="" width={22} height={22} className="size-[22px] rounded-full object-cover ring-2 ring-rose-400/60 ring-offset-1 ring-offset-[#0d0f0e]" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[10px] font-semibold text-zinc-100">ceramik</span>
+                <span className="block truncate text-[8px] text-zinc-500">San Francisco, CA</span>
+              </span>
+              <span className={`rounded-full px-1.5 py-0.5 text-[7px] font-semibold ring-1 ${CONTENT_PILLAR_CHIP.showcase}`}>
+                {l.carousel}
+              </span>
+            </div>
+            <div className="relative aspect-[4/5] bg-zinc-900">
+              <Image src="/images/platform/ceramik-post-cover.jpg" alt="" fill sizes="248px" className="object-cover" />
+              <span className="absolute right-2 top-2 rounded-full bg-black/55 px-1.5 py-0.5 text-[8px] font-medium text-white tabular-nums">1/5</span>
+            </div>
+            <div className="flex items-center justify-center gap-1 pt-2">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span key={i} className={`size-1 rounded-full ${i === 0 ? "bg-sky-400" : "bg-white/[0.15]"}`} />
+              ))}
+            </div>
+            <div className="px-3 pb-3 pt-2">
+              <p className="text-[9px] leading-relaxed text-zinc-300">
+                <span className="font-semibold text-zinc-100">ceramik</span> {l.demoCaption}{" "}
+                <span className="text-sky-400">{l.demoHashtags}</span>
+              </p>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-medium text-emerald-300 ring-1 ring-emerald-500/20">
+                  <CircleCheck className="size-2.5" />
+                  {l.approved}
+                </span>
+                <span className="truncate text-[8px] text-zinc-500">{l.scheduledFor}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -1387,7 +1606,7 @@ function CaseStudyScene({ copy }: { copy: DemoCopy }) {
         icon={Building2}
       />
       <div className="p-3.5 sm:p-5">
-        <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-4 sm:p-5">
+        <div className="surface-card rounded-xl p-4 sm:p-5">
           <div className="flex">
             <WorkflowStep icon={Radar} label={l.discovered} value="10" />
             <WorkflowStep icon={Target} label={l.qualified} value="5.0" />
@@ -1405,7 +1624,7 @@ function CaseStudyScene({ copy }: { copy: DemoCopy }) {
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
-          <div className="overflow-hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45">
+          <div className="overflow-hidden surface-card rounded-xl">
             <div className="border-b border-white/[0.06] px-3 py-2.5 text-[10px] font-medium text-zinc-400">
               {l.recentLeads}
             </div>
@@ -1422,7 +1641,7 @@ function CaseStudyScene({ copy }: { copy: DemoCopy }) {
               />
             </div>
           </div>
-          <div className="hidden rounded-xl border border-zinc-800/70 bg-zinc-950/45 p-4 sm:block">
+          <div className="hidden surface-card rounded-xl p-4 sm:block">
             <p className="text-[10px] font-medium text-zinc-300">
               {l.contactAvailability}
             </p>
@@ -1452,12 +1671,13 @@ function Scene({
     enrichment: <EnrichmentScene copy={copy} />,
     outreach: <OutreachScene copy={copy} />,
     pipeline: <PipelineScene copy={copy} />,
+    content: <ContentScene copy={copy} />,
     "case-study": <CaseStudyScene copy={copy} />,
   };
 
   return (
-    <div className="h-full bg-[#080908]">
-      <div className="flex h-11 items-center justify-between border-b border-zinc-800/70 px-4 md:hidden">
+    <div className="h-full bg-[#09090b] bg-[radial-gradient(ellipse_55%_45%_at_8%_0%,rgba(16,185,129,0.2),transparent_62%),radial-gradient(ellipse_50%_55%_at_100%_100%,rgba(6,182,212,0.12),transparent_60%),radial-gradient(ellipse_35%_30%_at_70%_15%,rgba(99,102,241,0.1),transparent_60%)]">
+      <div className="glass-strong mx-2 mt-2 flex h-9 items-center justify-between rounded-xl px-3 md:hidden">
         <span className="flex items-center gap-2">
           <ScoreLeadLogo className="size-4 text-zinc-100" />
           <span className="text-[11px] font-semibold text-zinc-100">
@@ -1470,9 +1690,9 @@ function Scene({
         </span>
         <span className="size-1.5 rounded-full bg-emerald-400" />
       </div>
-      <div className="grid h-[calc(100%-2.75rem)] md:h-full md:grid-cols-[8.75rem_minmax(0,1fr)]">
+      <div className="grid h-[calc(100%-2.75rem)] md:h-full md:grid-cols-[9.5rem_minmax(0,1fr)]">
         <DemoSidebar active={variant} labels={copy.labels} />
-        <div className="min-w-0 overflow-hidden bg-[radial-gradient(circle_at_42%_0%,rgba(16,185,129,0.045),transparent_34%),#090b0a] md:rounded-l-xl md:border md:border-zinc-800/70">
+        <div className="min-w-0 overflow-hidden">
           {scenes[variant]}
         </div>
       </div>
@@ -1494,11 +1714,11 @@ export function MarketingPlatformImage({
   return (
     <figure className="mt-12 sm:mt-16">
       <div className="relative">
-        <div className="relative overflow-hidden rounded-[1.35rem] border border-zinc-800/80 bg-[#070807] p-1 shadow-[0_34px_90px_-52px_rgba(16,185,129,0.22),0_28px_70px_-44px_rgba(0,0,0,0.95)]">
+        <div className="glass-strong relative overflow-hidden rounded-[1.35rem] p-1 shadow-[0_34px_90px_-52px_rgba(16,185,129,0.22),0_28px_70px_-44px_rgba(0,0,0,0.95)]">
           <div
             role="img"
             aria-label={description.alt}
-            className={`${demoViewportHeight[variant]} overflow-hidden rounded-[1.05rem] bg-[#080908]`}
+            className={`${demoViewportHeight[variant]} overflow-hidden rounded-[1.05rem] bg-[#09090b]`}
           >
             <div aria-hidden="true" className="h-full">
               <Scene variant={variant} copy={copy} />
@@ -1509,7 +1729,7 @@ export function MarketingPlatformImage({
 
       <figcaption className="mt-4 flex flex-col gap-3 text-sm leading-6 text-zinc-500 sm:flex-row sm:items-start sm:justify-between">
         <span className="max-w-3xl">{description.caption}</span>
-        <span className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg border border-zinc-800 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">
+        <span className="glass-pill inline-flex w-fit shrink-0 items-center gap-2 rounded-lg px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">
           <span aria-hidden="true" className="size-1 rounded-full bg-emerald-400" />
           {copy.workspace}
         </span>

@@ -54,7 +54,6 @@ export async function generateWhatsAppTemplateValues(
   const response = await getClient().chat.completions.create({
     model: OPENAI_TEXT_MODEL,
     response_format: { type: "json_object" },
-    temperature: 0.5,
     max_completion_tokens: 1600,
     messages: [
       {

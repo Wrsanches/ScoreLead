@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import {
+  getAppLinkHref,
   getAuthClientBaseUrl,
   getAnalyticsSurface,
   getLocalizedAppPath,
@@ -11,6 +12,26 @@ import {
 } from "./site-urls"
 
 describe("site URLs", () => {
+  it("keeps app links on the current origin outside the marketing host", () => {
+    expect(getAppLinkHref("/login", "en", "http://localhost:3000")).toBe("/login")
+    expect(getAppLinkHref("/signup", "es", "http://localhost:3000")).toBe(
+      "/es/signup",
+    )
+    expect(
+      getAppLinkHref("/admin", "en", "https://scorelead-preview.up.railway.app"),
+    ).toBe("/admin")
+    expect(getAppLinkHref("/admin", "pt", "https://app.scorelead.io")).toBe(
+      "/pt/admin",
+    )
+  })
+
+  it("sends app links from the marketing host to the app origin", () => {
+    expect(getAppLinkHref("/login", "en", "https://scorelead.io")).toBe(
+      "https://app.scorelead.io/login",
+    )
+    expect(getAppLinkHref("/signup", "es")).toBe("https://app.scorelead.io/es/signup")
+  })
+
   it("limits analytics to the public and application production hosts", () => {
     expect(isProductionAnalyticsHostname("scorelead.io")).toBe(true)
     expect(isProductionAnalyticsHostname("APP.SCORELEAD.IO")).toBe(true)

@@ -81,9 +81,9 @@ export function BusinessProductImages({
         {value.map((img) => (
           <div
             key={img.id}
-            className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 overflow-hidden"
+            className="rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] overflow-hidden"
           >
-            <div className="relative aspect-square bg-white dark:bg-zinc-900">
+            <div className="relative aspect-square bg-white dark:bg-white/[0.05]">
               <Image
                 src={img.url}
                 alt={img.description || ""}
@@ -95,7 +95,7 @@ export function BusinessProductImages({
               <button
                 type="button"
                 onClick={() => remove(img.id)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 dark:bg-zinc-950/80 hover:bg-red-500/90 hover:text-white border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-colors"
+                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 dark:bg-black/25 hover:bg-red-500/90 hover:text-white border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-colors"
                 aria-label={t("removeProductImage")}
               >
                 <X className="w-3 h-3" />
@@ -109,7 +109,7 @@ export function BusinessProductImages({
                 }
                 placeholder={t("productImageDescriptionPlaceholder")}
                 rows={2}
-                className="w-full px-2 py-1.5 bg-transparent text-[11px] text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 rounded-lg border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
+                className="w-full px-2 py-1.5 bg-transparent text-[11px] text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 rounded-lg border border-transparent hover:border-zinc-200 dark:hover:border-white/[0.18] focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
               />
               {!img.description.trim() && (
                 <p className="px-2 pb-0.5 text-[9px] text-amber-600/80 dark:text-amber-400/70">
@@ -125,7 +125,7 @@ export function BusinessProductImages({
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="aspect-square rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-emerald-500/40 hover:bg-emerald-500/5 flex flex-col items-center justify-center gap-1.5 text-zinc-500 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="aspect-square rounded-xl border border-dashed border-zinc-300 dark:border-white/[0.14] hover:border-emerald-500/40 hover:bg-emerald-500/5 flex flex-col items-center justify-center gap-1.5 text-zinc-500 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {uploading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

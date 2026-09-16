@@ -74,8 +74,12 @@ export function getPillar(key: string | null | undefined): PillarMeta | null {
 }
 
 // We only generate static images, so video formats (Reel) are not offered.
+/**
+ * Post types offered in the editor. Stories and reels are not produced (static
+ * feed images only) and cannot be scheduled through the Instagram integration,
+ * so they are not offered; legacy rows keep their type and stay editable.
+ */
 export const POST_TYPES: { key: ContentPostType; label: string }[] = [
   { key: "single", label: "Single" },
   { key: "carousel", label: "Carousel" },
-  { key: "story", label: "Story" },
 ]

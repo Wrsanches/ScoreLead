@@ -45,8 +45,8 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
 
   const hookLine = post.caption.split("\n")[0]?.trim() || "Untitled post"
   const approved = post.status === "approved"
-  const bgClass = pillar ? pillar.bgClass : "bg-zinc-200/40 dark:bg-zinc-800/40"
-  const ringClass = pillar ? pillar.ringClass : "ring-zinc-800/50"
+  const bgClass = pillar ? pillar.bgClass : "bg-zinc-200/40 dark:bg-white/[0.07]"
+  const ringClass = pillar ? pillar.ringClass : "ring-white/[0.08]"
   const textClass = pillar ? pillar.textClass : "text-zinc-700 dark:text-zinc-300"
   const dotClass = pillar ? pillar.dotClass : "bg-zinc-500"
 
@@ -70,13 +70,13 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
         e.stopPropagation()
         if (!isDragging) onSelect?.(post.id)
       }}
-      className={`group relative select-none rounded-md border border-zinc-200/80 dark:border-zinc-800/60 ${bgClass} ring-1 ${ringClass} hover:border-zinc-300 dark:hover:border-zinc-700 hover:brightness-110 transition-all duration-150 ${
+      className={`group relative select-none rounded-md border border-zinc-200/80 dark:border-white/[0.08] ${bgClass} ring-1 ${ringClass} hover:border-zinc-300 dark:hover:border-white/[0.22] hover:brightness-110 transition-all duration-150 ${
         draggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
       } ${compact ? "px-2 py-1" : "px-2.5 py-2"}`}
     >
       <div className="flex items-center gap-1.5 min-w-0">
         {post.images && post.images.length > 0 ? (
-          <span className="relative shrink-0 w-5 h-5 rounded-sm overflow-hidden border border-zinc-200 dark:border-zinc-800 block">
+          <span className="relative shrink-0 w-5 h-5 rounded-sm overflow-hidden border border-zinc-200 dark:border-white/[0.08] block">
             <Image
               src={post.images[0].url}
               alt=""
@@ -86,7 +86,7 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
               unoptimized
             />
             {post.images.length > 1 && (
-              <span className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 text-[8px] font-bold leading-none px-1 py-0.5 rounded-sm border border-zinc-300 dark:border-zinc-700">
+              <span className="absolute -top-1 -right-1 bg-white dark:bg-black/25 text-zinc-700 dark:text-zinc-300 text-[8px] font-bold leading-none px-1 py-0.5 rounded-sm border border-zinc-300 dark:border-white/[0.14]">
                 {post.images.length}
               </span>
             )}

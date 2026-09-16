@@ -71,7 +71,7 @@ export function SecuritySection() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+      <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
         <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-5">
           {t("changePassword")}
         </h2>
@@ -89,7 +89,7 @@ export function SecuritySection() {
               id="current-password"
               type="password"
               autoComplete="current-password"
-              className="bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+              className="bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-zinc-100"
               {...form.register("currentPassword")}
             />
           </div>
@@ -101,7 +101,7 @@ export function SecuritySection() {
               id="new-password"
               type="password"
               autoComplete="new-password"
-              className="bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+              className="bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-zinc-100"
               {...form.register("newPassword")}
             />
             {form.formState.errors.newPassword && (
@@ -118,7 +118,7 @@ export function SecuritySection() {
               id="confirm-password"
               type="password"
               autoComplete="new-password"
-              className="bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+              className="bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-zinc-100"
               {...form.register("confirmPassword")}
             />
             {form.formState.errors.confirmPassword && (
@@ -197,7 +197,7 @@ function ActiveSessions({ currentSessionId }: { currentSessionId?: string }) {
     : 0
 
   return (
-    <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+    <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
       <div className="flex items-start justify-between gap-3 mb-5">
         <div>
           <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">
@@ -235,7 +235,7 @@ function ActiveSessions({ currentSessionId }: { currentSessionId?: string }) {
             return (
               <li
                 key={s.id}
-                className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/30"
+                className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/60 dark:bg-white/[0.03]"
               >
                 <Icon className="w-4 h-4 text-zinc-500 shrink-0" />
                 <div className="min-w-0 flex-1">

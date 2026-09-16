@@ -21,7 +21,7 @@ interface TagsInputProps {
 }
 
 const DEFAULT_INPUT =
-  "w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/20 border border-zinc-200 dark:border-zinc-800/80 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
+  "w-full px-4 py-3 bg-zinc-50 dark:bg-white/[0.07] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/30 transition-all duration-200"
 const DEFAULT_CHIP =
   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-medium"
 const DEFAULT_CHIP_REMOVE =
@@ -92,7 +92,7 @@ export function TagsInput({
 
   const hasInput = inputValue.trim().length > 0
   const idleClass =
-    submitButtonIdleClassName ?? "bg-zinc-200/40 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-600"
+    submitButtonIdleClassName ?? "bg-zinc-200/40 dark:bg-white/[0.07] text-zinc-500 dark:text-zinc-600"
   const activeClass =
     submitButtonClassName ??
     "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25"

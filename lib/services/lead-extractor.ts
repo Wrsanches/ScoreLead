@@ -344,7 +344,6 @@ async function extractWithAI(
           content: `Website: ${websiteUrl}\n\nContent:\n${trimmed}`,
         },
       ],
-      temperature: 0.1,
       max_completion_tokens: 2000,
     })
 

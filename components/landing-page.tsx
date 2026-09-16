@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 
 const DashboardPreview = dynamic(
   () =>
@@ -22,8 +22,19 @@ import { WaitlistFooter } from "./waitlist-footer";
 import { PricingSection } from "./pricing-section";
 import { TrackedLink } from "./tracked-link";
 
+// The dashboard preview fades in once per browser session. Client-side
+// navigations back to the homepage remount this component, and replaying a
+// half-second blank-then-fade read as a flash. Module state survives those
+// navigations; a full reload starts fresh, which is when the entrance belongs.
+let heroPreviewRevealed = false;
+
 export function LandingPage() {
   const t = useTranslations("hero");
+  const [skipPreviewEntrance] = useState(() => heroPreviewRevealed);
+  useEffect(() => {
+    heroPreviewRevealed = true;
+  }, []);
+  const tb = useTranslations("billing");
   const [yOffset, setYOffset] = useState(0);
   const rafRef = useRef(0);
 
@@ -52,11 +63,20 @@ export function LandingPage() {
   };
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ backgroundColor: "#09090B" }}
+        style={{
+          backgroundColor: "#09090B",
+          // Ambient light the glass surfaces pick up as the page scrolls.
+          backgroundImage: `
+            radial-gradient(ellipse 50% 24% at 8% 3%, rgba(16,185,129,0.14), transparent 62%),
+            radial-gradient(ellipse 45% 18% at 96% 30%, rgba(6,182,212,0.08), transparent 60%),
+            radial-gradient(ellipse 42% 16% at 4% 64%, rgba(99,102,241,0.07), transparent 60%),
+            radial-gradient(ellipse 45% 14% at 92% 92%, rgba(16,185,129,0.08), transparent 60%)
+          `,
+        }}
       >
         <Navbar />
 
@@ -79,7 +99,7 @@ export function LandingPage() {
               <h1 className="text-3xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance">
                 {t("heading")}
               </h1>
-              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-400">
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-300">
                 {t("subtitle")}
               </p>
               <div className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20">
@@ -87,7 +107,7 @@ export function LandingPage() {
                   href="/signup"
                   eventName="signup_start"
                   eventParams={{ placement: "homepage_hero" }}
-                  className="px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-lg hover:bg-zinc-100 transition-colors text-sm"
+                  className="press transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)] px-5 py-2.5 bg-white text-zinc-900 font-medium rounded-xl hover:bg-zinc-100 text-sm shadow-[0_8px_24px_-12px_rgba(255,255,255,0.5)]"
                 >
                   {t("cta")}
                 </TrackedLink>
@@ -99,6 +119,7 @@ export function LandingPage() {
                   <span aria-hidden="true">→</span>
                 </a>
               </div>
+              <p className="mt-4 text-xs text-zinc-500">{tb("noCreditCard")}</p>
             </div>
           </div>
 
@@ -137,7 +158,7 @@ export function LandingPage() {
               }}
             >
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={skipPreviewEntrance ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{
                   delay: 0.5,
@@ -150,8 +171,9 @@ export function LandingPage() {
                   transformOrigin: "0 0",
                   backfaceVisibility: "hidden",
                   WebkitBackfaceVisibility: "hidden",
-                  border: "1px solid #1e1e1e",
-                  borderRadius: "10px",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.09), 0 40px 120px -40px rgba(0,0,0,0.8)",
+                  borderRadius: "28px",
                   width: "1600px",
                   height: "900px",
                   marginInline: "auto",
@@ -170,15 +192,15 @@ export function LandingPage() {
             </div>
           </div>
 
+          <TestimonialsSection />
           <FeatureCardsSection />
           <AISection />
           <PipelineSection />
-          <TestimonialsSection />
           <PricingSection />
           <WaitlistSection />
           <WaitlistFooter />
         </div>
       </section>
-    </>
+    </MotionConfig>
   );
 }

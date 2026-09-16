@@ -8,7 +8,7 @@ const ACCENTS: Record<ActivityAccent, { icon: string; bg: string; ring: string }
   violet:  { icon: "text-violet-600 dark:text-violet-400",  bg: "bg-violet-500/10",  ring: "ring-violet-500/20" },
   amber:   { icon: "text-amber-600 dark:text-amber-400",   bg: "bg-amber-500/10",   ring: "ring-amber-500/20" },
   rose:    { icon: "text-rose-600 dark:text-rose-400",    bg: "bg-rose-500/10",    ring: "ring-rose-500/20" },
-  zinc:    { icon: "text-zinc-600 dark:text-zinc-400",    bg: "bg-zinc-200/60 dark:bg-zinc-800/60",    ring: "ring-zinc-300/50 dark:ring-zinc-700/50" },
+  zinc:    { icon: "text-zinc-600 dark:text-zinc-400",    bg: "bg-zinc-200/60 dark:bg-white/[0.07]",    ring: "ring-zinc-300/50 dark:ring-white/[0.12]" },
 }
 
 interface ActivityItemProps {

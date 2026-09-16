@@ -1,13 +1,9 @@
-import { GoogleGenAI, Modality } from "@google/genai";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import { unlink, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ContentPillar, ContentPostType } from "@/lib/content-pillars";
 import type { ProductImage, ReferenceImagePref } from "@/lib/product-images";
-import {
-  GEMINI_IMAGE_MODEL,
-  OPENAI_TEXT_MODEL,
-} from "@/lib/models";
+import { OPENAI_IMAGE_MODEL, OPENAI_TEXT_MODEL } from "@/lib/models";
 import {
   buildKey,
   deleteObject,
@@ -19,13 +15,6 @@ import {
 
 // Legacy filesystem location for images created before the S3 migration.
 const LEGACY_PREFIX = "/generated/content-images/";
-
-let genai: GoogleGenAI | null = null;
-function getGenAI(): GoogleGenAI | null {
-  if (!process.env.GEMINI_API_KEY) return null;
-  if (!genai) genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  return genai;
-}
 
 let openai: OpenAI | null = null;
 function getOpenAI(): OpenAI | null {
@@ -95,7 +84,7 @@ const PILLAR_DIRECTION: Record<ContentPillar, PillarDirection> = {
     subjectPriority:
       "Choose one memorable object, gesture, or comparison that embodies the lesson. Keep the hierarchy unmistakable and leave a calm area for the headline.",
     typography:
-      "Clear editorial headline with disciplined alignment and strong contrast. The visual teaches; the type names the idea.",
+      "One short, plain-spoken headline in a clean sans-serif. The visual teaches; the type names the idea in as few words as possible.",
   },
   showcase: {
     intent:
@@ -103,7 +92,7 @@ const PILLAR_DIRECTION: Record<ContentPillar, PillarDirection> = {
     subjectPriority:
       "Give the product a decisive hero moment. Preserve recognizable details and use scale, framing, or context to make its value felt.",
     typography:
-      "Confident display headline integrated into the composition without covering the product's defining details.",
+      "A confident, understated headline set apart from the product so nothing covers its defining details.",
   },
   story: {
     intent:
@@ -127,7 +116,7 @@ const PILLAR_DIRECTION: Record<ContentPillar, PillarDirection> = {
     subjectPriority:
       "Use an unexpected juxtaposition, expressive gesture, bold crop, or tactile interaction. The image should reward a second look.",
     typography:
-      "Use energetic display type with one emphasized word or phrase, while keeping the exact headline readable at feed size.",
+      "Still restrained: one line, one weight, maybe one word set heavier. Energy comes from the image and the crop, not from loud type.",
   },
 };
 
@@ -142,76 +131,76 @@ export interface CreativeDirection {
 
 const CREATIVE_DIRECTIONS: CreativeDirection[] = [
   {
-    id: "studio-sculptural",
-    name: "Sculptural studio campaign",
+    id: "seamless-hero",
+    name: "Seamless studio hero",
     medium:
-      "High-end real product photography with a deliberately built physical set, real materials, optical depth, and controlled studio light.",
+      "Premium product photography on a pure white or pure black seamless backdrop, in the manner of an Apple product page. Real materials, flawless finish, no set dressing.",
     composition:
-      "One hero subject, bold scale contrast, crisp silhouette, and generous but intentional negative space. Avoid the habitual centered object-on-gradient layout.",
+      "One hero subject occupying roughly a third of the frame, placed with deliberate asymmetry or exact centering. Everything else is empty. The negative space is the design.",
     lightAndTexture:
-      "Directional key light, tactile surfaces, convincing contact shadows, restrained highlights, and rich tonal separation.",
+      "Soft wraparound studio light with one crisp specular highlight along the subject's edge, a faint soft contact shadow, and perfectly clean tonal gradation on the backdrop.",
     typography:
-      "Precise modern display type aligned to the subject or a visible grid. One family and no more than two weights.",
+      "One short headline in a clean geometric sans-serif, tight letter-spacing, medium weight, black on white or white on black, aligned to a clear margin. Nothing else.",
   },
   {
-    id: "documentary-editorial",
-    name: "Lived-in editorial documentary",
+    id: "macro-material",
+    name: "Macro material detail",
     medium:
-      "Naturalistic editorial photography that feels observed rather than staged: a real place, human gesture, and useful environmental detail.",
+      "An extreme close-up of the product, tool, or material, photographed like a premium hardware reveal: edges, seams, grain, finish, and machining fill the frame.",
     composition:
-      "Layer foreground, subject, and environment. Use an off-center decisive moment, frame-within-a-frame, or close human point of view.",
+      "Crop in hard so the subject becomes an abstract landscape of texture and edge. One sharp plane of focus, the rest falling into smooth defocus. Leave one calm region for the headline.",
     lightAndTexture:
-      "Available window light or practical light, subtle film grain, honest material texture, and natural color variation.",
+      "Raking directional light that reveals micro-texture, controlled specular highlights, deep but clean shadows, and true material color. No grain, no haze, no filters.",
     typography:
-      "Quiet editorial type placed like a photo-essay title, with generous margins and minimal interference with the scene.",
+      "A quiet headline in a clean sans-serif set small and precise in the calm region, sentence case, one weight. The detail is the hero; the type is a caption.",
   },
   {
-    id: "tactile-collage",
-    name: "Tactile cut-paper collage",
+    id: "keynote-type",
+    name: "Keynote typography",
     medium:
-      "A sophisticated physical paper collage photographed from above: cut edges, layered card stock, printed fragments, tape, ink, and real cast shadows. Handcrafted, not clip-art.",
+      "A keynote-style frame: a solid black or near-black field, one large headline, and at most one small product or object placed with precision. Designed, not illustrated.",
     composition:
-      "Build an asymmetric arrangement with clear depth between layers and one unmistakable focal asset. Use cropping and overlap to create rhythm.",
+      "The headline is the composition. Set it large, left-aligned or centered, with generous margins. Any subject is small, isolated, and placed to balance the type.",
     lightAndTexture:
-      "Soft raking light reveals paper fibers, folds, embossing, and small imperfections. The result should feel physically assembled and then photographed.",
+      "Matte black field with a barely visible soft vignette or a single soft spotlight on the subject. Zero clutter, zero decoration, no gradients that call attention to themselves.",
     typography:
-      "Headline can be typeset cleanly or constructed from one consistent printed treatment; never ransom-note lettering or a generic scrapbook font.",
+      "Large clean geometric sans-serif, tight tracking, semibold or medium, white on black, with perfect kerning. One line if possible, two at most.",
   },
   {
-    id: "graphic-poster",
-    name: "Bold modernist poster",
+    id: "quiet-lifestyle",
+    name: "Quiet lifestyle editorial",
     medium:
-      "A custom-designed editorial poster combining confident typography, geometric color fields, and a faithful cutout or depiction of the core subject. Designed, not templated.",
+      "Understated lifestyle photography in the style of an Apple campaign: a real environment, a person's hands or partial figure interacting with the product, and honest natural light.",
     composition:
-      "Use decisive asymmetry, unusual scale, hard cropping, and one strong visual axis. Let the subject break the grid once for tension.",
+      "One gesture, one subject, and a calm background with shallow depth of field. Off-center placement with a clear pocket of empty space for the headline.",
     lightAndTexture:
-      "Mostly graphic color with a controlled printed texture, subtle halftone, or one photographic material detail. Avoid glossy gradients and floating UI-card decoration.",
+      "Soft window light or open-shade daylight, muted natural palette, gentle contrast, true skin and material tones, and crisp focus on the point of contact.",
     typography:
-      "Typography is the compositional engine: large, tightly spaced, and deliberately aligned. Preserve the exact headline and keep all other copy out.",
+      "A short, warm headline in a clean sans-serif, set in the empty space, one weight, unobtrusive, aligned to a margin. It should read like a whisper, not a banner.",
   },
   {
-    id: "cinematic-narrative",
-    name: "Cinematic narrative frame",
+    id: "color-field",
+    name: "Monochrome color field",
     medium:
-      "A cinematic still from an implied story, photographed with realistic locations, motivated light, atmospheric depth, and a specific moment of action.",
+      "A single flat or softly graded field of the brand's primary color filling the frame, with the product or subject rendered in tonal harmony or as one sharp contrasting accent.",
     composition:
-      "Use a low, close, over-the-shoulder, or wide establishing viewpoint. Build visual tension through foreground occlusion, leading lines, or motion just entering the frame.",
+      "One subject, generous margins, exact placement. Use scale or a single diagonal for tension. No secondary props, no patterns, no shapes.",
     lightAndTexture:
-      "Motivated light, deep but readable shadows, restrained halation, nuanced color grade, and realistic lens behavior.",
+      "Smooth, even color with a soft studio shadow anchoring the subject. Materials stay believable and premium. No noise, no texture overlays, no glossy plastic sheen.",
     typography:
-      "Treat the headline like a film title card integrated into available negative space, never as a social-media sticker.",
+      "One headline in a clean sans-serif, in white or the darkest tone of the field, tight tracking, medium weight, aligned to a clear grid line.",
   },
   {
-    id: "playful-practical-set",
-    name: "Playful practical set",
+    id: "floating-still",
+    name: "Floating precision still",
     medium:
-      "A witty, surreal scene built from real props, miniatures, painted surfaces, and practical effects, then photographed. Imaginative but materially believable.",
+      "Product photography with the subject, or a few of its parts, suspended in mid-air on a seamless backdrop, arranged with engineering precision like an exploded view.",
     composition:
-      "Create one surprising relationship of scale or balance around the hero subject. Keep the scene simple enough that the joke reads instantly.",
+      "A calm, exact arrangement: components aligned on one axis or a gentle arc, evenly spaced, with a clear focal element and open space around the whole group.",
     lightAndTexture:
-      "Crisp stage or daylight-inspired lighting, real shadows, saturated physical color, and visible crafted materials rather than smooth CGI.",
+      "Clean studio light, crisp edges, soft ground shadows that make the levitation believable, and precise material rendering. Nothing dramatic, everything controlled.",
     typography:
-      "Bold, playful display type anchored to the set geometry, with disciplined spacing and no novelty-font clutter.",
+      "A short headline in a clean geometric sans-serif set in the open space, one weight, aligned to the arrangement's axis. Sentence case, no punctuation flourishes.",
   },
 ];
 
@@ -266,6 +255,18 @@ const POST_TYPE_ASPECT: Record<ContentPostType, "4:5" | "9:16" | "1:1"> = {
   story: "9:16",
 };
 
+/**
+ * Exact output sizes for GPT Image. Both dimensions must be divisible by 16
+ * and the aspect must sit between 1:3 and 3:1. These map 1:1 onto Instagram's
+ * 4:5 feed crop and 9:16 reel/story canvas at roughly 2K.
+ */
+const POST_TYPE_SIZE: Record<ContentPostType, string> = {
+  single: "1280x1600",
+  carousel: "1280x1600",
+  reel: "1152x2048",
+  story: "1152x2048",
+};
+
 function extractHook(caption: string): string {
   const firstLine = caption.split("\n")[0]?.trim();
   if (firstLine && firstLine.length > 0) return firstLine;
@@ -293,7 +294,7 @@ RULES:
 - Slides 2 through N-1 are BODY slides. Each one covers a single idea from the caption body. Each headline is under 50 characters and must stand alone. If the caption has a numbered list, extract each item as its own slide.
 - Last slide (optional) is a CTA slide with a short call to action if the caption ends with one.
 - Do NOT invent content the caption does not contain.
-- Keep each "sceneNote" to one sentence describing what the slide's photograph should show (a concrete real-world object/scene relevant to the headline, shot as editorial photography).
+- Keep each "sceneNote" to one sentence describing what the slide's photograph should show: one concrete real-world object, product detail, or gesture relevant to the headline, shot as clean minimal product photography with lots of empty space (think Apple product pages, not stock photos).
 - All headlines and sceneNotes must be in the language of the caption${language ? ` (detected: ${language})` : ""}.
 - Pillar: ${pillar ?? "educate"} - let this inform the photographic mood.
 
@@ -307,7 +308,6 @@ Return ONLY JSON of this shape:
           { role: "system", content: system },
           { role: "user", content: caption },
         ],
-        temperature: 0.5,
         max_completion_tokens: 1200,
       });
       const content = response.choices[0]?.message?.content;
@@ -396,7 +396,7 @@ function fallbackSlideSplit(caption: string): SlidePlan[] {
 
 /**
  * Decides which of the business's product images (if any) should be used as a
- * Gemini reference for this post's image. Honors the post's explicit pref
+ * reference image for this post's generation. Honors the post's explicit pref
  * ("none" / "specific"); in "auto" mode asks OpenAI to match the post against
  * the image descriptions, with a conservative keyword-overlap fallback.
  * Returns null when no image should be referenced.
@@ -443,7 +443,6 @@ Return ONLY JSON: {"selectedIndex": <zero-based number or null>}`;
           { role: "system", content: system },
           { role: "user", content: user },
         ],
-        temperature: 0,
         max_completion_tokens: 100,
       });
       const content = response.choices[0]?.message?.content;
@@ -558,8 +557,8 @@ function buildSlidePrompt(
     ? PILLAR_DIRECTION[post.pillar]
     : PILLAR_DIRECTION.educate;
   const primary = business.brandColorPrimary || "#111111";
-  const secondary = business.brandColorSecondary || "#f5f5f5";
-  const font = business.brandFonts?.[0] || "a modern geometric sans-serif";
+  const secondary = business.brandColorSecondary || "#f5f5f7";
+  const font = business.brandFonts?.[0] || "SF Pro Display";
   const brandName = business.name || "the brand";
   const brandVoice = business.persona || business.brandStyle || "";
   const category = business.category || business.field || "";
@@ -567,21 +566,21 @@ function buildSlidePrompt(
     business.clientPersona || "the brand's most likely Instagram customer";
   const offering =
     business.services || business.description || category || "the offering";
-  const captionContext = post.caption.replace(/\s+/g, " ").trim().slice(0, 1400);
+  const captionContext = post.caption.replace(/\s+/g, " ").trim().slice(0, 1000);
 
   const roleLine =
     slide.role === "cover"
-      ? `This is the COVER slide (slide 1 of ${totalSlides}). It must stop the scroll in a feed. The headline is the hero - OVERSIZE it.`
+      ? `This is the COVER slide (slide 1 of ${totalSlides}). It has to stop the scroll with confidence, not volume: one subject, one line of type, and space around both.`
       : slide.role === "cta"
-        ? `This is the final CTA slide (slide ${slideIndex + 1} of ${totalSlides}). Calmer composition - the headline is a direct invitation.`
-        : `This is body slide ${slideIndex + 1} of ${totalSlides}. Keep the visual language consistent with the cover - same medium, texture, brand palette, and type system - but use a fresh composition that matches this slide's idea.`;
+        ? `This is the final CTA slide (slide ${slideIndex + 1} of ${totalSlides}). Quieter than the cover. The headline is a plain, direct invitation.`
+        : `This is body slide ${slideIndex + 1} of ${totalSlides}. Same medium, backdrop, light, palette, and type system as the cover, with a fresh composition that matches this slide's idea.`;
 
   const sceneLine = slide.sceneNote
     ? `\nSCENE FOR THIS SLIDE: ${slide.sceneNote}`
     : "";
 
   const visualLine = post.visualIdea
-    ? `\nOVERALL CAMPAIGN NOTE (applies to every slide): ${post.visualIdea}`
+    ? `\nCAMPAIGN NOTE (applies to every slide): ${post.visualIdea}`
     : "";
 
   const variationHint =
@@ -589,11 +588,20 @@ function buildSlidePrompt(
       ? carouselVariationForIndex(slideIndex, totalSlides)
       : null;
 
-  return `You are a senior Instagram creative director, social-first art director, and conversion-aware designer. You specialize in thumb-stopping organic Instagram posts that communicate in under 1.5 seconds on a phone screen. Create a distinctive campaign asset for ${brandName}${category ? ` (${category})` : ""}, not a generic AI illustration or reusable Canva-style template.
+  return `You are a senior Instagram creative director who trained in Apple's marketing studio. Your work is defined by restraint: one subject, one idea, one line of type, and generous empty space. Create a premium organic Instagram asset for ${brandName}${category ? ` (${category})` : ""} that looks like it belongs on a product-launch page, not in a template library.
 
-Deliver ONE ${aspect} image for an Instagram ${post.postType}. It must feel native to a high-quality brand feed, remain legible at mobile-feed size, and earn attention without looking like a loud display ad.
+Deliver ONE ${aspect} image for an Instagram ${post.postType}. It must read in under 1.5 seconds on a phone, feel calm and expensive, and make the viewer trust the brand before they read a word of the caption.
 
 ${roleLine}
+
+== DESIGN PHILOSOPHY (Apple-style) ==
+- Restraint over decoration. If an element does not carry the idea, remove it.
+- One hero subject, rendered with obsessive material realism, sitting in abundant negative space. The subject usually occupies a third of the frame or less.
+- Backgrounds are simple: pure white, pure black, a seamless studio sweep, one soft gradient, or a single flat brand color. Never a busy scene behind the subject.
+- Light is soft, controlled, and flattering, with one crisp specular edge and a faint contact shadow. No dramatic haze, lens flare, or grain.
+- Typography is quiet and exact: a clean geometric sans-serif, tight letter-spacing, medium or semibold weight, sentence case, aligned to a real margin or to the subject. One line if possible, two at most.
+- Color is mostly neutral. The brand color appears once, deliberately, as the subject, the backdrop, or a single accent, never as a gradient wash across everything.
+- Composition is precise: exact centering or clear asymmetry on a grid. Nothing floats without a reason.
 
 == INSTAGRAM STRATEGY ==
 Target audience: ${audience}
@@ -605,12 +613,12 @@ Caption context (strategy only, do not render this paragraph as text):
 
 ${post.callToAction ? `Desired action after viewing: ${post.callToAction}` : "Desired action after viewing: understand the idea and want to read the caption."}
 
-Social-first rules:
-- The first glance must reveal one hook, one focal subject, and one emotional or practical payoff.
-- Compose for a phone screen. Avoid tiny details that only work when zoomed in.
-- Keep essential headline letters and product identity inside a 7% safe margin on every edge.
-- Use visual tension, crop, scale, gesture, or contrast to stop the scroll. Do not use clickbait badges or engagement-bait decoration.
-- Let the image create curiosity for the caption rather than trying to place the whole caption inside the artwork.
+Feed rules:
+- First glance reveals one hook, one focal subject, and one payoff. No competing details.
+- Compose for a phone screen. Nothing essential is small.
+- Keep the headline and the subject's defining edges inside a 7% safe margin on every side.
+- Earn attention with stillness, scale, and contrast, not with badges, stickers, arrows, or engagement-bait decoration.
+- The image creates curiosity for the caption. It never tries to say everything.
 
 == CREATIVE DIRECTION: ${creativeDirection.id} ==
 Name: ${creativeDirection.name}
@@ -623,10 +631,10 @@ Light and texture: ${creativeDirection.lightAndTexture}
 
 Typography approach: ${creativeDirection.typography}
 
-Commit fully to this direction. Do not drift back to the default AI look of a centered object on a smooth gradient. Other posts in the calendar deliberately receive other media and visual languages.
+Commit fully to this direction. Other posts in the calendar deliberately receive other directions, so do not average them out into a generic look.
 
 == THE HEADLINE ==
-Render this exact headline in the final image - perfectly typeset, crisp, and with zero spelling errors:
+Render this exact headline in the image, letter for letter, with zero spelling errors and no added punctuation:
 "${slide.headline}"
 ${sceneLine}
 
@@ -639,59 +647,58 @@ Typography treatment: ${direction.typography}
 
 == BRAND SYSTEM ==
 Palette:
-- Primary: ${primary} - use as the dominant brand cue in a way native to the chosen medium.
-- Secondary: ${secondary} - use as a supporting accent or contrast.
+- Primary: ${primary}. Use it once and deliberately (the subject, the backdrop, or one accent).
+- Secondary: ${secondary}. Supporting neutral or a single small contrast.
+- Everything else stays neutral: white, black, warm grey, or the natural color of real materials.
 
-Typeface for the headline: inspired by "${font}" if it fits the mood. Otherwise use a contemporary editorial face. One family only and two weights maximum. Typography must feel composed with the subject, never dropped on afterward.
+Headline typeface: in the spirit of "${font}", or a comparable clean geometric sans-serif such as SF Pro, Inter, or Helvetica Neue. One family, one weight (two at most), tight tracking. The type must feel set by a typographer, never pasted on.
 
 ${brandVoice ? `Brand voice: ${brandVoice}\n` : ""}${visualLine}${variationHint ? `\n\n== THIS SLIDE'S VARIATION ==\n${variationHint}` : ""}
 
 == CAROUSEL COHESION (when this is a carousel slide) ==
-This is slide ${slideIndex + 1} of ${totalSlides}. Keep the chosen medium, palette, texture, and type system consistent across the carousel. VARY scale, crop, subject placement, and visual rhythm so swiping feels authored rather than repetitive.
+This is slide ${slideIndex + 1} of ${totalSlides}. Keep the medium, backdrop, light, palette, and type system identical across the carousel so it reads as one product shoot. Vary only scale, crop, and subject placement so swiping feels authored.
 
 == QUALITY RUBRIC - grade yourself honestly ==
-- Would this stop the intended audience during a fast Instagram scroll?
+- Could this frame sit on an Apple product page without looking out of place?
+- Is there exactly one subject and exactly one line of type, with real empty space around both?
 - Is the post understandable at feed size in under 1.5 seconds?
-- Does it look authored specifically for this caption, audience, and offering?
-- Does this feel specifically designed for this brand and post rather than generated from a reusable template?
-- Is the chosen creative direction immediately visible and fully executed?
-- Does the composition use space intentionally rather than defaulting to a centered hero?
-- Is there a single clear focal point? No visual noise competing with the subject?
-- Do materials and textures feel convincing for the chosen medium?
-- Is the typography placed on a clear alignment (flush to an object edge, the frame, or a grid), not floating?
-- Are all essential elements safely inside the mobile crop and interface zones?
-- Does the frame feel composed by a human with taste, not generated by defaults?
+- Does it look made for this brand, audience, and caption rather than for any business?
+- Is the chosen creative direction immediately recognizable?
+- Do materials, edges, and shadows look physically real and premium?
+- Is the headline crisp, correctly spelled, tightly tracked, and aligned to something?
+- Is everything essential inside the safe margin?
+- Would a designer with taste remove anything? If yes, remove it now.
 
 == HARD DON'TS ==
-- No watermarks, invented third-party logos, Instagram UI mockups, borders, frames, or slide numbers. Faithfully preserve a real brand mark that is intrinsic to an attached product reference.
-- No invented text besides the headline. Text, numbers, labels, grids, and interface details intrinsic to an attached reference must remain recognizable. No fake body copy or signatures.
-- No stock-photo clichés, generic dashboard cards, muddy gradients, decorative blob shapes, emoji art, or unrelated filler props.
-- Do not repeat the familiar single-object studio composition unless the selected creative direction explicitly calls for it.
-- No misspellings. Render the headline letter-for-letter as given.
-- No recognizable real celebrities. Generic people from behind, side profile, or hands/torso only.
+- No watermarks, invented third-party logos, Instagram UI mockups, borders, frames, slide numbers, or badges. Faithfully preserve a real brand mark that is intrinsic to an attached product reference.
+- No invented text besides the headline. Text, numbers, labels, grids, and interface details intrinsic to an attached reference must remain recognizable. No fake body copy, prices, or signatures.
+- No stock-photo clichés, dashboard cards, muddy gradients, decorative blobs, sparkles, emoji art, confetti, or unrelated props.
+- No busy environments, no cluttered tabletops, no multiple competing subjects.
+- No misspellings. Render the headline letter for letter as given.
+- No recognizable real celebrities. People appear as hands, torso, side profile, or from behind only.
 - No em dashes in visible text.
 
-Final check: can a viewer identify the selected ${creativeDirection.name} direction without reading this prompt? If not, redesign until they can.`;
+Final check: does this look designed by Apple's studio for ${brandName}? If it looks like a template, a collage, or an illustration, strip it back until it does.`;
 }
 
 function carouselVariationForIndex(index: number, total: number): string {
   if (total <= 1) return "A single considered hero composition.";
   if (index === 0) {
-    return "COVER - the boldest composition of the carousel. Establish one unmistakable focal subject and set the visual language the rest of the carousel inherits.";
+    return "COVER - the most confident frame of the carousel. One unmistakable hero subject, the most space around it, and the type set largest. It establishes the backdrop, light, and type system every following slide inherits.";
   }
   if (index === total - 1) {
-    return "FINAL SLIDE - a calmer, quieter composition. Use a small detail, reduced scale, or generous breathing room so the headline lands like a considered close.";
+    return "FINAL SLIDE - the quietest frame. A small detail or a reduced-scale subject with the most empty space of the set, so the headline lands like a considered close.";
   }
   const patterns = [
-    "A tight detail: magnify one material, symbol, or product feature until its texture becomes the composition.",
-    "A top-down or flat-plane arrangement with deliberate spacing and a strong diagonal reading path.",
-    "A wide contextual composition with foreground, subject, and background layers. Keep the hero smaller in frame.",
-    "A dominant brand-color field interrupted by one sharply contrasting subject or gesture.",
-    "A human interaction moment: a hand using, holding, marking, moving, or revealing the subject.",
-    "A silhouette, cutout, or edge-defined profile that reduces the idea to one memorable shape.",
+    "A macro detail: move in close on one edge, surface, or feature until material and finish become the composition.",
+    "A top-down flat lay of the subject alone on the backdrop, aligned to one clean axis with even spacing.",
+    "A wider frame with the subject small and off-center, leaving most of the canvas empty on one side for the headline.",
+    "The subject in a single human gesture: one hand holding, placing, or touching it, cropped tight and calm.",
+    "A precise three-quarter angle of the subject, exactly centered, with the type set beneath or above on the same axis.",
+    "A silhouette or edge-lit profile that reduces the subject to one clean shape against the backdrop.",
   ];
   const choice = patterns[(index - 1) % patterns.length];
-  return `Vary the composition from the previous slide. This slide: ${choice} Keep the selected medium, palette, texture, and typography consistent with the cover.`;
+  return `Vary the composition from the previous slide. This slide: ${choice} Keep the medium, backdrop, palette, light, and typography identical to the cover.`;
 }
 
 /**
@@ -728,8 +735,8 @@ export async function removePublicImage(url: string): Promise<void> {
 }
 
 /**
- * Reads a slide image back into a base64 string so it can be fed into Gemini
- * edit mode. Handles both S3-stored and legacy filesystem images. Returns null
+ * Reads a slide image back into a base64 string so it can be passed to the
+ * Images API edit endpoint. Handles both S3-stored and legacy filesystem images. Returns null
  * if the image cannot be read.
  */
 async function readPublicImageAsBase64(url: string): Promise<string | null> {
@@ -766,11 +773,12 @@ interface RunSlideOptions {
 }
 
 /**
- * Generates or edits a single slide.
+ * Generates or edits a single slide with the OpenAI Images API.
  * - If baseImageUrl + refinementPrompt are provided and the file is readable,
- *   runs Nano Banana in image-to-image mode.
- * - If a reference is provided, keeps it in context during both generation
- *   and refinement so the real product/source survives subsequent edits.
+ *   runs an image edit with the prior slide as the first input image.
+ * - If a reference is provided, it is passed as an additional input image
+ *   during both generation and refinement so the real product/source survives
+ *   subsequent edits.
  * - Otherwise does a fresh text-to-image generation.
  * Tries up to 2 attempts before surfacing failure.
  */
@@ -782,8 +790,8 @@ async function runSlideGeneration(
   totalSlides: number,
   opts: RunSlideOptions = {},
 ): Promise<GeneratedSlide | null> {
-  const ai = getGenAI();
-  if (!ai) return null;
+  const openaiClient = getOpenAI();
+  if (!openaiClient) return null;
 
   const basePrompt = buildSlidePrompt(
     business,
@@ -795,6 +803,7 @@ async function runSlideGeneration(
   );
 
   const aspectRatio = POST_TYPE_ASPECT[post.postType];
+  const size = POST_TYPE_SIZE[post.postType];
   const refinement =
     opts.refinementPrompt?.trim() ||
     (opts.reference?.kind === "user"
@@ -811,12 +820,10 @@ async function runSlideGeneration(
     hasBaseImage && opts.baseImageRole === "user-source";
   const editMode = hasBaseImage && !userSourceMode;
   const reference = opts.reference;
-  const referenceMode = Boolean(reference);
 
-  // Mention the aspect ratio explicitly in the prompt so the model honors it
-  // even when we can't pass `imageConfig.aspectRatio` (some Gemini variants
-  // like flash-lite reject the config).
-  const aspectLine = `\n\n== FRAME ==\nDeliver the image at an exact ${aspectRatio} aspect ratio (width:height). Do not letterbox, do not crop text, do not pad. The canvas itself is ${aspectRatio}.`
+  // The output size is enforced via the `size` parameter, but the prompt
+  // restates it so the model composes for that canvas from the start.
+  const aspectLine = `\n\n== FRAME ==\nThe canvas is exactly ${aspectRatio} (width:height). Compose for that canvas. Do not letterbox, pad, or crop text.`;
 
   const referenceLine = reference
     ? `\n\n== ${reference.kind === "product" ? "PRODUCT" : "USER"} REFERENCE IMAGE (attached) ==
@@ -825,10 +832,10 @@ The ${hasBaseImage ? "SECOND attached" : "attached"} reference shows ${
           ? `${business.name || "the brand"}'s actual product${reference.description.trim() ? `: "${reference.description.trim()}"` : ""}`
           : "the exact visual asset the user wants featured"
       }.
-- Blend the attached image naturally and visibly into the AI-generated Instagram composition. It must be a prominent, intentional part of the scene, not merely a source of inspiration.
+- Make the attached image the hero of the composition. It must be a prominent, intentional part of the scene, not merely a source of inspiration.
 - Treat the attached image as an immutable finished asset. Do not redesign, redraw, regenerate, rewrite, crop, blur, recolor, relabel, simplify, or replace it.
 - Preserve the complete attached image: exact text, spelling, numbers, grid cells, markings, logo, colors, proportions, borders, and layout.
-- Build the art direction, environment, lighting, shadows, props, human interaction, and headline around the unchanged asset so it feels naturally photographed or designed into the scene.
+- Build the backdrop, lighting, shadows, and headline around the unchanged asset so it looks photographed in a real studio.
 - If perspective or scale is needed to integrate it, keep the entire asset visible and fully legible. Do not cover it with the headline, hands, props, glare, or effects.
 - For bingo cards, worksheets, packaging, screenshots, menus, flyers, and other text-heavy artwork, fidelity is the highest priority. The final viewer must recognize the attached image as the same original asset, unchanged.`
     : "";
@@ -850,116 +857,85 @@ Deliver the refined image at the same aspect and quality.`
       ? `${basePrompt}${aspectLine}
 
 == USER-UPLOADED SOURCE IMAGE ==
-The FIRST attached image is a source asset, not a finished slide to retouch. Create a brand-new AI composition in the selected creative direction and visibly incorporate the exact subject from that source.
+The FIRST attached image is a source asset, not a finished slide to retouch. Create a brand-new composition in the selected creative direction and visibly feature the exact subject from that source.
 - Preserve its recognizable layout, grid, markings, colors, labels, proportions, and interface details.
-- For a bingo or game card, keep the card recognizable and show it being held, played, marked, printed, displayed, layered into the design, or otherwise used naturally.
+- For a bingo or game card, keep the card recognizable and show it being held, played, marked, printed, displayed, or otherwise used naturally.
 - Do not merely return the uploaded image with a filter or headline added.
 
 User instruction: "${refinement}"
 ${referenceLine}`
       : `${basePrompt}${aspectLine}${referenceLine}${freshInstructionLine}`;
 
-  const inputParts: Array<
-    | { inlineData: { mimeType: string; data: string } }
-    | { text: string }
-  > = [];
+  // Input images for the edit endpoint, in the order the prompt refers to
+  // them: prior slide first (when refining), then the product/user reference.
+  const inputImages: Array<{ base64: string; mimeType: string; name: string }> =
+    [];
   if (hasBaseImage) {
-    inputParts.push({
-      inlineData: {
-        mimeType: mimeFromUrl(opts.baseImageUrl!),
-        data: inlineImageBase64!,
-      },
+    inputImages.push({
+      base64: inlineImageBase64!,
+      mimeType: mimeFromUrl(opts.baseImageUrl!),
+      name: "previous-slide",
     });
   }
-  if (referenceMode) {
-    inputParts.push({
-      inlineData: {
-        mimeType: reference!.mimeType,
-        data: reference!.base64,
-      },
+  if (reference) {
+    inputImages.push({
+      base64: reference.base64,
+      mimeType: reference.mimeType,
+      name: `${reference.kind}-reference`,
     });
   }
-  inputParts.push({ text: generationPrompt });
-  const contents = inputParts.length > 1 ? inputParts : generationPrompt;
-
-  // All `*-image*` Gemini models accept imageConfig. Text-only models don't
-  // and must be avoided at the source (see lib/models.ts). With any inline
-  // image input (edit or reference mode) we drop imageConfig because it isn't
-  // allowed alongside it - the == FRAME == prompt line covers aspect ratio.
-  const supportsImageConfig = /image/.test(GEMINI_IMAGE_MODEL);
-  let disableImageConfig =
-    hasBaseImage || referenceMode || !supportsImageConfig;
-
-  function buildConfig() {
-    const base: Record<string, unknown> = {
-      // TEXT+IMAGE lets the model "think out loud" about composition before
-      // committing to the render - the art-direction prompt is long and the
-      // extra reasoning channel keeps more of it in the final image.
-      responseModalities: [Modality.TEXT, Modality.IMAGE],
-    };
-    // `thinkingLevel` is a Flash-only knob; Pro image models have thinking
-    // always on and don't accept this config.
-    if (/flash-image/.test(GEMINI_IMAGE_MODEL)) {
-      base.thinkingConfig = { thinkingLevel: "high" };
-    }
-    if (!disableImageConfig) {
-      base.imageConfig = { aspectRatio, imageSize: "2K" };
-    }
-    return base;
-  }
+  const inputFiles = await Promise.all(
+    inputImages.map((img) =>
+      toFile(
+        Buffer.from(img.base64, "base64"),
+        `${img.name}.${img.mimeType.split("/")[1] ?? "png"}`,
+        { type: img.mimeType },
+      ),
+    ),
+  );
 
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const response = await ai.models.generateContent({
-        model: GEMINI_IMAGE_MODEL,
-        contents,
-        config: buildConfig(),
-      });
-      const parts = response.candidates?.[0]?.content?.parts ?? [];
-      // With thinking enabled, the model may return interim "thought" images
-      // before the final render. Prefer the last non-thought image; fall back
-      // to any image if none have a `thought` flag.
-      const imageParts = parts.filter(
-        (p): p is { inlineData: { data: string; mimeType?: string }; thought?: boolean } =>
-          Boolean(
-            p.inlineData &&
-              typeof p.inlineData.data === "string" &&
-              p.inlineData.data.length > 0,
-          ),
-      );
-      const finalImage =
-        imageParts.filter((p) => !p.thought).pop() ?? imageParts.pop();
-      if (finalImage) {
-        const buffer = Buffer.from(finalImage.inlineData.data, "base64");
+      const response =
+        inputFiles.length > 0
+          ? await openaiClient.images.edit({
+              model: OPENAI_IMAGE_MODEL,
+              image: inputFiles,
+              prompt: generationPrompt,
+              size,
+              quality: "high",
+              output_format: "png",
+            })
+          : await openaiClient.images.generate({
+              model: OPENAI_IMAGE_MODEL,
+              prompt: generationPrompt,
+              size,
+              quality: "high",
+              output_format: "png",
+            });
+
+      const b64 = response.data?.[0]?.b64_json;
+      if (b64) {
+        const buffer = Buffer.from(b64, "base64");
         const url = await writeImageToPublic(post.id, slideIndex, buffer);
         return { url, headline: slide.headline, prompt: generationPrompt };
       }
-      // Response arrived but contains no image. Almost always means the
-      // configured model isn't an image generator. Abort both attempts.
-      const textOnlyParts = parts
-        .map((p) => (typeof p.text === "string" ? p.text : ""))
-        .filter(Boolean)
       console.error(
-        `[content-image] slide ${slideIndex}: model "${GEMINI_IMAGE_MODEL}" returned no image data. Is this an image-generation model? Text body:`,
-        textOnlyParts.join("\n").slice(0, 200) || "(empty)",
-      )
+        `[content-image] slide ${slideIndex}: model "${OPENAI_IMAGE_MODEL}" returned no image data.`,
+      );
       return null;
     } catch (err) {
-      // If the model doesn't accept imageConfig (e.g. flash-lite variants),
-      // retry without it. The aspect ratio lives in the prompt text as backup.
       const message = err instanceof Error ? err.message : String(err);
-      const isConfigRejected =
-        /aspect ratio is not enabled|image_?config|invalid_argument/i.test(
-          message,
+      // A wrong or not-yet-available model id fails identically on retry.
+      if (
+        /model/i.test(message) &&
+        /does not exist|not found|unsupported|invalid/i.test(message)
+      ) {
+        console.error(
+          `[content-image] slide ${slideIndex}: model "${OPENAI_IMAGE_MODEL}" was rejected. Check OPENAI_IMAGE_MODEL.`,
+          err,
         );
-      if (!disableImageConfig && isConfigRejected) {
-        disableImageConfig = true;
-        console.warn(
-          `[content-image] model rejected imageConfig; retrying without it`,
-        );
-        // Don't burn the attempt counter on this retry - re-try same attempt.
-        attempt--;
-        continue;
+        return null;
       }
       console.error(
         `[content-image] slide ${slideIndex} attempt ${attempt} failed:`,

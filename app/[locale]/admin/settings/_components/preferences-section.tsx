@@ -33,14 +33,14 @@ export function PreferencesSection() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/40 p-6">
+      <section className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/80 dark:bg-white/[0.03] p-6">
         <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">{t("language")}</h2>
         <p className="text-sm text-zinc-500 mb-5">{t("languageDescription")}</p>
 
         <div className="space-y-1.5 max-w-xs">
           <Label className="text-zinc-700 dark:text-zinc-300">{t("language")}</Label>
           <Select value={locale} onValueChange={handleLocaleChange}>
-            <SelectTrigger className="w-full bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+            <SelectTrigger className="w-full bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-zinc-100">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

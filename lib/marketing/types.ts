@@ -57,8 +57,5 @@ export type MarketingUi = {
   relatedSolutionsDescription: string
   viewPage: string
   lastReviewed: string
-  methodology: string
-  methodologyDescription: string
-  editorialPolicy: string
   startFree: string
 }

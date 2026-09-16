@@ -1,15 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Loader2, Unplug } from "lucide-react"
-import { SocialIcon } from "@/components/admin/social-icon"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import { usePathname } from "@/i18n/routing"
 import { parseLegacyBusinessPath } from "@/lib/admin-routes"
 
-type ConnectionState = {
+export type InstagramConnectionState = {
   enabled: boolean
   connection: {
     username: string
@@ -17,21 +14,22 @@ type ConnectionState = {
     tokenExpiresAt: string
   } | null
 }
-export function InstagramConnectionCard({
-  businessId,
-  readOnly = false,
-}: {
-  businessId: string
-  readOnly?: boolean
-}) {
+
+/**
+ * Loads the Instagram connection for a business and exposes connect /
+ * disconnect actions. Also consumes the `?instagram=` OAuth result the
+ * callback appends when it redirects back to the setup page.
+ */
+export function useInstagramConnection(businessId: string) {
   const t = useTranslations("instagram")
   const locale = useLocale()
   const pathname = usePathname()
-  const [data, setData] = useState<ConnectionState | null>(null)
+  const [data, setData] = useState<InstagramConnectionState | null>(null)
   const [busy, setBusy] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [revision, setRevision] = useState(0)
   const [oauthResult, setOauthResult] = useState<string | null>(null)
+
   useEffect(() => {
     const controller = new AbortController()
     fetch(`/api/businesses/${businessId}/instagram/connection`, {
@@ -50,6 +48,7 @@ export function InstagramConnectionCard({
       })
     return () => controller.abort()
   }, [businessId, revision])
+
   useEffect(() => {
     // BusinessProvider first migrates legacy callback URLs to the clean route.
     // Consuming the result before that reload loses both the query and toast.
@@ -72,7 +71,8 @@ export function InstagramConnectionCard({
       `${url.pathname}${url.search}${url.hash}`,
     )
   }, [pathname, t])
-  async function connect() {
+
+  const connect = useCallback(async () => {
     setBusy(true)
     setOauthResult(null)
     try {
@@ -97,8 +97,9 @@ export function InstagramConnectionCard({
       )
       setBusy(false)
     }
-  }
-  async function disconnect() {
+  }, [businessId, locale, t])
+
+  const disconnect = useCallback(async () => {
     if (!window.confirm(t("disconnectConfirm"))) return
     setBusy(true)
     try {
@@ -123,87 +124,13 @@ export function InstagramConnectionCard({
     } finally {
       setBusy(false)
     }
-  }
+  }, [businessId, t])
+
+  const retry = useCallback(() => setRevision((value) => value + 1), [])
+
   const connected =
     data?.connection?.status === "connected" &&
     new Date(data.connection.tokenExpiresAt) > new Date()
-  return (
-    <section
-      aria-labelledby="instagram-heading"
-      className="mb-8 border-y border-zinc-200 py-6 dark:border-zinc-800"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-5">
-        <div className="max-w-xl">
-          <h2
-            id="instagram-heading"
-            className="flex items-center gap-2 text-lg font-semibold text-zinc-950 dark:text-zinc-50"
-          >
-            <SocialIcon platform="instagram" className="size-5" />
-            Instagram
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            {t("description")}
-          </p>
-          <p className="mt-2 text-xs text-zinc-500">{t("professionalOnly")}</p>
-          {data?.connection && (
-            <p className="mt-3 text-sm font-medium">
-              @{data.connection.username} ·{" "}
-              {connected ? t("connected") : t("reconnectRequired")}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {loadError ? (
-            <Button
-              variant="outline"
-              onClick={() => setRevision((value) => value + 1)}
-            >
-              {t("retry")}
-            </Button>
-          ) : !data ? (
-            <Loader2
-              className="size-4 animate-spin"
-              aria-label={t("loading")}
-            />
-          ) : (
-            !readOnly && (
-              <>
-                {(!connected || !data.connection) && (
-                  <Button onClick={connect} disabled={busy || !data.enabled}>
-                    {busy && <Loader2 className="size-4 animate-spin" />}
-                    {data.connection ? t("reconnect") : t("connect")}
-                  </Button>
-                )}
-                {data.connection && (
-                  <Button
-                    variant="outline"
-                    onClick={disconnect}
-                    disabled={busy}
-                  >
-                    <Unplug className="size-4" />
-                    {t("disconnect")}
-                  </Button>
-                )}
-              </>
-            )
-          )}
-        </div>
-      </div>
-      {data && !data.enabled && (
-        <p className="mt-4 text-xs text-zinc-500">{t("unavailable")}</p>
-      )}
-      {loadError && (
-        <p role="alert" className="mt-3 text-sm text-red-600">
-          {t("errors.LOAD_FAILED")}
-        </p>
-      )}
-      {oauthResult && oauthResult !== "connected" && (
-        <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
-          {t.has(`errors.${oauthResult}`)
-            ? t(`errors.${oauthResult}`)
-            : t("errors.AUTH_FAILED")}
-        </p>
-      )}
-    </section>
-  )
+
+  return { data, busy, loadError, oauthResult, connected, connect, disconnect, retry }
 }
