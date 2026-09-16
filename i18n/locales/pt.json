@@ -1297,5 +1297,11 @@
     "instagramStep3": "O ScoreLead publica no horário agendado, mesmo com você offline.",
     "active": "Ativo",
     "inactive": "Inativo"
+  },
+  "adminBanner": {
+    "badge": "Admin",
+    "editing": "Editando",
+    "owner": "Proprietário",
+    "unnamed": "Organização sem nome"
   }
 }

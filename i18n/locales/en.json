@@ -1297,5 +1297,11 @@
     "instagramStep3": "ScoreLead publishes at the scheduled time, even when you are offline.",
     "active": "Active",
     "inactive": "Inactive"
+  },
+  "adminBanner": {
+    "badge": "Admin",
+    "editing": "Editing",
+    "owner": "Owner",
+    "unnamed": "Unnamed organization"
   }
 }

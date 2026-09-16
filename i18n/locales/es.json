@@ -1297,5 +1297,11 @@
     "instagramStep3": "ScoreLead publica a la hora programada, incluso cuando no estás conectado.",
     "active": "Activo",
     "inactive": "Inactivo"
+  },
+  "adminBanner": {
+    "badge": "Admin",
+    "editing": "Editando",
+    "owner": "Propietario",
+    "unnamed": "Organización sin nombre"
   }
 }
