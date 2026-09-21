@@ -10,7 +10,6 @@ export default function SupportPage() {
     <div className="flex-1 overflow-y-auto">
       <ContentWrapper>
         <PageHeader
-          variant="hero"
           title={t("support")}
           description={t("supportDescription")}
           breadcrumbs={[{ label: t("support") }]}

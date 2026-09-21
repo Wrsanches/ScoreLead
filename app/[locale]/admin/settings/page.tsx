@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { ContentWrapper } from "@/components/admin"
+import { ContentWrapper, PageHeader } from "@/components/admin"
 import { SettingsNav, type SettingsSectionId } from "./_components/settings-nav"
 import { ProfileSection } from "./_components/profile-section"
 import { PreferencesSection } from "./_components/preferences-section"
@@ -18,10 +18,11 @@ export default function SettingsPage() {
   return (
     <div className="flex-1 overflow-y-auto">
       <ContentWrapper>
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">{t("title")}</h1>
-          <p className="text-sm text-zinc-500 mt-1">{t("description")}</p>
-        </div>
+        <PageHeader
+          title={t("title")}
+          description={t("description")}
+          breadcrumbs={[{ label: t("title") }]}
+        />
 
         <div className="flex flex-col md:flex-row gap-8">
           <SettingsNav active={section} onChange={setSection} />

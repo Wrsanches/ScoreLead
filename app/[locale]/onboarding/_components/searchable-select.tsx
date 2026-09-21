@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Search, Check } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export interface SelectOption {
   value: string
@@ -28,6 +29,7 @@ export function SearchableSelect({
   disabled = false,
   icon,
 }: SearchableSelectProps) {
+  const t = useTranslations("onboarding")
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [openUpward, setOpenUpward] = useState(false)
@@ -176,7 +178,7 @@ export function SearchableSelect({
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search..."
+                  placeholder={t("searchPlaceholder")}
                   className="w-full pl-9 pr-3 py-2 bg-white/[0.05] rounded-lg text-sm text-white placeholder:text-zinc-600 focus:outline-none"
                 />
               </div>
@@ -190,7 +192,7 @@ export function SearchableSelect({
             >
               {filtered.length === 0 ? (
                 <li className="px-4 py-3 text-sm text-zinc-600 text-center">
-                  No results found
+                  {t("noResults")}
                 </li>
               ) : (
                 filtered.map((option, i) => {

@@ -117,7 +117,7 @@ export function StepReview({
 
   const groups = [
     {
-      label: "Identity",
+      label: tBusiness("groupIdentity"),
       fields: [
         { name: "name" as const, label: t("reviewName"), type: "input" as const, placeholder: t("reviewNamePlaceholder") },
         { name: "field" as const, label: t("reviewField"), type: "input" as const, placeholder: t("reviewFieldPlaceholder") },
@@ -125,7 +125,7 @@ export function StepReview({
       ],
     },
     {
-      label: "Story",
+      label: tBusiness("groupStory"),
       fields: [
         { name: "description" as const, label: t("reviewDescription"), type: "textarea" as const, placeholder: t("reviewDescriptionPlaceholder") },
         { name: "persona" as const, label: t("reviewPersona"), type: "textarea" as const, placeholder: t("reviewPersonaPlaceholder") },
@@ -133,7 +133,7 @@ export function StepReview({
       ],
     },
     {
-      label: "Discovery",
+      label: tBusiness("groupDiscovery"),
       fields: [
         { name: "tags" as const, label: t("reviewTags"), type: "tags" as const, placeholder: t("reviewTagsPlaceholder") },
         { name: "location" as const, label: t("reviewLocation"), type: "input" as const, placeholder: t("reviewLocationPlaceholder") },
@@ -180,7 +180,7 @@ export function StepReview({
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {brandColors.length > 0 && (
+        {(brandColors.length > 0 || onPrimaryColorChange) && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

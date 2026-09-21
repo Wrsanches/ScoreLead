@@ -1,5 +1,10 @@
 # ScoreLead SEO and GEO Strategy
 
+Latest implementation: [September 21 evidence and rollout](seo-implementation-2026-09-21.md).
+The August figures below are historical context; use the dated September
+baseline and source/medium corrections for the next evaluation.
+
+
 Updated: 2026-08-26
 
 ## Audit baseline

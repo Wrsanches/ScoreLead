@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl"
 import { publicationLocksPost } from "@/lib/instagram/status"
 import Image from "next/image"
 import { useDraggable } from "@dnd-kit/core"
-import { CSS } from "@dnd-kit/utilities"
 import { Square, Images, Film, BookOpen } from "lucide-react"
 import { getPillar, type ContentPostType } from "@/lib/content-pillars"
 import type { ContentPostRow } from "./types"
@@ -25,6 +24,7 @@ interface PostChipProps {
 
 export function PostChip({ post, onSelect, compact = true, draggable = true }: PostChipProps) {
   const t = useTranslations("instagram")
+  const tc = useTranslations("contentCalendar")
   draggable = draggable && !publicationLocksPost(post.publication?.status)
   const pillar = getPillar(post.pillar)
   const Icon = POST_TYPE_ICON[post.postType] ?? Square
@@ -34,14 +34,11 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
     disabled: !draggable,
   })
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = draggableState
+  const { attributes, listeners, setNodeRef, isDragging } = draggableState
 
-  const style = draggable
-    ? {
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.3 : 1,
-      }
-    : undefined
+  // The DragOverlay renders the moving copy; the source chip stays put as a
+  // dimmed placeholder so the grid does not show two chips travelling.
+  const style = draggable && isDragging ? { opacity: 0.3 } : undefined
 
   const hookLine = post.caption.split("\n")[0]?.trim() || "Untitled post"
   const approved = post.status === "approved"
@@ -106,17 +103,22 @@ export function PostChip({ post, onSelect, compact = true, draggable = true }: P
             {t(`status.${post.publication.status}`)}
           </span>
         ) : approved && (
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Approved" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("statusApproved")} />
         )}
       </div>
     </div>
   )
 }
 
+/**
+ * Rendered inside the DragOverlay, which is sized to the chip that was
+ * grabbed. Filling it keeps the preview under the cursor exactly where the
+ * user picked the chip up; the tilt and shadow just say "lifted".
+ */
 export function PostChipPreview({ post }: { post: ContentPostRow }) {
   return (
-    <div className="w-60 rotate-[1.5deg]">
-      <PostChip post={post} draggable={false} compact={false} />
+    <div className="w-full h-full cursor-grabbing rotate-[1.5deg] drop-shadow-[0_12px_24px_rgba(0,0,0,0.35)]">
+      <PostChip post={post} draggable={false} compact />
     </div>
   )
 }

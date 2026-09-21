@@ -254,10 +254,13 @@ export default function ContentCalendarPage() {
 
   return (
     <>
-      <PageHeader title={t("title")} breadcrumbs={[{ label: t("title") }]} />
-
       <div className="flex-1 overflow-auto">
         <ContentWrapper>
+          <PageHeader
+            title={t("title")}
+            description={t("subtitle")}
+            breadcrumbs={[{ label: t("title") }]}
+          />
           {/* Sticky header: month nav + provider + generate */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
             <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/60 dark:bg-white/[0.03] p-1">

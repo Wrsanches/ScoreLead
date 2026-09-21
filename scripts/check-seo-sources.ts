@@ -1,10 +1,10 @@
 import { blogPosts } from "../lib/blog"
+import { comparisonSources } from "../lib/marketing/comparisons"
 
 async function main() {
   const sources = Array.from(
     new Map(
-      blogPosts
-        .flatMap((post) => post.sources)
+      [...blogPosts.flatMap((post) => post.sources), ...comparisonSources]
         .map((source) => [source.url, source]),
     ).values(),
   )
@@ -14,6 +14,7 @@ async function main() {
       try {
         const response = await fetch(source.url, {
           redirect: "follow",
+          signal: AbortSignal.timeout(20_000),
           headers: {
             "User-Agent": "ScoreLead source integrity check",
           },

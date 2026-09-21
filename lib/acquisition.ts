@@ -64,25 +64,28 @@ export function classifyAcquisition(input: {
   const utmSource = url.searchParams.get("utm_source")?.trim().toLowerCase()
   const utmMedium = url.searchParams.get("utm_medium")?.trim().toLowerCase()
 
-  const aiSource =
-    (utmSource &&
-      (matchKnownHost(utmSource, aiHosts) ||
-        Object.values(aiHosts).find((source) => source === utmSource))) ||
-    matchKnownHost(referrerHost, aiHosts)
-  if (aiSource) return { channel: "ai", source: aiSource }
-
-  if (utmMedium === "organic" && utmSource) {
-    return { channel: "organic", source: utmSource }
+  // An explicit campaign takes precedence over a browser referrer.
+  if (utmSource) {
+    const aiSource = matchKnownHost(utmSource, aiHosts) ||
+      Object.values(aiHosts).find((source) => source === utmSource)
+    if (aiSource) return { channel: "ai", source: aiSource }
+    return { channel: utmMedium === "organic" ? "organic" : "campaign", source: utmSource }
   }
 
-  const organicSource = matchKnownHost(referrerHost, searchHosts)
+  const aiSource = matchKnownHost(referrerHost, aiHosts)
+  if (aiSource) return { channel: "ai", source: aiSource }
+
+  // Search Console, Mail and other Google services are not search results.
+  const organicSource = searchHosts[referrerHost.replace(/^www\./, "")]
   if (organicSource) return { channel: "organic", source: organicSource }
 
-  if (utmSource) return { channel: "campaign", source: utmSource }
+  const ownHosts = ["scorelead.io", "www.scorelead.io", "app.scorelead.io"]
+  const isOwnNavigation = ownHosts.includes(currentHostname) && ownHosts.includes(referrerHost)
 
   if (
     referrerHost &&
     referrerHost !== currentHostname &&
+    !isOwnNavigation &&
     !isUnwantedReferral(referrerHost)
   ) {
     return { channel: "referral", source: referrerHost }

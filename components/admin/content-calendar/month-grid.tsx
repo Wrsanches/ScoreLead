@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 import {
   DndContext,
   DragOverlay,
@@ -8,7 +9,9 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  pointerWithin,
+  rectIntersection,
+  type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core"
@@ -28,6 +31,17 @@ interface MonthGridProps {
   /** 0 = Sunday, 1 = Monday. Defaults to 1 (Monday). */
   weekStartsOn?: 0 | 1
   readOnly?: boolean
+}
+
+/**
+ * Drop where the cursor is. `closestCenter` measured from the chip's centre
+ * to each cell's centre, and because cells are tall and chips sit near the
+ * top, a chip dragged one column over often landed in the row above. The
+ * pointer is unambiguous; the rect fallback only matters for keyboard drags.
+ */
+const dropUnderPointer: CollisionDetection = (args) => {
+  const hits = pointerWithin(args)
+  return hits.length > 0 ? hits : rectIntersection(args)
 }
 
 function isoDay(d: Date): string {
@@ -62,6 +76,14 @@ export function MonthGrid({
   readOnly = false,
 }: MonthGridProps) {
   const [activePost, setActivePost] = useState<ContentPostRow | null>(null)
+  // The overlay is portalled to <body>: the page wraps this grid in a
+  // motion.div that animates `filter`, and any filter value turns that
+  // element into the containing block for position:fixed descendants, which
+  // pushed the preview away from the cursor.
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setPortalTarget(document.body)
+  }, [])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -140,7 +162,7 @@ export function MonthGrid({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={dropUnderPointer}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
@@ -180,9 +202,16 @@ export function MonthGrid({
         })}
       </motion.div>
 
-      <DragOverlay dropAnimation={{ duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" }}>
-        {activePost ? <PostChipPreview post={activePost} /> : null}
-      </DragOverlay>
+      {portalTarget &&
+        createPortal(
+          <DragOverlay
+            dropAnimation={{ duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" }}
+            zIndex={60}
+          >
+            {activePost ? <PostChipPreview post={activePost} /> : null}
+          </DragOverlay>,
+          portalTarget,
+        )}
     </DndContext>
   )
 }

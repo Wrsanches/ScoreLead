@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import {
-  ArrowLeft,
   Loader2,
   Plus,
   RefreshCw,
@@ -12,7 +11,6 @@ import {
   Trash2,
   X,
 } from "lucide-react"
-import { Link } from "@/i18n/routing"
 import { ContentWrapper, PageHeader } from "@/components/admin"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -157,6 +155,8 @@ function statusBadgeClass(status: string): string {
 
 export function WhatsAppTemplatesManager({ businessId }: { businessId: string }) {
   const t = useTranslations("whatsapp")
+  const ti = useTranslations("integrations")
+  const td = useTranslations("dashboard")
   const { readOnly } = useBusinessAccess()
   const [templates, setTemplates] = useState<TemplateRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -363,10 +363,11 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
     <div className="flex-1 overflow-y-auto">
     <ContentWrapper>
       <PageHeader
-        variant="hero"
         title={t("templatesManagerTitle")}
         description={t("templatesManagerDescription")}
         breadcrumbs={[
+          { label: td("businessPage"), href: "/admin/profile" },
+          { label: ti("title"), href: "/admin/integrations" },
           { label: t("title"), href: "/admin/integrations/whatsapp" },
           { label: t("manageTemplates") },
         ]}
@@ -387,14 +388,6 @@ export function WhatsAppTemplatesManager({ businessId }: { businessId: string })
           </div>
         ) : undefined}
       />
-
-      <Link
-        href="/admin/integrations/whatsapp"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        {t("title")}
-      </Link>
 
       {loading ? (
         <div className="mt-8 flex justify-center py-16">

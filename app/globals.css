@@ -436,3 +436,33 @@ select:-webkit-autofill:focus {
     color: white;
   }
 }
+
+/* Keep tool exports focused on the visitor's work, including multiline notes. */
+@media print {
+  .marketing-page:has([data-marketing-tool]),
+  .marketing-page [data-marketing-tool] {
+    background: white !important;
+    color: #18181b !important;
+  }
+  .marketing-page:has([data-marketing-tool]) > :not(main),
+  .marketing-page:has([data-marketing-tool]) main > :not(header),
+  .marketing-page:has([data-marketing-tool]) header nav,
+  .marketing-page:has([data-marketing-tool]) header h1,
+  .marketing-page:has([data-marketing-tool]) header > div > p {
+    display: none !important;
+  }
+  .marketing-page:has([data-marketing-tool]) main,
+  .marketing-page:has([data-marketing-tool]) header,
+  .marketing-page [data-tool-container] {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .marketing-page [data-marketing-tool] * {
+    color: #18181b !important;
+    box-shadow: none !important;
+  }
+  .marketing-page [data-marketing-tool] label,
+  .marketing-page [data-marketing-tool] fieldset {
+    break-inside: avoid;
+  }
+}

@@ -207,35 +207,34 @@ export default function NewDiscoveryJobPage() {
         return
       }
 
-      toast.success("Discovery job started! Redirecting...")
+      toast.success(t("discoveryStarted"))
       router.push("/admin/discovery-jobs")
     } catch {
-      toast.error("Failed to start discovery")
+      toast.error(t("discoveryStartFailed"))
       setIsSubmitting(false)
     }
   }
 
   return (
     <>
-      <PageHeader
-        title={t("createJob")}
-        backHref="/admin/discovery-jobs"
-        breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
-      />
-
       <div className="flex-1 overflow-auto">
         <ContentWrapper narrow>
-          <div className="mb-8">
-            <h1 className="text-zinc-900 dark:text-white text-2xl font-semibold tracking-tight mb-2">{t("createJob")}</h1>
-            <p className="text-zinc-500 text-sm">Configure your discovery parameters. Our AI will scan the web, find matching businesses, and score them as leads.</p>
-          </div>
+          <PageHeader
+            title={t("createJob")}
+            description={t("createJobDesc")}
+            breadcrumbs={[
+              { label: t("allLeads"), href: "/admin/leads" },
+              { label: t("discovery"), href: "/admin/discovery-jobs" },
+              { label: t("createJob") },
+            ]}
+          />
 
             {/* Form */}
             <div className="space-y-8">
               {/* Section: Basic info */}
               <div className="space-y-5">
                 <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/80 dark:border-white/[0.08]">
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Basic Information</span>
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("basicInformation")}</span>
                 </div>
 
                 <div>
@@ -251,7 +250,7 @@ export default function NewDiscoveryJobPage() {
                       className="w-full h-11 pl-11 pr-4 bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-white/[0.22] transition-colors disabled:opacity-50"
                     />
                   </div>
-                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Give your job a descriptive name so you can find it later.</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">{t("jobNameHint")}</p>
                 </div>
               </div>
 
@@ -274,8 +273,8 @@ export default function NewDiscoveryJobPage() {
                   options={countryOptions}
                   value={countryCode}
                   onChange={handleCountryChange}
-                  placeholder="Select a country"
-                  label="Country"
+                  placeholder={t("selectCountry")}
+                  label={t("country")}
                   icon={<MapPin className="w-4 h-4" />}
                   disabled={isSubmitting || loadingCountries}
                 />
@@ -285,8 +284,8 @@ export default function NewDiscoveryJobPage() {
                     options={stateOptions}
                     value={stateCode}
                     onChange={handleStateChange}
-                    placeholder="Select a state"
-                    label="State"
+                    placeholder={t("selectState")}
+                    label={t("state")}
                     disabled={isSubmitting || loadingStates}
                   />
                 )}
@@ -296,8 +295,8 @@ export default function NewDiscoveryJobPage() {
                     options={cityOptions}
                     value={cityName}
                     onChange={handleCityChange}
-                    placeholder="Select a city"
-                    label="City"
+                    placeholder={t("selectCity")}
+                    label={t("city")}
                     disabled={isSubmitting || loadingCities}
                   />
                 )}
@@ -314,12 +313,12 @@ export default function NewDiscoveryJobPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
                       <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs text-zinc-600 dark:text-zinc-400">AI Suggestions</span>
+                      <span className="text-xs text-zinc-600 dark:text-zinc-400">{t("aiSuggestions")}</span>
                     </div>
                     {loadingSuggestions ? (
                       <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-600 text-sm">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Generating suggestions...
+                        {t("generatingSuggestions")}
                       </div>
                     ) : (
                       <div className="flex flex-wrap gap-2">
@@ -381,7 +380,7 @@ export default function NewDiscoveryJobPage() {
                       className="flex-1 min-w-30 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none disabled:opacity-50"
                     />
                   </div>
-                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">Press Enter to add custom keywords. Click suggestions above to toggle them.</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">{t("keywordsHint")}</p>
                 </div>
               </div>
 
@@ -389,7 +388,7 @@ export default function NewDiscoveryJobPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Radar className="w-4 h-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Leads per run</span>
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("leadsPerRun")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {batchOptions.map((n) => (
@@ -413,16 +412,16 @@ export default function NewDiscoveryJobPage() {
                       onClick={() => openUpgrade("leadsPerJob")}
                       className="h-10 px-4 text-sm font-medium rounded-xl border border-dashed border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
                     >
-                      Upgrade for more
+                      {t("upgradeForMore")}
                     </button>
                   )}
                 </div>
                 <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1.5">
                   {canRaiseCap
-                    ? `Your plan finds up to ${leadCap} leads per run. Upgrade for larger batches and to continue jobs in the same area.`
+                    ? t("leadsPerRunPlanCap", { cap: leadCap })
                     : can("continueJob")
-                      ? "Each run finds up to this many new leads. You can continue the job to discover more in the same area."
-                      : "Each run finds up to this many new leads. Upgrade to Growth to continue a job in the same area."}
+                      ? t("leadsPerRunContinue")
+                      : t("leadsPerRunUpgrade")}
                 </p>
               </div>
 
@@ -431,19 +430,19 @@ export default function NewDiscoveryJobPage() {
                 <div className="bg-zinc-50 dark:bg-white/[0.05] rounded-2xl border border-zinc-200 dark:border-white/[0.08] p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Info className="w-4 h-4 text-zinc-500" />
-                    <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Summary</span>
+                    <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{t("summary")}</span>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-500">Job name</span>
+                      <span className="text-zinc-500">{t("name")}</span>
                       <span className="text-zinc-800 dark:text-zinc-200">{jobName}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-500">Location</span>
+                      <span className="text-zinc-500">{t("location")}</span>
                       <span className="text-zinc-800 dark:text-zinc-200">{buildLocation()}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-500">Keywords</span>
+                      <span className="text-zinc-500">{t("keywords")}</span>
                       <span className="text-zinc-800 dark:text-zinc-200 text-right max-w-[60%] truncate">{keywords.join(", ")}</span>
                     </div>
                   </div>
@@ -457,7 +456,7 @@ export default function NewDiscoveryJobPage() {
                   disabled={isSubmitting}
                   className="h-10 px-4 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors disabled:opacity-50"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <div className="flex items-center gap-2">
                 <button
@@ -468,7 +467,7 @@ export default function NewDiscoveryJobPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Running...
+                      {t("running")}
                     </>
                   ) : (
                     <>

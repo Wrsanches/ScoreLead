@@ -113,7 +113,7 @@ export function LeadDetailModal({
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${status.bg} ${status.text} ring-1 ${status.ring} hover:brightness-110 transition`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-                      {status.label}
+                      {t(status.labelKey)}
                       {!readOnly && <ChevronDown className="w-3 h-3 opacity-60" />}
                     </button>
                   </DropdownMenuTrigger>
@@ -128,7 +128,7 @@ export function LeadDetailModal({
                           onClick={() => onStatusChange(lead.id, key)}
                         >
                           <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                          <span className="flex-1 text-sm">{cfg.label}</span>
+                          <span className="flex-1 text-sm">{t(cfg.labelKey)}</span>
                           {isCurrent && (
                             <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                           )}
@@ -182,7 +182,7 @@ export function LeadDetailModal({
             <div className="rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white/70 dark:bg-black/25 p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">
-                  Score breakdown
+                  {t("scoreBreakdown")}
                 </p>
                 <span
                   className={`text-xs font-semibold tabular-nums ${scoreColor(lead.score)}`}
@@ -230,7 +230,7 @@ export function LeadDetailModal({
           {/* Contact */}
           <div className="space-y-1.5">
             <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mb-2">
-              Contact
+              {t("contact")}
             </p>
             {lead.website && (
               <ContactRow icon={Globe} label={lead.websiteDomain || lead.website} href={lead.website} external />
@@ -250,7 +250,7 @@ export function LeadDetailModal({
               />
             )}
             {!lead.website && !lead.email && !lead.phone && !lead.instagramHandle && (
-              <p className="text-xs text-zinc-500 dark:text-zinc-600 italic">No contact info.</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-600 italic">{t("noContactInfoShort")}</p>
             )}
           </div>
 
@@ -276,7 +276,7 @@ export function LeadDetailModal({
           {lead.description && (
             <div>
               <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mb-2">
-                About
+                {t("about")}
               </p>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-6">
                 {lead.description}
@@ -297,7 +297,7 @@ export function LeadDetailModal({
             onClick={() => onOpenChange(false)}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200 transition-colors"
           >
-            Open full lead
+            {t("openFullLead")}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>

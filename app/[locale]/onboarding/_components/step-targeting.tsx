@@ -189,6 +189,7 @@ function CompetitorInputs({
   onChange: (values: string[]) => void
   placeholder: string
 }) {
+  const t = useTranslations("onboarding")
   function updateAt(index: number, value: string) {
     const next = [...values]
     next[index] = value
@@ -245,7 +246,7 @@ function CompetitorInputs({
           className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-emerald-400 transition-colors mt-1"
         >
           <Plus className="w-3 h-3" />
-          Add competitor
+          {t("addCompetitor")}
         </button>
       )}
     </div>

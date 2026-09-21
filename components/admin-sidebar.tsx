@@ -13,6 +13,7 @@ import {
   X,
   User,
   LogOut,
+  ShieldCheck,
   LifeBuoy,
   Settings,
   Building2,
@@ -25,6 +26,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
+import { BusinessAvatar } from "@/components/admin/business-avatar";
 import { authClient } from "@/lib/auth-client";
 import { getPathname, Link, useRouter, usePathname } from "@/i18n/routing";
 import { useSearch } from "./search-overlay";
@@ -58,20 +60,6 @@ type SidebarBusiness = Pick<
   | "ownerEmail"
   | "readOnly"
 >;
-
-function getBusinessLogo(b: SidebarBusiness | undefined): string | null {
-  if (!b) return null;
-  if (b.logo) return b.logo;
-  if (b.website) {
-    try {
-      const domain = new URL(b.website).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
 
 export function AdminSidebar({
   open,
@@ -166,8 +154,8 @@ export function AdminSidebar({
           type="button"
           onClick={() => onCollapsedChange(false)}
           className={`hidden h-9 w-9 items-center justify-center rounded-lg text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:flex" : ""}`}
-          title="Expand sidebar"
-          aria-label="Expand sidebar"
+          title={t("expandSidebar")}
+          aria-label={t("expandSidebar")}
         >
           <ScoreLeadLogo className="w-6 h-6" />
         </button>
@@ -178,13 +166,22 @@ export function AdminSidebar({
           <span className="text-zinc-900 dark:text-white font-semibold text-[15px] tracking-tight truncate">
             ScoreLead
           </span>
+          {isPlatformAdmin && (
+            <span
+              className="inline-flex shrink-0 text-orange-500"
+              title={t("platformAdmin")}
+              aria-label={t("platformAdmin")}
+            >
+              <ShieldCheck className="size-4" aria-hidden="true" />
+            </span>
+          )}
         </div>
         <button
           type="button"
           onClick={() => onCollapsedChange(!collapsed)}
           className={`hidden h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:hidden" : "lg:flex"}`}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? t("expandSidebar") : t("collapseSidebar")}
+          aria-label={collapsed ? t("expandSidebar") : t("collapseSidebar")}
           aria-pressed={collapsed}
         >
           {collapsed ? (
@@ -208,26 +205,13 @@ export function AdminSidebar({
               className={`glass-pill group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:brightness-110 transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
               title={selectedBusiness?.name || t("noBusiness")}
             >
-              {getBusinessLogo(selectedBusiness) ? (
-                <span
-                  className={`relative w-6 h-6 rounded-md overflow-hidden shrink-0 block ${collapsed ? "lg:mx-auto" : ""}`}
-                >
-                  <Image
-                    src={getBusinessLogo(selectedBusiness)!}
-                    alt=""
-                    fill
-                    sizes="24px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </span>
-              ) : (
-                <div
-                  className={`w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 ${collapsed ? "lg:mx-auto" : ""}`}
-                >
-                  <Building2 className="w-3.5 h-3.5 text-zinc-500" />
-                </div>
-              )}
+              <BusinessAvatar
+                name={selectedBusiness?.name}
+                logo={selectedBusiness?.logo}
+                website={selectedBusiness?.website}
+                size={24}
+                className={collapsed ? "lg:mx-auto" : ""}
+              />
               <span
                 className={`flex-1 text-sm text-zinc-800 dark:text-zinc-200 text-left truncate ${collapsed ? "lg:hidden" : ""}`}
               >
@@ -254,22 +238,7 @@ export function AdminSidebar({
                 className="px-3 py-2 text-zinc-600 dark:text-zinc-400 focus:text-zinc-800 dark:focus:text-zinc-200 focus:bg-black/[0.05] dark:focus:bg-white/[0.07] rounded-lg cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 w-full">
-                  {getBusinessLogo(b) ? (
-                    <span className="relative w-6 h-6 rounded-md overflow-hidden shrink-0 block">
-                      <Image
-                        src={getBusinessLogo(b)!}
-                        alt=""
-                        fill
-                        sizes="24px"
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </span>
-                  ) : (
-                    <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center shrink-0">
-                      <Building2 className="w-3.5 h-3.5 text-zinc-500" />
-                    </div>
-                  )}
+                  <BusinessAvatar name={b.name} logo={b.logo} website={b.website} size={24} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm truncate">{b.name || "Unnamed"}</p>
                     {isPlatformAdmin && b.ownerEmail ? (

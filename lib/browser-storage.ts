@@ -51,11 +51,13 @@ export function getAnalyticsConsent(): AnalyticsConsent | null {
   // Migrate the pre-subdomain localStorage preference on the visitor's next
   // visit, so existing consent is honored on both scorelead.io hosts.
   if (typeof window !== "undefined") {
-    const legacy = window.localStorage.getItem(CONSENT_KEY)
-    if (legacy === "accepted" || legacy === "declined") {
-      writeSharedCookie(CONSENT_KEY, legacy)
-      return legacy
-    }
+    try {
+      const legacy = window.localStorage.getItem(CONSENT_KEY)
+      if (legacy === "accepted" || legacy === "declined") {
+        writeSharedCookie(CONSENT_KEY, legacy)
+        return legacy
+      }
+    } catch { /* No consent can be inferred from inaccessible storage. */ }
   }
 
   return null
@@ -65,7 +67,7 @@ export function setAnalyticsConsent(consent: AnalyticsConsent) {
   writeSharedCookie(CONSENT_KEY, consent)
   // Keep the legacy value during the migration window and notify listeners in
   // the current tab; cookie writes do not emit the browser storage event.
-  window.localStorage.setItem(CONSENT_KEY, consent)
+  try { window.localStorage.setItem(CONSENT_KEY, consent) } catch { /* The shared cookie is authoritative. */ }
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: consent }))
 }
 

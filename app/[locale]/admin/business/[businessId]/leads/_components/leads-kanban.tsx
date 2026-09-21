@@ -25,6 +25,7 @@ import {
 } from "../_shared";
 import { StatNumber } from "@/components/admin";
 import { getInitials, scoreBadgeClasses } from "@/lib/admin-utils";
+import { useTranslations } from "next-intl";
 
 interface LeadsKanbanProps {
   leads: Lead[];
@@ -137,6 +138,7 @@ function KanbanColumn({
   onCardClick?: (leadId: string) => void;
   readOnly: boolean;
 }) {
+  const t = useTranslations("dashboard");
   const cfg = STATUS_CONFIG[status];
   const { isOver, setNodeRef } = useDroppable({
     id: status,
@@ -156,7 +158,7 @@ function KanbanColumn({
       <div className="flex items-center gap-2 px-3.5 py-3 border-b border-zinc-200/80 dark:border-white/[0.08] shrink-0">
         <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
         <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
-          {cfg.label}
+          {t(cfg.labelKey)}
         </h3>
         <StatNumber
           value={items.length}
@@ -168,7 +170,7 @@ function KanbanColumn({
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {items.length === 0 ? (
           <div className="flex items-center justify-center h-16 text-xs text-zinc-400 dark:text-zinc-700 border border-dashed border-zinc-200/80 dark:border-white/[0.08] rounded-lg">
-            {isOver ? "Drop here" : "Empty"}
+            {isOver ? t("dropHere") : t("empty")}
           </div>
         ) : (
           items.map((lead) => (
@@ -242,6 +244,7 @@ function KanbanCardPreview({ lead }: { lead: Lead }) {
 // ── Shared card body ────────────────────────────────────
 
 function CardContent({ lead }: { lead: Lead }) {
+  const t = useTranslations("dashboard");
   const location = [lead.city, lead.state, lead.country]
     .filter(Boolean)
     .join(", ");
@@ -287,15 +290,15 @@ function CardContent({ lead }: { lead: Lead }) {
         )}
 
         <div className="flex items-center gap-1 mt-1.5">
-          {lead.website && <ContactDot icon={Globe} title="Has website" />}
+          {lead.website && <ContactDot icon={Globe} title={t("hasWebsite")} />}
           {lead.email && (
-            <ContactDot icon={Mail} title={`Email: ${lead.email}`} />
+            <ContactDot icon={Mail} title={`${t("email")}: ${lead.email}`} />
           )}
           {lead.phone && (
-            <ContactDot icon={Phone} title={`Phone: ${lead.phone}`} />
+            <ContactDot icon={Phone} title={`${t("phone")}: ${lead.phone}`} />
           )}
           {lead.firecrawlEnriched && (
-            <ContactDot icon={Bot} title="AI enriched" variant="violet" />
+            <ContactDot icon={Bot} title={t("aiEnriched")} variant="violet" />
           )}
         </div>
       </div>

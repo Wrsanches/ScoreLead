@@ -1,7 +1,8 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Check, Palette, Star, Sparkles, X } from "lucide-react"
+import { Check, Droplet, Droplets, Palette, Pipette, X } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,23 +24,61 @@ function normalize(value: string | null) {
   return value ? value.toLowerCase() : null
 }
 
+const HEX_RE = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+
+/** Accepts "1e88e5", "#1E88E5" or "#fff"; returns a lowercase 6-digit hex or null. */
+function parseHex(input: string): string | null {
+  const raw = input.trim().replace(/^#/, "")
+  if (!HEX_RE.test(`#${raw}`)) return null
+  const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw
+  return `#${full.toLowerCase()}`
+}
+
 function Slot({
   label,
   value,
   emptyLabel,
   icon: Icon,
   accent,
-  onClear,
+  onChange,
   readOnly,
 }: {
   label: string
   value: string | null
   emptyLabel: string
-  icon: typeof Star
+  icon: typeof Droplet
   accent: "emerald" | "sky"
-  onClear: () => void
+  onChange: (color: string | null) => void
   readOnly: boolean
 }) {
+  const t = useTranslations("business")
+  const [draft, setDraft] = useState(value ?? "")
+  const [invalid, setInvalid] = useState(false)
+  const colorInputRef = useRef<HTMLInputElement>(null)
+
+  // Keep the field in sync when the value changes from outside (chip click,
+  // clear, optimistic rollback).
+  useEffect(() => {
+    setDraft(value ?? "")
+    setInvalid(false)
+  }, [value])
+
+  function commit() {
+    if (draft.trim() === "") {
+      setInvalid(false)
+      if (value) onChange(null)
+      return
+    }
+    const parsed = parseHex(draft)
+    if (!parsed) {
+      setInvalid(true)
+      return
+    }
+    setInvalid(false)
+    setDraft(parsed)
+    if (parsed !== normalize(value)) onChange(parsed)
+  }
+
   const ring =
     accent === "emerald"
       ? "ring-emerald-500/30 bg-emerald-500/5"
@@ -50,39 +89,102 @@ function Slot({
       className={`flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-white/[0.08] ring-1 ${ring}`}
     >
       <div className="relative shrink-0">
-        <div
-          className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-white/[0.08] shadow-inner"
+        {/* The swatch doubles as the trigger for the native colour picker. */}
+        <button
+          type="button"
+          disabled={readOnly}
+          onClick={() => colorInputRef.current?.click()}
+          title={t("pickAnyColor")}
+          aria-label={t("pickAnyColor")}
+          className={`group/swatch relative w-10 h-10 rounded-lg border border-zinc-200 dark:border-white/[0.08] shadow-inner overflow-hidden transition-transform ${
+            readOnly ? "cursor-default" : "cursor-pointer hover:scale-[1.04] active:scale-[0.98]"
+          }`}
           style={{
             backgroundColor: value || "transparent",
             backgroundImage: value
               ? undefined
-              : "repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 6px, transparent 6px 12px)",
+              : "repeating-linear-gradient(45deg, rgba(127,127,127,0.18) 0 6px, transparent 6px 12px)",
           }}
-        />
-        <div
-          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white dark:bg-black/25 border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center ${iconColor}`}
         >
-          <Icon className="w-2.5 h-2.5" />
-        </div>
+          {!readOnly && (
+            <span className="absolute inset-0 flex items-center justify-center bg-black/35 text-white opacity-0 group-hover/swatch:opacity-100 transition-opacity">
+              <Pipette className="w-3.5 h-3.5" />
+            </span>
+          )}
+        </button>
+        <input
+          ref={colorInputRef}
+          type="color"
+          tabIndex={-1}
+          aria-hidden="true"
+          disabled={readOnly}
+          value={parseHex(value ?? "") ?? "#808080"}
+          onChange={(e) => onChange(e.target.value.toLowerCase())}
+          className="sr-only"
+        />
       </div>
       <div className="min-w-0 flex-1">
-        <p className={`text-[10px] uppercase tracking-wider font-semibold ${iconColor}`}>
+        <p className={`flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold ${iconColor}`}>
+          <Icon
+            className="w-3 h-3"
+            strokeWidth={2.5}
+            fill={accent === "emerald" ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
           {label}
         </p>
-        {value ? (
-          <p className="text-sm text-zinc-800 dark:text-zinc-200 font-mono tabular-nums uppercase truncate">
-            {value}
-          </p>
+        {readOnly ? (
+          value ? (
+            <p className="text-sm text-zinc-800 dark:text-zinc-200 font-mono tabular-nums uppercase truncate">
+              {value}
+            </p>
+          ) : (
+            <p className="text-sm text-zinc-500 dark:text-zinc-600 italic">{emptyLabel}</p>
+          )
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-600 italic">{emptyLabel}</p>
+          <>
+            <input
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              spellCheck={false}
+              value={draft}
+              placeholder={emptyLabel}
+              maxLength={7}
+              onChange={(e) => {
+                setDraft(e.target.value)
+                if (invalid) setInvalid(false)
+              }}
+              onBlur={commit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  commit()
+                  e.currentTarget.blur()
+                } else if (e.key === "Escape") {
+                  setDraft(value ?? "")
+                  setInvalid(false)
+                  e.currentTarget.blur()
+                }
+              }}
+              aria-label={`${label} ${t("hexColor")}`}
+              aria-invalid={invalid || undefined}
+              className={`w-full bg-transparent text-sm font-mono tabular-nums uppercase text-zinc-800 dark:text-zinc-200 placeholder:normal-case placeholder:italic placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none border-b border-transparent focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors ${
+                invalid ? "text-red-600 dark:text-red-400 border-red-500/60" : ""
+              }`}
+            />
+            {invalid && (
+              <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{t("invalidHex")}</p>
+            )}
+          </>
         )}
       </div>
       {value && !readOnly && (
         <button
           type="button"
-          onClick={onClear}
+          onClick={() => onChange(null)}
           className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.11] transition-colors"
-          aria-label="Clear"
+          aria-label={t("clearAssignment")}
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -103,8 +205,15 @@ export function BrandColorPicker({
   const primaryNorm = normalize(primary)
   const secondaryNorm = normalize(secondary)
 
-  if (colors.length === 0) {
-    return null
+  // Website colours first, then any hand-picked colour that is not among
+  // them, so a custom pick still shows up as a chip that can be reassigned.
+  const palette: string[] = []
+  const seen = new Set<string>()
+  for (const c of [...colors, primary, secondary]) {
+    const norm = normalize(c ?? null)
+    if (!norm || seen.has(norm)) continue
+    seen.add(norm)
+    palette.push(c!)
   }
 
   return (
@@ -114,24 +223,29 @@ export function BrandColorPicker({
           label={t("primaryColor")}
           value={primary}
           emptyLabel={t("noColorAssigned")}
-          icon={Star}
+          icon={Droplet}
           accent="emerald"
-          onClear={() => onPrimaryChange(null)}
+          onChange={onPrimaryChange}
           readOnly={readOnly}
         />
         <Slot
           label={t("secondaryColor")}
           value={secondary}
           emptyLabel={t("noColorAssigned")}
-          icon={Sparkles}
+          icon={Droplets}
           accent="sky"
-          onClear={() => onSecondaryChange(null)}
+          onChange={onSecondaryChange}
           readOnly={readOnly}
         />
       </div>
 
+      {!readOnly && (
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-600">{t("pickAnyColorHint")}</p>
+      )}
+
+      {palette.length > 0 && (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-        {colors.map((color) => {
+        {palette.map((color) => {
           const norm = color.toLowerCase()
           const isPrimary = primaryNorm === norm
           const isSecondary = secondaryNorm === norm
@@ -179,7 +293,7 @@ export function BrandColorPicker({
                         ? t("primaryColor")
                         : isSecondary
                           ? t("secondaryColor")
-                          : "Tap to assign"}
+                          : t("tapToAssign")}
                     </p>
                   </div>
                 </button>
@@ -192,7 +306,7 @@ export function BrandColorPicker({
                   }}
                   disabled={isPrimary}
                 >
-                  <Star className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <Droplet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   {t("setAsPrimary")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -202,7 +316,7 @@ export function BrandColorPicker({
                   }}
                   disabled={isSecondary}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <Droplets className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                   {t("setAsSecondary")}
                 </DropdownMenuItem>
                 {(isPrimary || isSecondary) && (
@@ -224,6 +338,7 @@ export function BrandColorPicker({
           )
         })}
       </div>
+      )}
     </div>
   )
 }

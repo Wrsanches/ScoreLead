@@ -7,6 +7,7 @@ import { ScoreLeadLogo } from "@/components/scorelead-logo"
 import { Link } from "@/i18n/routing"
 import { AnimatePresence, motion } from "framer-motion"
 import { authClient } from "@/lib/auth-client"
+import { useTranslations } from "next-intl"
 import { AiOrb, type OrbState } from "@/components/ai-orb"
 import { NeuralBackground } from "./_components/neural-background"
 import { StepWelcome } from "./_components/step-welcome"
@@ -59,6 +60,7 @@ const STEP_ORDER: Step[] = ["welcome", "primaryLinks", "moreLinks", "location", 
 const PROGRESS_STEPS: Step[] = ["primaryLinks", "moreLinks", "location", "targeting", "review"]
 
 export default function OnboardingPage() {
+  const t = useTranslations("onboarding")
   const router = useRouter()
   const searchParams = useSearchParams()
   const isAddingNew = searchParams.get("new") === "true"
@@ -367,7 +369,7 @@ export default function OnboardingPage() {
           </Link>
           {/* Step progress: the four questions before the AI takes over */}
           {PROGRESS_STEPS.includes(step) && (
-            <ol className="flex items-center gap-1.5" aria-label="Progress">
+            <ol className="flex items-center gap-1.5" aria-label={t("progress")}>
               {PROGRESS_STEPS.map((s, i) => {
                 const currentIdx = PROGRESS_STEPS.indexOf(step)
                 const state = i < currentIdx ? "done" : i === currentIdx ? "current" : "todo"

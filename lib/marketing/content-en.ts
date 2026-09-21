@@ -486,8 +486,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
       },
     ],
     proofLabel: "Methodology and disclosure",
-    proof:
-      "ScoreLead publishes these figures as customer-reported evidence with the known window, baseline, definitions, and limitations visible. Any future revision must preserve the original source and update history rather than silently replacing the numbers.",
+    proof: "These published figures are approved customer-reported results. The first 30 days and previous manual workflow define the comparison; approval does not make this an independent audit.",
     ctaTitle: "Build a prospecting workflow around your own market.",
     ctaDescription: "Define the target, keep the evidence, and measure accepted accounts.",
     ctaLabel: "Start your workflow",
@@ -628,12 +627,12 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "tool-icp-worksheet": {
     eyebrow: "Free tool · ICP worksheet",
-    title: "Build a Usable B2B ICP Worksheet",
+    title: "Free Ideal Customer Profile Worksheet",
     description:
-      "Build a compact B2B ICP with required conditions, preferred signals, disqualifiers, problem evidence, and a clear learning plan.",
+      "Build your ideal customer profile with a free ICP worksheet, completed example, CSV download, and clear criteria for accepting or rejecting accounts.",
     answer:
       "A useful ICP should help a team accept or reject a company consistently. This worksheet turns broad positioning into observable account criteria that can be tested in discovery and revised with sales outcomes.",
-    highlights: ["No account required", "Runs in your browser", "Print or save the completed worksheet"],
+    highlights: ["No account required", "Runs in your browser", "CSV download and print-ready worksheet"],
     sections: [
       {
         heading: "Describe the account, not a fictional buyer",
@@ -662,12 +661,12 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
   },
   "tool-lead-scoring-calculator": {
     eyebrow: "Free tool · Scoring calculator",
-    title: "Build an explainable B2B lead score",
+    title: "Free Lead Scoring Template & Calculator",
     description:
-      "Compare fit, reach, trust, engagement potential, and readiness without hiding the dimensions behind one number.",
+      "Use a free lead scoring template with adjustable weights, disqualifiers, a worked example, and CSV download to prioritize B2B accounts.",
     answer:
       "This calculator creates a transparent weighted score from five account dimensions. It is a prioritization aid: the result should be reviewed against the evidence and calibrated with accepted and rejected accounts.",
-    highlights: ["Adjustable inputs", "Visible formula", "No data is submitted"],
+    highlights: ["Adjustable inputs", "Visible formula", "Adjustable weights and CSV export"],
     sections: [
       {
         heading: "Score each dimension from observable evidence",
@@ -689,7 +688,7 @@ export const marketingContentEn: Record<string, MarketingPageTranslation> = {
       },
     ],
     proofLabel: "Model limitation",
-    proof: "The calculator uses equal weights for demonstration and does not estimate purchase intent.",
+    proof: "The calculator uses your relative weights and planning thresholds. It does not estimate purchase intent or reproduce ScoreLead’s AI model.",
     ctaTitle: "Apply the model to discovered accounts.",
     ctaDescription: "Keep the evidence and score together inside ScoreLead.",
     ctaLabel: "Try ScoreLead scoring",

@@ -75,7 +75,7 @@ export default function DiscoveryJobDetailPage({
     try {
       const res = await fetch(`/api/discovery/jobs/${id}/continue`, { method: "POST" })
       if (res.ok) {
-        toast.success("Finding more leads...")
+        toast.success(t("findingMoreLeads"))
         // Optimistically flip to queued so the poll re-activates.
         setJob((j) => (j ? { ...j, status: "queued" } : j))
         setPollKey((k) => k + 1)
@@ -84,10 +84,10 @@ export default function DiscoveryJobDetailPage({
         openUpgrade(err.action)
       } else {
         const err = await res.json().catch(() => ({}))
-        toast.error(err.error || "Could not continue this job")
+        toast.error(err.error || t("continueDiscoveryFailed"))
       }
     } catch {
-      toast.error("Could not continue this job")
+      toast.error(t("continueDiscoveryFailed"))
     } finally {
       setContinuing(false)
     }
@@ -150,14 +150,16 @@ export default function DiscoveryJobDetailPage({
 
   return (
     <>
-      <PageHeader
-        title={job?.name || "..."}
-        backHref="/admin/discovery-jobs"
-        breadcrumbs={[{ label: t("discoveryJobsTitle") }]}
-      />
-
       <div className="flex-1 overflow-auto">
         <ContentWrapper>
+          <PageHeader
+            title={job?.name || "..."}
+            breadcrumbs={[
+              { label: t("allLeads"), href: "/admin/leads" },
+              { label: t("discovery"), href: "/admin/discovery-jobs" },
+              { label: job?.name || "..." },
+            ]}
+          />
           {!job ? (
             <LoadingState />
           ) : (
@@ -169,7 +171,7 @@ export default function DiscoveryJobDetailPage({
                     <StatusBadge status={job.status} />
                     {job.runs > 0 && (
                       <span className="text-xs text-zinc-500 dark:text-zinc-600">
-                        Run {job.runs + 1}
+                        {t("runNumber", { n: job.runs + 1 })}
                       </span>
                     )}
                   </div>
@@ -225,7 +227,7 @@ export default function DiscoveryJobDetailPage({
                 {job.exhausted && (
                   <div className="mt-4 flex items-center gap-2 p-3 bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-600 dark:text-zinc-400">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-zinc-500" />
-                    No more new leads to find in this area.
+                    {t("discoveryExhausted")}
                   </div>
                 )}
               </div>
@@ -238,13 +240,13 @@ export default function DiscoveryJobDetailPage({
               {/* Stats */}
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Statistics</p>
+                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">{t("statistics")}</p>
                   {stats && stats.totalLeads > 0 && (
                     <button
                       onClick={() => router.push(`/admin/leads?jobId=${id}`)}
                       className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
-                      View all leads
+                      {t("viewAllLeads")}
                       <ExternalLink className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -254,27 +256,27 @@ export default function DiscoveryJobDetailPage({
                   <LoadingState />
                 ) : !stats || stats.totalLeads === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-                    <p className="text-sm">No leads found yet.</p>
+                    <p className="text-sm">{t("noLeadsFoundYet")}</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     {/* Key metrics */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <StatCard label="Total Leads" value={stats.totalLeads} icon={Users} />
-                      <StatCard label="Avg Score" value={stats.avgScore.toFixed(1)} icon={Star} />
-                      <StatCard label="Enriched" value={stats.enrichedCount} icon={Radar} />
+                      <StatCard label={t("totalLeads")} value={stats.totalLeads} icon={Users} />
+                      <StatCard label={t("avgScore")} value={stats.avgScore.toFixed(1)} icon={Star} />
+                      <StatCard label={t("enriched")} value={stats.enrichedCount} icon={Radar} />
                       {stats.avgGoogleRating != null && (
-                        <StatCard label="Avg Google Rating" value={stats.avgGoogleRating.toFixed(1)} icon={Star} />
+                        <StatCard label={t("avgGoogleRating")} value={stats.avgGoogleRating.toFixed(1)} icon={Star} />
                       )}
                     </div>
 
                     {/* Score distribution */}
-                    <SectionCard title="Score Distribution">
+                    <SectionCard title={t("scoreDistribution")}>
                       <div className="flex items-end gap-4">
                         {[
-                          { label: "High (4+)", count: stats.scoreDistribution.high, color: "bg-emerald-500" },
-                          { label: "Medium (3-4)", count: stats.scoreDistribution.medium, color: "bg-amber-500" },
-                          { label: "Low (<3)", count: stats.scoreDistribution.low, color: "bg-red-500" },
+                          { label: t("scoreHigh"), count: stats.scoreDistribution.high, color: "bg-emerald-500" },
+                          { label: t("scoreMedium"), count: stats.scoreDistribution.medium, color: "bg-amber-500" },
+                          { label: t("scoreLow"), count: stats.scoreDistribution.low, color: "bg-red-500" },
                         ].map(({ label, count, color }) => {
                           const pct = stats.totalLeads > 0 ? (count / stats.totalLeads) * 100 : 0
                           return (
@@ -294,12 +296,12 @@ export default function DiscoveryJobDetailPage({
 
                     {/* Contact & Sources */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <SectionCard title="Contact Availability">
+                      <SectionCard title={t("contactAvailability")}>
                         <div className="space-y-3">
                           {[
-                            { label: "Website", count: stats.withWebsite, icon: Globe },
-                            { label: "Email", count: stats.withEmail, icon: Mail },
-                            { label: "Phone", count: stats.withPhone, icon: Phone },
+                            { label: t("website"), count: stats.withWebsite, icon: Globe },
+                            { label: t("email"), count: stats.withEmail, icon: Mail },
+                            { label: t("phone"), count: stats.withPhone, icon: Phone },
                           ].map(({ label, count, icon: Icon }) => {
                             const pct = stats.totalLeads > 0 ? (count / stats.totalLeads) * 100 : 0
                             return (
@@ -320,7 +322,7 @@ export default function DiscoveryJobDetailPage({
                         </div>
                       </SectionCard>
 
-                      <SectionCard title="Sources">
+                      <SectionCard title={t("sources")}>
                         <div className="space-y-3">
                           {Object.entries(stats.sourceBreakdown).map(([source, count]) => {
                             const pct = stats.totalLeads > 0 ? (count / stats.totalLeads) * 100 : 0
@@ -343,7 +345,7 @@ export default function DiscoveryJobDetailPage({
 
                     {/* Duration */}
                     {job.completedAt && (
-                      <SectionCard title="Duration">
+                      <SectionCard title={t("duration")}>
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-zinc-500 dark:text-zinc-600" />
                           <span className="text-sm text-zinc-700 dark:text-zinc-300">

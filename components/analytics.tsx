@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { GoogleAnalytics } from "@next/third-parties/google"
-import { AcquisitionTracker } from "./marketing-analytics"
+import { AcquisitionTracker, AnalyticsEventQueue } from "./marketing-analytics"
+import { clearQueuedMarketingEvents } from "@/lib/analytics-events"
+import { isInternalAnalyticsSession } from "@/lib/analytics-session"
 import {
   getAnalyticsConsent,
   subscribeToAnalyticsConsent,
@@ -23,6 +25,10 @@ export function ConsentGatedAnalytics({
   const [surface, setSurface] = useState<AnalyticsSurface | null>(null)
 
   useEffect(() => {
+    if (isInternalAnalyticsSession()) {
+      clearQueuedMarketingEvents()
+      return
+    }
     const detectedSurface = getAnalyticsSurface(
       window.location.hostname,
       window.location.pathname,
@@ -33,6 +39,8 @@ export function ConsentGatedAnalytics({
     setSurface(detectedSurface)
     setConsent(getAnalyticsConsent() === "accepted")
     return subscribeToAnalyticsConsent((value) => {
+      window.gtag?.("consent", "update", { analytics_storage: value === "accepted" ? "granted" : "denied" })
+      if (value !== "accepted") clearQueuedMarketingEvents()
       setConsent(value === "accepted")
     })
   }, [appGaId, publicGaId])
@@ -44,6 +52,7 @@ export function ConsentGatedAnalytics({
     <>
       <GoogleAnalytics gaId={gaId} />
       {surface === "public" ? <AcquisitionTracker /> : null}
+      <AnalyticsEventQueue />
     </>
   )
 }

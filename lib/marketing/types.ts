@@ -35,6 +35,7 @@ export type MarketingPageDefinition = {
   group: MarketingPageGroup
   slug: string
   pathname: string
+  publishedAt?: string
   updatedAt: string
   keywords: string[]
   relatedBlogSlugs: string[]

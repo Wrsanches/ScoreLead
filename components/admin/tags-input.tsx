@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, CornerDownLeft } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface TagsInputProps {
   value: string
@@ -42,6 +43,7 @@ export function TagsInput({
   arrayValue,
   onArrayChange,
 }: TagsInputProps) {
+  const t = useTranslations("dashboard")
   const [inputValue, setInputValue] = useState("")
 
   const tags = asArray && arrayValue
@@ -115,7 +117,7 @@ export function TagsInput({
                 type="button"
                 onClick={() => removeTag(i)}
                 className={chipRemoveClassName}
-                aria-label="Remove"
+                aria-label={t("remove")}
               >
                 <X className="w-3 h-3" />
               </button>

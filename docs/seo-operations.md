@@ -128,6 +128,8 @@ and compare only sessions collected after it.
 
 Create GA4 custom dimensions for:
 
+- `locale` (event scope)
+- `tool` and `action` (event scope)
 - `acquisition_channel`
 - `acquisition_source`
 - `first_touch_channel`
@@ -157,10 +159,10 @@ later rolling 28-day periods with that baseline.
 
 ## Ahrefs Rank Tracker
 
-Use the existing `scorelead.io` project and retain its 12 US keywords. Add the
-expanded set from `docs/seo-keyword-map.csv`, using the United States for
-English, Brazil for Portuguese, and Spain or the primary Spanish-speaking sales
-market for Spanish. Keep the CSV's page ownership and tags so cannibalization
+The September 21 audit found 32 tracked keywords: 18 US, 7 BR, and 7 ES.
+Keep those existing markets and reconcile the local `docs/seo-keyword-map.csv`
+against the live list before adding anything. The CSV records intended page
+ownership; editing it does not import keywords into Ahrefs. Keep the CSV's page ownership and tags so cannibalization
 can be reviewed consistently.
 
 Review weekly:
@@ -206,3 +208,46 @@ count:
    justification is DR.
 5. Judge the program by relevant earned links, referral engagement, assisted
    signups, and commercial rankings—not total referring domains.
+
+## September 21 implementation and account handoff
+
+See [implementation and distribution plan](seo-implementation-2026-09-21.md)
+for the dated evidence, completed changes and launch checks.
+
+- An initial URL tagged `utm_medium=internal_test` now suppresses analytics for
+  that host's tab session. Open a fresh tab on each host when testing. Preview
+  and localhost remain excluded. This does not filter historical GA4 data.
+- Search Console (`search.google.com`) and Mail referrals are now classified
+  as referrals in ScoreLead attribution, not Google organic traffic. The
+  application classification does not override GA4's native channel grouping.
+- Explicit campaign UTMs take precedence over referrer classification. Stripe
+  returns and navigation between production hosts preserve non-direct touch.
+- Event delivery now drains consented events on both public and app hosts;
+  revoking consent discards undelivered events. Field contents are never sent
+  with worksheet/scoring events. Downloads and print requests are tool actions,
+  not qualified leads or evidence of a completed sale.
+- ScoreLead App was created and connected to Windsor on September 21: property
+  `555227054`, web stream `15818262903`, measurement ID `G-3RXJLNF5KG`.
+  ScoreLead Web remains property `531207288`, stream `14306888128`, measurement
+  ID `G-NSQBJHL4Z0`. The properties are separate; first-party attribution fields
+  carry the acquisition context into product events. Do not sum their users or
+  sessions as if they were a deduplicated cross-property funnel.
+- Both properties now have all 16 event-scoped dimensions listed above. The
+  public property already had 13; `locale`, `tool`, and `action` were added.
+  The app property has the four specified key events, counted per event with
+  no invented default monetary value. Actual conversion events still require
+  the corresponding real user actions.
+- Stripe checkout/billing exclusions were already configured on the public
+  stream. Exact-match exclusions for `checkout.stripe.com` and
+  `billing.stripe.com` were saved on the app stream.
+- `NEXT_PUBLIC_GA_APP_ID` was added to Railway production and deployed. Both
+  public measurement IDs were set in `.env.local`. A consented browser check
+  verified the intended tag on each host; GA4 app Realtime showed `first_visit`,
+  `page_view`, and `session_start`. This diagnostic visit is not a conversion.
+- Windsor reconnection used the user's explicitly approved read-only Analytics
+  and basic profile/email scope. Its connector inventory now includes ScoreLead
+  App, and an app-only report request succeeded. Standard reports were still
+  empty immediately after setup; allow processing before establishing a baseline.
+- Team-IP exclusions still require the team's actual fixed IPs; no addresses
+  were invented and no permanent traffic filter was activated. Use the existing
+  `internal_test` exclusion for subsequent application diagnostics.

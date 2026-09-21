@@ -33,7 +33,7 @@ export function CookieConsent() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 p-4 md:left-auto md:bottom-4 md:right-4 md:p-0 z-50 transition-all duration-500 ease-out ${
+      className={`print:hidden fixed bottom-0 left-0 right-0 p-4 md:left-auto md:bottom-4 md:right-4 md:p-0 z-50 transition-all duration-500 ease-out ${
         visible
           ? "translate-y-0 opacity-100"
           : "translate-y-4 opacity-0 pointer-events-none"

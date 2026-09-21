@@ -111,7 +111,7 @@ export default function AdminPage({
                 }}
                 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-semibold tracking-tight leading-tight"
               >
-                {hasRunningJobs ? "Your AI is working" : "Welcome back"}
+                {hasRunningJobs ? t("aiWorking") : t("welcomeBack")}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
@@ -125,7 +125,7 @@ export default function AdminPage({
               >
                 {hasRunningJobs
                   ? `${stats?.jobs.running} discovery job${(stats?.jobs.running ?? 0) > 1 ? "s" : ""} running in the background.`
-                  : "Overview of your leads, discovery jobs, and pipeline activity."}
+                  : "Overview of your leads, discovery runs, and pipeline activity."}
               </motion.p>
             </div>
             {/* Hero AI orb — matches onboarding pattern. No fixed-size wrapper
@@ -152,7 +152,7 @@ export default function AdminPage({
         ) : !stats ? (
           <EmptyState
             icon={AlertTriangle}
-            title="Failed to load dashboard data."
+            title={t("dashboardLoadFailed")}
           />
         ) : (
           <div className="space-y-6">
@@ -170,19 +170,19 @@ export default function AdminPage({
                 label={t("score")}
                 value={stats.leads.avgScore.toFixed(1)}
                 icon={Star}
-                sub="avg across all leads"
+                sub={t("avgAcrossLeads")}
                 accent="amber"
               />
               <StatCard
                 label={t("discoveryJobs")}
                 value={stats.jobs.total}
                 icon={Radar}
-                sub={`${stats.jobs.completed} completed`}
+                sub={t("nCompleted", { n: stats.jobs.completed })}
                 href="/admin/discovery-jobs"
                 accent="sky"
               />
               <StatCard
-                label="Enriched"
+                label={t("enriched")}
                 value={stats.leads.enriched}
                 icon={TrendingUp}
                 sub={
@@ -196,7 +196,7 @@ export default function AdminPage({
 
             {/* Charts row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <SectionCard title="Leads - Last 7 days">
+              <SectionCard title={t("leadsLast7Days")}>
                 {stats.charts.leadsOverTime.length > 0 ? (
                   <ChartContainer config={chartConfig} className="h-50 w-full">
                     <AreaChart
@@ -258,12 +258,12 @@ export default function AdminPage({
                   </ChartContainer>
                 ) : (
                   <div className="h-50 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
-                    No data yet
+                    {t("noDataYet")}
                   </div>
                 )}
               </SectionCard>
 
-              <SectionCard title="Score Distribution">
+              <SectionCard title={t("scoreDistribution")}>
                 {stats.charts.scoreDistribution.length > 0 ? (
                   <ChartContainer config={chartConfig} className="h-50 w-full">
                     <BarChart
@@ -306,7 +306,7 @@ export default function AdminPage({
                   </ChartContainer>
                 ) : (
                   <div className="h-50 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
-                    No data yet
+                    {t("noDataYet")}
                   </div>
                 )}
               </SectionCard>
@@ -314,11 +314,11 @@ export default function AdminPage({
 
             {/* Source + Contact + Jobs */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <SectionCard title="Sources">
+              <SectionCard title={t("sources")}>
                 {stats.charts.sourceBreakdown.length > 0 ? (
                   <div className="flex items-center gap-6">
                     <ChartContainer
-                      config={{ count: { label: "Leads" } }}
+                      config={{ count: { label: t("leads") } }}
                       className="h-35 w-35 shrink-0"
                     >
                       <PieChart>
@@ -366,27 +366,27 @@ export default function AdminPage({
                   </div>
                 ) : (
                   <div className="h-35 flex items-center justify-center text-zinc-500 dark:text-zinc-600 text-sm">
-                    No data yet
+                    {t("noDataYet")}
                   </div>
                 )}
               </SectionCard>
 
-              <SectionCard title="Contact Availability">
+              <SectionCard title={t("contactAvailability")}>
                 <div className="space-y-4">
                   {(
                     [
                       {
-                        label: "Website",
+                        label: t("website"),
                         count: stats.leads.withWebsite,
                         icon: Globe,
                       },
                       {
-                        label: "Email",
+                        label: t("email"),
                         count: stats.leads.withEmail,
                         icon: Mail,
                       },
                       {
-                        label: "Phone",
+                        label: t("phone"),
                         count: stats.leads.withPhone,
                         icon: Phone,
                       },
@@ -422,13 +422,13 @@ export default function AdminPage({
               </SectionCard>
 
               <SectionCard
-                title="Recent Jobs"
+                title={t("recentDiscoveries")}
                 actions={
                   <Link
                     href="/admin/discovery-jobs"
                     className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                   >
-                    View all <ArrowRight className="w-3 h-3" />
+                    {t("viewAll")} <ArrowRight className="w-3 h-3" />
                   </Link>
                 }
               >
@@ -453,20 +453,20 @@ export default function AdminPage({
                     ))}
                   </div>
                 ) : (
-                  <EmptyState icon={Radar} title="No jobs yet" />
+                  <EmptyState icon={Radar} title={t("noJobsYet")} />
                 )}
               </SectionCard>
             </div>
 
             {/* Recent leads */}
             <SectionCard
-              title="Recent Leads"
+              title={t("recentLeads")}
               actions={
                 <Link
                   href="/admin/leads"
                   className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
                 >
-                  View all <ArrowRight className="w-3 h-3" />
+                  {t("viewAll")} <ArrowRight className="w-3 h-3" />
                 </Link>
               }
             >
@@ -495,7 +495,7 @@ export default function AdminPage({
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
-                          {lead.name || "Unknown"}
+                          {lead.name || t("unknown")}
                         </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-600 truncate">
                           {[lead.city, lead.country]
@@ -514,8 +514,8 @@ export default function AdminPage({
               ) : (
                 <EmptyState
                   icon={Users}
-                  title="No leads yet"
-                  description="Run a discovery job to get started."
+                  title={t("noLeadsYet")}
+                  description={t("dashboardEmptyDesc")}
                 />
               )}
             </SectionCard>

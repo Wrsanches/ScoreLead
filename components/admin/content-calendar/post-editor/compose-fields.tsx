@@ -101,7 +101,7 @@ export function ComposeFields({ values, onChange }: ComposeFieldsProps) {
     ? POST_TYPES
     : [
         ...POST_TYPES,
-        { key: values.postType, label: values.postType === "reel" ? "Reel" : "Story" },
+        { key: values.postType, label: values.postType === "reel" ? t("postTypeReel") : t("postTypeStory") },
       ];
 
   return (

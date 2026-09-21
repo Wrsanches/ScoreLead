@@ -15,6 +15,7 @@ import {
   getBlogUi,
 } from "@/lib/blog";
 import {
+  marketingPages,
   getMarketingPageByPath,
   getMarketingTranslation,
 } from "@/lib/marketing";
@@ -116,6 +117,8 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
     relatedMarketingPage,
     normalizedLocale,
   );
+  const relatedTools = marketingPages.filter(page => page.group === "tools" && page.relatedBlogSlugs.includes(post.slug) && page.pathname !== post.relatedMarketingPath);
+  const toolLinkLabel = { en: "Put this guide into practice", pt: "Coloque este guia em prática", es: "Pon esta guía en práctica" }[normalizedLocale];
   const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
   const image = `${siteConfig.url}/images/blog-og.png`;
   const related = blogPosts
@@ -402,6 +405,21 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                   {ui.productGuide}: {relatedMarketingTranslation.title}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
+                {relatedTools.length ? (
+                  <div className="mt-6 border-t border-white/10 pt-5">
+                    <p className="text-sm text-zinc-400">{toolLinkLabel}</p>
+                    <ul className="mt-3 grid gap-3">
+                      {relatedTools.map(tool => (
+                        <li key={tool.id}>
+                          <Link href={`/${tool.pathname}`} className="surface-card group flex min-h-12 items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-medium leading-6 text-zinc-200 transition-colors hover:bg-white/[0.06] hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400">
+                            {getMarketingTranslation(tool, normalizedLocale).title}
+                            <ArrowRight className="size-4 shrink-0 text-zinc-500 transition-colors group-hover:text-emerald-300" aria-hidden="true" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </section>
 
               <section

@@ -9,7 +9,7 @@ import { getBusinessAccess } from "@/lib/business-access"
 import { getManageableLead } from "@/lib/whatsapp/data"
 
 /** Allowed lead statuses. Must match STATUS_CONFIG on the client. */
-export const LEAD_STATUSES = [
+const LEAD_STATUSES = [
   "new",
   "contacted",
   "interested",
@@ -100,4 +100,33 @@ export async function PATCH(
     .returning()
 
   return NextResponse.json(updated)
+}
+
+/**
+ * Permanently removes a lead. Messages, WhatsApp threads and consent events
+ * cascade at the database level; content posts that referenced the lead keep
+ * their row with the reference cleared.
+ */
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const { id } = await params
+
+  const manageable = await getManageableLead(id, session.user.id)
+  if (!manageable) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 })
+  }
+
+  await db.delete(lead).where(eq(lead.id, id))
+
+  return NextResponse.json({ ok: true })
 }

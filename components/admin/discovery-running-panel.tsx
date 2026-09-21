@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Search } from "lucide-react"
 import { AiOrb } from "@/components/ai-orb"
+import { useTranslations } from "next-intl"
 
 interface RunningJob {
   status: string
@@ -41,6 +42,7 @@ function LiveStat({ label, value }: { label: string; value: number }) {
 }
 
 export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
+  const t = useTranslations("dashboard")
   const queued = job.status === "queued" || job.status === "pending"
   // insertedLeads is cumulative across batches; the target grows by the
   // per-run cap (maxResults) for each Continue run so the bar stays 0-100%.
@@ -74,7 +76,7 @@ export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
             <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
-              {queued ? "Queued, starting soon" : "Discovering leads"}
+              {queued ? t("queuedStarting") : t("discoveringLeads")}
             </h2>
           </div>
 
@@ -100,7 +102,7 @@ export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
       {/* progress toward the target lead count */}
       <div className="relative mt-6">
         <div className="mb-1.5 flex items-center justify-between text-xs text-zinc-500">
-          <span>Leads added</span>
+          <span>{t("leadsAdded")}</span>
           <span className="tabular-nums">
             {job.insertedLeads}
             {target ? ` / ${target}` : ""}
@@ -117,10 +119,10 @@ export function DiscoveryRunningPanel({ job }: { job: RunningJob }) {
 
       {/* live counters */}
       <div className="relative mt-6 grid grid-cols-4 gap-4">
-        <LiveStat label="Found" value={job.totalFound} />
-        <LiveStat label="Added" value={job.insertedLeads} />
-        <LiveStat label="Duplicates" value={job.duplicateLeads} />
-        <LiveStat label="Queries" value={job.completedQueries} />
+        <LiveStat label={t("found")} value={job.totalFound} />
+        <LiveStat label={t("added")} value={job.insertedLeads} />
+        <LiveStat label={t("duplicates")} value={job.duplicateLeads} />
+        <LiveStat label={t("queries")} value={job.completedQueries} />
       </div>
     </motion.div>
   )

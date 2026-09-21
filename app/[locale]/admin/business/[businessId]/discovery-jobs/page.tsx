@@ -95,11 +95,11 @@ export default function DiscoveryJobsPage() {
     try {
       const res = await fetch(`/api/discovery/jobs/${jobId}/cancel`, { method: "POST" })
       if (res.ok) {
-        toast.success("Job cancelled")
+        toast.success(t("discoveryCancelled"))
         fetchJobs()
       }
     } catch {
-      toast.error("Failed to cancel job")
+      toast.error(t("cancelDiscoveryFailed"))
     }
   }
 
@@ -111,17 +111,17 @@ export default function DiscoveryJobsPage() {
     try {
       const res = await fetch(`/api/discovery/jobs/${jobId}/continue`, { method: "POST" })
       if (res.ok) {
-        toast.success("Finding more leads...")
+        toast.success(t("findingMoreLeads"))
         await fetchJobs() // status flips to queued -> polling reactivates
       } else if (res.status === 402) {
         const err = await res.json().catch(() => ({}))
         openUpgrade(err.action)
       } else {
         const err = await res.json().catch(() => ({}))
-        toast.error(err.error || "Could not continue this job")
+        toast.error(err.error || t("continueDiscoveryFailed"))
       }
     } catch {
-      toast.error("Could not continue this job")
+      toast.error(t("continueDiscoveryFailed"))
     } finally {
       setContinuingId(null)
     }
@@ -131,10 +131,9 @@ export default function DiscoveryJobsPage() {
     <div className="flex-1 overflow-auto">
       <ContentWrapper>
         <PageHeader
-          variant="hero"
           title={t("discoveryJobsTitle")}
           description={t("discoveryJobsDesc")}
-          breadcrumbs={[{ label: t("discovery") }]}
+          breadcrumbs={[{ label: t("allLeads"), href: "/admin/leads" }, { label: t("discovery") }]}
           actions={!readOnly ? (
             <Link
               href="/admin/discovery-jobs/new"
@@ -222,7 +221,7 @@ export default function DiscoveryJobsPage() {
                           <button
                             onClick={(e) => handleCancel(job.id, e)}
                             className="p-1 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
-                            title="Cancel job"
+                            title={t("cancelDiscovery")}
                           >
                             <XCircle className="w-4 h-4" />
                           </button>
@@ -231,10 +230,10 @@ export default function DiscoveryJobsPage() {
                             onClick={(e) => handleContinue(job.id, e)}
                             disabled={continuingId === job.id}
                             className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 disabled:opacity-50 transition-colors"
-                            title="Find more leads"
+                            title={t("findMoreLeads")}
                           >
                             <Plus className="w-3.5 h-3.5" />
-                            More
+                            {t("more")}
                           </button>
                         ) : (
                           <ChevronRight className="w-4 h-4 text-zinc-400 dark:text-zinc-700 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors" />
@@ -284,7 +283,7 @@ export default function DiscoveryJobsPage() {
                               {job.currentQuery}
                             </span>
                           ) : (
-                            <span className="text-[11px] text-zinc-500 dark:text-zinc-600">Starting...</span>
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-600">{t("starting")}</span>
                           )}
                         </div>
                         <span className="shrink-0 text-[11px] text-zinc-500 dark:text-zinc-600 tabular-nums">

@@ -77,11 +77,10 @@ export default function LeadsKanbanPage() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="px-6 pt-6 shrink-0">
+      <div className="px-6 md:px-8 pt-8 shrink-0">
         <PageHeader
-          variant="hero"
           title={t("pipeline")}
-          description="Drag cards between columns to move leads through your pipeline."
+          description={t("pipelineDesc")}
           breadcrumbs={[{ label: t("allLeads"), href: "/admin/leads" }, { label: t("pipeline") }]}
         />
       </div>
@@ -91,8 +90,8 @@ export default function LeadsKanbanPage() {
       ) : leads.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No leads yet"
-          description="Run a discovery job to start populating your pipeline."
+          title={t("noLeadsYet")}
+          description={t("pipelineEmptyDesc")}
         />
       ) : (
         <LeadsKanban

@@ -7,6 +7,7 @@ import {
   relatedGuideIcon as RelatedGuideIcon,
 } from "@/lib/marketing/page-icons";
 import { MarketingPlatformImage } from "@/components/marketing-platform-image";
+import { MarketingComparison } from "@/components/marketing-comparison";
 import { MarketingTool } from "@/components/marketing-tool";
 import { Navbar } from "@/components/navbar";
 import { TrackedLink } from "@/components/tracked-link";
@@ -93,7 +94,7 @@ export function MarketingPageView({
             headline: translation.title,
             description: translation.description,
             url: canonical,
-            datePublished: page.updatedAt,
+            datePublished: page.publishedAt ?? page.updatedAt,
             dateModified: page.updatedAt,
             inLanguage: getLocaleConfig(normalizedLocale).htmlLang,
             author: { "@id": `${siteConfig.url}/#organization` },
@@ -133,7 +134,7 @@ export function MarketingPageView({
   };
 
   return (
-    <div className="marketing-canvas min-h-screen text-zinc-100">
+    <div className="marketing-page marketing-canvas min-h-screen text-zinc-100">
       <JsonLd data={jsonLd} />
       <Navbar />
 
@@ -173,7 +174,16 @@ export function MarketingPageView({
               {translation.description}
             </p>
 
-            <MarketingPlatformImage page={page} locale={normalizedLocale} />
+            {page.group === "tools" ? (
+              <div className="mt-10" data-tool-container>
+                <MarketingTool slug={page.slug} locale={normalizedLocale} />
+              </div>
+            ) : page.group === "compare" ? (
+              <MarketingComparison pageId={page.id} locale={normalizedLocale} />
+            ) : (
+              <MarketingPlatformImage page={page} locale={normalizedLocale} />
+            )}
+            {page.group === "case-studies" ? <p className="mt-5 text-xs text-zinc-400">{ui.lastReviewed}: <time dateTime={page.updatedAt}>{new Intl.DateTimeFormat(getLocaleConfig(normalizedLocale).htmlLang, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${page.updatedAt}T00:00:00Z`))}</time></p> : null}
           </div>
         </header>
 
@@ -244,16 +254,6 @@ export function MarketingPageView({
           </div>
         </section>
 
-        {page.group === "tools" ? (
-          <section
-            className="border-t border-white/[0.06] px-6 py-16 sm:py-20"
-            aria-label={translation.title}
-          >
-            <div className="mx-auto max-w-5xl">
-              <MarketingTool slug={page.slug} locale={normalizedLocale} />
-            </div>
-          </section>
-        ) : null}
 
         {/* ── Body sections ────────────────────────────────────
             The only place a number appears, and it hangs beside

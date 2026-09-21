@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import {
-  Building2,
   Globe,
   Link2,
   MapPin,
@@ -33,6 +32,7 @@ import {
 } from "@/components/admin/business-edit-sheet"
 import type { ProductImage } from "@/lib/product-images"
 import { useBusinessAccess } from "@/components/admin/business-context"
+import { BusinessAvatar } from "@/components/admin/business-avatar"
 
 interface Business {
   id: string
@@ -61,16 +61,6 @@ interface Business {
   competitors: string | null
   suggestedKeywords: string[] | null
   productImages: ProductImage[] | null
-}
-
-function getFaviconUrl(website: string | null): string | null {
-  if (!website) return null
-  try {
-    const domain = new URL(website).hostname
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
-  } catch {
-    return null
-  }
 }
 
 function parseTags(tags: string | null): string[] {
@@ -274,14 +264,6 @@ export default function BusinessDetailPage() {
     }
   }, [id])
 
-  const logo = data?.logo || getFaviconUrl(data?.website || null)
-  const initials = (data?.name || "")
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-
   const tags = parseTags(data?.tags || null)
   const servicesList = parseTags(data?.services || null)
   const competitorsList = parseTags(data?.competitors || null)
@@ -299,14 +281,13 @@ export default function BusinessDetailPage() {
 
   return (
     <>
-      <PageHeader
-        title={data?.name || t("title")}
-        backHref="/admin"
-        breadcrumbs={[{ label: t("title") }]}
-      />
-
       <div className="flex-1 overflow-auto">
         <ContentWrapper>
+          <PageHeader
+            title={t("title")}
+            description={t("description")}
+            breadcrumbs={[{ label: t("title") }]}
+          />
           {loading ? (
             <LoadingState />
           ) : error || !data ? (
@@ -315,27 +296,20 @@ export default function BusinessDetailPage() {
             <div className="space-y-6">
               {/* Hero */}
               <div className="flex items-start gap-5">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center shrink-0">
-                  {logo ? (
-                    <Image
-                      src={logo}
-                      alt=""
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                    />
-                  ) : initials ? (
-                    <span className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300">{initials}</span>
-                  ) : (
-                    <Building2 className="w-8 h-8 text-zinc-500 dark:text-zinc-600" />
-                  )}
-                </div>
+                <BusinessAvatar
+                  name={data?.name}
+                  logo={data?.logo}
+                  website={data?.website}
+                  size={80}
+                  rounded="rounded-2xl"
+                  textClassName="text-2xl font-semibold"
+                  className="border border-zinc-200 dark:border-white/[0.08]"
+                />
 
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-medium tracking-tight">
+                  <h2 className="text-2xl md:text-3xl text-zinc-900 dark:text-white font-medium tracking-tight">
                     {data.name || t("untitled")}
-                  </h1>
+                  </h2>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     {data.field && (
                       <span className="flex items-center gap-1.5">
@@ -447,24 +421,25 @@ export default function BusinessDetailPage() {
                     <span>{brandError}</span>
                   </div>
                 )}
-                {hasBrand ? (
-                  <div className="space-y-5">
-                    {hasBrandColors && (
-                      <Field label={t("brandColors")}>
-                        <BrandColorPicker
-                          colors={data.brandColors!}
-                          primary={data.brandColorPrimary}
-                          secondary={data.brandColorSecondary}
-                          readOnly={readOnly}
-                          onPrimaryChange={(color) =>
-                            updateBrandColors({ brandColorPrimary: color })
-                          }
-                          onSecondaryChange={(color) =>
-                            updateBrandColors({ brandColorSecondary: color })
-                          }
-                        />
-                      </Field>
-                    )}
+                <div className="space-y-5">
+                  {/* Colours are always editable: detected ones become chips,
+                      and any hex can be typed or picked regardless. */}
+                  <Field label={t("brandColors")}>
+                    <BrandColorPicker
+                      colors={data.brandColors ?? []}
+                      primary={data.brandColorPrimary}
+                      secondary={data.brandColorSecondary}
+                      readOnly={readOnly}
+                      onPrimaryChange={(color) =>
+                        updateBrandColors({ brandColorPrimary: color })
+                      }
+                      onSecondaryChange={(color) =>
+                        updateBrandColors({ brandColorSecondary: color })
+                      }
+                    />
+                  </Field>
+                  {hasBrand ? (
+                  <>
                     {hasBrandFonts && (
                       <Field label={t("brandFonts")}>
                         <div className="flex flex-wrap gap-2">
@@ -488,16 +463,17 @@ export default function BusinessDetailPage() {
                         </p>
                       </Field>
                     )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center mb-3">
-                      <Palette className="w-5 h-5 text-zinc-500 dark:text-zinc-600" />
+                  </>
+                  ) : (
+                  <div className="flex items-start gap-2.5 rounded-lg border border-dashed border-zinc-200 dark:border-white/[0.08] px-3 py-2.5">
+                    <Palette className="w-4 h-4 shrink-0 mt-0.5 text-zinc-500 dark:text-zinc-600" />
+                    <div>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("noBrand")}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-0.5">{t("noBrandHint")}</p>
                     </div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("noBrand")}</p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">{t("noBrandHint")}</p>
                   </div>
-                )}
+                  )}
+                </div>
               </SectionCard>
 
               {/* Product images */}

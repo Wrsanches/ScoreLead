@@ -486,8 +486,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
       },
     ],
     proofLabel: "Metodología y divulgación",
-    proof:
-      "ScoreLead publica estas cifras como evidencia reportada por el cliente, con ventana, baseline, definiciones y límites visibles. Cualquier revisión futura debe conservar la fuente y el historial de actualización.",
+    proof: "Las cifras publicadas son resultados comunicados y aprobados por el cliente. La comparación abarca los primeros 30 días y el proceso manual anterior; la aprobación no constituye una auditoría independiente.",
     ctaTitle: "Crea un flujo para tu propio mercado.",
     ctaDescription: "Define el objetivo, conserva evidencia y mide cuentas aceptadas.",
     ctaLabel: "Iniciar tu flujo",
@@ -628,12 +627,12 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "tool-icp-worksheet": {
     eyebrow: "Herramienta gratis · Hoja de ICP",
-    title: "ICP B2B con Criterios de Búsqueda",
+    title: "Plantilla de ICP Gratis con Ejemplo",
     description:
-      "Crea un ICP B2B compacto y accionable con requisitos, preferencias, descalificadores, evidencia observable y un plan de aprendizaje.",
+      "Define tu perfil de cliente ideal con una plantilla de ICP gratis, ejemplo completo y descarga CSV para fijar requisitos y descalificadores.",
     answer:
       "Un ICP útil ayuda a aceptar o rechazar empresas con consistencia. Esta hoja convierte posicionamiento amplio en criterios observables.",
-    highlights: ["Sin cuenta", "Funciona en el navegador", "Imprime o guarda la hoja"],
+    highlights: ["Sin cuenta", "Funciona en el navegador", "Descarga CSV e impresión de la plantilla"],
     sections: [
       {
         heading: "Describe la cuenta, no un comprador ficticio",
@@ -662,12 +661,12 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
   },
   "tool-lead-scoring-calculator": {
     eyebrow: "Herramienta gratis · Calculadora de score",
-    title: "Crea una puntuación B2B explicable",
+    title: "Plantilla y Calculadora de Lead Scoring",
     description:
-      "Compara ajuste, alcance, confianza, interacción y preparación con una calculadora de lead scoring B2B transparente y gratuita.",
+      "Usa una plantilla de lead scoring gratis con pesos ajustables, descalificadores, ejemplo y descarga CSV para priorizar cuentas B2B con criterios claros.",
     answer:
       "La calculadora crea un promedio transparente de cinco dimensiones. Ayuda a priorizar y debe revisarse contra la evidencia.",
-    highlights: ["Entradas ajustables", "Fórmula visible", "Ningún dato enviado"],
+    highlights: ["Entradas ajustables", "Fórmula visible", "Pesos ajustables y exportación CSV"],
     sections: [
       {
         heading: "Puntúa con evidencia observable",
@@ -683,7 +682,7 @@ export const marketingContentEs: Record<string, MarketingPageTranslation> = {
       },
     ],
     proofLabel: "Limitación",
-    proof: "La calculadora usa pesos iguales y no estima intención de compra.",
+    proof: "La calculadora usa tus pesos relativos y umbrales de planificación. No estima intención de compra ni reproduce el modelo de IA de ScoreLead.",
     ctaTitle: "Aplica el modelo a cuentas descubiertas.",
     ctaDescription: "Mantén evidencia y puntuación juntas en ScoreLead.",
     ctaLabel: "Probar scoring",

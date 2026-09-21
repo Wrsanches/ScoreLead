@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 export default function InstagramIntegrationPage() {
   const t = useTranslations("integrations")
   const ti = useTranslations("instagram")
+  const td = useTranslations("dashboard")
   const locale = useLocale()
   const { businessId, readOnly } = useBusinessAccess()
   const { data, busy, loadError, oauthResult, connected, connect, disconnect, retry } =
@@ -27,11 +28,11 @@ export default function InstagramIntegrationPage() {
     <div className="flex-1 overflow-y-auto">
       <ContentWrapper>
         <PageHeader
-          variant="hero"
           title={t("instagramSetupTitle")}
           description={t("instagramSetupDescription")}
           breadcrumbs={[
-            { label: t("backToIntegrations"), href: "/admin/integrations" },
+            { label: td("businessPage"), href: "/admin/profile" },
+            { label: t("title"), href: "/admin/integrations" },
             { label: t("instagramSetupTitle") },
           ]}
         />

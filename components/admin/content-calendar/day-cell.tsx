@@ -5,6 +5,7 @@ import { Plus } from "lucide-react"
 import { motion } from "framer-motion"
 import { PostChip } from "./post-chip"
 import type { ContentPostRow } from "./types"
+import { useTranslations } from "next-intl"
 
 interface DayCellProps {
   date: Date
@@ -31,6 +32,7 @@ export function DayCell({
   animationIndex,
   readOnly = false,
 }: DayCellProps) {
+  const t = useTranslations("contentCalendar")
   const { isOver, setNodeRef } = useDroppable({
     id: `day-${date.toISOString().slice(0, 10)}`,
     data: { date },
@@ -81,7 +83,7 @@ export function DayCell({
               onAdd(date)
             }}
             className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 rounded-md flex items-center justify-center text-zinc-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10"
-            aria-label="Add post"
+            aria-label={t("addPost")}
           >
             <Plus className="w-3 h-3" />
           </button>

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
 import { useLocale, useTranslations } from "next-intl"
 import {
   Sheet,
@@ -11,12 +10,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { TagsInput } from "@/components/admin/tags-input"
+import { BusinessAvatar } from "@/components/admin/business-avatar"
 import { BusinessProductImages } from "@/components/admin/business-product-images"
 import { getTranslatedCategories } from "@/lib/categories"
 import type { ProductImage } from "@/lib/product-images"
 import { uploadImage, UploadError } from "@/lib/upload-client"
 import { toast } from "sonner"
-import { Loader2, Check, Upload, ImageIcon, Building2 } from "lucide-react"
+import { Loader2, Check, Upload, ImageIcon } from "lucide-react"
 
 export interface BusinessEditValues {
   name: string
@@ -109,13 +109,6 @@ export function BusinessEditSheet({
     }
   }
 
-  const initials = values.name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -135,24 +128,15 @@ export function BusinessEditSheet({
           {/* Logo + Name row */}
           <div className="flex items-center gap-4">
             <div className="relative group shrink-0">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center">
-                {values.logo ? (
-                  <Image
-                    src={values.logo}
-                    alt=""
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover"
-                    unoptimized
-                  />
-                ) : initials ? (
-                  <span className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
-                    {initials}
-                  </span>
-                ) : (
-                  <Building2 className="w-6 h-6 text-zinc-500 dark:text-zinc-600" />
-                )}
-              </div>
+              <BusinessAvatar
+                name={values.name}
+                logo={values.logo}
+                website={values.website}
+                size={64}
+                rounded="rounded-2xl"
+                textClassName="text-lg font-semibold"
+                className="border border-zinc-200 dark:border-white/[0.08]"
+              />
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
@@ -352,7 +336,7 @@ export function BusinessEditSheet({
                 onChange={(e) => set("brandStyle", e.target.value)}
                 rows={2}
                 className={`${INPUT} resize-none`}
-                placeholder="Modern, warm, editorial..."
+                placeholder={t("brandStylePlaceholder")}
               />
             </Field>
           </Group>

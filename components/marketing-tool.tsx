@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Clock,
   Gauge,
+  Download,
   ListChecks,
   Printer,
   RotateCcw,
@@ -15,7 +16,9 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { trackMarketingEvent } from "@/lib/analytics-events"
-import type { MarketingLocale } from "@/lib/marketing"
+import type { MarketingLocale } from "@/lib/marketing/types"
+import { calculateLeadScore, toCsv } from "@/lib/marketing/tool-model"
+import { toolCopy } from "@/lib/marketing/tool-copy"
 
 const toolLabels = {
   en: {
@@ -39,7 +42,6 @@ const toolLabels = {
       tierHigh: "Priority review",
       tierMedium: "Enrich or research",
       tierLow: "Hold or reject",
-      formula: "Equal-weight average of the five visible inputs.",
     },
     checklist: {
       title: "Enrichment checklist",
@@ -96,7 +98,6 @@ const toolLabels = {
       tierHigh: "Revisão prioritária",
       tierMedium: "Enriquecer ou pesquisar",
       tierLow: "Aguardar ou rejeitar",
-      formula: "Média com pesos iguais dos cinco inputs visíveis.",
     },
     checklist: {
       title: "Checklist de enriquecimento",
@@ -153,7 +154,6 @@ const toolLabels = {
       tierHigh: "Revisión prioritaria",
       tierMedium: "Enriquecer o investigar",
       tierLow: "Esperar o rechazar",
-      formula: "Promedio con pesos iguales de las cinco entradas visibles.",
     },
     checklist: {
       title: "Checklist de enriquecimiento",
@@ -232,7 +232,7 @@ const ACCENT: Record<Accent, { ring: string; gradient: string; icon: string; ico
   },
 }
 
-const STAT_LABEL = "text-[11px] font-semibold uppercase tracking-wider text-zinc-500 print:text-zinc-600"
+const STAT_LABEL = "text-xs font-medium text-zinc-400 print:text-zinc-600"
 
 function StatTile({
   label,
@@ -291,6 +291,8 @@ function ToolShell({
   title,
   icon: Icon,
   onReset,
+  csvRows,
+  exportDisabled = false,
 }: {
   children: React.ReactNode
   slug: string
@@ -298,17 +300,40 @@ function ToolShell({
   title: string
   icon: LucideIcon
   onReset: () => void
+  csvRows?: (string | number)[][]
+  exportDisabled?: boolean
 }) {
   const labels = toolLabels[locale]
+  const copy = toolCopy[locale]
+  const [notice, setNotice] = useState("")
+
+  function downloadCsv() {
+    if (!csvRows || exportDisabled) return
+    try {
+      const url = URL.createObjectURL(new Blob([toCsv(csvRows)], { type: "text/csv;charset=utf-8" }))
+      const anchor = document.createElement("a")
+      anchor.href = url
+      anchor.download = `scorelead-${slug}-${locale}.csv`
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setNotice(copy.exported)
+      trackMarketingEvent("tool_completed", { tool: slug, action: "csv_download", locale, page_group: "tools" })
+    } catch {
+      setNotice(copy.exportError)
+    }
+  }
 
   function printTool() {
-    trackMarketingEvent("tool_completed", { tool: slug, action: "print" })
+    trackMarketingEvent("tool_completed", { tool: slug, action: "print", locale, page_group: "tools" })
     window.print()
   }
 
   return (
     <section
       aria-label={title}
+      data-marketing-tool
       className="glass-card relative overflow-hidden rounded-3xl p-5 sm:p-7 print:bg-white print:text-zinc-950 print:shadow-none print:ring-zinc-300"
     >
       {/* Header: mirrors the dashboard hero (eyebrow + title) with a pill icon */}
@@ -318,32 +343,37 @@ function ToolShell({
         </span>
         <div className="min-w-0">
           <p className={STAT_LABEL}>{labels.shell.eyebrow}</p>
-          <p className="mt-0.5 truncate text-[0.9375rem] font-medium tracking-tight text-white print:text-zinc-950">
+          <h2 className="mt-1 text-xl font-medium tracking-tight text-white sm:text-2xl print:text-zinc-950">
             {title}
-          </p>
+          </h2>
         </div>
       </div>
 
       {children}
 
-      <div className="mt-7 flex flex-wrap gap-3 border-t border-white/[0.06] pt-5 print:hidden">
+      <p className="mt-6 text-sm leading-6 text-zinc-400 print:hidden">{copy.privacy}</p>
+      <div className="mt-5 flex flex-col gap-3 border-t border-white/[0.06] pt-5 sm:flex-row sm:flex-wrap print:hidden">
+        {csvRows ? <button type="button" onClick={downloadCsv} disabled={exportDisabled} className="press inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-medium text-zinc-950 hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50">
+          <Download className="size-4" aria-hidden="true" />{copy.download}
+        </button> : null}
         <button
           type="button"
           onClick={printTool}
-          className="press inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-medium text-zinc-950 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+          className={`press inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300 ${csvRows ? "glass-pill text-zinc-200 hover:brightness-125" : "bg-emerald-400 text-zinc-950 hover:bg-emerald-300"}`}
         >
           <Printer className="size-4" aria-hidden="true" />
           {labels.actions.print}
         </button>
         <button
           type="button"
-          onClick={onReset}
-          className="glass-pill press inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-300 transition-[transform,filter] ease-[cubic-bezier(0.23,1,0.32,1)] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
+          onClick={() => { onReset(); setNotice(copy.reset) }}
+          className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300 sm:ml-auto"
         >
           <RotateCcw className="size-4" aria-hidden="true" />
           {labels.actions.reset}
         </button>
       </div>
+      <p role="status" className="mt-3 min-h-6 text-sm text-zinc-300 print:hidden">{notice}</p>
     </section>
   )
 }
@@ -351,120 +381,113 @@ function ToolShell({
 /* Shared field surface: quiet content material with an emerald focus ring,
    matching how inputs sit inside admin section cards. */
 const FIELD_TILE =
-  "surface-card grid gap-3 rounded-2xl p-4 transition-shadow focus-within:ring-1 focus-within:ring-emerald-500/40 print:bg-white print:shadow-none print:ring-zinc-300"
+  "surface-card flex min-w-0 flex-col gap-3 rounded-2xl p-5 transition-shadow focus-within:ring-1 focus-within:ring-emerald-400/60 print:bg-white print:shadow-none print:ring-zinc-300"
 
-function IcpWorksheet({
-  locale,
-  onFirstInteraction,
-}: {
-  locale: MarketingLocale
-  onFirstInteraction: () => void
-}) {
+const TOOL_ACTION = "glass-pill press inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-zinc-200 transition-[filter,transform] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400 print:hidden"
+
+function IcpWorksheet({ locale, onFirstInteraction }: { locale: MarketingLocale; onFirstInteraction: () => void }) {
   const labels = toolLabels[locale].worksheet
-  const fields = [
-    labels.market,
-    labels.required,
-    labels.preferred,
-    labels.disqualifiers,
-    labels.evidence,
-    labels.learning,
-  ]
-  const [version, setVersion] = useState(0)
-
+  const copy = toolCopy[locale]
+  const fields = [labels.market, labels.required, labels.preferred, labels.disqualifiers, labels.evidence, labels.learning]
+  const [values, setValues] = useState<string[]>(() => fields.map(() => ""))
+  const [notice, setNotice] = useState("")
+  const rows = [[copy.field, copy.value, copy.help, copy.exampleColumn], ...fields.map((field, i) => [field, values[i], copy.hints[i], copy.examples[i]])]
   return (
-    <ToolShell
-      slug="icp-worksheet"
-      locale={locale}
-      title={labels.title}
-      icon={ClipboardList}
-      onReset={() => setVersion((value) => value + 1)}
-    >
-      <div key={version} className="grid gap-4 md:grid-cols-2">
+    <ToolShell slug="icp-worksheet" locale={locale} title={labels.title} icon={ClipboardList} csvRows={rows}
+      onReset={() => { setValues(fields.map(() => "")); setNotice("") }}>
+      <div className="mb-6">
+        <div className="flex flex-col items-start gap-4 border-b border-white/[0.06] pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-2xl text-sm leading-6 text-zinc-400">{copy.exampleNote}</p>
+          <button type="button" className={TOOL_ACTION} onClick={() => { setValues([...copy.examples]); setNotice(copy.replaced); onFirstInteraction() }}><ClipboardList className="size-4" aria-hidden="true" />{copy.example}</button>
+        </div>
+        <p role="status" className="mt-3 text-sm text-emerald-300 empty:hidden print:hidden">{notice}</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
         {fields.map((field, index) => (
           <label key={field} className={FIELD_TILE}>
             <span className="flex items-start justify-between gap-3">
-              <span className="text-sm font-medium leading-6 text-zinc-200 print:text-zinc-900">{field}</span>
+              <span id={`icp-label-${index}`} className="text-sm font-medium leading-6 text-zinc-200 print:text-zinc-900">{field}</span>
               <IndexPill index={index} />
             </span>
-            <textarea
-              rows={4}
-              onChange={onFirstInteraction}
-              placeholder={labels.placeholder}
-              className="resize-y rounded-lg bg-transparent text-[0.9375rem] font-normal leading-6 text-zinc-100 placeholder:text-zinc-600 focus:outline-none print:text-zinc-950"
-            />
+            <span id={`icp-help-${index}`} className="text-sm leading-6 text-zinc-400">{copy.hints[index]}</span>
+            <textarea rows={4} value={values[index]} aria-labelledby={`icp-label-${index}`} aria-describedby={`icp-help-${index}`} placeholder={labels.placeholder}
+              onChange={(event) => {
+                onFirstInteraction()
+                setValues(values.map((value, i) => i === index ? event.target.value : value))
+              }}
+              className="min-h-28 w-full max-w-full resize-none self-start rounded-xl border border-white/10 bg-zinc-950/30 p-3 text-base leading-6 text-zinc-100 placeholder:text-zinc-500 focus:border-emerald-400/50 focus:outline-none supports-[field-sizing:content]:h-auto supports-[field-sizing:content]:max-h-80 supports-[field-sizing:content]:field-sizing-content print:hidden" />
+            <div className="hidden whitespace-pre-wrap text-zinc-950 print:block">{values[index] || "—"}</div>
           </label>
         ))}
       </div>
+      <details className="mt-6 rounded-2xl border border-white/10 p-5 print:hidden">
+        <summary className="cursor-pointer text-sm font-medium text-zinc-200 focus-visible:outline-2 focus-visible:outline-emerald-400">{copy.exampleHeading}</summary>
+        <dl className="mt-4 space-y-4">{fields.map((field, i) => <div key={field}><dt className="text-sm font-medium text-zinc-200">{field}</dt><dd className="mt-1 text-sm leading-6 text-zinc-400">{copy.examples[i]}</dd></div>)}</dl>
+      </details>
     </ToolShell>
   )
 }
 
-function ScoringCalculator({
-  locale,
-  onFirstInteraction,
-}: {
-  locale: MarketingLocale
-  onFirstInteraction: () => void
-}) {
+function ScoringCalculator({ locale, onFirstInteraction }: { locale: MarketingLocale; onFirstInteraction: () => void }) {
   const labels = toolLabels[locale].scoring
+  const copy = toolCopy[locale]
   const [scores, setScores] = useState([50, 50, 50, 50, 50])
-  const result = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
-  const tier =
-    result >= 75
-      ? { label: labels.tierHigh, badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-300", accent: "emerald" as Accent }
-      : result >= 50
-        ? { label: labels.tierMedium, badge: "bg-amber-500/10 border-amber-500/20 text-amber-300", accent: "amber" as Accent }
-        : { label: labels.tierLow, badge: "bg-zinc-500/10 border-zinc-500/20 text-zinc-400", accent: "zinc" as Accent }
-
+  const [weights, setWeights] = useState(["20", "20", "20", "20", "20"])
+  const [excluded, setExcluded] = useState([false, false, false])
+  const inputs = scores.map((score, i) => ({ score, weight: weights[i].trim() === "" ? NaN : Number(weights[i]) }))
+  const result = calculateLeadScore(inputs, excluded.some(Boolean))
+  const invalid = result.status === "invalid"
+  const tier = result.status === "disqualified" ? copy.excluded : result.status === "priority" ? labels.tierHigh : result.status === "research" ? labels.tierMedium : labels.tierLow
+  const rows: (string | number)[][] = [
+    [copy.field, copy.score, copy.weight],
+    ...labels.dimensions.map((dimension, i) => [dimension, scores[i], weights[i]]),
+    [copy.weighted, result.score ?? "", ""], [copy.status, invalid ? copy.invalid : tier, ""],
+    ...copy.rules.map((rule, i) => [rule, Number(excluded[i]), ""]),
+    [copy.formula, "", ""], [copy.review, "", ""],
+  ]
   return (
-    <ToolShell
-      slug="lead-scoring-calculator"
-      locale={locale}
-      title={labels.title}
-      icon={Gauge}
-      onReset={() => setScores([50, 50, 50, 50, 50])}
-    >
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
-        <div className="surface-card grid gap-5 rounded-2xl p-5 print:bg-white print:shadow-none print:ring-zinc-300">
+    <ToolShell slug="lead-scoring-calculator" locale={locale} title={labels.title} icon={Gauge} csvRows={rows} exportDisabled={invalid}
+      onReset={() => { setScores([50, 50, 50, 50, 50]); setWeights(["20", "20", "20", "20", "20"]); setExcluded([false, false, false]) }}>
+      <div className="mb-6 flex flex-col items-start gap-4 border-b border-white/[0.06] pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <p className="max-w-2xl text-sm leading-6 text-zinc-400">{copy.formula}</p>
+        <button type="button" className={TOOL_ACTION} onClick={() => { setScores([90, 60, 80, 50, 40]); setWeights(["40", "10", "20", "10", "20"]); setExcluded([false, false, false]); onFirstInteraction() }}><ClipboardList className="size-4" aria-hidden="true" />{copy.example}</button>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+        <div className="surface-card divide-y divide-white/[0.06] rounded-2xl px-5 print:bg-white">
           {labels.dimensions.map((dimension, index) => (
-            <label key={dimension} className="grid gap-2.5">
-              <span className="flex items-center justify-between gap-3 text-sm">
-                <span className="font-medium text-zinc-200 print:text-zinc-900">{dimension}</span>
-                <output className="glass-pill rounded-md px-2 py-0.5 font-mono text-xs tabular-nums text-zinc-300 print:text-zinc-900">
-                  {scores[index]}
-                </output>
-              </span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={scores[index]}
-                aria-label={dimension}
-                style={{
-                  background: `linear-gradient(to right, #34d399 ${scores[index]}%, rgba(255,255,255,0.08) ${scores[index]}%)`,
-                }}
-                onChange={(event) => {
-                  onFirstInteraction()
-                  const next = [...scores]
-                  next[index] = Number(event.target.value)
-                  setScores(next)
-                }}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-emerald-400 print:bg-zinc-200 [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.5)] [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white"
-              />
-            </label>
+            <div key={dimension} className="grid grid-cols-[minmax(0,1fr)_4.5rem] items-center gap-4 py-5 sm:grid-cols-[minmax(0,1fr)_5.5rem] sm:gap-6">
+              <label className="grid min-w-0 gap-3">
+                <span className="flex justify-between gap-3 text-sm text-zinc-200 print:text-zinc-900"><span>{dimension}</span><output className="font-mono tabular-nums">{scores[index]}</output></span>
+                <input type="range" min="0" max="100" step="5" value={scores[index]} aria-label={`${dimension}: ${copy.score}`}
+                  onChange={(event) => { onFirstInteraction(); setScores(scores.map((score, i) => i === index ? Number(event.target.value) : score)) }}
+                  className="h-6 w-full cursor-pointer accent-emerald-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400 print:hidden" />
+              </label>
+              <label className="grid gap-1 text-xs text-zinc-400"><span>{copy.weight}</span>
+                <input type="number" min="0" max="100" step="any" value={weights[index]} aria-label={`${dimension}: ${copy.weight}`} aria-invalid={invalid} aria-describedby={invalid ? "scoring-error" : undefined}
+                  onChange={(event) => { onFirstInteraction(); setWeights(weights.map((weight, i) => i === index ? event.target.value : weight)) }}
+                  className="min-h-11 w-full rounded-xl border border-white/15 bg-zinc-950/30 px-3 font-mono text-base tabular-nums text-white focus-visible:outline-2 focus-visible:outline-emerald-400 print:text-zinc-900" />
+              </label>
+            </div>
           ))}
         </div>
-        <StatTile label={labels.result} value={result} icon={Gauge} accent={tier.accent}>
-          <span
-            className={`mt-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${tier.badge} print:border-zinc-300 print:text-zinc-900`}
-          >
-            <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
-            {tier.label}
-          </span>
-          <p className="mt-4 text-xs leading-5 text-zinc-500">{labels.formula}</p>
-        </StatTile>
+        <div className="space-y-4 lg:sticky lg:top-24" aria-live="polite" aria-atomic="true">
+          <StatTile label={labels.result} value={result.score === null ? "—" : <>{result.score}<span className="ml-1 text-lg font-normal text-zinc-500">/100</span></>} icon={Gauge} accent={result.status === "priority" ? "emerald" : result.status === "disqualified" ? "amber" : "zinc"}>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10 print:hidden" aria-hidden="true"><div className={`h-full rounded-full transition-[width] duration-200 ${result.status === "disqualified" ? "bg-amber-400" : "bg-emerald-400"}`} style={{ width: `${result.score ?? 0}%` }} /></div>
+            <p className="mt-3 text-sm leading-6 text-zinc-200 print:text-zinc-900">{invalid ? copy.invalid : tier}</p>
+            <div className="mt-4 flex justify-between gap-3 border-t border-white/10 pt-3 text-xs text-zinc-400"><span>{copy.totalWeight}</span><span className="font-mono tabular-nums">{invalid ? "—" : inputs.reduce((sum, input) => sum + input.weight, 0)}</span></div>
+          </StatTile>
+          <p className="text-sm leading-6 text-zinc-400">{copy.review}</p>
+        </div>
       </div>
+      {invalid ? <p id="scoring-error" role="alert" className="mt-4 text-sm text-amber-300">{copy.invalid}</p> : null}
+      <fieldset className="mt-6 space-y-3 rounded-2xl border border-white/10 p-5">
+        <legend className="px-2 font-medium text-zinc-200 print:text-zinc-900">{copy.disqualifiers}</legend>
+        <p className="text-sm leading-6 text-zinc-400">{copy.disqualifierHelp}</p>
+        {copy.rules.map((rule, i) => <label key={rule} className="surface-card flex min-h-12 cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm leading-6 text-zinc-300 transition-colors has-checked:bg-amber-500/[0.06] has-checked:text-amber-200 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-emerald-400 print:text-zinc-900">
+          <input type="checkbox" checked={excluded[i]} onChange={(event) => { onFirstInteraction(); setExcluded(excluded.map((value, index) => index === i ? event.target.checked : value)) }} className="size-4 shrink-0 accent-emerald-400" />{rule}
+        </label>)}
+      </fieldset>
+      <p className="mt-6 text-sm leading-6 text-zinc-400">{copy.exampleMath}</p>
     </ToolShell>
   )
 }
@@ -635,7 +658,7 @@ export function MarketingTool({
   function onFirstInteraction() {
     if (tracked.current) return
     tracked.current = true
-    trackMarketingEvent("tool_started", { tool: slug })
+    trackMarketingEvent("tool_started", { tool: slug, locale, page_group: "tools" })
   }
 
   if (slug === "icp-worksheet") {

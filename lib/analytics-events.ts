@@ -5,6 +5,8 @@ import {
   readSharedCookie,
   writeSharedCookie,
 } from "@/lib/browser-storage"
+import { isInternalAnalyticsSession } from "@/lib/analytics-session"
+import { getAnalyticsSurface } from "@/lib/site-urls"
 
 export type MarketingEventName =
   | "acquisition_landing"
@@ -53,7 +55,7 @@ type QueuedMarketingEvent = {
 declare global {
   interface Window {
     gtag?: (
-      command: "event" | "set",
+      command: "event" | "set" | "consent",
       eventName: string,
       params?: EventParams,
     ) => void
@@ -61,7 +63,9 @@ declare global {
 }
 
 function hasAnalyticsConsent() {
-  return getAnalyticsConsent() === "accepted"
+  return typeof window !== "undefined" &&
+    Boolean(getAnalyticsSurface(window.location.hostname, window.location.pathname)) &&
+    !isInternalAnalyticsSession() && getAnalyticsConsent() === "accepted"
 }
 
 function readAcquisitionTouch(key: string) {
@@ -92,13 +96,13 @@ function readAcquisitionTouch(key: string) {
 export function persistAcquisitionTouch(touch: AcquisitionTouch) {
   const firstTouch = readAcquisitionTouch(FIRST_TOUCH_KEY)
   if (!firstTouch) {
-    window.localStorage.setItem(FIRST_TOUCH_KEY, JSON.stringify(touch))
+    try { window.localStorage.setItem(FIRST_TOUCH_KEY, JSON.stringify(touch)) } catch { /* Storage may be disabled. */ }
     writeSharedCookie(SHARED_FIRST_TOUCH_KEY, JSON.stringify(touch))
   }
 
   const lastTouch = readAcquisitionTouch(LAST_TOUCH_KEY)
   if (touch.channel !== "direct" || !lastTouch) {
-    window.localStorage.setItem(LAST_TOUCH_KEY, JSON.stringify(touch))
+    try { window.localStorage.setItem(LAST_TOUCH_KEY, JSON.stringify(touch)) } catch { /* Storage may be disabled. */ }
     writeSharedCookie(SHARED_LAST_TOUCH_KEY, JSON.stringify(touch))
   }
 
@@ -153,7 +157,12 @@ function queueMarketingEvent(event: QueuedMarketingEvent) {
 }
 
 export function flushQueuedMarketingEvents() {
-  if (typeof window === "undefined" || !window.gtag) return 0
+  if (typeof window === "undefined") return 0
+  if (!hasAnalyticsConsent()) {
+    clearQueuedMarketingEvents()
+    return 0
+  }
+  if (!window.gtag) return 0
 
   try {
     const existing = JSON.parse(
@@ -168,9 +177,13 @@ export function flushQueuedMarketingEvents() {
     })
     return queue.length
   } catch {
-    window.sessionStorage.removeItem(EVENT_QUEUE_KEY)
+    clearQueuedMarketingEvents()
     return 0
   }
+}
+
+export function clearQueuedMarketingEvents() {
+  try { window.sessionStorage.removeItem(EVENT_QUEUE_KEY) } catch { /* Analytics is optional. */ }
 }
 
 export function trackMarketingEvent(
@@ -181,6 +194,7 @@ export function trackMarketingEvent(
 
   const eventParams = {
     ...getStoredAttributionParams(),
+    locale: ["pt", "es"].includes(window.location.pathname.split("/")[1]) ? window.location.pathname.split("/")[1] : "en",
     ...params,
     page_path: window.location.pathname,
     page_hostname: window.location.hostname,

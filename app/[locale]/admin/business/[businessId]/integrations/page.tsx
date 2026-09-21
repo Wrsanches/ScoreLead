@@ -93,7 +93,6 @@ export default function IntegrationsPage() {
     <div className="flex-1 overflow-y-auto">
       <ContentWrapper>
         <PageHeader
-          variant="hero"
           title={t("title")}
           description={t("description")}
           breadcrumbs={[

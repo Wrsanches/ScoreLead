@@ -416,14 +416,13 @@ export function PostEditor({
   if (missing) {
     return (
       <>
-        <PageHeader
-          title={t("editPost")}
-          backHref={CALENDAR_HREF}
-          onBack={handleBack}
-          breadcrumbs={[{ label: t("title") }]}
-        />
         <div className="flex-1 overflow-auto">
           <ContentWrapper>
+            <PageHeader
+              title={t("editPost")}
+              breadcrumbs={[{ label: t("title"), href: CALENDAR_HREF }, { label: t("editPost") }]}
+              onNavigate={handleBack}
+            />
             <EmptyState
               title={t("postMissing")}
               action={
@@ -452,11 +451,12 @@ export function PostEditor({
 
   return (
     <>
+      <div className="flex-1 overflow-auto">
+        <ContentWrapper>
       <PageHeader
         title={title}
-        backHref={CALENDAR_HREF}
-        onBack={handleBack}
-        breadcrumbs={[{ label: t("title") }]}
+        breadcrumbs={[{ label: t("title"), href: CALENDAR_HREF }, { label: title }]}
+        onNavigate={handleBack}
         actions={
           <div className="flex items-center gap-2">
             {statusLabel && (
@@ -501,9 +501,6 @@ export function PostEditor({
           </div>
         }
       />
-
-      <div className="flex-1 overflow-auto">
-        <ContentWrapper>
           {loading ? (
             <LoadingState />
           ) : (

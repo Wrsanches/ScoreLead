@@ -53,4 +53,20 @@ describe("acquisition classification", () => {
       }),
     ).toEqual({ channel: "referral", source: "partner.example" })
   })
+
+  it("does not count Google service referrals as organic search", () => {
+    for (const host of ["search.google.com", "mail.google.com"]) {
+      expect(classifyAcquisition({ currentUrl: "https://scorelead.io", referrer: `https://${host}/` })).toEqual({ channel: "referral", source: host })
+    }
+  })
+
+  it("prioritizes explicit campaigns over search and AI referrers", () => {
+    for (const host of ["www.google.com", "chatgpt.com"]) {
+      expect(classifyAcquisition({ currentUrl: "https://scorelead.io/?utm_source=newsletter&utm_medium=email", referrer: `https://${host}/` })).toEqual({ channel: "campaign", source: "newsletter" })
+    }
+  })
+
+  it("does not overwrite acquisition with navigation between ScoreLead hosts", () => {
+    expect(classifyAcquisition({ currentUrl: "https://scorelead.io/pricing", referrer: "https://app.scorelead.io/admin" })).toEqual({ channel: "direct", source: "direct" })
+  })
 })

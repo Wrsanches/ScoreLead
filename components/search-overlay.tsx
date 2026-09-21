@@ -13,6 +13,7 @@ import { Search, X } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOrb } from "@/components/ai-orb";
+import { useTranslations } from "next-intl";
 import { useOptionalBusinessId } from "@/components/admin/business-context";
 
 interface SearchResult {
@@ -97,6 +98,7 @@ function SearchOverlay({
 }) {
   const router = useRouter();
   const businessId = useOptionalBusinessId();
+  const t = useTranslations("dashboard");
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -225,7 +227,7 @@ function SearchOverlay({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search leads by name, city, domain..."
+                placeholder={t("searchPlaceholder")}
                 className="flex-1 bg-transparent text-white text-sm placeholder:text-zinc-500 outline-none"
               />
               {query && (
@@ -250,7 +252,7 @@ function SearchOverlay({
                   </div>
                 ) : results.length === 0 ? (
                   <div className="px-4 py-8 text-center">
-                    <p className="text-zinc-500 text-sm">No leads found</p>
+                    <p className="text-zinc-500 text-sm">{t("searchNoLeads")}</p>
                   </div>
                 ) : (
                   <div className="py-1.5">
@@ -309,7 +311,7 @@ function SearchOverlay({
             {query.length < 2 && (
               <div className="px-4 py-6 text-center">
                 <p className="text-zinc-600 text-xs">
-                  Type at least 2 characters to search
+                  {t("searchMinChars")}
                 </p>
               </div>
             )}

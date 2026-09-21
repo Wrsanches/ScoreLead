@@ -46,7 +46,7 @@ const sentEvents: SentEvent[] = []
 const mockWindow = {
   localStorage,
   sessionStorage,
-  location: { pathname: "/features/ai-lead-discovery" },
+  location: { pathname: "/features/ai-lead-discovery", hostname: "scorelead.io", search: "" },
   gtag: (
     command: string,
     eventName: string,
@@ -66,6 +66,9 @@ describe("marketing attribution", () => {
     localStorage.clear()
     sessionStorage.clear()
     sentEvents.length = 0
+    mockWindow.location.hostname = "scorelead.io"
+    mockWindow.location.pathname = "/features/ai-lead-discovery"
+    mockWindow.location.search = ""
     mockWindow.gtag = (
       command: string,
       eventName: string,
@@ -152,5 +155,49 @@ describe("marketing attribution", () => {
       command: "event",
       eventName: "signup_completed",
     })
+  })
+
+  it("flushes app-host completion events with shared attribution", () => {
+    localStorage.setItem("cookie-consent", "accepted")
+    persistAcquisitionTouch({ channel: "organic", source: "google", landingPath: "/tools/icp-worksheet", capturedAt: "2026-09-21T12:00:00Z" })
+    mockWindow.location.hostname = "app.scorelead.io"
+    mockWindow.location.pathname = "/pt/onboarding"
+    const send = mockWindow.gtag
+    mockWindow.gtag = undefined
+    trackMarketingEvent("onboarding_completed")
+    mockWindow.gtag = send
+    expect(flushQueuedMarketingEvents()).toBe(1)
+    expect(sentEvents[0].params).toMatchObject({ first_touch_source: "google", page_hostname: "app.scorelead.io", locale: "pt" })
+  })
+
+  it("discards queued events if consent is withdrawn before delivery", () => {
+    localStorage.setItem("cookie-consent", "accepted")
+    const send = mockWindow.gtag
+    mockWindow.gtag = undefined
+    trackMarketingEvent("signup_completed")
+    localStorage.setItem("cookie-consent", "declined")
+    mockWindow.gtag = send
+    expect(flushQueuedMarketingEvents()).toBe(0)
+    localStorage.setItem("cookie-consent", "accepted")
+    expect(flushQueuedMarketingEvents()).toBe(0)
+    expect(sentEvents).toHaveLength(0)
+  })
+
+  it("excludes explicitly tagged test sessions after subsequent navigation", () => {
+    localStorage.setItem("cookie-consent", "accepted")
+    mockWindow.location.search = "?utm_source=codex_seo_verification&utm_medium=internal_test"
+    expect(trackMarketingEvent("tool_started")).toBe(false)
+    mockWindow.location.search = ""
+    expect(trackMarketingEvent("tool_completed")).toBe(false)
+    expect(flushQueuedMarketingEvents()).toBe(0)
+    expect(sentEvents).toHaveLength(0)
+  })
+
+  it("does not send events from preview hosts or without consent", () => {
+    expect(trackMarketingEvent("signup_start")).toBe(false)
+    localStorage.setItem("cookie-consent", "accepted")
+    mockWindow.location.hostname = "localhost"
+    expect(trackMarketingEvent("signup_start")).toBe(false)
+    expect(sentEvents).toHaveLength(0)
   })
 })

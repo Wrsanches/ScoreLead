@@ -35,7 +35,18 @@ import {
   Users,
   X,
   Download,
+  Trash2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { MobileMenuButton } from "@/components/admin-shell";
 import { usePlan } from "@/components/admin/plan-context";
 import { trackMarketingEvent } from "@/lib/analytics-events";
@@ -97,6 +108,8 @@ export default function LeadsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [sortBy, setSortByState] = useState<"score" | "name" | "createdAt">("score");
   const [sortOrder, setSortOrderState] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilterState] = useState<LeadStatus | "all">("all");
@@ -183,6 +196,31 @@ export default function LeadsPage() {
     fetchLeads();
     return () => controller.abort();
   }, [page, businessId, sortBy, sortOrder, statusFilter]);
+
+  async function deleteLead(target: Lead) {
+    if (readOnly || deleting) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(
+        `/api/leads/${target.id}?businessId=${encodeURIComponent(businessId)}`,
+        { method: "DELETE" },
+      );
+      if (!res.ok) throw new Error("Failed");
+      setLeads((prev) => {
+        const next = prev.filter((l) => l.id !== target.id);
+        setSelectedIndex((i) => Math.min(i, Math.max(0, next.length - 1)));
+        return next;
+      });
+      setTotal((n) => Math.max(0, n - 1));
+      setDetailOpen(false);
+      setDeleteOpen(false);
+      toast.success(t("leadDeleted"));
+    } catch {
+      toast.error(t("deleteLeadFailed"));
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   // Handle search selection
   useEffect(() => {
@@ -373,7 +411,7 @@ export default function LeadsPage() {
                     className="cursor-pointer"
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                    <span className="flex-1">{cfg.label}</span>
+                    <span className="flex-1">{t(cfg.labelKey)}</span>
                     {statusFilter === key && (
                       <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     )}
@@ -411,7 +449,7 @@ export default function LeadsPage() {
               <span
                 className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[statusFilter].dot}`}
               />
-              <span>{STATUS_CONFIG[statusFilter].label}</span>
+              <span>{t(STATUS_CONFIG[statusFilter].labelKey)}</span>
               <span className="w-4 h-4 rounded-full bg-black/20 flex items-center justify-center">
                 <X className="w-2.5 h-2.5 opacity-80" />
               </span>
@@ -460,31 +498,17 @@ export default function LeadsPage() {
             statusFilter !== "all" ? (
               <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
                 <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-1">
-                  No leads with this status
+                  {t("noLeadsWithStatus")}
                 </p>
                 <button
                   type="button"
                   onClick={() => setStatusFilter("all")}
                   className="text-emerald-600 dark:text-emerald-400 hover:underline text-xs"
                 >
-                  Clear filter
+                  {t("clearFilter")}
                 </button>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-1">No leads yet</p>
-                <p className="text-zinc-500 dark:text-zinc-600 text-xs">
-                  Run a discovery job to find leads.
-                </p>
-                <Link
-                  href="/admin/discovery-jobs"
-                  className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
-                >
-                  <Radar className="w-4 h-4" />
-                  Go to discovery jobs
-                </Link>
-              </div>
-            )
+            ) : null
           ) : (
             <>
               {leads.map((l, i) => (
@@ -525,7 +549,7 @@ export default function LeadsPage() {
                       <p
                         className={`text-sm font-medium truncate leading-tight transition-colors ${i === selectedIndex ? "text-zinc-900 dark:text-white" : "text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white"}`}
                       >
-                        {l.name || "Unknown"}
+                        {l.name || t("unknown")}
                       </p>
                       <p className="text-zinc-500 text-xs mt-1 truncate">
                         {[l.city, l.state, l.country]
@@ -556,7 +580,7 @@ export default function LeadsPage() {
                     disabled={page === 1}
                     className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white disabled:opacity-40 px-2 py-1"
                   >
-                    Prev
+                    {t("prev")}
                   </button>
                   <span className="text-xs text-zinc-500 dark:text-zinc-600 tabular-nums">
                     {page}/{totalPages}
@@ -566,7 +590,7 @@ export default function LeadsPage() {
                     disabled={page === totalPages}
                     className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white disabled:opacity-40 px-2 py-1"
                   >
-                    Next
+                    {t("next")}
                   </button>
                 </div>
               )}
@@ -590,28 +614,36 @@ export default function LeadsPage() {
               {!isLoading && leads.length === 0 ? (
                 <>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    No leads yet
+                    {t("noLeadsYet")}
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-600">
-                    Run a discovery job to start finding and scoring leads for
-                    this business.
+                    {t("noLeadsYetDesc")}
                   </p>
                   <Link
                     href="/admin/discovery-jobs"
-                    className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium rounded-lg transition-colors text-sm"
+                    className="glass-card group mt-6 flex w-full items-center gap-3 rounded-2xl px-3.5 py-3 text-left ring-1 ring-emerald-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:ring-emerald-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
                   >
-                    <Radar className="w-4 h-4" />
-                    Go to discovery jobs
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                      <Radar className="w-4 h-4" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-semibold tracking-tight text-zinc-900 dark:text-white">
+                        {t("discoveryCta")}
+                      </span>
+                      <span className="block text-xs text-zinc-500 truncate">
+                        {t("discoveryCtaHint")}
+                      </span>
+                    </span>
+                    <ChevronRight className="w-4 h-4 shrink-0 text-zinc-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />
                   </Link>
                 </>
               ) : (
                 <>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Select a lead
+                    {t("selectLead")}
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-600">
-                    Open a record from the list to review contact details,
-                    scoring, and outreach.
+                    {t("selectLeadDesc")}
                   </p>
                 </>
               )}
@@ -639,7 +671,7 @@ export default function LeadsPage() {
                     </>
                   )}
                   <span className="text-zinc-900 dark:text-white font-semibold truncate max-w-60">
-                    {lead.name || "Unknown"}
+                    {lead.name || t("unknown")}
                   </span>
                 </div>
               </div>
@@ -648,20 +680,20 @@ export default function LeadsPage() {
                   <a
                     href={`mailto:${lead.email}`}
                     className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] bg-zinc-50/90 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-all duration-150 flex items-center gap-1.5"
-                    title={`Email ${lead.email}`}
+                    title={t("emailTo", { email: lead.email })}
                   >
                     <Mail className="w-3.5 h-3.5" />
-                    <span className="hidden md:inline">Email</span>
+                    <span className="hidden md:inline">{t("email")}</span>
                   </a>
                 )}
                 {lead.phone && (
                   <a
                     href={`tel:${lead.phone}`}
                     className="h-8 px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.22] bg-zinc-50/90 dark:bg-white/[0.03] hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-all duration-150 flex items-center gap-1.5"
-                    title={`Call ${lead.phone}`}
+                    title={t("callTo", { phone: lead.phone })}
                   >
                     <Phone className="w-3.5 h-3.5" />
-                    <span className="hidden md:inline">Call</span>
+                    <span className="hidden md:inline">{t("call")}</span>
                   </a>
                 )}
                 {lead.website && (
@@ -672,17 +704,57 @@ export default function LeadsPage() {
                     className="h-8 px-3 text-sm font-medium text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition-all duration-150 flex items-center gap-1.5 shadow-lg shadow-emerald-500/10"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    <span className="hidden md:inline">Visit</span>
+                    <span className="hidden md:inline">{t("visit")}</span>
                   </a>
                 )}
-                <button
-                  className="h-8 w-8 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-colors duration-150 flex items-center justify-center"
-                  title="More actions"
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
+                {!readOnly && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="h-8 w-8 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.11] rounded-lg transition-colors duration-150 flex items-center justify-center"
+                        title={t("moreActions")}
+                        aria-label={t("moreActions")}
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onClick={() => setDeleteOpen(true)}
+                        className="text-red-600 focus:bg-red-500/10 focus:text-red-700 dark:text-red-400 dark:focus:text-red-300 [&_svg]:!text-current"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        {t("deleteLead")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
+
+            <AlertDialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
+              <AlertDialogContent className="glass-strong rounded-2xl border-transparent">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("deleteLeadTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("deleteLeadDescription", { name: lead.name || t("unknownLead") })}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleting}>{t("deleteLeadCancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={deleting}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void deleteLead(lead);
+                    }}
+                    className="bg-red-600 text-white hover:bg-red-500 focus-visible:ring-red-500/40 dark:bg-red-500 dark:hover:bg-red-400"
+                  >
+                    {deleting ? t("deleting") : t("deleteLeadConfirm")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto scrollbar-hide">
               <div className="w-full max-w-5xl mx-auto">
@@ -731,12 +803,12 @@ export default function LeadsPage() {
                                   type="button"
                                   disabled={readOnly}
                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ring-1 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.ring}`}
-                                  aria-label="Change lead status"
+                                  aria-label={t("changeLeadStatus")}
                                 >
                                   <span
                                     className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`}
                                   />
-                                  {statusCfg.label}
+                                  {t(statusCfg.labelKey)}
                                   {!readOnly && (
                                     <ChevronDown className="w-3 h-3 opacity-60" />
                                   )}
@@ -748,7 +820,7 @@ export default function LeadsPage() {
                                 className="w-50 border-zinc-300/60"
                               >
                                 <DropdownMenuLabel className="px-3 py-1.5 text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
-                                  Change status
+                                  {t("changeStatus")}
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-zinc-200 dark:bg-white/[0.07]" />
                                 {LEAD_STATUS_KEYS.map((key) => {
@@ -768,7 +840,7 @@ export default function LeadsPage() {
                                           className={`w-2 h-2 rounded-full ${cfg.dot}`}
                                         />
                                         <span className="flex-1 text-sm">
-                                          {cfg.label}
+                                          {t(cfg.labelKey)}
                                         </span>
                                         {isCurrent && (
                                           <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -781,13 +853,13 @@ export default function LeadsPage() {
                             </DropdownMenu>
                             {lead.firecrawlEnriched && (
                               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-200/60 dark:bg-white/[0.07] text-zinc-700 dark:text-zinc-300 ring-1 ring-white/[0.12]">
-                                Enriched
+                                {t("enriched")}
                               </span>
                             )}
                           </div>
 
                           <h2 className="text-zinc-900 dark:text-white text-2xl sm:text-3xl font-semibold tracking-tight line-clamp-2">
-                            {lead.name || "Unknown"}
+                            {lead.name || t("unknown")}
                           </h2>
                           <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2 flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-600 shrink-0" />
@@ -862,10 +934,10 @@ export default function LeadsPage() {
                     <div className="flex items-center justify-between gap-4 mb-5">
                       <div>
                         <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
-                          Score breakdown
+                          {t("scoreBreakdown")}
                         </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">
-                          Signals grouped by discovery quality.
+                          {t("scoreBreakdownDesc")}
                         </p>
                       </div>
                       <span
@@ -968,7 +1040,7 @@ export default function LeadsPage() {
 
                 {/* Contact + Business cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                  <SectionCard title="Contact">
+                  <SectionCard title={t("contact")}>
                     <div className="space-y-1">
                       {lead.website && (
                         <CopyRow
@@ -1035,25 +1107,25 @@ export default function LeadsPage() {
                         !lead.address &&
                         !lead.instagramHandle && (
                           <p className="text-zinc-500 dark:text-zinc-600 text-sm py-2">
-                            No contact info found.
+                            {t("noContactInfo")}
                           </p>
                         )}
                     </div>
                   </SectionCard>
 
-                  <SectionCard title="Business">
+                  <SectionCard title={t("business")}>
                     <div className="space-y-2.5">
                       {lead.ownerName && (
                         <InfoRow
                           icon={User}
-                          label="Owner"
+                          label={t("owner")}
                           value={lead.ownerName}
                         />
                       )}
                       {lead.operatingHours && (
                         <InfoRow
                           icon={Clock}
-                          label="Hours"
+                          label={t("hours")}
                           value={lead.operatingHours}
                         />
                       )}
@@ -1061,7 +1133,7 @@ export default function LeadsPage() {
                         !lead.operatingHours &&
                         !lead.services?.length && (
                           <p className="text-zinc-500 dark:text-zinc-600 text-sm py-2">
-                            No business data.
+                            {t("noBusinessData")}
                           </p>
                         )}
                       {lead.services && lead.services.length > 0 && (
@@ -1074,7 +1146,7 @@ export default function LeadsPage() {
                         >
                           <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-2 flex items-center gap-1.5">
                             <Building2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                            Services
+                            {t("services")}
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {lead.services.map((s) => (
@@ -1095,7 +1167,7 @@ export default function LeadsPage() {
                 {/* Social media */}
                 {lead.socialMedia &&
                   Object.keys(lead.socialMedia).length > 0 && (
-                    <SectionCard title="Social" className="mb-6">
+                    <SectionCard title={t("social")} className="mb-6">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {Object.entries(lead.socialMedia).map(
                           ([platform, url]) => {
@@ -1148,7 +1220,7 @@ export default function LeadsPage() {
 
                 {/* AI Summary */}
                 {lead.aiSummary && (
-                  <SectionCard title="AI Summary" className="mb-6">
+                  <SectionCard title={t("aiSummary")} className="mb-6">
                     <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
                       {lead.aiSummary}
                     </p>
@@ -1157,7 +1229,7 @@ export default function LeadsPage() {
 
                 {/* Description */}
                 {lead.description && !lead.aiSummary && (
-                  <SectionCard title="Description" className="mb-6">
+                  <SectionCard title={t("description")} className="mb-6">
                     <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
                       {lead.description}
                     </p>
@@ -1190,7 +1262,7 @@ export default function LeadsPage() {
                       reviews.reduce((sum, r) => sum + r.rating, 0) /
                       reviews.length;
                     return (
-                      <SectionCard title="Reviews" className="mb-6">
+                      <SectionCard title={t("reviews")} className="mb-6">
                         {/* Aggregate header */}
                         <div className="flex items-center gap-4 pb-4 mb-4 border-b border-zinc-200/80 dark:border-white/[0.08]">
                           <div className="flex items-baseline gap-1">
@@ -1253,7 +1325,7 @@ export default function LeadsPage() {
 
                 {/* Pricing */}
                 {lead.pricingInfo && (
-                  <SectionCard title="Pricing" className="mb-6">
+                  <SectionCard title={t("pricing")} className="mb-6">
                     <div className="space-y-2.5">
                       {lead.pricingInfo
                         .split(/[|;\n]/)
@@ -1277,29 +1349,29 @@ export default function LeadsPage() {
                 {/* Metadata */}
                 <div className="pt-6 mt-2 border-t border-zinc-200 dark:border-white/[0.08]">
                   <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider mb-4">
-                    Details
+                    {t("details")}
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                     <MetaCell
-                      label="Source"
+                      label={t("source")}
                       value={lead.source.replace("_", " ")}
                     />
                     <MetaCell
-                      label="Enriched"
-                      value={lead.firecrawlEnriched ? "Yes" : "No"}
+                      label={t("enriched")}
+                      value={lead.firecrawlEnriched ? t("yes") : t("no")}
                     />
                     <MetaCell
-                      label="Found"
+                      label={t("found")}
                       value={formatDate(lead.createdAt)}
                     />
                     <MetaCell
-                      label="Status"
-                      value={getStatus(lead.status).label}
+                      label={t("status")}
+                      value={t(getStatus(lead.status).labelKey)}
                     />
                     {lead.teamMembers && lead.teamMembers.length > 0 && (
                       <div className="col-span-2">
                         <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-1.5">
-                          Team
+                          {t("team")}
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                           {lead.teamMembers.map((m) => (
@@ -1352,6 +1424,7 @@ function CopyRow({
   linkHref,
   external,
 }: CopyRowProps) {
+  const t = useTranslations("dashboard");
   const isCopied = copiedKey === copyKey;
   const linkClasses =
     "flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white truncate transition-colors";
@@ -1383,8 +1456,8 @@ function CopyRow({
             ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 opacity-100"
             : "text-zinc-500 dark:text-zinc-600 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.11] opacity-0 group-hover:opacity-100"
         }`}
-        title={isCopied ? "Copied!" : "Copy"}
-        aria-label={isCopied ? "Copied" : `Copy ${copyKey}`}
+        title={isCopied ? t("copied") : t("copy")}
+        aria-label={isCopied ? t("copied") : t("copyValue", { what: copyKey })}
       >
         {isCopied ? (
           <Check className="w-3.5 h-3.5" />

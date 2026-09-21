@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Maximize2, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 /**
  * A thumbnail that opens its image in a full-screen lightbox on click.
@@ -22,6 +23,7 @@ export function ZoomableImage({
   thumbClassName?: string
   sizes?: string
 }) {
+  const t = useTranslations("dashboard")
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -46,7 +48,7 @@ export function ZoomableImage({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open image"
+        aria-label={t("openImage")}
         className={`group relative block cursor-zoom-in overflow-hidden ${thumbClassName}`}
       >
         <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" unoptimized />
@@ -70,7 +72,7 @@ export function ZoomableImage({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  aria-label="Close"
+                  aria-label={t("close")}
                   className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/90 hover:bg-white/20 transition-colors"
                 >
                   <X className="h-5 w-5" />

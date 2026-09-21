@@ -9,7 +9,6 @@ import {
 } from "@/lib/business-access"
 import { getActiveViewableBusinessIdForUser } from "@/lib/active-business"
 import { BusinessProvider } from "@/components/admin/business-context"
-import { AdminViewBanner } from "@/components/admin/admin-view-banner"
 import { getPlanStatus, serializePlanStatus } from "@/lib/plan"
 import { getUserTimeZone } from "@/lib/user-timezone"
 import { UserTimeZoneProvider } from "@/components/admin/user-timezone-context"
@@ -77,13 +76,6 @@ export default async function AdminLayout({
           userImage={session.user.image}
           isPlatformAdmin={platformAdmin}
         >
-          {access?.isPlatformAdmin && !access.isOwner && (
-            <AdminViewBanner
-              businessName={access.businessName}
-              ownerName={access.ownerName}
-              ownerEmail={access.ownerEmail}
-            />
-          )}
           {children}
         </AdminShell>
       </BusinessProvider>

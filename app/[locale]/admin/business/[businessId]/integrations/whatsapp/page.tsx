@@ -82,6 +82,7 @@ const WHATSAPP_INTEGRATION_CONFIGURED =
 export default function WhatsAppIntegrationPage() {
   const t = useTranslations("whatsapp")
   const ti = useTranslations("integrations")
+  const td = useTranslations("dashboard")
   const { timeZone: userTimeZone } = useUserTimeZone()
   const { can: planCan, openUpgrade } = usePlan()
   const { businessId, readOnly } = useBusinessAccess()
@@ -368,11 +369,11 @@ export default function WhatsAppIntegrationPage() {
       ) : null}
       <ContentWrapper>
         <PageHeader
-          variant="hero"
           title={ti("whatsappSetupTitle")}
           description={ti("whatsappSetupDescription")}
           breadcrumbs={[
-            { label: ti("backToIntegrations"), href: "/admin/integrations" },
+            { label: td("businessPage"), href: "/admin/profile" },
+            { label: ti("title"), href: "/admin/integrations" },
             { label: ti("whatsappSetupTitle") },
           ]}
         />
