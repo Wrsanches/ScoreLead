@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import {
   AlertCircle,
   CheckCircle2,
+  ExternalLink,
   Eye,
   EyeOff,
   Loader2,
@@ -16,6 +17,7 @@ import {
   MousePointerClick,
   RefreshCw,
   Send,
+  ShieldCheck,
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
@@ -83,6 +85,19 @@ function Heading({ title, hint }: { title: string; hint?: string }) {
         <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{title}</h4>
         {hint && <p className="mt-1 text-xs leading-5 text-zinc-500">{hint}</p>}
       </div>
+    </div>
+  )
+}
+
+/** Gated state row: an icon, one line of explanation, and the single action that unblocks it. */
+function Notice({ icon: Icon, text, children }: { icon: React.ElementType; text: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-5 flex flex-col gap-3 rounded-lg bg-zinc-100/70 p-4 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-2.5 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+        <Icon className="h-4 w-4 shrink-0" />
+        {text}
+      </div>
+      <div className="shrink-0">{children}</div>
     </div>
   )
 }
@@ -230,10 +245,10 @@ export function EmailOutreachPanel({
   if (!canUse) {
     return (
       <Shell>
-        <Heading title={t("panelTitle")} hint={t("planRequired")} />
-        <Button variant="outline" size="sm" className="mt-3 ml-12" onClick={() => openUpgrade("emailOutreach")}>
-          {t("upgradeButton")}
-        </Button>
+        <Heading title={t("panelTitle")} />
+        <Notice icon={ShieldCheck} text={t("planRequired")}>
+          <Button size="sm" onClick={() => openUpgrade("emailOutreach")}>{t("upgradeButton")}</Button>
+        </Notice>
       </Shell>
     )
   }
@@ -250,13 +265,12 @@ export function EmailOutreachPanel({
   if (!connected) {
     return (
       <Shell>
-        <Heading title={t("panelTitle")} hint={t("connectionRequired")} />
-        <Link
-          href="/admin/integrations/resend"
-          className="mt-3 ml-12 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-300"
-        >
-          {t("openIntegrations")}
-        </Link>
+        <Heading title={t("panelTitle")} />
+        <Notice icon={ExternalLink} text={t("connectionRequired")}>
+          <Button size="sm" variant="outline" asChild>
+            <Link href="/admin/integrations/resend">{t("openIntegrations")}</Link>
+          </Button>
+        </Notice>
       </Shell>
     )
   }

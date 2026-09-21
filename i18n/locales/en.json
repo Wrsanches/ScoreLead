@@ -747,7 +747,7 @@
     "panelTitle": "Email",
     "panelDescription": "Send a template from {from} and follow delivery here.",
     "connectionRequired": "Connect your Resend account to email leads from their detail page.",
-    "openIntegrations": "Open Resend integration",
+    "openIntegrations": "Open integrations",
     "noRecipients": "No email address is known for this lead.",
     "noTemplates": "No templates yet.",
     "recipient": "Send to",
