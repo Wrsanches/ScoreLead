@@ -21,6 +21,7 @@ const VALID_KINDS: UploadKind[] = [
   "avatar",
   "content-reference",
   "content-slide",
+  "email-asset",
 ]
 
 /**

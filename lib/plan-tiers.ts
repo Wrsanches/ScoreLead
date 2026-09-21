@@ -47,6 +47,7 @@ export const ACTION_MIN_PLAN: Record<string, PaidPlanId> = {
   leadsPerJob: "starter",
   continueJob: "growth",
   whatsappAutomation: "growth",
+  emailOutreach: "growth",
   decisionMakers: "pro",
 }
 

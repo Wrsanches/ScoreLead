@@ -34,6 +34,7 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
 
       <div className="relative mb-6 select-none">
         <h1
+          data-text="500"
           className="glitch-500 relative text-[10rem] sm:text-[14rem] font-black leading-none tracking-tighter bg-clip-text text-transparent"
           style={{
             backgroundImage: "linear-gradient(135deg, #ffffff 0%, #10b981 50%, #a1a1aa 100%)",

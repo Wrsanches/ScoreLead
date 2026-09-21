@@ -253,6 +253,20 @@
       "when": 1789567799262,
       "tag": "0035_loud_echo",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790007708391,
+      "tag": "0036_sleepy_gideon",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790013578381,
+      "tag": "0037_empty_jamie_braddock",
+      "breakpoints": true
     }
   ]
 }

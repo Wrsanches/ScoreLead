@@ -10,7 +10,6 @@ import {
   Clock3,
   ExternalLink,
   Loader2,
-  MessageCircle,
   Pause,
   Send,
   ShieldCheck,
@@ -32,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { usePlan } from "@/components/admin/plan-context"
+import { BrandLogo } from "@/components/admin/brand-logo"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 
@@ -315,9 +315,7 @@ export function WhatsAppAutomationPanel({
     return (
       <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-white/[0.08]">
         <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-white/[0.07]">
-            <Clock3 className="h-4 w-4" aria-hidden="true" />
-          </span>
+          <BrandLogo platform="whatsapp" className="size-9 shrink-0 opacity-60 grayscale" />
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{t("automationTitle")}</h4>
@@ -345,9 +343,7 @@ export function WhatsAppAutomationPanel({
     <section className="mt-7 border-t border-zinc-200 pt-6 dark:border-white/[0.08]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-700 dark:text-emerald-300">
-            <MessageCircle className="h-4 w-4" />
-          </span>
+          <BrandLogo platform="whatsapp" className="size-9 shrink-0" />
           <div>
             <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{t("automationTitle")}</h4>
             <p className="mt-0.5 text-xs leading-5 text-zinc-500">{t("automationDescription")}</p>

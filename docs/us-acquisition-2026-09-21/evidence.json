@@ -1,0 +1,2541 @@
+{
+  "retrieved_at": "2026-09-21",
+  "ahrefs": {
+    "country": "us",
+    "cpc_raw_unit": "USD cents",
+    "overview": {
+      "keywords": [
+        {
+          "keyword": "agency prospecting tool",
+          "volume": 0,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "lead generation software for agencies",
+          "volume": 0,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "b2b lead research",
+          "volume": 40,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "lead scoring software",
+          "volume": 700,
+          "cpc": 1300,
+          "difficulty": 5,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-18T18:10:24Z"
+        },
+        {
+          "keyword": "b2b lead scoring",
+          "volume": 250,
+          "cpc": 60,
+          "difficulty": 3,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-08T11:22:41Z"
+        },
+        {
+          "keyword": "ideal customer profile worksheet",
+          "volume": 70,
+          "cpc": 300,
+          "difficulty": 5,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-16T13:26:45Z"
+        },
+        {
+          "keyword": "lead enrichment checklist",
+          "volume": null,
+          "cpc": null,
+          "difficulty": 0,
+          "intents": null,
+          "serp_last_update": "2026-03-14T12:07:58Z"
+        },
+        {
+          "keyword": "lead generation for agencies",
+          "volume": 100,
+          "cpc": 250,
+          "difficulty": 11,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-20T18:48:42Z"
+        },
+        {
+          "keyword": "icp worksheet",
+          "volume": 10,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "apollo alternative",
+          "volume": 300,
+          "cpc": 1100,
+          "difficulty": 2,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-08-11T21:04:11Z"
+        },
+        {
+          "keyword": "ai sales prospecting",
+          "volume": 350,
+          "cpc": 1100,
+          "difficulty": 16,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-03T14:01:43Z"
+        },
+        {
+          "keyword": "sales prospecting software",
+          "volume": 600,
+          "cpc": 45,
+          "difficulty": 1,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-05T06:47:48Z"
+        },
+        {
+          "keyword": "lead generation software",
+          "volume": 2300,
+          "cpc": 60,
+          "difficulty": 3,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T07:15:18Z"
+        },
+        {
+          "keyword": "find local business leads",
+          "volume": 40,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "lead scoring template",
+          "volume": 100,
+          "cpc": 700,
+          "difficulty": 1,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-06-09T16:51:19Z"
+        },
+        {
+          "keyword": "local business lead generation software",
+          "volume": 20,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "lead enrichment software",
+          "volume": 20,
+          "cpc": 1400,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "b2b lead enrichment",
+          "volume": 150,
+          "cpc": 2500,
+          "difficulty": 2,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-20T17:18:34Z"
+        },
+        {
+          "keyword": "lead scoring calculator",
+          "volume": 10,
+          "cpc": null,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "ai lead generation",
+          "volume": 3600,
+          "cpc": 600,
+          "difficulty": 41,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-17T07:35:53Z"
+        },
+        {
+          "keyword": "clay alternative",
+          "volume": 150,
+          "cpc": 1100,
+          "difficulty": 2,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-28T07:37:46Z"
+        },
+        {
+          "keyword": "lead enrichment",
+          "volume": 1500,
+          "cpc": 900,
+          "difficulty": 6,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-20T05:11:54Z"
+        },
+        {
+          "keyword": "b2b prospecting software",
+          "volume": 300,
+          "cpc": 500,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-19T04:47:49Z"
+        }
+      ]
+    },
+    "matching_terms": {
+      "keywords": [
+        {
+          "keyword": "what is sales prospecting",
+          "volume": 2500,
+          "cpc": 9,
+          "difficulty": 22,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-18T11:33:49Z"
+        },
+        {
+          "keyword": "sales prospecting",
+          "volume": 1500,
+          "cpc": 250,
+          "difficulty": 20,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-10T12:45:11Z"
+        },
+        {
+          "keyword": "ai for sales prospecting",
+          "volume": 1400,
+          "cpc": 80,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T16:05:27Z"
+        },
+        {
+          "keyword": "ai lead scoring",
+          "volume": 900,
+          "cpc": 300,
+          "difficulty": 31,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-21T13:02:43Z"
+        },
+        {
+          "keyword": "sales prospecting software",
+          "volume": 600,
+          "cpc": 45,
+          "difficulty": 1,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-05T06:47:48Z"
+        },
+        {
+          "keyword": "sales prospecting techniques",
+          "volume": 450,
+          "cpc": 120,
+          "difficulty": 15,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-16T02:47:00Z"
+        },
+        {
+          "keyword": "what is lead scoring",
+          "volume": 300,
+          "cpc": 40,
+          "difficulty": 29,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-16T05:16:14Z"
+        },
+        {
+          "keyword": "crm with lead scoring",
+          "volume": 300,
+          "cpc": 20,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "b2b lead scoring",
+          "volume": 250,
+          "cpc": 60,
+          "difficulty": 3,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-08T11:22:41Z"
+        },
+        {
+          "keyword": "sales prospecting email examples",
+          "volume": 200,
+          "cpc": 190,
+          "difficulty": 2,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-04T12:32:22Z"
+        },
+        {
+          "keyword": "sales prospecting tips",
+          "volume": 200,
+          "cpc": 70,
+          "difficulty": 15,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T16:47:32Z"
+        },
+        {
+          "keyword": "lead scoring best practices",
+          "volume": 200,
+          "cpc": 10,
+          "difficulty": 15,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-21T05:55:16Z"
+        },
+        {
+          "keyword": "email subject lines for sales prospecting",
+          "volume": 200,
+          "cpc": 110,
+          "difficulty": 2,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-07T01:22:21Z"
+        },
+        {
+          "keyword": "sales prospecting methods",
+          "volume": 200,
+          "cpc": 120,
+          "difficulty": 14,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-02T13:20:54Z"
+        },
+        {
+          "keyword": "sales prospecting ideas",
+          "volume": 200,
+          "cpc": 45,
+          "difficulty": 22,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-26T06:44:16Z"
+        },
+        {
+          "keyword": "sales prospecting services",
+          "volume": 200,
+          "cpc": 80,
+          "difficulty": 6,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-03T16:06:21Z"
+        },
+        {
+          "keyword": "local business leads",
+          "volume": 200,
+          "cpc": 150,
+          "difficulty": 28,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T11:41:59Z"
+        },
+        {
+          "keyword": "clay lead scoring",
+          "volume": 150,
+          "cpc": 140,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "marketo lead scoring",
+          "volume": 150,
+          "cpc": 300,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-08-17T12:15:20Z"
+        },
+        {
+          "keyword": "lead scoring automation",
+          "volume": 150,
+          "cpc": 110,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T20:22:20Z"
+        },
+        {
+          "keyword": "sales prospecting definition",
+          "volume": 150,
+          "cpc": 10,
+          "difficulty": 20,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-11T14:27:16Z"
+        },
+        {
+          "keyword": "sales prospecting strategy",
+          "volume": 150,
+          "cpc": 300,
+          "difficulty": 18,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-25T19:55:18Z"
+        },
+        {
+          "keyword": "lead scoring examples",
+          "volume": 150,
+          "cpc": 300,
+          "difficulty": 4,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-11T18:54:18Z"
+        },
+        {
+          "keyword": "chatgpt for sales prospecting",
+          "volume": 100,
+          "cpc": 200,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-09-20T00:55:13Z"
+        },
+        {
+          "keyword": "linkedin for sales prospecting",
+          "volume": 100,
+          "cpc": 250,
+          "difficulty": 13,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-08-08T07:11:52Z"
+        },
+        {
+          "keyword": "lead scoring marketing",
+          "volume": 100,
+          "cpc": 200,
+          "difficulty": 26,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-07T15:07:29Z"
+        },
+        {
+          "keyword": "sales prospecting funnel",
+          "volume": 100,
+          "cpc": 1,
+          "difficulty": 31,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-11T23:39:49Z"
+        },
+        {
+          "keyword": "video sales prospecting",
+          "volume": 100,
+          "cpc": 250,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-09T23:39:46Z"
+        },
+        {
+          "keyword": "lead generation for agencies",
+          "volume": 100,
+          "cpc": 250,
+          "difficulty": 11,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-20T18:48:42Z"
+        },
+        {
+          "keyword": "sales prospecting for dummies",
+          "volume": 100,
+          "cpc": 100,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": true,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "using chatgpt for sales prospecting",
+          "volume": 100,
+          "cpc": 190,
+          "difficulty": 1,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-08-18T23:48:04Z"
+        },
+        {
+          "keyword": "lead scoring pardot",
+          "volume": 100,
+          "cpc": 200,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-09-04T14:35:27Z"
+        },
+        {
+          "keyword": "sales prospecting sales email examples",
+          "volume": 100,
+          "cpc": 300,
+          "difficulty": 4,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-18T00:55:38Z"
+        },
+        {
+          "keyword": "sales prospecting template",
+          "volume": 80,
+          "cpc": 250,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-10T19:12:47Z"
+        },
+        {
+          "keyword": "sales prospecting ai",
+          "volume": 80,
+          "cpc": 90,
+          "difficulty": 20,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-26T14:17:33Z"
+        },
+        {
+          "keyword": "lead scoring in pardot",
+          "volume": 70,
+          "cpc": 200,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-08-10T20:11:57Z"
+        },
+        {
+          "keyword": "best sales prospecting books",
+          "volume": 60,
+          "cpc": 40,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-06T05:20:35Z"
+        },
+        {
+          "keyword": "chatgpt prompts for sales prospecting",
+          "volume": 50,
+          "cpc": 200,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "sales prospecting games",
+          "volume": 50,
+          "cpc": 110,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "sales prospecting gifts",
+          "volume": 50,
+          "cpc": 130,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-07-03T22:17:57Z"
+        },
+        {
+          "keyword": "pardot lead scoring best practices",
+          "volume": 50,
+          "cpc": 180,
+          "difficulty": 1,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-09-20T13:22:45Z"
+        },
+        {
+          "keyword": "sales prospecting email",
+          "volume": 50,
+          "cpc": 300,
+          "difficulty": 4,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": true,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-22T19:49:15Z"
+        },
+        {
+          "keyword": "definition of sales prospecting",
+          "volume": 40,
+          "cpc": 150,
+          "difficulty": 16,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-03T23:02:02Z"
+        },
+        {
+          "keyword": "define sales prospecting",
+          "volume": 40,
+          "cpc": 150,
+          "difficulty": 16,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-09-19T00:50:58Z"
+        },
+        {
+          "keyword": "insurance sales prospecting",
+          "volume": 30,
+          "cpc": 110,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "quotes about sales prospecting",
+          "volume": 30,
+          "cpc": 170,
+          "difficulty": 6,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": "2026-08-08T14:03:34Z"
+        },
+        {
+          "keyword": "how to use chatgpt for sales prospecting",
+          "volume": 20,
+          "cpc": 150,
+          "difficulty": null,
+          "intents": {},
+          "serp_last_update": null
+        },
+        {
+          "keyword": "tips for sales prospecting",
+          "volume": 20,
+          "cpc": 140,
+          "difficulty": null,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": false,
+            "local": false
+          },
+          "serp_last_update": null
+        },
+        {
+          "keyword": "how to use chat gpt for sales prospecting",
+          "volume": 20,
+          "cpc": 300,
+          "difficulty": 0,
+          "intents": {
+            "informational": true,
+            "navigational": false,
+            "commercial": false,
+            "transactional": false,
+            "branded": true,
+            "local": false
+          },
+          "serp_last_update": "2026-07-10T11:44:04Z"
+        }
+      ]
+    }
+  },
+  "windsor": {
+    "gsc": {
+      "property": "sc-domain:scorelead.io",
+      "date_from": "2026-08-22",
+      "date_to": "2026-09-18",
+      "countries": [
+        {
+          "country": "Vietnam",
+          "clicks": 3,
+          "impressions": 122,
+          "position": 18.6066
+        },
+        {
+          "country": "Germany",
+          "clicks": 2,
+          "impressions": 47,
+          "position": 55.7021
+        },
+        {
+          "country": "Hong Kong",
+          "clicks": 2,
+          "impressions": 6,
+          "position": 3.3333
+        },
+        {
+          "country": "Brazil",
+          "clicks": 1,
+          "impressions": 24,
+          "position": 16.8333
+        },
+        {
+          "country": "Portugal",
+          "clicks": 1,
+          "impressions": 4,
+          "position": 4
+        },
+        {
+          "country": "United Arab Emirates",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 5
+        },
+        {
+          "country": "Argentina",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 95
+        },
+        {
+          "country": "Australia",
+          "clicks": 0,
+          "impressions": 17,
+          "position": 51.9412
+        },
+        {
+          "country": "Austria",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 16.3333
+        },
+        {
+          "country": "Belgium",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 4
+        },
+        {
+          "country": "Bangladesh",
+          "clicks": 0,
+          "impressions": 10,
+          "position": 75.7
+        },
+        {
+          "country": "Canada",
+          "clicks": 0,
+          "impressions": 8,
+          "position": 57.625
+        },
+        {
+          "country": "Switzerland",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 29
+        },
+        {
+          "country": "Chile",
+          "clicks": 0,
+          "impressions": 19,
+          "position": 79.7895
+        },
+        {
+          "country": "China",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 9
+        },
+        {
+          "country": "Cote d'Ivoire",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 36
+        },
+        {
+          "country": "Colombia",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 1
+        },
+        {
+          "country": "Cyprus",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 11
+        },
+        {
+          "country": "Denmark",
+          "clicks": 0,
+          "impressions": 4,
+          "position": 31
+        },
+        {
+          "country": "Algeria",
+          "clicks": 0,
+          "impressions": 7,
+          "position": 78.8571
+        },
+        {
+          "country": "Spain",
+          "clicks": 0,
+          "impressions": 120,
+          "position": 81.7667
+        },
+        {
+          "country": "Estonia",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 5.6667
+        },
+        {
+          "country": "France",
+          "clicks": 0,
+          "impressions": 11,
+          "position": 10.0909
+        },
+        {
+          "country": "United Kingdom",
+          "clicks": 0,
+          "impressions": 86,
+          "position": 59.2791
+        },
+        {
+          "country": "Indonesia",
+          "clicks": 0,
+          "impressions": 20,
+          "position": 59.55
+        },
+        {
+          "country": "India",
+          "clicks": 0,
+          "impressions": 36,
+          "position": 62.1111
+        },
+        {
+          "country": "Ireland",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 84.6667
+        },
+        {
+          "country": "Italy",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 20.8
+        },
+        {
+          "country": "Jordan",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 64.5
+        },
+        {
+          "country": "Japan",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 5
+        },
+        {
+          "country": "South Korea",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 16.5
+        },
+        {
+          "country": "Lebanon",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 8
+        },
+        {
+          "country": "Lithuania",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 7
+        },
+        {
+          "country": "Morocco",
+          "clicks": 0,
+          "impressions": 4,
+          "position": 19.25
+        },
+        {
+          "country": "Mexico",
+          "clicks": 0,
+          "impressions": 38,
+          "position": 82.3421
+        },
+        {
+          "country": "Malaysia",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 84.5
+        },
+        {
+          "country": "Nigeria",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 7.2
+        },
+        {
+          "country": "Netherlands",
+          "clicks": 0,
+          "impressions": 52,
+          "position": 31.1923
+        },
+        {
+          "country": "Nepal",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 8
+        },
+        {
+          "country": "Oman",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 4
+        },
+        {
+          "country": "Pakistan",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 56
+        },
+        {
+          "country": "Peru",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 1
+        },
+        {
+          "country": "Philippines",
+          "clicks": 0,
+          "impressions": 16,
+          "position": 74.75
+        },
+        {
+          "country": "Poland",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 22.8
+        },
+        {
+          "country": "Russia",
+          "clicks": 0,
+          "impressions": 8,
+          "position": 33.5
+        },
+        {
+          "country": "El Salvador",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 7
+        },
+        {
+          "country": "Serbia",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 1
+        },
+        {
+          "country": "Thailand",
+          "clicks": 0,
+          "impressions": 8,
+          "position": 56.5
+        },
+        {
+          "country": "Tunisia",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 7
+        },
+        {
+          "country": "Türkiye",
+          "clicks": 0,
+          "impressions": 11,
+          "position": 70
+        },
+        {
+          "country": "Ukraine",
+          "clicks": 0,
+          "impressions": 7,
+          "position": 39.4286
+        },
+        {
+          "country": "United States",
+          "clicks": 0,
+          "impressions": 338,
+          "position": 60.7485
+        }
+      ],
+      "us_queries": [
+        {
+          "country": "United States",
+          "query": "account enrichment",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 17,
+          "position": 47.5882
+        },
+        {
+          "country": "United States",
+          "query": "advantidge icp scoring criteria",
+          "page": "https://scorelead.io/tools/icp-worksheet",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 48
+        },
+        {
+          "country": "United States",
+          "query": "ai lead discovery",
+          "page": "https://scorelead.io/features/ai-lead-discovery",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 24
+        },
+        {
+          "country": "United States",
+          "query": "ai lead score calculation osha specialized companies",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 98.5
+        },
+        {
+          "country": "United States",
+          "query": "ai tool for flooring measuring lead scoring",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 95
+        },
+        {
+          "country": "United States",
+          "query": "ai tool for flooring measuring lead scoring",
+          "page": "https://scorelead.io/features/ai-lead-discovery",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 92
+        },
+        {
+          "country": "United States",
+          "query": "b2b account scoring platform",
+          "page": "https://scorelead.io/use-cases/b2b-companies",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 46
+        },
+        {
+          "country": "United States",
+          "query": "b2b discovery ai",
+          "page": "https://scorelead.io/features/ai-lead-discovery",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 42
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead enrichment",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 26,
+          "position": 88.1923
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead enrichment tools",
+          "page": "https://scorelead.io/compare/b2b-lead-enrichment-tools",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 29
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead scoring",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 84
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead scoring software",
+          "page": "https://scorelead.io/compare/best-lead-scoring-software",
+          "clicks": 0,
+          "impressions": 4,
+          "position": 59.75
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead scoring software",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 99
+        },
+        {
+          "country": "United States",
+          "query": "b2b lead scoring template",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 75
+        },
+        {
+          "country": "United States",
+          "query": "b2b prospect validation criteria",
+          "page": "https://scorelead.io/blog/b2b-prospecting-guide",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 67.5
+        },
+        {
+          "country": "United States",
+          "query": "b2b saas lead analysis sponsorcloud",
+          "page": "https://scorelead.io/use-cases/b2b-startups",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 66
+        },
+        {
+          "country": "United States",
+          "query": "ceramik",
+          "page": "https://scorelead.io/case-studies/ceramik",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 10
+        },
+        {
+          "country": "United States",
+          "query": "compare the top revenue-as-a-service platforms that bundle ai lead scoring with multilingual inside sales teams",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 7
+        },
+        {
+          "country": "United States",
+          "query": "enrich lead",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 70
+        },
+        {
+          "country": "United States",
+          "query": "enriched lead",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 85
+        },
+        {
+          "country": "United States",
+          "query": "enriquecimento leads e-commerce b2b metodologia",
+          "page": "https://scorelead.io/pt/compare/b2b-lead-enrichment-tools",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 18
+        },
+        {
+          "country": "United States",
+          "query": "finding enriching scoring target buyers no free trial",
+          "page": "https://scorelead.io/compare/sales-prospecting-software",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 78
+        },
+        {
+          "country": "United States",
+          "query": "finding enriching scoring target buyers no free trial",
+          "page": "https://scorelead.io/features/ai-lead-discovery",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 82.6667
+        },
+        {
+          "country": "United States",
+          "query": "free lead scoring tool",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 54
+        },
+        {
+          "country": "United States",
+          "query": "how to automate lead scoring for b2b sales",
+          "page": "https://scorelead.io/blog",
+          "clicks": 0,
+          "impressions": 4,
+          "position": 79
+        },
+        {
+          "country": "United States",
+          "query": "how to calculate lead score",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 91
+        },
+        {
+          "country": "United States",
+          "query": "how to measure b2b lead quality",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 91
+        },
+        {
+          "country": "United States",
+          "query": "how to measure roi in b2b lead generation",
+          "page": "https://scorelead.io/tools/lead-research-roi-calculator",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 87
+        },
+        {
+          "country": "United States",
+          "query": "icp worksheet",
+          "page": "https://scorelead.io/tools/icp-worksheet",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 12
+        },
+        {
+          "country": "United States",
+          "query": "ideal customer profile worksheet",
+          "page": "https://scorelead.io/tools/icp-worksheet",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 16
+        },
+        {
+          "country": "United States",
+          "query": "lead enrich",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 88
+        },
+        {
+          "country": "United States",
+          "query": "lead enrichement",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 79
+        },
+        {
+          "country": "United States",
+          "query": "lead enrichment",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 69,
+          "position": 77.5217
+        },
+        {
+          "country": "United States",
+          "query": "lead scoring calculator",
+          "page": "https://scorelead.io/features/lead-scoring",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 26
+        },
+        {
+          "country": "United States",
+          "query": "lead scoring enrichment for re-engagement",
+          "page": "https://scorelead.io/tools/enrichment-checklist",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 81.5
+        },
+        {
+          "country": "United States",
+          "query": "lead scoring with data enrichment",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 74.5
+        },
+        {
+          "country": "United States",
+          "query": "lead valuation",
+          "page": "https://scorelead.io/tools/lead-scoring-calculator",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 97
+        },
+        {
+          "country": "United States",
+          "query": "manager score io",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 10
+        },
+        {
+          "country": "United States",
+          "query": "personalized b2b outreach agency",
+          "page": "https://scorelead.io/blog/personalized-b2b-outreach",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 33
+        },
+        {
+          "country": "United States",
+          "query": "personalized b2b sales outreach",
+          "page": "https://scorelead.io/blog/personalized-b2b-outreach",
+          "clicks": 0,
+          "impressions": 24,
+          "position": 84.75
+        },
+        {
+          "country": "United States",
+          "query": "predict lead value",
+          "page": "https://scorelead.io/features/ai-lead-discovery",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 88.5
+        },
+        {
+          "country": "United States",
+          "query": "product data enrichment checklist",
+          "page": "https://scorelead.io/tools/enrichment-checklist",
+          "clicks": 0,
+          "impressions": 15,
+          "position": 75.8
+        },
+        {
+          "country": "United States",
+          "query": "sales prospecting",
+          "page": "https://scorelead.io/compare/sales-prospecting-software",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 2.5
+        },
+        {
+          "country": "United States",
+          "query": "scaling b2b lead generation",
+          "page": "https://scorelead.io/blog",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 87.4
+        },
+        {
+          "country": "United States",
+          "query": "score sales",
+          "page": "https://scorelead.io/compare/sales-prospecting-software",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 27
+        },
+        {
+          "country": "United States",
+          "query": "score sales",
+          "page": "https://scorelead.io/use-cases/b2b-sales-teams",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 32
+        },
+        {
+          "country": "United States",
+          "query": "scorecard io",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 63
+        },
+        {
+          "country": "United States",
+          "query": "scorelead",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 1
+        },
+        {
+          "country": "United States",
+          "query": "scorelead",
+          "page": "https://scorelead.io/about",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 9
+        },
+        {
+          "country": "United States",
+          "query": "scorely",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 68
+        },
+        {
+          "country": "United States",
+          "query": "smart lead scoring platform for agencies",
+          "page": "https://scorelead.io/",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 98
+        },
+        {
+          "country": "United States",
+          "query": "we're evaluating new prospecting software. what should we compare, and how should we decide?",
+          "page": "https://scorelead.io/compare/sales-prospecting-software",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 2
+        },
+        {
+          "country": "United States",
+          "query": "what is b2b lead enrichment",
+          "page": "https://scorelead.io/blog/lead-enrichment-guide",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 100
+        },
+        {
+          "country": "United States",
+          "query": "what is lead enrichment",
+          "page": "https://scorelead.io/features/lead-enrichment",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 99
+        },
+        {
+          "country": "United States",
+          "query": "what marketing agency can help optimize lead scoring",
+          "page": "https://scorelead.io/use-cases/agencies",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 90
+        }
+      ]
+    },
+    "ga_sources": {
+      "property": "ScoreLead Web",
+      "date_from": "2026-08-22",
+      "date_to": "2026-09-18",
+      "data": [
+        {
+          "country": "Brazil",
+          "session_source_medium": "search.google.com / referral",
+          "sessions": 28,
+          "engaged_sessions": 9
+        },
+        {
+          "country": "Brazil",
+          "session_source_medium": "reddit.com / referral",
+          "sessions": 11,
+          "engaged_sessions": 10
+        },
+        {
+          "country": "Brazil",
+          "session_source_medium": "(direct) / (none)",
+          "sessions": 5,
+          "engaged_sessions": 3
+        },
+        {
+          "country": "Brazil",
+          "session_source_medium": "billing.stripe.com / referral",
+          "sessions": 3,
+          "engaged_sessions": 1
+        },
+        {
+          "country": "Brazil",
+          "session_source_medium": "checkout.stripe.com / referral",
+          "sessions": 3,
+          "engaged_sessions": 3
+        },
+        {
+          "country": "Brazil",
+          "session_source_medium": "codex_seo_verification / internal_test",
+          "sessions": 3,
+          "engaged_sessions": 1
+        },
+        {
+          "country": "India",
+          "session_source_medium": "google / organic",
+          "sessions": 3,
+          "engaged_sessions": 1
+        },
+        {
+          "country": "Nigeria",
+          "session_source_medium": "google / organic",
+          "sessions": 1,
+          "engaged_sessions": 1
+        },
+        {
+          "country": "Portugal",
+          "session_source_medium": "google / organic",
+          "sessions": 1,
+          "engaged_sessions": 0
+        }
+      ]
+    },
+    "ga_events": {
+      "properties_requested": [
+        "ScoreLead Web",
+        "ScoreLead App"
+      ],
+      "date_from": "2026-08-22",
+      "date_to": "2026-09-20",
+      "note": "Only Web rows returned. App property was created 2026-09-21.",
+      "data": [
+        {
+          "account_id": "531207288",
+          "event_name": "page_view",
+          "event_count": 280
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "CLS",
+          "event_count": 137
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "FCP",
+          "event_count": 135
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "FID",
+          "event_count": 115
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "INP",
+          "event_count": 123
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "LCP",
+          "event_count": 135
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "TTFB",
+          "event_count": 141
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "user_engagement",
+          "event_count": 72
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "acquisition_landing",
+          "event_count": 84
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "scroll",
+          "event_count": 83
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "session_start",
+          "event_count": 58
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "form_start",
+          "event_count": 1
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "click",
+          "event_count": 6
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "signup_start",
+          "event_count": 8
+        },
+        {
+          "account_id": "531207288",
+          "event_name": "first_visit",
+          "event_count": 4
+        }
+      ]
+    }
+  },
+  "google_keyword_planner": {
+    "plan_id": "1438562691",
+    "plan_name": "ScoreLead | US | USD 100 research | 2026-09-21",
+    "account_context": "Research conducted in accessible Ceramik account. No ScoreLead campaign performance inferred. Account currency BRL.",
+    "historical": {
+      "country": "United States",
+      "network": "Google",
+      "language": "All languages (disabled historical selector)",
+      "period": "2025-09 to 2026-08",
+      "rows": [
+        {
+          "keyword": "ai for sales prospecting",
+          "monthly_search_range": "100-1000",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 62.06,
+          "top_of_page_bid_high_brl": 244.29
+        },
+        {
+          "keyword": "ai lead discovery",
+          "monthly_search_range": null,
+          "competition": null,
+          "top_of_page_bid_low_brl": null,
+          "top_of_page_bid_high_brl": null
+        },
+        {
+          "keyword": "ai sales prospecting",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 90.96,
+          "top_of_page_bid_high_brl": 246.12
+        },
+        {
+          "keyword": "b2b lead scoring",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 62.28,
+          "top_of_page_bid_high_brl": 210.55
+        },
+        {
+          "keyword": "b2b prospecting software",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": null,
+          "top_of_page_bid_high_brl": null
+        },
+        {
+          "keyword": "clay alternative",
+          "monthly_search_range": "100-1000",
+          "competition": "medium",
+          "top_of_page_bid_low_brl": 49.39,
+          "top_of_page_bid_high_brl": 172.51
+        },
+        {
+          "keyword": "ideal customer profile worksheet",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": null,
+          "top_of_page_bid_high_brl": null
+        },
+        {
+          "keyword": "lead enrichment",
+          "monthly_search_range": "100-1000",
+          "competition": "medium",
+          "top_of_page_bid_low_brl": 80.94,
+          "top_of_page_bid_high_brl": 252.68
+        },
+        {
+          "keyword": "lead generation for agencies",
+          "monthly_search_range": "10-100",
+          "competition": "medium",
+          "top_of_page_bid_low_brl": 109.45,
+          "top_of_page_bid_high_brl": 353.62
+        },
+        {
+          "keyword": "lead generation software",
+          "monthly_search_range": "100-1000",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 50.65,
+          "top_of_page_bid_high_brl": 237.59
+        },
+        {
+          "keyword": "lead scoring automation",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 62.22,
+          "top_of_page_bid_high_brl": 203.12
+        },
+        {
+          "keyword": "lead scoring software",
+          "monthly_search_range": "100-1000",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 95.33,
+          "top_of_page_bid_high_brl": 191.27
+        },
+        {
+          "keyword": "lead scoring template",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 51.24,
+          "top_of_page_bid_high_brl": 422.68
+        },
+        {
+          "keyword": "local business leads",
+          "monthly_search_range": "10-100",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 108.04,
+          "top_of_page_bid_high_brl": 398.46
+        },
+        {
+          "keyword": "sales prospecting software",
+          "monthly_search_range": "100-1000",
+          "competition": "low",
+          "top_of_page_bid_low_brl": 106.71,
+          "top_of_page_bid_high_brl": 466.5
+        }
+      ]
+    },
+    "forecast": {
+      "country": "United States",
+      "language": "English",
+      "network": "Google",
+      "period": "2026-10-01 to 2026-10-31",
+      "strategy": "Manual CPC",
+      "max_cpc_brl": 10,
+      "clicks": 63.34,
+      "impressions": 6027.32,
+      "cost_brl": 430.5,
+      "average_cpc_brl": 6.8,
+      "ctr_displayed": "1.1%",
+      "suggested_daily_budget_brl": 19.82,
+      "keyword_count": 15,
+      "match_type_note": "Keywords entered as plain text; exact/phrase types were not individually verified. This is not the forecast for the proposed two-keyword pilot.",
+      "conversion_note": "UI estimates based on assumed conversion rate of 3.42% are excluded from decision-making. They are not ScoreLead observations."
+    },
+    "state": "Saved research plan only. No campaigns created or activated."
+  },
+  "serp": [
+    {
+      "keyword": "sales prospecting software",
+      "data": {
+        "positions": [
+          {
+            "position": 1,
+            "title": null,
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "ai_overview"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 1,
+            "title": "Salesforce",
+            "url": "https://www.salesforce.com/sales/prospecting/tools/",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 1,
+            "title": "Reddit·r/sales",
+            "url": "https://www.reddit.com/r/sales/comments/1f40a98/what_are_the_best_b2b_sales_tools_that_you_use/",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 2,
+            "title": "9 Best Sales Prospecting Tools & Software for 2026",
+            "url": "https://www.salesforge.ai/de/blog/sales-prospecting-tools",
+            "domain_rating": 72,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 3,
+            "title": "What are the 5 P's of prospecting?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 3,
+            "title": "What is a sales prospecting tool?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 3,
+            "title": "What is the best software to track sales?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 3,
+            "title": "What is the 10-3-1 rule in sales?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 4,
+            "title": "The 7 Best Sales Prospecting Software Programs (2026)",
+            "url": "https://en.outmind.ai/blog/logiciel-prospection-commerciale",
+            "domain_rating": 37,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          },
+          {
+            "position": 5,
+            "title": "Best AI Sales Prospecting Tools for 2026",
+            "url": "https://instantly.ai/blog/ai-sales-prospecting-tools/",
+            "domain_rating": 80,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-05T06:47:48Z"
+          }
+        ]
+      }
+    },
+    {
+      "keyword": "ai for sales prospecting",
+      "data": {
+        "positions": [
+          {
+            "position": 1,
+            "title": null,
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "ai_overview"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "Reddit·r/GrowthHacking",
+            "url": "https://www.reddit.com/r/GrowthHacking/comments/1fabmp9/what_ai_tools_do_you_use_for_sales_prospecting/",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "IBM",
+            "url": "https://www.google.com/goto?url=CAESbQHrOzAVz7vw0OPjKfne7JBV0rSe141QdJvrel4GyWtIMsKQzIW7SBd5k-h9t3EiKBsRc4qa5q_e9Owq4jVjzrWKiEhz-lZ7WttssQ4zb6y8v1scU_9-jKgSaxFm2m_9Qiiltl8HoaL2fdRWSwU",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "Nooks",
+            "url": "https://www.nooks.ai/blog-posts/mastering-ai-for-sales-prospecting-strategies-for-2026-success",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "HubSpot",
+            "url": "https://www.hubspot.com/products/sales/ai-prospecting-agent",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "YouTube·Wiza",
+            "url": "https://www.google.com/goto?url=CAESaQHrOzAVIywg0wBCnItKhW_MyWKkuE7k5WxfAakoA-QoOAqB91MFKpW7E_FSkliekfIB6VN4SrGRhFB18KoSBa7OmazQPPMJvMDsG-qPjyvTWqqSMF8p7xNt2JrZqubbGI_2V1EGurxbQg",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "Dust",
+            "url": "https://www.google.com/goto?url=CAESZQHrOzAV7VxD6GgocpYLTY3FvsH2s-Y4Z9XRUjHMoueSe52V64GisxfhWNE6PUXf1bk58KNYLPSWuawJDxutKY2huVxqkM_eTGvEDMZ1zzxMv7h6m0hWCTmkyilY4qCpQjXR-84u",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "SyncGTM",
+            "url": "https://www.google.com/goto?url=CAEScwHrOzAVXaOihXe9ICQHTfg8zePp1KTmQkUvFJaiZqFOFhYwsvQm4nBodD_ibDn4mc0IjLRKoGscJy-ipbXymGsAfKF0wIKjeUWQArqELTaza5X7Oc2YusZbzMyFLP3Et4xjj5YDMC6HKQMMYQD74Dbf-3Y",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "www.youtube.com",
+            "url": "https://www.google.com/goto?url=CAESYwHrOzAViAclgrH7es2rNWedZGmL4wPR2BL0Kz4G-w9QCh05cMFDReXokHit5SK1EZN-OAwIgY0UeIe6AmzlNCMMhUr2ryT9XDjFeP0lz5PFRjQ3Agk600tYlZFvmn7FFnYEXQ",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 1,
+            "title": "www.youtube.com",
+            "url": "https://www.google.com/goto?url=CAESYwHrOzAVORIdaYTnXgFi2gBCj5MHDwRZH3PfznrYZdNUznDkQbd5kTBcq8wn6qHBbiw0VcXR2SqbArRYt-xekYOMf2rPBU6kjRldQT1PwpBdxG3aiXmPtOX01BLhenp-o-UPHw",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 2,
+            "title": "The final piece of my AI sales prospecting system is a timed ...",
+            "url": "https://www.reddit.com/r/n8n/comments/1vbu06k/the_final_piece_of_my_ai_sales_prospecting_system/",
+            "domain_rating": 95,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 3,
+            "title": "Which AI is best for sales prospecting?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 3,
+            "title": "How to use AI to improve your sales prospecting?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 3,
+            "title": "Which AI is best for prospecting?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 3,
+            "title": "What are the 5 P's of prospecting?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 4,
+            "title": "Best AI Sales Prospecting Tools for B2B Teams 2026",
+            "url": "https://instantly.ai/blog/best-ai-sales-prospecting-tools/",
+            "domain_rating": 80,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          },
+          {
+            "position": 5,
+            "title": "How AI Tools Improve Sales Prospecting and Lead ...",
+            "url": "https://salestarget.ai/blogs/how-ai-tools-improve-sales-prospecting",
+            "domain_rating": 16,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-09T16:05:27Z"
+          }
+        ]
+      }
+    },
+    {
+      "keyword": "b2b lead scoring",
+      "data": {
+        "positions": [
+          {
+            "position": 1,
+            "title": null,
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "ai_overview"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "Outfunnel",
+            "url": "https://outfunnel.com/lead-scoring/",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "ZoomInfo Blog",
+            "url": "https://pipeline.zoominfo.com/marketing/lead-scoring",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "NC Squared",
+            "url": "https://nc-squared.com/blog/article/what-is-lead-scoring",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "Spotler",
+            "url": "https://spotler.com/blog/what-is-lead-scoring-in-b2b-marketing",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "Belkins",
+            "url": "https://belkins.io/blog/lead-scoring",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "Ortto",
+            "url": "https://ortto.com/learn/what-is-lead-scoring/",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "www.default.com",
+            "url": "https://www.default.com/post/lead-scoring-model",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 1,
+            "title": "YouTube·On The Fuze I HubSpot Experts",
+            "url": "https://www.youtube.com/watch?v=K2LUHYj0WSQ&t=259",
+            "domain_rating": null,
+            "type": [
+              "ai_overview_sitelink",
+              "image_th"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 2,
+            "title": "A Guide to Lead Scoring for B2B Sales",
+            "url": "https://www.leadforensics.com/blog/how-to-score-your-b2b-sales-leads/",
+            "domain_rating": 74,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 3,
+            "title": "What is the rule of 7 in B2B?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 3,
+            "title": "What is a good cost per lead B2B?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 3,
+            "title": "How is lead score calculated?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 3,
+            "title": "Can you give me an example of lead scoring?",
+            "url": null,
+            "domain_rating": null,
+            "type": [
+              "question"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 4,
+            "title": "Lead Scoring: The Complete Guide for B2B Sales and ...",
+            "url": "https://outfunnel.com/lead-scoring/",
+            "domain_rating": 72,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          },
+          {
+            "position": 5,
+            "title": "What is lead scoring in B2B Marketing?",
+            "url": "https://spotler.com/blog/what-is-lead-scoring-in-b2b-marketing",
+            "domain_rating": 80,
+            "type": [
+              "organic"
+            ],
+            "update_date": "2026-09-08T11:22:41Z"
+          }
+        ]
+      }
+    }
+  ]
+}
+

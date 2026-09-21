@@ -40,6 +40,8 @@ export interface Lead {
   website: string | null
   websiteDomain: string | null
   email: string | null
+  emails?: string[] | null
+  decisionMakers?: { name: string; title?: string; linkedin?: string; email?: string }[] | null
   phone: string | null
   address: string | null
   city: string | null

@@ -35,6 +35,7 @@ const NUMERIC_CAPS = [
 const CAPABILITIES = [
   "continueJob",
   "whatsappAutomation",
+  "emailOutreach",
   "csvExport",
   "decisionMakers",
 ] as const

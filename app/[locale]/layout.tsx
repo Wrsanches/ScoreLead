@@ -7,7 +7,6 @@ import { hasLocale } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { getLocaleConfig, siteConfig, siteViewport } from '@/lib/seo'
-import { ThemeProvider } from '@/components/theme-provider'
 import { CookieConsent } from '@/components/cookie-consent'
 import NextTopLoader from 'nextjs-toploader'
 import '../globals.css'
@@ -52,7 +51,7 @@ export default async function LocaleLayout({
     <html
       lang={getLocaleConfig(locale).htmlLang}
       data-scroll-behavior="smooth"
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`dark ${geist.variable} ${geistMono.variable}`}
       style={{ backgroundColor: "#09090b", colorScheme: "dark" }}
       suppressHydrationWarning
     >
@@ -71,18 +70,13 @@ export default async function LocaleLayout({
         >
           Skip to content
         </a>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          forcedTheme="dark"
-          disableTransitionOnChange
-          storageKey="scorelead:theme"
-        >
-          <NextIntlClientProvider messages={messages}>
-            {children}
-            <CookieConsent />
-          </NextIntlClientProvider>
-        </ThemeProvider>
+        {/* The app is dark-only: the class is set statically on <html> above.
+            (next-themes used to do this with an inline <script>, which React 19
+            warns about on every client-side mount of this layout.) */}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+          <CookieConsent />
+        </NextIntlClientProvider>
         <ConsentGatedAnalytics
           publicGaId={
             process.env.NEXT_PUBLIC_GA_PUBLIC_ID ||

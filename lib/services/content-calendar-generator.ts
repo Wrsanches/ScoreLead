@@ -48,7 +48,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
   it: "Italian",
 }
 
-function resolveLanguageLabel(language: string | null): string {
+export function resolveLanguageLabel(language: string | null): string {
   if (!language) return "English"
   const key = language.toLowerCase()
   return LANGUAGE_LABELS[key] ?? "English"

@@ -34,6 +34,19 @@ export function BrandLogo({
     )
   }
 
+  if (platform === "resend") {
+    // Resend's mark is black on white; on our dark canvas the tile needs a
+    // faint edge so it does not dissolve into the background.
+    return (
+      <svg viewBox="0 0 40 40" className={className} aria-hidden="true" role="img">
+        <rect width="40" height="40" rx="11" fill="#18181B" />
+        <rect x="0.5" y="0.5" width="39" height="39" rx="10.5" fill="none" stroke="rgba(255,255,255,0.18)" />
+        {/* Resend's "R" mark, centered with a little breathing room on the tile. */}
+        <path d={path} fill="#fff" transform="translate(10 10) scale(0.8333)" />
+      </svg>
+    )
+  }
+
   const fill = platform === "whatsapp" ? "#25D366" : getSocialConfig(platform).color
   return (
     <svg viewBox="0 0 40 40" className={className} aria-hidden="true" role="img">

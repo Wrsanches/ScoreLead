@@ -14,6 +14,7 @@ import {
   getBlogTranslation,
   getBlogUi,
 } from "@/lib/blog";
+import { getBlogImage } from "@/lib/blog/images";
 import {
   marketingPages,
   getMarketingPageByPath,
@@ -61,7 +62,7 @@ export async function generateMetadata({
   const normalizedLocale = normalizeLocale(locale);
   const translation = getBlogTranslation(post, normalizedLocale);
   const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
-  const image = `${siteConfig.url}/images/blog-og.png`;
+  const image = `${siteConfig.url}${getBlogImage(post.slug)?.og ?? "/images/blog-og.png"}`;
 
   return {
     title: translation.title,
@@ -120,7 +121,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
   const relatedTools = marketingPages.filter(page => page.group === "tools" && page.relatedBlogSlugs.includes(post.slug) && page.pathname !== post.relatedMarketingPath);
   const toolLinkLabel = { en: "Put this guide into practice", pt: "Coloque este guia em prática", es: "Pon esta guía en práctica" }[normalizedLocale];
   const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
-  const image = `${siteConfig.url}/images/blog-og.png`;
+  const image = `${siteConfig.url}${getBlogImage(post.slug)?.og ?? "/images/blog-og.png"}`;
   const related = blogPosts
     .filter((candidate) => candidate.slug !== post.slug)
     .slice(0, 3);

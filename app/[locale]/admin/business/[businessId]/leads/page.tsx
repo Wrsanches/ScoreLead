@@ -78,6 +78,7 @@ import {
   type LeadStatus,
 } from "./_shared";
 import { OutreachMessagesCard } from "./_components/outreach-messages-card";
+import { allowedRecipients } from "@/lib/resend/render";
 
 export default function LeadsPage() {
   const t = useTranslations("dashboard");
@@ -1243,6 +1244,7 @@ export default function LeadsPage() {
                   businessId={businessId}
                   initialMessages={lead.outreachMessages}
                   contact={{ email: lead.email, phone: lead.phone }}
+                  emailRecipients={allowedRecipients(lead)}
                   readOnly={readOnly}
                   onMessagesChange={(msgs) => {
                     setLeads((prev) =>

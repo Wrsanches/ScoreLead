@@ -8,9 +8,11 @@ import {
   type IntegrationStatus,
 } from "@/components/admin/integrations/integration-card"
 import { useInstagramConnection } from "@/components/admin/instagram-connection-card"
+import { useResendConnection } from "@/components/admin/resend/use-resend-connection"
 import { useBusinessAccess } from "@/components/admin/business-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
+import { isResendIntegrationEnabled } from "@/lib/resend/feature-access"
 
 const WHATSAPP_INTEGRATION_CONFIGURED =
   process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true"
@@ -28,6 +30,8 @@ export default function IntegrationsPage() {
   const { data: session } = authClient.useSession()
 
   const instagram = useInstagramConnection(businessId)
+  const resendEnabled = isResendIntegrationEnabled()
+  const resend = useResendConnection(businessId, resendEnabled)
 
   const whatsappEnabled =
     WHATSAPP_INTEGRATION_CONFIGURED &&
@@ -66,6 +70,17 @@ export default function IntegrationsPage() {
     if (whatsapp.connection?.status === "connected") whatsappStatus = "connected"
     else if (whatsapp.connection) whatsappStatus = "reconnect"
     else whatsappStatus = "disconnected"
+  }
+
+  // Resend card state
+  let resendStatus: IntegrationStatus = "loading"
+  if (!resendEnabled) resendStatus = "coming_soon"
+  else if (resend.error) resendStatus = "disconnected"
+  else if (resend.data) {
+    if (!resend.data.enabled) resendStatus = "unavailable"
+    else if (resend.data.connection?.status === "connected") resendStatus = "connected"
+    else if (resend.data.connection) resendStatus = "reconnect"
+    else resendStatus = "disconnected"
   }
 
   const statusLabel = (status: IntegrationStatus) => {
@@ -129,6 +144,20 @@ export default function IntegrationsPage() {
             }
             href="/admin/integrations/whatsapp"
             actionLabel={actionLabel(whatsappStatus)}
+          />
+          <IntegrationCard
+            platform="resend"
+            name="Resend"
+            tagline={t("resendTagline")}
+            status={resendStatus}
+            statusLabel={statusLabel(resendStatus)}
+            detail={
+              resend.data?.connection
+                ? `${resend.data.connection.fromName} <${resend.data.connection.fromEmail}>`
+                : null
+            }
+            href="/admin/integrations/resend"
+            actionLabel={actionLabel(resendStatus)}
           />
         </div>
       </ContentWrapper>

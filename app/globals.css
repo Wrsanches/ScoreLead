@@ -388,9 +388,10 @@ select:-webkit-autofill:focus {
   animation: not-found-glitch-base 3s ease-in-out infinite;
 }
 
+/* Both error pages share this; the glitched copy comes from data-text. */
 .glitch-500::before,
 .glitch-500::after {
-  content: "500";
+  content: attr(data-text);
   position: absolute;
   top: 0;
   left: 0;

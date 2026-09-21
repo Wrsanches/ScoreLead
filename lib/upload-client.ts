@@ -15,6 +15,7 @@ export type UploadKind =
   | "avatar"
   | "content-reference"
   | "content-slide"
+  | "email-asset"
 
 export interface UploadOptions {
   kind: UploadKind

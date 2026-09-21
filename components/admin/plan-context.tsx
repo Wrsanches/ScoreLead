@@ -19,6 +19,7 @@ export type Plan = PlanId
 export type PlanCapability =
   | "continueJob"
   | "whatsappAutomation"
+  | "emailOutreach"
   | "csvExport"
   | "decisionMakers"
 

@@ -10,6 +10,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
+import type { EmailDocument } from "@/lib/resend/blocks"
 
 export type NotificationPreferences = {
   leadAlerts: boolean
@@ -733,3 +734,152 @@ export const usage = pgTable("usage", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
+
+// ---------------------------------------------------------------------------
+// Resend email integration: a business connects its own Resend account, stores
+// reusable email templates, and sends one-off emails to leads. Secrets are
+// encrypted per business (see lib/resend/security.ts); serializers must never
+// return the encrypted columns.
+// ---------------------------------------------------------------------------
+
+export const resendConnection = pgTable("resend_connection", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  /** connected | needs_action | disconnected */
+  status: text("status").notNull().default("connected"),
+  apiKeyEncrypted: text("apiKeyEncrypted"),
+  keyVersion: integer("keyVersion").notNull().default(1),
+  /** full | sending - whether the key could list domains and manage webhooks. */
+  keyScope: text("keyScope").notNull().default("full"),
+  keyLastFour: text("keyLastFour"),
+  fromName: text("fromName").notNull(),
+  fromEmail: text("fromEmail").notNull(),
+  replyTo: text("replyTo"),
+  domainId: text("domainId"),
+  domainName: text("domainName"),
+  domainStatus: text("domainStatus"),
+  webhookId: text("webhookId"),
+  webhookSecretEncrypted: text("webhookSecretEncrypted"),
+  /** active | manual | missing */
+  webhookStatus: text("webhookStatus").notNull().default("missing"),
+  lastVerifiedAt: timestamp("lastVerifiedAt", { withTimezone: true }),
+  connectedAt: timestamp("connectedAt", { withTimezone: true }).notNull().defaultNow(),
+  disconnectedAt: timestamp("disconnectedAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("resend_connection_business_uidx").on(table.businessId),
+])
+
+export type EmailTemplateBodyMode = "blocks" | "html"
+export type EmailComponentKind = "header" | "footer" | "signature"
+
+export const emailTemplate = pgTable("email_template", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  subject: text("subject").notNull(),
+  /** blocks (structured document rendered with React Email) | html (hand-written) */
+  bodyMode: text("bodyMode").$type<EmailTemplateBodyMode>().notNull().default("blocks"),
+  bodyDoc: jsonb("bodyDoc").$type<EmailDocument>(),
+  /**
+   * html mode: the canonical body. blocks mode: a server-rendered snapshot with
+   * {{tokens}} intact, used for listings and mode switching only; sends
+   * re-render from bodyDoc plus the business's current shared components.
+   */
+  bodyHtml: text("bodyHtml").notNull(),
+  createdByUserId: text("createdByUserId").references(() => user.id, { onDelete: "set null" }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("email_template_business_updated_idx").on(table.businessId, table.updatedAt),
+])
+
+/** Business-wide header, footer, and signature shared by every email template. */
+export const emailComponent = pgTable("email_component", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  kind: text("kind").$type<EmailComponentKind>().notNull(),
+  props: jsonb("props").$type<Record<string, unknown>>().notNull(),
+  updatedByUserId: text("updatedByUserId").references(() => user.id, { onDelete: "set null" }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("email_component_business_kind_uidx").on(table.businessId, table.kind),
+])
+
+export type EmailMessageStatus =
+  | "sending"
+  | "accepted"
+  | "sent"
+  | "delivered"
+  | "opened"
+  | "clicked"
+  | "delivery_delayed"
+  | "bounced"
+  | "complained"
+  | "failed"
+
+export const emailMessage = pgTable("email_message", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  leadId: text("leadId").notNull().references(() => lead.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId").notNull().references(() => resendConnection.id, { onDelete: "cascade" }),
+  templateId: text("templateId").references(() => emailTemplate.id, { onDelete: "set null" }),
+  sentByUserId: text("sentByUserId").references(() => user.id, { onDelete: "set null" }),
+  toEmail: text("toEmail").notNull(),
+  fromEmail: text("fromEmail").notNull(),
+  replyTo: text("replyTo"),
+  subject: text("subject").notNull(),
+  html: text("html").notNull(),
+  text: text("text"),
+  status: text("status").$type<EmailMessageStatus>().notNull().default("sending"),
+  resendEmailId: text("resendEmailId"),
+  errorCode: text("errorCode"),
+  errorMessage: text("errorMessage"),
+  openCount: integer("openCount").notNull().default(0),
+  clickCount: integer("clickCount").notNull().default(0),
+  lastClickedUrl: text("lastClickedUrl"),
+  acceptedAt: timestamp("acceptedAt", { withTimezone: true }),
+  sentAt: timestamp("sentAt", { withTimezone: true }),
+  deliveredAt: timestamp("deliveredAt", { withTimezone: true }),
+  delayedAt: timestamp("delayedAt", { withTimezone: true }),
+  openedAt: timestamp("openedAt", { withTimezone: true }),
+  clickedAt: timestamp("clickedAt", { withTimezone: true }),
+  bouncedAt: timestamp("bouncedAt", { withTimezone: true }),
+  complainedAt: timestamp("complainedAt", { withTimezone: true }),
+  failedAt: timestamp("failedAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("email_message_lead_created_idx").on(table.leadId, table.createdAt),
+  index("email_message_business_created_idx").on(table.businessId, table.createdAt),
+  uniqueIndex("email_message_resend_uidx").on(table.resendEmailId)
+    .where(sql`${table.resendEmailId} is not null`),
+])
+
+export const emailWebhookEvent = pgTable("email_webhook_event", {
+  id: text("id").primaryKey(),
+  connectionId: text("connectionId").notNull().references(() => resendConnection.id, { onDelete: "cascade" }),
+  /** `${connectionId}:${svix-id}` so a redelivered event is a no-op. */
+  eventKey: text("eventKey").notNull(),
+  eventType: text("eventType").notNull(),
+  resendEmailId: text("resendEmailId"),
+  processedAt: timestamp("processedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("email_webhook_event_key_uidx").on(table.eventKey),
+])
+
+export type EmailSuppressionReason = "bounced" | "complained" | "unsubscribed"
+
+export const emailSuppression = pgTable("email_suppression", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  /** Lowercased address; one row per business + address. */
+  email: text("email").notNull(),
+  reason: text("reason").$type<EmailSuppressionReason>().notNull(),
+  messageId: text("messageId").references(() => emailMessage.id, { onDelete: "set null" }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("email_suppression_business_email_uidx").on(table.businessId, table.email),
+])

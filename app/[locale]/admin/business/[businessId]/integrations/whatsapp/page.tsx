@@ -8,7 +8,6 @@ import {
   Clock3,
   Link2,
   Loader2,
-  MessageCircle,
   RefreshCw,
   ShieldCheck,
   Unplug,
@@ -16,6 +15,7 @@ import {
 import { toast } from "sonner"
 import { Link } from "@/i18n/routing"
 import { ContentWrapper, PageHeader } from "@/components/admin"
+import { BrandLogo } from "@/components/admin/brand-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -384,6 +384,7 @@ export default function WhatsAppIntegrationPage() {
             aria-labelledby="whatsapp-coming-soon-title"
           >
             <div className="max-w-2xl">
+              <BrandLogo platform="whatsapp" className="mb-6 size-12" />
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-zinc-300">
                 <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
                 {t("comingSoonBadge")}
@@ -412,9 +413,7 @@ export default function WhatsAppIntegrationPage() {
         ) : !connection || connection.status !== "connected" ? (
           <section className="grid gap-8 border-y border-zinc-200 py-8 dark:border-white/[0.08] lg:grid-cols-[minmax(0,1fr)_22rem]">
             <div className="max-w-2xl">
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-700 dark:text-emerald-300">
-                <MessageCircle className="h-5 w-5" />
-              </div>
+              <BrandLogo platform="whatsapp" className="mb-6 size-12" />
               <h2 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">{t("connectTitle")}</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">{t("connectDescription")}</p>
               {!readOnly && (
@@ -434,9 +433,7 @@ export default function WhatsAppIntegrationPage() {
           <div className="space-y-10">
             <section className="flex flex-col justify-between gap-5 border-y border-zinc-200 py-6 dark:border-white/[0.08] sm:flex-row sm:items-center">
               <div className="flex items-center gap-4">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-700 dark:text-emerald-300">
-                  <MessageCircle className="h-5 w-5" />
-                </span>
+                <BrandLogo platform="whatsapp" className="size-11 shrink-0" />
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">

@@ -44,6 +44,7 @@ export type UploadKind =
   | "content-reference"
   | "content-slide"
   | "lead-photo"
+  | "email-asset"
 
 let client: S3Client | null = null
 
@@ -118,6 +119,8 @@ export function buildKey(
       return `content/${ctx.postId}/${ctx.slideIndex}-${id}.${ctx.ext}`
     case "lead-photo":
       return `leads/${id}.${ctx.ext}`
+    case "email-asset":
+      return `email-assets/${ctx.userId}/${id}.${ctx.ext}`
   }
 }
 

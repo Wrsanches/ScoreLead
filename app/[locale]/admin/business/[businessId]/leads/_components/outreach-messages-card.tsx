@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { usePlan } from "@/components/admin/plan-context"
 import { AiOrb } from "@/components/ai-orb"
 import { WhatsAppAutomationPanel } from "./whatsapp-automation-panel"
+import { EmailOutreachPanel } from "./email-outreach-panel"
 
 export interface OutreachMessage {
   step: number
@@ -42,6 +43,8 @@ interface OutreachMessagesCardProps {
     phone?: string | null
   }
   readOnly?: boolean
+  /** Every address this lead may be emailed at; enables the Resend panel. */
+  emailRecipients?: string[]
 }
 
 // A cohesive 3-beat cadence: greet -> give value -> ask. One emerald accent
@@ -55,6 +58,7 @@ export function OutreachMessagesCard({
   onMessagesChange,
   contact,
   readOnly = false,
+  emailRecipients = [],
 }: OutreachMessagesCardProps) {
   const t = useTranslations("outreach")
   const { openUpgrade } = usePlan()
@@ -405,11 +409,18 @@ export function OutreachMessagesCard({
           </div>
         )}
         {!readOnly && (
-          <WhatsAppAutomationPanel
-            businessId={businessId}
-            leadId={leadId}
-            phone={contact?.phone}
-          />
+          <>
+            <EmailOutreachPanel
+              businessId={businessId}
+              leadId={leadId}
+              recipients={emailRecipients}
+            />
+            <WhatsAppAutomationPanel
+              businessId={businessId}
+              leadId={leadId}
+              phone={contact?.phone}
+            />
+          </>
         )}
       </div>
     </div>

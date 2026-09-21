@@ -127,6 +127,7 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
         perks: [
           "3 businesses, 30 runs per month",
           "WhatsApp automation",
+          "Email outreach from your Resend account",
           "AI content calendar and images",
           "150 contact enrichments per month",
         ],
@@ -205,6 +206,15 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
       },
       {
         label: "WhatsApp automation",
+        values: cells(
+          { value: "Not included", muted: true },
+          { value: "Not included", muted: true },
+          "Included",
+          "Included",
+        ),
+      },
+      {
+        label: "Email outreach (Resend)",
         values: cells(
           { value: "Not included", muted: true },
           { value: "Not included", muted: true },
@@ -324,6 +334,7 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
         perks: [
           "3 negócios, 30 descobertas por mês",
           "Automação de WhatsApp",
+          "Envio de emails pela sua conta Resend",
           "Calendário de conteúdo e imagens com IA",
           "150 enriquecimentos de contato por mês",
         ],
@@ -402,6 +413,15 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
       },
       {
         label: "Automação de WhatsApp",
+        values: cells(
+          { value: "Não incluído", muted: true },
+          { value: "Não incluído", muted: true },
+          "Incluído",
+          "Incluído",
+        ),
+      },
+      {
+        label: "Envio de emails (Resend)",
         values: cells(
           { value: "Não incluído", muted: true },
           { value: "Não incluído", muted: true },
@@ -521,6 +541,7 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
         perks: [
           "3 negocios, 30 descubrimientos al mes",
           "Automatización de WhatsApp",
+          "Envío de emails desde tu cuenta de Resend",
           "Calendario de contenido e imágenes con IA",
           "150 enriquecimientos de contacto al mes",
         ],
@@ -599,6 +620,15 @@ export const pricingUi: Record<MarketingLocale, PricingUi> = {
       },
       {
         label: "Automatización de WhatsApp",
+        values: cells(
+          { value: "No incluido", muted: true },
+          { value: "No incluido", muted: true },
+          "Incluido",
+          "Incluido",
+        ),
+      },
+      {
+        label: "Envío de emails (Resend)",
         values: cells(
           { value: "No incluido", muted: true },
           { value: "No incluido", muted: true },

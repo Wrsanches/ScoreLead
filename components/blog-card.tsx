@@ -1,6 +1,8 @@
+import Image from "next/image"
 import { ArrowUpRight, Clock3 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import type { BlogPost, BlogTranslation } from "@/lib/blog"
+import { getBlogImage } from "@/lib/blog/images"
 
 const accentStyles = {
   emerald: {
@@ -40,6 +42,35 @@ export function BlogVisual({
   compact?: boolean
 }) {
   const accent = accentStyles[post.accent]
+  const image = getBlogImage(post.slug)
+
+  if (image) {
+    return (
+      <div
+        className={`relative overflow-hidden border-b border-white/[0.06] bg-black/20 ${
+          compact ? "h-44" : "min-h-72 sm:min-h-80"
+        }`}
+      >
+        <Image
+          src={image.hero}
+          alt=""
+          fill
+          sizes={compact ? "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" : "(min-width: 1024px) 50vw, 100vw"}
+          priority={!compact}
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"
+        />
+        <span
+          className={`absolute bottom-5 left-6 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${accent.text}`}
+        >
+          {category}
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div

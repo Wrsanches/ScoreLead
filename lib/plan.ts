@@ -53,6 +53,7 @@ export type GateAction =
 export type Capability =
   | "continueJob"
   | "whatsappAutomation"
+  | "emailOutreach"
   | "csvExport"
   | "decisionMakers"
 
@@ -72,6 +73,7 @@ export interface PlanLimits {
   apolloEnrichmentsPerMonth: number
   continueJob: boolean
   whatsappAutomation: boolean
+  emailOutreach: boolean
   csvExport: boolean
   decisionMakers: boolean
 }
@@ -92,6 +94,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     apolloEnrichmentsPerMonth: 0,
     continueJob: false,
     whatsappAutomation: false,
+    emailOutreach: false,
     csvExport: false,
     decisionMakers: false,
   },
@@ -107,6 +110,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     apolloEnrichmentsPerMonth: 0,
     continueJob: false,
     whatsappAutomation: false,
+    emailOutreach: false,
     csvExport: true,
     decisionMakers: false,
   },
@@ -122,6 +126,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     apolloEnrichmentsPerMonth: 150,
     continueJob: true,
     whatsappAutomation: true,
+    emailOutreach: true,
     csvExport: true,
     decisionMakers: false,
   },
@@ -137,6 +142,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     apolloEnrichmentsPerMonth: 500, // fair-use - paid, credit-metered API
     continueJob: true,
     whatsappAutomation: true,
+    emailOutreach: true,
     csvExport: true,
     decisionMakers: true,
   },
@@ -704,6 +710,7 @@ export async function getPlanStatus(userId: string) {
     capabilities: {
       continueJob: limits.continueJob,
       whatsappAutomation: limits.whatsappAutomation,
+      emailOutreach: limits.emailOutreach,
       csvExport: limits.csvExport,
       decisionMakers: limits.decisionMakers,
     },
