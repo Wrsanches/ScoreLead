@@ -746,6 +746,7 @@
     },
     "panelTitle": "Email",
     "panelDescription": "Envía una plantilla desde {from} y sigue la entrega aquí.",
+    "panelIntro": "Envía una plantilla desde tu propia cuenta de Resend y sigue la entrega aquí.",
     "connectionRequired": "Conecta tu cuenta de Resend para enviar emails a los leads desde su página.",
     "openIntegrations": "Abrir integraciones",
     "noRecipients": "No se conoce ninguna dirección de email para este lead.",

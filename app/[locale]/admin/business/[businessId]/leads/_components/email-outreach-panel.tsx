@@ -245,7 +245,7 @@ export function EmailOutreachPanel({
   if (!canUse) {
     return (
       <Shell>
-        <Heading title={t("panelTitle")} />
+        <Heading title={t("panelTitle")} hint={t("panelIntro")} />
         <Notice icon={ShieldCheck} text={t("planRequired")}>
           <Button size="sm" onClick={() => openUpgrade("emailOutreach")}>{t("upgradeButton")}</Button>
         </Notice>
@@ -265,7 +265,7 @@ export function EmailOutreachPanel({
   if (!connected) {
     return (
       <Shell>
-        <Heading title={t("panelTitle")} />
+        <Heading title={t("panelTitle")} hint={t("panelIntro")} />
         <Notice icon={ExternalLink} text={t("connectionRequired")}>
           <Button size="sm" variant="outline" asChild>
             <Link href="/admin/integrations/resend">{t("openIntegrations")}</Link>

@@ -746,6 +746,7 @@
     },
     "panelTitle": "Email",
     "panelDescription": "Envie um template de {from} e acompanhe a entrega aqui.",
+    "panelIntro": "Envie um template da sua própria conta Resend e acompanhe a entrega aqui.",
     "connectionRequired": "Conecte sua conta Resend para enviar emails aos leads pela página deles.",
     "openIntegrations": "Abrir integrações",
     "noRecipients": "Nenhum endereço de email conhecido para este lead.",
