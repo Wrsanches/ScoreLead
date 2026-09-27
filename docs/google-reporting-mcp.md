@@ -1,6 +1,6 @@
 # Google reporting and Scorelead MCP
 
-Business owners and explicitly assigned platform admins connect Google Analytics 4 and Search Console at **Integrations → Google reporting**. Each connector supports multiple Google identities and multiple selected properties. Assistants use the same hosted, read-only MCP endpoint; no plugin installation, Google service account, or Google credentials on the user's computer are needed.
+Business owners and explicitly assigned platform admins connect Google Analytics 4 and Search Console at **Integrations → Google Analytics 4** or **Google Search Console**. Each connector supports multiple Google identities and multiple selected properties. Assistants use the same hosted, read-only MCP endpoint; no plugin installation, Google service account, or Google credentials on the user's computer are needed.
 
 ## Enable in a deployment
 
@@ -29,9 +29,9 @@ The public OAuth discovery documents and unauthenticated MCP rejection were veri
 
 ## User journey
 
-1. Open **Integrations → Google reporting** and connect a Google account separately for each desired connector.
+1. Open **Integrations → Google Analytics 4** or **Google Search Console** and connect a Google account separately for each desired connector.
 2. Select properties, then **Save selection**. Missing access, expired tokens, empty property lists, stale edits, quota errors and reconnect controls are shown in the page. Connect a second account to add properties from another Google identity.
-3. In **Connect your AI assistant**, copy the appropriate command.
+3. Open **Integrations → AI assistants** and copy the appropriate command. Google connection controls are kept on their own integration pages.
 
 ```sh
 codex mcp add scorelead --url https://app.scorelead.io/api/mcp

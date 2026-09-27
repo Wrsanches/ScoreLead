@@ -100,3 +100,21 @@ source and limitations.
 - Do preserve locale links and cite comparison facts.
 - Don't imitate a spreadsheet grid when six readable criteria fields suffice.
 - Don't present illustrative scores as purchase probabilities or customer results.
+
+## Authenticated integration surfaces
+
+The integration catalog and detail pages inherit the existing authenticated
+application rather than the public marketing layout above. Runtime ownership
+remains `app/globals.css` → Tailwind utilities → `ContentWrapper`, `PageHeader`,
+`SectionCard`, `IntegrationCard` and shared `Button`/`AlertDialog` components.
+No new theme tokens are introduced.
+
+Use the Instagram integration as the sibling reference: one integration per
+page, a quiet account surface, and setup instructions in a 20rem right column
+that stacks below the settings on mobile. Provider identity belongs in the
+rounded icon tile; emerald denotes actions and successful connections, amber
+flags reconnection, and neutral text carries help. GA4, Search Console and AI
+assistant catalog cards use the same card owner as WhatsApp and Instagram.
+Property selection uses a subtle emerald border and wash, not a second card
+style. Preserve the existing light/dark utility pairs and Geist typography.
+See `UX-CONTRACT.md` for navigation and behavior.

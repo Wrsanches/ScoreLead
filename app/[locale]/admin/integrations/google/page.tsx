@@ -1,1 +1,1 @@
-export { default } from "@/components/admin/google-reporting/reporting-settings"
+export { LegacyReportingRedirect as default } from "@/components/admin/google-reporting/reporting-settings"

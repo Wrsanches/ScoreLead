@@ -1846,7 +1846,7 @@
     "codexHelp": "Ejecuta estos comandos en tu terminal. Inicia sesión en Scorelead y autoriza la empresa y las propiedades.",
     "claudeHelp": "Ejecuta el comando, abre /mcp en Claude Code y autentica Scorelead en el navegador.",
     "assistantDescription": "Tu asistente puede leer informes de las propiedades autorizadas. Las credenciales de Google permanecen en Scorelead. El acceso caduca en 30 días y puedes revocarlo cuando quieras.",
-    "steps": "1. Conecta Google arriba. 2. Guarda tus propiedades. 3. Añade Scorelead a tu asistente y autoriza en el navegador.",
+    "steps": "Conecta Google Analytics o Search Console, guarda tus propiedades y añade ScoreLead a tu asistente para autorizar el acceso.",
     "copy": "Copiar",
     "samplePrompt": "Prueba: “¿Qué páginas perdieron clics de búsqueda el mes pasado y cómo cambió su tráfico web?”",
     "authorizedAssistants": "Asistentes autorizados",
@@ -1888,6 +1888,25 @@
       "AUTH_FAILED": "Falló la autorización de Google. Conecta de nuevo.",
       "AUTHORIZATION_EXPIRED": "Este enlace caducó o ya se usó. Inicia la conexión de nuevo desde tu asistente.",
       "RESOURCE_NOT_AUTHORIZED": "Una propiedad ya no está disponible para compartir. Recarga y revisa la selección."
-    }
+    },
+    "assistantName": "Asistentes de IA",
+    "assistantCount": "{count, plural, one {# asistente autorizado} other {# asistentes autorizados}}",
+    "accountCount": "{count, plural, one {# cuenta de Google conectada} other {# cuentas de Google conectadas}}",
+    "addAccount": "Añadir cuenta de Google",
+    "assistantSetup": "Configuración del asistente",
+    "connectedSources": "Tus fuentes de datos",
+    "sourcesHelp": "Conecta una cuenta de Google y guarda tus propiedades antes de autorizar un asistente.",
+    "googleStep1": "Inicia sesión con una cuenta de Google que tenga acceso a las propiedades de esta empresa.",
+    "googleStep2": "Selecciona las propiedades que quieres usar y guarda tu selección.",
+    "googleStep3": "Conecta un asistente de IA desde Integraciones cuando quieras explorar tus informes.",
+    "assistantStep1": "Conecta Google Analytics o Search Console y guarda tus propiedades.",
+    "assistantStep2": "Añade ScoreLead a tu asistente con los comandos de configuración.",
+    "assistantStep3": "Inicia sesión en ScoreLead y autoriza la empresa y las propiedades que tu asistente podrá consultar.",
+    "readOnlyHelp": "Acceso de solo lectura. ScoreLead y tu asistente no pueden modificar tus datos de Google.",
+    "unsavedTitle": "¿Descartar los cambios en las propiedades?",
+    "unsavedDescription": "No has guardado tu selección de propiedades. ¿Quieres salir de esta página y descartar los cambios?",
+    "discard": "Descartar cambios",
+    "unsaved": "Cambios sin guardar",
+    "propertiesLimit": "Selecciona hasta 100 propiedades."
   }
 }

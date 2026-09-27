@@ -396,7 +396,7 @@ test("admin Google consent is business-bound and records the connecting admin", 
     ),
   )
   expect(response.headers.get("location")).toContain(
-    `/admin/business/${b2}/integrations/google?google=connected`,
+    `/admin/business/${b2}/integrations/google-analytics?google=connected`,
   )
   const added = (await data.reportingConnections(b2)).find(
     (item) => item.email === "admin@example.com",
@@ -616,31 +616,37 @@ test("Google state is user-bound, expires, and is consumed once even under concu
     "INVALID_OAUTH_STATE",
   )
 })
-test("Google denial consumes state and returns a localized business URL", async () => {
-  const state = new URL(
-    await data.beginGoogleConnection(u1, b1, "ga4", "pt"),
-  ).searchParams.get("state")!
-  const response = await callbackRoute.GET(
-    new Request(
-      `${origin}/api/google-reporting/callback?state=${state}&error=access_denied`,
-      { headers: { cookie } },
-    ),
-  )
-  expect(response.status).toBe(307)
-  expect(response.headers.get("location")).toContain(
-    `/pt/admin/business/${b1}/integrations/google?google=AUTH_CANCELLED`,
-  )
-  expect(
-    (
-      await callbackRoute.GET(
-        new Request(
-          `${origin}/api/google-reporting/callback?state=${state}&code=again`,
-          { headers: { cookie } },
-        ),
-      )
-    ).status,
-  ).toBe(400)
-})
+test.each([
+  ["ga4", "google-analytics"],
+  ["search_console", "search-console"],
+] as const)(
+  "Google denial returns to the selected %s detail page",
+  async (provider, path) => {
+    const state = new URL(
+      await data.beginGoogleConnection(u1, b1, provider, "pt"),
+    ).searchParams.get("state")!
+    const response = await callbackRoute.GET(
+      new Request(
+        `${origin}/api/google-reporting/callback?state=${state}&error=access_denied`,
+        { headers: { cookie } },
+      ),
+    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get("location")).toContain(
+      `/pt/admin/business/${b1}/integrations/${path}?google=AUTH_CANCELLED`,
+    )
+    expect(
+      (
+        await callbackRoute.GET(
+          new Request(
+            `${origin}/api/google-reporting/callback?state=${state}&code=again`,
+            { headers: { cookie } },
+          ),
+        )
+      ).status,
+    ).toBe(400)
+  },
+)
 test("Google callback creates the selected provider and preserves existing refresh tokens on same-account reauthorization", async () => {
   const state = new URL(
     await data.beginGoogleConnection(u1, b1, "ga4", "en"),

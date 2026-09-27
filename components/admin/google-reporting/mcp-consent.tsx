@@ -79,7 +79,7 @@ export function McpConsent({
             <p className="text-sm text-amber-300">{t("consentEmpty")}</p>
             <Link
               className="text-sm text-emerald-400 underline"
-              href="/admin/integrations/google"
+              href="/admin/integrations"
               target="_blank"
               rel="noopener noreferrer"
             >

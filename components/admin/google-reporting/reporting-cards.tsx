@@ -1,89 +1,88 @@
 "use client"
-import {
-  Bot,
-  ChartNoAxesColumnIncreasing,
-  Search,
-  ArrowRight,
-} from "lucide-react"
+
 import { useTranslations } from "next-intl"
-import { Link } from "@/i18n/routing"
+import {
+  IntegrationCard,
+  type IntegrationStatus,
+} from "@/components/admin/integrations/integration-card"
+import { reportingIntegrationPath } from "@/lib/google-reporting/paths"
+import { ReportingIcon } from "./reporting-icon"
 import { useReporting } from "./use-reporting"
+
 export function ReportingCards({ businessId }: { businessId: string }) {
   const t = useTranslations("googleReporting")
+  const ti = useTranslations("integrations")
   const { data, error, loading } = useReporting(businessId)
   return (
     <>
-      {(
-        [
-          {
-            provider: "ga4",
-            title: "Google Analytics 4",
-            icon: ChartNoAxesColumnIncreasing,
-            copy: "gaTagline",
-          },
-          {
-            provider: "search_console",
-            title: "Google Search Console",
-            icon: Search,
-            copy: "searchTagline",
-          },
-        ] as const
-      ).map(({ provider, title, icon: Icon, copy }) => {
+      {(["ga4", "search_console", "assistants"] as const).map((integration) => {
+        const assistants = integration === "assistants"
         const connections =
-          data?.connections.filter((c) => c.provider === provider) || []
-        const count = connections.reduce(
-          (sum, c) => sum + c.resources.length,
-          0,
-        )
-        const status = loading
-          ? t("loading")
+          data?.connections.filter((c) => c.provider === integration) ?? []
+        const count = assistants
+          ? (data?.grants.length ?? 0)
+          : connections.reduce((sum, c) => sum + c.resources.length, 0)
+        const status: IntegrationStatus = loading
+          ? "loading"
           : error
-            ? t("loadErrorShort")
+            ? "unavailable"
             : connections.some((c) => c.status === "reconnect")
-              ? t("reconnect")
-              : count
-                ? t("selectedCount", { count })
-                : t("notConnected")
+              ? "reconnect"
+              : (assistants ? count : connections.length)
+                ? "connected"
+                : "disconnected"
+        const label = error
+          ? t("loadErrorShort")
+          : status === "reconnect"
+            ? ti("statusReconnect")
+            : status === "connected"
+              ? ti("statusConnected")
+              : ti("statusNotConnected")
         return (
-          <Link
-            key={provider}
-            href="/admin/integrations/google"
-            className="glass-card flex flex-col gap-4 rounded-2xl p-5 transition-colors hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <Icon
-                className={`size-9 ${provider === "ga4" ? "text-amber-400" : "text-sky-400"}`}
-                aria-hidden="true"
-              />
-              <span className="text-xs text-zinc-400">{status}</span>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-base font-semibold">{title}</h2>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">{t(copy)}</p>
-            </div>
-            <div className="flex items-center justify-between border-t border-white/10 pt-4 text-sm">
-              <span>{t("manage")}</span>
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </div>
-          </Link>
+          <IntegrationCard
+            key={integration}
+            icon={
+              <ReportingIcon integration={integration} className="size-11" />
+            }
+            brandColor={
+              assistants
+                ? "#10b981"
+                : integration === "ga4"
+                  ? "#f59e0b"
+                  : "#0ea5e9"
+            }
+            name={
+              assistants
+                ? t("assistantName")
+                : integration === "ga4"
+                  ? "Google Analytics 4"
+                  : "Google Search Console"
+            }
+            tagline={t(
+              assistants
+                ? "assistantsTagline"
+                : integration === "ga4"
+                  ? "gaTagline"
+                  : "searchTagline",
+            )}
+            status={status}
+            statusLabel={label}
+            detail={
+              (assistants ? count > 0 : connections.length > 0)
+                ? t(assistants ? "assistantCount" : "selectedCount", { count })
+                : null
+            }
+            href={reportingIntegrationPath(integration)}
+            actionLabel={
+              assistants
+                ? t("setup")
+                : connections.length
+                  ? ti("actionManage")
+                  : ti("actionConnect")
+            }
+          />
         )
       })}
-      <Link
-        href="/admin/integrations/google#assistants"
-        className="glass-card flex flex-col gap-4 rounded-2xl p-5 transition-colors hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
-      >
-        <Bot className="size-9 text-emerald-400" aria-hidden="true" />
-        <div className="flex-1">
-          <h2 className="text-base font-semibold">{t("assistantsTitle")}</h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-400">
-            {t("assistantsTagline")}
-          </p>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/10 pt-4 text-sm">
-          <span>{t("setup")}</span>
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </div>
-      </Link>
     </>
   )
 }

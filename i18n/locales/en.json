@@ -1846,7 +1846,7 @@
     "codexHelp": "Run these commands in your terminal. Sign in to Scorelead in the browser and approve the business and properties to share.",
     "claudeHelp": "Run the command, then open /mcp in Claude Code and authenticate Scorelead in your browser.",
     "assistantDescription": "Your assistant can read reports for approved properties. Google credentials stay in Scorelead. Access expires after 30 days and you can revoke it at any time.",
-    "steps": "1. Connect Google above. 2. Save your properties. 3. Add Scorelead to your assistant and approve access in the browser.",
+    "steps": "Connect Google Analytics or Search Console, save your properties, then add ScoreLead to your assistant and approve access.",
     "copy": "Copy",
     "samplePrompt": "Try asking: “Which pages lost search clicks last month, and how did their website traffic change?”",
     "authorizedAssistants": "Authorized assistants",
@@ -1888,6 +1888,25 @@
       "AUTH_FAILED": "Google authorization failed. Please connect again.",
       "AUTHORIZATION_EXPIRED": "This authorization link expired or was already used. Start the connection again from your assistant.",
       "RESOURCE_NOT_AUTHORIZED": "A property is no longer available for sharing. Reload and review the selection."
-    }
+    },
+    "assistantName": "AI assistants",
+    "assistantCount": "{count, plural, one {# assistant authorized} other {# assistants authorized}}",
+    "accountCount": "{count, plural, one {# Google account connected} other {# Google accounts connected}}",
+    "addAccount": "Add Google account",
+    "assistantSetup": "Assistant setup",
+    "connectedSources": "Your data sources",
+    "sourcesHelp": "Connect a Google account and save your properties before authorizing an assistant.",
+    "googleStep1": "Sign in with a Google account that has access to this business’s properties.",
+    "googleStep2": "Select the properties you want to use and save your selection.",
+    "googleStep3": "Connect an AI assistant from Integrations when you are ready to explore your reports.",
+    "assistantStep1": "Connect Google Analytics or Search Console and save your properties.",
+    "assistantStep2": "Add ScoreLead to your assistant using the setup commands.",
+    "assistantStep3": "Sign in to ScoreLead and approve the business and properties your assistant can read.",
+    "readOnlyHelp": "Read-only access. ScoreLead and your assistant cannot change your Google data.",
+    "unsavedTitle": "Discard property changes?",
+    "unsavedDescription": "Your property selection has not been saved. Leave this page and discard these changes?",
+    "discard": "Discard changes",
+    "unsaved": "Unsaved changes",
+    "propertiesLimit": "Select up to 100 properties."
   }
 }

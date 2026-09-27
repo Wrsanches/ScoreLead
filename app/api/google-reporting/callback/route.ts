@@ -1,3 +1,4 @@
+import { reportingIntegrationPath } from "@/lib/google-reporting/paths"
 import { NextResponse } from "next/server"
 import { reportingSession, reportingAccess } from "@/lib/google-reporting/http"
 import {
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
     )
     const destination = new URL(
       getLocalizedAppPath(
-        `/admin/business/${state.businessId}/integrations/google`,
+        reportingIntegrationPath(state.provider, state.businessId),
         state.locale,
       ),
       reportingOrigin(),
