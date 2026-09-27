@@ -13,6 +13,7 @@ import { useBusinessAccess } from "@/components/admin/business-context"
 import { authClient } from "@/lib/auth-client"
 import { hasWhatsAppEarlyAccess } from "@/lib/whatsapp/feature-access"
 import { isResendIntegrationEnabled } from "@/lib/resend/feature-access"
+import { ReportingCards } from "@/components/admin/google-reporting/reporting-cards"
 
 const WHATSAPP_INTEGRATION_CONFIGURED =
   process.env.NEXT_PUBLIC_WHATSAPP_INTEGRATION_ENABLED === "true"
@@ -117,6 +118,7 @@ export default function IntegrationsPage() {
         />
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ReportingCards businessId={businessId} />
           <IntegrationCard
             platform="instagram"
             name="Instagram"
