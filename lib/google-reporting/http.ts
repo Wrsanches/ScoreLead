@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { business } from "@/lib/db/schema"
 import { ReportingError } from "./errors"
 import { sameReportingOrigin } from "./security"
+import { reportingBusinessAccess } from "./access"
 
 export async function reportingSession(request: Request, write = false) {
   if (write && !sameReportingOrigin(request))
@@ -13,21 +14,24 @@ export async function reportingSession(request: Request, write = false) {
   if (!session) throw new ReportingError("UNAUTHORIZED", 401)
   return session
 }
-// Analytics credentials and external delegation are owner-only, including for platform admins.
+// Owners retain access; admins require an explicit assignment to this business.
 export async function reportingAccess(
   request: Request,
   businessId: string,
   write = false,
 ) {
   const session = await reportingSession(request, write)
-  const [owner] = await db
+  const [allowed] = await db
     .select({ id: business.id })
     .from(business)
     .where(
-      and(eq(business.id, businessId), eq(business.userId, session.user.id)),
+      and(
+        eq(business.id, businessId),
+        reportingBusinessAccess(session.user.id),
+      ),
     )
     .limit(1)
-  if (!owner) throw new ReportingError("BUSINESS_NOT_FOUND", 404)
+  if (!allowed) throw new ReportingError("BUSINESS_NOT_FOUND", 404)
   return session
 }
 export async function boundedText(request: Request, limit = 16384) {

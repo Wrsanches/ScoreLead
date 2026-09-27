@@ -1,4 +1,36 @@
 import type { GoogleReportingProvider } from "@/lib/db/schema"
+import { z } from "zod"
+
+const adminAssignmentsSchema = z
+  .array(
+    z
+      .object({
+        userId: z
+          .string()
+          .min(1)
+          .max(255)
+          .regex(/^[A-Za-z0-9_-]+$/),
+        businessId: z
+          .string()
+          .min(1)
+          .max(255)
+          .regex(/^[A-Za-z0-9_-]+$/),
+      })
+      .strict(),
+  )
+  .max(100)
+
+// Admin delegation is opt-in per exact actor/business pair, never organization-wide.
+export function reportingAdminAssignments() {
+  const configured = process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
+  if (!configured || configured.length > 65536) return []
+  try {
+    const parsed = adminAssignmentsSchema.safeParse(JSON.parse(configured))
+    return parsed.success ? parsed.data : []
+  } catch {
+    return []
+  }
+}
 
 export const GOOGLE_REPORTING_SCOPES = {
   ga4: "https://www.googleapis.com/auth/analytics.readonly",

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { and, eq, gt, isNull } from "drizzle-orm"
+import { and, eq, gt, inArray, isNull } from "drizzle-orm"
 import { z } from "zod"
 import { db } from "@/lib/db"
 import {
@@ -12,6 +12,7 @@ import {
   reportingMcpToken as token,
 } from "@/lib/db/schema"
 import { ReportingError } from "@/lib/google-reporting/errors"
+import { reportingBusinessAccess } from "@/lib/google-reporting/access"
 import {
   hashToken,
   opaqueToken,
@@ -131,7 +132,7 @@ export async function consentBusinesses(userId: string) {
     .innerJoin(resource, eq(resource.connectionId, connection.id))
     .where(
       and(
-        eq(business.userId, userId),
+        reportingBusinessAccess(userId),
         eq(connection.status, "connected"),
         eq(resource.selected, true),
       ),
@@ -191,24 +192,24 @@ export async function decideMcpAuthorization(input: {
       destination.searchParams.set("error", "access_denied")
       return destination.toString()
     }
-    const [owned] = await tx
+    const [managed] = await tx
       .select()
       .from(business)
       .where(
         and(
           eq(business.id, input.businessId || ""),
-          eq(business.userId, input.userId),
+          reportingBusinessAccess(input.userId),
         ),
       )
       .for("share")
-    if (!owned) throw new ReportingError("BUSINESS_NOT_FOUND", 404)
+    if (!managed) throw new ReportingError("BUSINESS_NOT_FOUND", 404)
     const available = await tx
       .select({ id: resource.id })
       .from(resource)
       .innerJoin(connection, eq(resource.connectionId, connection.id))
       .where(
         and(
-          eq(connection.businessId, owned.id),
+          eq(connection.businessId, managed.id),
           eq(connection.status, "connected"),
           eq(resource.selected, true),
         ),
@@ -223,7 +224,7 @@ export async function decideMcpAuthorization(input: {
       id: grantId,
       clientId: pending.clientId,
       userId: input.userId,
-      businessId: owned.id,
+      businessId: managed.id,
       resourceIds: selected,
       scope: pending.scope,
       audience: pending.audience,
@@ -316,16 +317,16 @@ export async function exchangeMcpToken(input: z.output<typeof tokenSchema>) {
       allowed.expiresAt.getTime() <= Date.now()
     )
       return new ReportingError("invalid_grant")
-    const [owner] = await tx
+    const [manager] = await tx
       .select({ id: business.id })
       .from(business)
       .where(
         and(
           eq(business.id, allowed.businessId),
-          eq(business.userId, allowed.userId),
+          reportingBusinessAccess(allowed.userId),
         ),
       )
-    if (!owner) return new ReportingError("invalid_grant")
+    if (!manager) return new ReportingError("invalid_grant")
     if (isCode) {
       const [current] = await tx
         .select()
@@ -388,10 +389,7 @@ export async function authorizeMcpToken(bearer: string) {
     .select({ grant })
     .from(token)
     .innerJoin(grant, eq(token.grantId, grant.id))
-    .innerJoin(
-      business,
-      and(eq(grant.businessId, business.id), eq(grant.userId, business.userId)),
-    )
+    .innerJoin(business, eq(grant.businessId, business.id))
     .where(
       and(
         eq(token.hash, hashToken(bearer)),
@@ -400,6 +398,7 @@ export async function authorizeMcpToken(bearer: string) {
         gt(grant.expiresAt, new Date()),
         isNull(grant.revokedAt),
         eq(grant.audience, mcpResource()),
+        reportingBusinessAccess(grant.userId),
       ),
     )
     .limit(1)
@@ -432,9 +431,10 @@ export async function listMcpGrants(userId: string, businessId: string) {
     })
     .from(grant)
     .innerJoin(client, eq(grant.clientId, client.id))
+    .innerJoin(business, eq(grant.businessId, business.id))
     .where(
       and(
-        eq(grant.userId, userId),
+        reportingBusinessAccess(userId),
         eq(grant.businessId, businessId),
         isNull(grant.revokedAt),
         gt(grant.expiresAt, new Date()),
@@ -452,8 +452,14 @@ export async function revokeMcpGrant(
     .where(
       and(
         eq(grant.id, grantId),
-        eq(grant.userId, userId),
         eq(grant.businessId, businessId),
+        inArray(
+          grant.businessId,
+          db
+            .select({ id: business.id })
+            .from(business)
+            .where(reportingBusinessAccess(userId)),
+        ),
       ),
     )
 }

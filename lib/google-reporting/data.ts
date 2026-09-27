@@ -6,8 +6,10 @@ import {
   googleReportingResource as resource,
   googleReportingOAuthState as oauthState,
   googleReportingCache as cache,
+  business,
   type GoogleReportingProvider,
 } from "@/lib/db/schema"
+import { reportingAdminBusinessAccess } from "./access"
 import { GOOGLE_REPORTING_SCOPES } from "./config"
 import {
   decryptReportingToken,
@@ -38,17 +40,15 @@ export async function beginGoogleConnection(
   const state = opaqueToken(),
     verifier = opaqueToken()
   await db.delete(oauthState).where(lt(oauthState.expiresAt, new Date()))
-  await db
-    .insert(oauthState)
-    .values({
-      hash: hashToken(state),
-      userId,
-      businessId,
-      provider,
-      locale,
-      verifierEncrypted: encryptReportingToken(verifier, state),
-      expiresAt: new Date(Date.now() + 600000),
-    })
+  await db.insert(oauthState).values({
+    hash: hashToken(state),
+    userId,
+    businessId,
+    provider,
+    locale,
+    verifierEncrypted: encryptReportingToken(verifier, state),
+    expiresAt: new Date(Date.now() + 600000),
+  })
   return googleAuthorizationUrl(provider, state, verifier)
 }
 export async function consumeGoogleState(state: string, userId: string) {
@@ -119,15 +119,13 @@ export async function saveGoogleConnection(input: {
         .set(values)
         .where(eq(connection.id, existing.id))
     else
-      await tx
-        .insert(connection)
-        .values({
-          id: randomUUID(),
-          businessId: input.businessId,
-          provider: input.provider,
-          subject: input.subject,
-          ...values,
-        })
+      await tx.insert(connection).values({
+        id: randomUUID(),
+        businessId: input.businessId,
+        provider: input.provider,
+        subject: input.subject,
+        ...values,
+      })
   })
 }
 export async function getGoogleConnection(businessId: string, id: string) {
@@ -248,8 +246,33 @@ export async function withGoogleAccess<T>(
     throw error
   }
 }
-export async function discoverGoogleResources(businessId: string, id: string) {
+export async function discoverGoogleResources(
+  businessId: string,
+  id: string,
+  actorUserId: string,
+) {
   const row = await getGoogleConnection(businessId, id)
+  if (row.connectedBy !== actorUserId) {
+    const [assignedAdmin] = await db
+      .select({ id: business.id })
+      .from(business)
+      .where(
+        and(
+          eq(business.id, businessId),
+          reportingAdminBusinessAccess(actorUserId),
+        ),
+      )
+      .limit(1)
+    if (!assignedAdmin) {
+      // A shared agency identity may contain other clients' properties. Business
+      // owners can keep/remove its selected properties, but cannot discover or add
+      // more without the connecting actor or an explicitly assigned admin.
+      return db
+        .select({ externalId: resource.externalId, name: resource.name })
+        .from(resource)
+        .where(and(eq(resource.connectionId, id), eq(resource.selected, true)))
+    }
+  }
   return withGoogleAccess(businessId, id, (token) =>
     listGoogleResources(row.provider, token),
   )
@@ -259,9 +282,10 @@ export async function selectGoogleResources(
   id: string,
   externalIds: string[],
   version: string,
+  actorUserId: string,
 ) {
   const available = externalIds.length
-    ? await discoverGoogleResources(businessId, id)
+    ? await discoverGoogleResources(businessId, id, actorUserId)
     : []
   const names = new Map(available.map((item) => [item.externalId, item.name]))
   if (externalIds.some((key) => !names.has(key)))

@@ -1839,7 +1839,7 @@
     "noProperties": "No properties are available for this Google account. Check its permissions or connect another account.",
     "propertyUnavailable": "No longer accessible; deselect to save",
     "saveSelection": "Save selection",
-    "selectionHelp": "Choose up to 100 properties. New properties need separate approval in your assistant. Removing a property blocks assistant access.",
+    "selectionHelp": "Choose up to 100 properties. Only the person who connected this Google account or an admin assigned to this business can add properties. Business owners can remove selected properties. New properties need separate approval in your assistant; removing a property blocks assistant access.",
     "copied": "Copied to clipboard.",
     "copyFailed": "Couldn't copy. Select and copy the command below.",
     "revoked": "Assistant access revoked.",
@@ -1873,7 +1873,7 @@
     "errors": {
       "REPORTING_UNAVAILABLE": "Reporting is temporarily unavailable. Try again.",
       "UNAUTHORIZED": "Your session expired. Sign in again.",
-      "BUSINESS_NOT_FOUND": "Only the business owner can manage reporting and assistant access.",
+      "BUSINESS_NOT_FOUND": "Only the business owner or an admin assigned to this business can manage reporting and assistant access.",
       "REPORTING_NOT_CONFIGURED": "Google reporting needs to be configured by the administrator.",
       "GOOGLE_RECONNECT_REQUIRED": "Google access expired or was revoked. Reconnect this account.",
       "GOOGLE_PERMISSIONS_REQUIRED": "Grant the requested read-only reporting permission when connecting Google.",

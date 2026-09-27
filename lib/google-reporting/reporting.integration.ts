@@ -128,7 +128,12 @@ async function googleConnection(
     (c) => c.provider === provider,
   )!.id
 }
-async function authorize(ids = [r1, r2]) {
+function allowReportingAdmin(userId: string, businessId: string) {
+  process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = JSON.stringify([
+    { userId, businessId },
+  ])
+}
+async function authorize(ids = [r1, r2], businessId = b1) {
   const client = await oauth.registerMcpClient(
     registrationSchema.parse({
       client_name: "Test assistant",
@@ -152,7 +157,7 @@ async function authorize(ids = [r1, r2]) {
       requestId,
       userId: u1,
       accept: true,
-      businessId: b1,
+      businessId,
       resourceIds: ids,
     }),
   )
@@ -223,6 +228,7 @@ beforeAll(async () => {
 })
 beforeEach(async () => {
   delete process.env.GOOGLE_REPORTING_ALLOWED_EMAILS
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
   await db.execute(
     sql`truncate table "user", reporting_mcp_client, reporting_rate_bucket cascade`,
   )
@@ -277,6 +283,7 @@ beforeEach(async () => {
 afterEach(() => {
   globalThis.fetch = originalFetch
   delete process.env.GOOGLE_REPORTING_ALLOWED_EMAILS
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
 })
 afterAll(async () => {
   await pool.end()
@@ -292,7 +299,7 @@ test("migration is repeatable and credential summaries never include tokens", as
   expect(summary).not.toContain("Encrypted")
   expect(summary).toContain("properties/123")
 })
-test("dashboard access rejects anonymous users, other owners and platform admins acting for owners", async () => {
+test("dashboard requires an exact business assignment and a current admin role", async () => {
   expect(
     (
       await connectionRoute.GET(new Request(`${origin}/api`), {
@@ -318,6 +325,216 @@ test("dashboard access rejects anonymous users, other owners and platform admins
       })
     ).status,
   ).toBe(404)
+  // Different pairs must not become a cross-product of allowed actors/businesses.
+  process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = JSON.stringify([
+    { userId: u1, businessId: b1 },
+    { userId: u2, businessId: b2 },
+  ])
+  expect(
+    (
+      await connectionRoute.GET(read(b2), {
+        params: Promise.resolve({ id: b2 }),
+      })
+    ).status,
+  ).toBe(404)
+  allowReportingAdmin(u1, b2)
+  expect(
+    (
+      await connectionRoute.GET(read(b2), {
+        params: Promise.resolve({ id: b2 }),
+      })
+    ).status,
+  ).toBe(200)
+  expect(
+    (await oauth.consentBusinesses(u1)).map((entry) => entry.id).sort(),
+  ).toEqual([b1, b2].sort())
+  await db
+    .update(schema.user)
+    .set({ role: "user" })
+    .where(eq(schema.user.id, u1))
+  expect(
+    (
+      await connectionRoute.GET(read(b2), {
+        params: Promise.resolve({ id: b2 }),
+      })
+    ).status,
+  ).toBe(404)
+  expect((await oauth.consentBusinesses(u1)).map((entry) => entry.id)).toEqual([
+    b1,
+  ])
+})
+test("admin Google consent is business-bound and records the connecting admin", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const started = await startRoute.POST(write("/api", { provider: "ga4" }), {
+    params: Promise.resolve({ id: b2 }),
+  })
+  expect(started.status).toBe(200)
+  const state = new URL((await started.json()).url).searchParams.get("state")!
+  upstream(async (url) =>
+    url.includes("/token")
+      ? Response.json({
+          access_token: "admin-access",
+          refresh_token: "admin-refresh",
+          expires_in: 3600,
+          scope: `openid email ${GOOGLE_REPORTING_SCOPES.ga4}`,
+          token_type: "Bearer",
+        })
+      : Response.json({
+          sub: "admin-google",
+          email: "admin@example.com",
+          email_verified: true,
+        }),
+  )
+  const response = await callbackRoute.GET(
+    new Request(
+      `${origin}/api/google-reporting/callback?state=${state}&code=valid`,
+      { headers: { cookie } },
+    ),
+  )
+  expect(response.headers.get("location")).toContain(
+    `/admin/business/${b2}/integrations/google?google=connected`,
+  )
+  const added = (await data.reportingConnections(b2)).find(
+    (item) => item.email === "admin@example.com",
+  )!
+  expect(added).toBeDefined()
+  expect((await data.getGoogleConnection(b2, added.id)).connectedBy).toBe(u1)
+  expect(
+    (await data.reportingConnections(b1)).some(
+      (item) => item.email === "admin@example.com",
+    ),
+  ).toBe(false)
+})
+test("Google callback rechecks admin access after the role is removed", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const started = await startRoute.POST(write("/api", { provider: "ga4" }), {
+    params: Promise.resolve({ id: b2 }),
+  })
+  const state = new URL((await started.json()).url).searchParams.get("state")!
+  await db
+    .update(schema.user)
+    .set({ role: "user" })
+    .where(eq(schema.user.id, u1))
+  let upstreamCalls = 0
+  upstream(async () => {
+    upstreamCalls++
+    return Response.json({})
+  })
+  const response = await callbackRoute.GET(
+    new Request(
+      `${origin}/api/google-reporting/callback?state=${state}&code=valid`,
+      { headers: { cookie } },
+    ),
+  )
+  expect(response.headers.get("location")).toContain(
+    "google=BUSINESS_NOT_FOUND",
+  )
+  expect(upstreamCalls).toBe(0)
+})
+test("admin assistant grants include only the chosen business and properties", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  await expect(authorize([r1], b2)).rejects.toThrow("RESOURCE_NOT_AUTHORIZED")
+  const a = await authorize([r3], b2)
+  expect(a.grant.userId).toBe(u1)
+  expect(a.grant.businessId).toBe(b2)
+  expect(a.grant.resourceIds).toEqual([r3])
+  const listed = await rpc(a.tokens.access_token, "tools/call", {
+    name: "list_connections",
+    arguments: {},
+  })
+  expect(listed.response.status).toBe(200)
+  expect(JSON.stringify(listed.body)).toContain("properties/999")
+  expect(JSON.stringify(listed.body)).not.toContain("properties/123")
+  const denied = await rpc(a.tokens.access_token, "tools/call", {
+    name: "get_reporting_fields",
+    arguments: { resourceId: r1 },
+  })
+  expect(JSON.stringify(denied.body)).toContain("RESOURCE_NOT_AUTHORIZED")
+})
+test("removing admin access blocks issued MCP tokens and refresh without affecting owned-business grants", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const delegated = await authorize([r3], b2)
+  const owned = await authorize()
+  await db
+    .update(schema.user)
+    .set({ role: "user" })
+    .where(eq(schema.user.id, u1))
+  await expect(
+    oauth.authorizeMcpToken(delegated.tokens.access_token),
+  ).rejects.toThrow("invalid_token")
+  await expect(
+    oauth.exchangeMcpToken({
+      grant_type: "refresh_token",
+      client_id: delegated.client.client_id,
+      refresh_token: delegated.tokens.refresh_token!,
+    }),
+  ).rejects.toThrow("invalid_grant")
+  expect(
+    (await oauth.authorizeMcpToken(owned.tokens.access_token)).businessId,
+  ).toBe(b1)
+})
+test("removing an admin assignment blocks delegated tokens and refresh while the admin role remains", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const delegated = await authorize([r3], b2)
+  const owned = await authorize()
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
+  await expect(
+    oauth.authorizeMcpToken(delegated.tokens.access_token),
+  ).rejects.toThrow("invalid_token")
+  await expect(
+    oauth.exchangeMcpToken({
+      grant_type: "refresh_token",
+      client_id: delegated.client.client_id,
+      refresh_token: delegated.tokens.refresh_token!,
+    }),
+  ).rejects.toThrow("invalid_grant")
+  expect(
+    (await oauth.authorizeMcpToken(owned.tokens.access_token)).businessId,
+  ).toBe(b1)
+  expect((await oauth.consentBusinesses(u1)).map((entry) => entry.id)).toEqual([
+    b1,
+  ])
+})
+test("business owners can see and revoke admin-issued grants without touching other businesses", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const delegated = await authorize([r3], b2)
+  const owned = await authorize()
+  expect((await oauth.listMcpGrants(u2, b2)).map((g) => g.id)).toContain(
+    delegated.grant.id,
+  )
+  expect(await oauth.listMcpGrants(u2, b1)).toEqual([])
+  await oauth.revokeMcpGrant(u2, b2, owned.grant.id)
+  expect((await oauth.authorizeMcpToken(owned.tokens.access_token)).id).toBe(
+    owned.grant.id,
+  )
+  await oauth.revokeMcpGrant(u2, b2, delegated.grant.id)
+  await expect(
+    oauth.authorizeMcpToken(delegated.tokens.access_token),
+  ).rejects.toThrow("invalid_token")
 })
 test("Google connect rejects CSRF and validates bounded input", async () => {
   const context = { params: Promise.resolve({ id: b1 }) }
@@ -513,9 +730,10 @@ test("resource selection rejects forged properties, foreign connections and stal
       ga,
       ["properties/999"],
       row.updatedAt.toISOString(),
+      u1,
     ),
   ).rejects.toThrow("GOOGLE_RESOURCE_NOT_FOUND")
-  await expect(data.discoverGoogleResources(b1, foreign)).rejects.toThrow(
+  await expect(data.discoverGoogleResources(b1, foreign, u1)).rejects.toThrow(
     "CONNECTION_NOT_FOUND",
   )
   await data.selectGoogleResources(
@@ -523,9 +741,10 @@ test("resource selection rejects forged properties, foreign connections and stal
     ga,
     ["properties/123"],
     row.updatedAt.toISOString(),
+    u1,
   )
   await expect(
-    data.selectGoogleResources(b1, ga, [], row.updatedAt.toISOString()),
+    data.selectGoogleResources(b1, ga, [], row.updatedAt.toISOString(), u1),
   ).rejects.toThrow("CONNECTION_CHANGED")
   const res = await resourceRoute.PUT(
     new Request(`${origin}/api`, {
@@ -539,6 +758,62 @@ test("resource selection rejects forged properties, foreign connections and stal
     { params: Promise.resolve({ id: b1, connectionId: ga }) },
   )
   expect(res.status).toBe(400)
+})
+test("owners cannot discover or add other clients from an admin-connected Google identity", async () => {
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u2))
+  await db
+    .update(schema.googleReportingConnection)
+    .set({ connectedBy: u2 })
+    .where(eq(schema.googleReportingConnection.id, ga))
+  let googleCalls = 0
+  upstream(async () => {
+    googleCalls++
+    return Response.json({
+      accountSummaries: [
+        {
+          propertySummaries: [
+            { property: "properties/123", displayName: "Approved website" },
+            { property: "properties/999", displayName: "Another client" },
+          ],
+        },
+      ],
+    })
+  })
+  const context = { params: Promise.resolve({ id: b1, connectionId: ga }) }
+  const visible = await resourceRoute.GET(read(b1), context)
+  expect(
+    (await visible.json()).resources.map(
+      (r: { externalId: string }) => r.externalId,
+    ),
+  ).toEqual(["properties/123"])
+  expect(googleCalls).toBe(0)
+  const save = async (externalIds: string[]) =>
+    resourceRoute.PUT(
+      write("/api", {
+        externalIds,
+        version: (
+          await data.getGoogleConnection(b1, ga)
+        ).updatedAt.toISOString(),
+      }),
+      context,
+    )
+  expect((await save(["properties/123", "properties/999"])).status).toBe(400)
+  expect((await save(["properties/123"])).status).toBe(200)
+  expect((await save([])).status).toBe(200)
+  expect((await save(["properties/123"])).status).toBe(400)
+  expect(googleCalls).toBe(0)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  allowReportingAdmin(u1, b1)
+  const managed = await resourceRoute.GET(read(b1), context)
+  expect((await managed.json()).resources).toHaveLength(2)
+  expect((await save(["properties/123"])).status).toBe(200)
+  expect(googleCalls).toBe(2)
 })
 test("MCP authorization validates redirect before redirecting or saving, with no open redirect", async () => {
   const client = await oauth.registerMcpClient(
@@ -601,7 +876,7 @@ test("explicit consent denies another tenant and forged resource IDs", async () 
     "AUTHORIZATION_EXPIRED",
   )
 })
-test("consent mutation requires signed-in owner and same-origin request", async () => {
+test("consent mutation requires a signed-in manager and same-origin request", async () => {
   expect(
     (
       await consentRoute.POST(

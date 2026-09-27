@@ -15,9 +15,13 @@ export async function GET(
 ) {
   try {
     const { id, connectionId } = await params
-    await reportingAccess(request, id)
+    const session = await reportingAccess(request, id)
     return noStoreJson({
-      resources: await discoverGoogleResources(id, connectionId),
+      resources: await discoverGoogleResources(
+        id,
+        connectionId,
+        session.user.id,
+      ),
     })
   } catch (error) {
     return reportingErrorResponse(error)
@@ -29,7 +33,7 @@ export async function PUT(
 ) {
   try {
     const { id, connectionId } = await params
-    await reportingAccess(request, id, true)
+    const session = await reportingAccess(request, id, true)
     const body = await jsonBody(
       request,
       z
@@ -47,6 +51,7 @@ export async function PUT(
       connectionId,
       body.externalIds,
       body.version,
+      session.user.id,
     )
     return noStoreJson({ success: true })
   } catch (error) {

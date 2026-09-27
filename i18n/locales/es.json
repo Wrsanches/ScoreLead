@@ -1839,7 +1839,7 @@
     "noProperties": "No hay propiedades disponibles para esta cuenta. Revisa sus permisos o conecta otra cuenta.",
     "propertyUnavailable": "Ya no es accesible; desmarca para guardar",
     "saveSelection": "Guardar selección",
-    "selectionHelp": "Elige hasta 100 propiedades. Las nuevas requieren autorización en tu asistente. Quitar una propiedad bloquea su acceso.",
+    "selectionHelp": "Elige hasta 100 propiedades. Solo quien conectó esta cuenta de Google o un administrador autorizado para este negocio puede añadir propiedades. El propietario del negocio puede quitar propiedades seleccionadas. Las nuevas requieren autorización en tu asistente; quitar una propiedad bloquea su acceso.",
     "copied": "Copiado al portapapeles.",
     "copyFailed": "No se pudo copiar. Selecciona y copia el comando.",
     "revoked": "Acceso del asistente revocado.",
@@ -1873,7 +1873,7 @@
     "errors": {
       "REPORTING_UNAVAILABLE": "Los informes no están disponibles temporalmente. Reintenta.",
       "UNAUTHORIZED": "Tu sesión ha caducado. Inicia sesión de nuevo.",
-      "BUSINESS_NOT_FOUND": "Solo el propietario puede gestionar los informes y el acceso de asistentes.",
+      "BUSINESS_NOT_FOUND": "Solo el propietario o un administrador autorizado para este negocio puede gestionar los informes y el acceso de asistentes.",
       "REPORTING_NOT_CONFIGURED": "El administrador debe configurar los informes de Google.",
       "GOOGLE_RECONNECT_REQUIRED": "El acceso de Google caducó o fue revocado. Reconecta la cuenta.",
       "GOOGLE_PERMISSIONS_REQUIRED": "Concede el permiso de lectura solicitado al conectar Google.",
