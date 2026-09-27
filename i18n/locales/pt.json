@@ -1839,7 +1839,7 @@
     "noProperties": "Nenhuma propriedade disponível nesta conta Google. Verifique as permissões ou conecte outra conta.",
     "propertyUnavailable": "Sem acesso; desmarque para salvar",
     "saveSelection": "Salvar seleção",
-    "selectionHelp": "Escolha até 100 propriedades. Novas propriedades exigem autorização no assistente. Remover uma propriedade bloqueia o acesso do assistente.",
+    "selectionHelp": "Escolha até 100 propriedades. Somente quem conectou esta conta Google ou um administrador da plataforma pode adicionar propriedades. O proprietário da empresa pode remover propriedades selecionadas. Novas propriedades exigem autorização no assistente; remover uma propriedade bloqueia o acesso do assistente.",
     "copied": "Copiado para a área de transferência.",
     "copyFailed": "Não foi possível copiar. Selecione e copie o comando abaixo.",
     "revoked": "Acesso do assistente revogado.",
@@ -1873,7 +1873,7 @@
     "errors": {
       "REPORTING_UNAVAILABLE": "Os relatórios estão indisponíveis temporariamente. Tente novamente.",
       "UNAUTHORIZED": "Sua sessão expirou. Entre novamente.",
-      "BUSINESS_NOT_FOUND": "Somente o proprietário pode gerenciar relatórios e acesso dos assistentes.",
+      "BUSINESS_NOT_FOUND": "Somente o proprietário ou um administrador da plataforma pode gerenciar relatórios e acesso dos assistentes.",
       "REPORTING_NOT_CONFIGURED": "O administrador precisa configurar os relatórios do Google.",
       "GOOGLE_RECONNECT_REQUIRED": "O acesso Google expirou ou foi revogado. Reconecte a conta.",
       "GOOGLE_PERMISSIONS_REQUIRED": "Conceda a permissão de leitura solicitada ao conectar o Google.",
