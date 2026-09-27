@@ -2,6 +2,7 @@ export const APP_ROUTE_ROOTS = new Set([
   "admin",
   "forgot-password",
   "login",
+  "mcp",
   "onboarding",
   "reset-password",
   "signup",

@@ -12,6 +12,8 @@ import {
 import { sql } from "drizzle-orm"
 import type { EmailDocument } from "@/lib/resend/blocks"
 
+export type GoogleReportingProvider = "ga4" | "search_console"
+
 export type NotificationPreferences = {
   leadAlerts: boolean
   weeklyDigest: boolean
@@ -883,3 +885,103 @@ export const emailSuppression = pgTable("email_suppression", {
 }, (table) => [
   uniqueIndex("email_suppression_business_email_uidx").on(table.businessId, table.email),
 ])
+
+// Google reporting credentials are separate from Google sign-in credentials.
+export const googleReportingConnection = pgTable("google_reporting_connection", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  connectedBy: text("connectedBy").notNull().references(() => user.id, { onDelete: "cascade" }),
+  provider: text("provider").$type<GoogleReportingProvider>().notNull(),
+  subject: text("subject").notNull(),
+  email: text("email").notNull(),
+  accessTokenEncrypted: text("accessTokenEncrypted").notNull(),
+  refreshTokenEncrypted: text("refreshTokenEncrypted").notNull(),
+  tokenExpiresAt: timestamp("tokenExpiresAt", { withTimezone: true }).notNull(),
+  scopes: text("scopes").array().notNull(),
+  status: text("status").$type<"connected" | "reconnect">().notNull().default("connected"),
+  lastError: text("lastError"),
+  lastCheckedAt: timestamp("lastCheckedAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [uniqueIndex("google_reporting_account_uidx").on(t.businessId, t.provider, t.subject)])
+
+export const googleReportingResource = pgTable("google_reporting_resource", {
+  id: text("id").primaryKey(),
+  connectionId: text("connectionId").notNull().references(() => googleReportingConnection.id, { onDelete: "cascade" }),
+  externalId: text("externalId").notNull(),
+  name: text("name").notNull(),
+  selected: boolean("selected").notNull().default(true),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [uniqueIndex("google_reporting_resource_uidx").on(t.connectionId, t.externalId)])
+
+export const googleReportingOAuthState = pgTable("google_reporting_oauth_state", {
+  hash: text("hash").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  provider: text("provider").$type<GoogleReportingProvider>().notNull(),
+  verifierEncrypted: text("verifierEncrypted").notNull(),
+  locale: text("locale").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+}, (t) => [index("google_reporting_state_expiry_idx").on(t.expiresAt)])
+
+export const googleReportingCache = pgTable("google_reporting_cache", {
+  key: text("key").primaryKey(),
+  resourceId: text("resourceId").notNull().references(() => googleReportingResource.id, { onDelete: "cascade" }),
+  payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+  fetchedAt: timestamp("fetchedAt", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+}, (t) => [index("google_reporting_cache_expiry_idx").on(t.expiresAt)])
+
+// Shared limits apply across replicas. Keys contain hashes, never credentials.
+export const reportingRateBucket = pgTable("reporting_rate_bucket", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+}, (t) => [index("reporting_rate_expiry_idx").on(t.expiresAt)])
+
+export const reportingMcpClient = pgTable("reporting_mcp_client", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  redirectUris: text("redirectUris").array().notNull(),
+  scopes: text("scopes").array().notNull(),
+  grantTypes: text("grantTypes").array().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const reportingMcpGrant = pgTable("reporting_mcp_grant", {
+  id: text("id").primaryKey(),
+  clientId: text("clientId").notNull().references(() => reportingMcpClient.id, { onDelete: "cascade" }),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  resourceIds: text("resourceIds").array().notNull(),
+  scope: text("scope").notNull(),
+  audience: text("audience").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }),
+  lastUsedAt: timestamp("lastUsedAt", { withTimezone: true }),
+}, (t) => [index("reporting_mcp_grant_business_idx").on(t.businessId)])
+
+export const reportingMcpAuthorization = pgTable("reporting_mcp_authorization", {
+  id: text("id").primaryKey(),
+  clientId: text("clientId").notNull().references(() => reportingMcpClient.id, { onDelete: "cascade" }),
+  redirectUri: text("redirectUri").notNull(),
+  challenge: text("challenge").notNull(),
+  state: text("state"),
+  scope: text("scope").notNull(),
+  audience: text("audience").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  decidedAt: timestamp("decidedAt", { withTimezone: true }),
+  codeHash: text("codeHash").unique(),
+  codeExpiresAt: timestamp("codeExpiresAt", { withTimezone: true }),
+  codeUsedAt: timestamp("codeUsedAt", { withTimezone: true }),
+  grantId: text("grantId").references(() => reportingMcpGrant.id, { onDelete: "cascade" }),
+}, (t) => [index("reporting_mcp_auth_expiry_idx").on(t.expiresAt)])
+
+export const reportingMcpToken = pgTable("reporting_mcp_token", {
+  hash: text("hash").primaryKey(),
+  grantId: text("grantId").notNull().references(() => reportingMcpGrant.id, { onDelete: "cascade" }),
+  kind: text("kind").$type<"access" | "refresh">().notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  usedAt: timestamp("usedAt", { withTimezone: true }),
+}, (t) => [index("reporting_mcp_token_grant_idx").on(t.grantId), index("reporting_mcp_token_expiry_idx").on(t.expiresAt)])

@@ -20,6 +20,7 @@ import {
   authLinkClass,
 } from "@/components/auth-layout"
 import { authClient } from "@/lib/auth-client"
+import { loginReturnTo } from "@/lib/auth-return-to"
 import { loginSchema, type LoginValues } from "@/lib/validations/auth"
 
 export default function LoginPage() {
@@ -57,7 +58,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = getPathname({ locale, href: "/admin" })
+    window.location.href = loginReturnTo(window.location.search, getPathname({ locale, href: "/admin" }))
   }
 
   async function handleGoogleSignIn() {
@@ -65,7 +66,7 @@ export default function LoginPage() {
     const loginPath = getPathname({ locale, href: "/login" })
     const { error } = await authClient.signIn.social({
       provider: "google",
-      callbackURL: getPathname({ locale, href: "/admin" }),
+      callbackURL: loginReturnTo(window.location.search, getPathname({ locale, href: "/admin" })),
       errorCallbackURL: loginPath,
     })
 
