@@ -128,6 +128,11 @@ async function googleConnection(
     (c) => c.provider === provider,
   )!.id
 }
+function allowReportingAdmin(userId: string, businessId: string) {
+  process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = JSON.stringify([
+    { userId, businessId },
+  ])
+}
 async function authorize(ids = [r1, r2], businessId = b1) {
   const client = await oauth.registerMcpClient(
     registrationSchema.parse({
@@ -223,6 +228,7 @@ beforeAll(async () => {
 })
 beforeEach(async () => {
   delete process.env.GOOGLE_REPORTING_ALLOWED_EMAILS
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
   await db.execute(
     sql`truncate table "user", reporting_mcp_client, reporting_rate_bucket cascade`,
   )
@@ -277,6 +283,7 @@ beforeEach(async () => {
 afterEach(() => {
   globalThis.fetch = originalFetch
   delete process.env.GOOGLE_REPORTING_ALLOWED_EMAILS
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
 })
 afterAll(async () => {
   await pool.end()
@@ -292,7 +299,7 @@ test("migration is repeatable and credential summaries never include tokens", as
   expect(summary).not.toContain("Encrypted")
   expect(summary).toContain("properties/123")
 })
-test("dashboard allows current platform admins and rejects anonymous or unrelated users", async () => {
+test("dashboard requires an exact business assignment and a current admin role", async () => {
   expect(
     (
       await connectionRoute.GET(new Request(`${origin}/api`), {
@@ -311,6 +318,26 @@ test("dashboard allows current platform admins and rejects anonymous or unrelate
     .update(schema.user)
     .set({ role: "admin" })
     .where(eq(schema.user.id, u1))
+  expect(
+    (
+      await connectionRoute.GET(read(b2), {
+        params: Promise.resolve({ id: b2 }),
+      })
+    ).status,
+  ).toBe(404)
+  // Different pairs must not become a cross-product of allowed actors/businesses.
+  process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = JSON.stringify([
+    { userId: u1, businessId: b1 },
+    { userId: u2, businessId: b2 },
+  ])
+  expect(
+    (
+      await connectionRoute.GET(read(b2), {
+        params: Promise.resolve({ id: b2 }),
+      })
+    ).status,
+  ).toBe(404)
+  allowReportingAdmin(u1, b2)
   expect(
     (
       await connectionRoute.GET(read(b2), {
@@ -337,6 +364,7 @@ test("dashboard allows current platform admins and rejects anonymous or unrelate
   ])
 })
 test("admin Google consent is business-bound and records the connecting admin", async () => {
+  allowReportingAdmin(u1, b2)
   await db
     .update(schema.user)
     .set({ role: "admin" })
@@ -382,6 +410,7 @@ test("admin Google consent is business-bound and records the connecting admin", 
   ).toBe(false)
 })
 test("Google callback rechecks admin access after the role is removed", async () => {
+  allowReportingAdmin(u1, b2)
   await db
     .update(schema.user)
     .set({ role: "admin" })
@@ -411,6 +440,7 @@ test("Google callback rechecks admin access after the role is removed", async ()
   expect(upstreamCalls).toBe(0)
 })
 test("admin assistant grants include only the chosen business and properties", async () => {
+  allowReportingAdmin(u1, b2)
   await db
     .update(schema.user)
     .set({ role: "admin" })
@@ -434,6 +464,7 @@ test("admin assistant grants include only the chosen business and properties", a
   expect(JSON.stringify(denied.body)).toContain("RESOURCE_NOT_AUTHORIZED")
 })
 test("removing admin access blocks issued MCP tokens and refresh without affecting owned-business grants", async () => {
+  allowReportingAdmin(u1, b2)
   await db
     .update(schema.user)
     .set({ role: "admin" })
@@ -458,7 +489,34 @@ test("removing admin access blocks issued MCP tokens and refresh without affecti
     (await oauth.authorizeMcpToken(owned.tokens.access_token)).businessId,
   ).toBe(b1)
 })
+test("removing an admin assignment blocks delegated tokens and refresh while the admin role remains", async () => {
+  allowReportingAdmin(u1, b2)
+  await db
+    .update(schema.user)
+    .set({ role: "admin" })
+    .where(eq(schema.user.id, u1))
+  const delegated = await authorize([r3], b2)
+  const owned = await authorize()
+  delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
+  await expect(
+    oauth.authorizeMcpToken(delegated.tokens.access_token),
+  ).rejects.toThrow("invalid_token")
+  await expect(
+    oauth.exchangeMcpToken({
+      grant_type: "refresh_token",
+      client_id: delegated.client.client_id,
+      refresh_token: delegated.tokens.refresh_token!,
+    }),
+  ).rejects.toThrow("invalid_grant")
+  expect(
+    (await oauth.authorizeMcpToken(owned.tokens.access_token)).businessId,
+  ).toBe(b1)
+  expect((await oauth.consentBusinesses(u1)).map((entry) => entry.id)).toEqual([
+    b1,
+  ])
+})
 test("business owners can see and revoke admin-issued grants without touching other businesses", async () => {
+  allowReportingAdmin(u1, b2)
   await db
     .update(schema.user)
     .set({ role: "admin" })
@@ -751,6 +809,7 @@ test("owners cannot discover or add other clients from an admin-connected Google
     .update(schema.user)
     .set({ role: "admin" })
     .where(eq(schema.user.id, u1))
+  allowReportingAdmin(u1, b1)
   const managed = await resourceRoute.GET(read(b1), context)
   expect((await managed.json()).resources).toHaveLength(2)
   expect((await save(["properties/123"])).status).toBe(200)

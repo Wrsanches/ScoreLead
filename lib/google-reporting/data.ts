@@ -6,10 +6,10 @@ import {
   googleReportingResource as resource,
   googleReportingOAuthState as oauthState,
   googleReportingCache as cache,
-  user,
+  business,
   type GoogleReportingProvider,
 } from "@/lib/db/schema"
-import { PLATFORM_ADMIN_ROLE } from "@/lib/business-access"
+import { reportingAdminBusinessAccess } from "./access"
 import { GOOGLE_REPORTING_SCOPES } from "./config"
 import {
   decryptReportingToken,
@@ -253,15 +253,20 @@ export async function discoverGoogleResources(
 ) {
   const row = await getGoogleConnection(businessId, id)
   if (row.connectedBy !== actorUserId) {
-    const [actor] = await db
-      .select({ role: user.role })
-      .from(user)
-      .where(eq(user.id, actorUserId))
+    const [assignedAdmin] = await db
+      .select({ id: business.id })
+      .from(business)
+      .where(
+        and(
+          eq(business.id, businessId),
+          reportingAdminBusinessAccess(actorUserId),
+        ),
+      )
       .limit(1)
-    if (actor?.role !== PLATFORM_ADMIN_ROLE) {
+    if (!assignedAdmin) {
       // A shared agency identity may contain other clients' properties. Business
       // owners can keep/remove its selected properties, but cannot discover or add
-      // more without the connecting actor or a current platform admin.
+      // more without the connecting actor or an explicitly assigned admin.
       return db
         .select({ externalId: resource.externalId, name: resource.name })
         .from(resource)

@@ -14,7 +14,7 @@ export async function reportingSession(request: Request, write = false) {
   if (!session) throw new ReportingError("UNAUTHORIZED", 401)
   return session
 }
-// Use the same owner/admin management policy as the rest of the dashboard.
+// Owners retain access; admins require an explicit assignment to this business.
 export async function reportingAccess(
   request: Request,
   businessId: string,

@@ -11,6 +11,7 @@ import {
   googleReportingAvailableTo,
   googleReportingEnabled,
   reportingOrigin,
+  reportingAdminAssignments,
 } from "./config"
 const keys = [
   "GOOGLE_REPORTING_TOKEN_ENCRYPTION_KEY",
@@ -20,6 +21,7 @@ const keys = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_REPORTING_ALLOWED_EMAILS",
+  "GOOGLE_REPORTING_ADMIN_ASSIGNMENTS",
 ] as const
 const env = Object.fromEntries(keys.map((k) => [k, process.env[k]]))
 beforeEach(() => {
@@ -74,6 +76,26 @@ test("preview authorization requires an exact verified email and empty allowlist
   ).toBe(false)
   process.env.GOOGLE_REPORTING_ALLOWED_EMAILS = " , "
   expect(googleReportingAvailableTo(user)).toBe(false)
+})
+test("admin reporting assignments require exact pairs and malformed configuration fails closed", () => {
+  const pair = { userId: "specific-admin", businessId: "specific-business" }
+  process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = JSON.stringify([pair])
+  expect(reportingAdminAssignments()).toEqual([pair])
+  for (const value of [
+    undefined,
+    "",
+    "broken json",
+    "{}",
+    JSON.stringify([{ ...pair, userId: "*" }]),
+    JSON.stringify([{ ...pair, businessId: "*" }]),
+    JSON.stringify([{ ...pair, allBusinesses: true }]),
+    JSON.stringify(Array(101).fill(pair)),
+  ]) {
+    if (value === undefined)
+      delete process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS
+    else process.env.GOOGLE_REPORTING_ADMIN_ASSIGNMENTS = value
+    expect(reportingAdminAssignments()).toEqual([])
+  }
 })
 test("OAuth PKCE follows RFC 7636 test vector and rejects malformed verifiers", () => {
   const verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
