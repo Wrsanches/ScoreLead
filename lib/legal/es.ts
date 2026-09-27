@@ -13,6 +13,7 @@ const shared = {
 export const legalContentEs: Record<LegalDocumentKey, LegalDocumentContent> = {
   privacy: {
     ...shared,
+    updatedDate: "27 de septiembre de 2026",
     eyebrow: "Legal · Privacidad",
     title: "Política de Privacidad",
     description:
@@ -70,6 +71,26 @@ export const legalContentEs: Record<LegalDocumentKey, LegalDocumentContent> = {
         ],
         paragraphs: [
           "Según el contexto y la ley aplicable, nos basamos en la ejecución de un contrato, intereses legítimos, consentimiento, cumplimiento legal u otra base válida. Cuando usamos consentimiento, puede retirarse sin invalidar el tratamiento lícito anterior.",
+        ],
+      },
+      {
+        id: "google-reporting",
+        title: "Conexiones con Google Analytics y Search Console",
+        paragraphs: [
+          "Al conectar los informes de Google, ScoreLead recibe el identificador y el correo de tu cuenta de Google, credenciales de acceso y renovación cifradas, las propiedades de Analytics o los sitios de Search Console disponibles y la información de los informes que solicitas. Los informes de Analytics pueden incluir tráfico del sitio, adquisición, interacción y eventos clave configurados. Los informes de Search Console pueden incluir clics, impresiones, consultas de búsqueda, páginas, países y dispositivos.",
+          "Usamos esta información para proporcionar la conexión y los informes que solicitas. Los permisos de informes son de solo lectura. Las credenciales de Google permanecen en los servidores de ScoreLead y no se envían a tu asistente de IA.",
+          "Puedes autorizar por separado a un asistente compatible con MCP, como Codex o Claude Code, para consultar propiedades seleccionadas de una empresa seleccionada. Los informes devueltos mediante esa conexión se envían al asistente que elijas. El tratamiento de la información se rige por los términos, la política de privacidad del proveedor y la configuración de tu cuenta. Revisa esa configuración antes de conceder acceso. Añadir otra propiedad no la comparte automáticamente con una autorización de asistente existente.",
+          "ScoreLead no utiliza los datos de los informes conectados de Google para publicidad ni para entrenar modelos de IA de uso general. El uso y la transferencia de información recibida de las APIs de Google seguirán la Política de Datos de Usuario de los Servicios de API de Google, incluidos los requisitos aplicables de Uso Limitado.",
+          "Los informes repetidos pueden servirse desde una caché durante cinco minutos. Las entradas de caché y los registros de autorización caducados se eliminan mediante una limpieza programada. Las conexiones de Google y los metadatos de las propiedades seleccionadas se conservan hasta que se desconecten. Desconectar elimina la conexión, sus credenciales almacenadas, los recursos seleccionados y la caché de informes asociada de la base de datos activa; las copias de seguridad protegidas caducan en su ciclo habitual. Desconectar ScoreLead no elimina los informes ya recibidos por un asistente externo.",
+          "Las autorizaciones de asistentes caducan a los 30 días y se pueden revocar antes en Integraciones. Puedes desconectar Google allí y también revocar ScoreLead mediante los controles de acceso de terceros de tu cuenta de Google. Contacta con hello@scorelead.io para solicitudes de privacidad y eliminación.",
+        ],
+        links: [
+          {
+            label:
+              "Política de Datos de Usuario de los Servicios de API de Google",
+            href: "https://developers.google.com/terms/api-services-user-data-policy",
+            external: true,
+          },
         ],
       },
       {

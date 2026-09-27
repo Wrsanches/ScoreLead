@@ -13,6 +13,7 @@ const shared = {
 export const legalContentEn: Record<LegalDocumentKey, LegalDocumentContent> = {
   privacy: {
     ...shared,
+    updatedDate: "September 27, 2026",
     eyebrow: "Legal · Privacy",
     title: "Privacy Policy",
     description:
@@ -70,6 +71,25 @@ export const legalContentEn: Record<LegalDocumentKey, LegalDocumentContent> = {
         ],
         paragraphs: [
           "Depending on the context and applicable law, we rely on performance of a contract, legitimate interests, consent, compliance with law, or another lawful basis. Where consent is the basis, it may be withdrawn, although prior lawful processing remains valid.",
+        ],
+      },
+      {
+        id: "google-reporting",
+        title: "Google Analytics and Search Console connections",
+        paragraphs: [
+          "When you connect Google reporting, ScoreLead receives your Google account identifier and email address, encrypted access and refresh credentials, the available Analytics properties or Search Console sites, and the reporting information you ask it to retrieve. Analytics reports can include website traffic, acquisition, engagement, and configured key events. Search Console reports can include clicks, impressions, search queries, pages, countries, and devices.",
+          "We use this information to provide the reporting connection and reports you request. Reporting permissions are read-only. Google credentials stay on ScoreLead’s servers and are not sent to your AI assistant.",
+          "You may separately authorize an MCP-compatible assistant, such as Codex or Claude Code, to read selected properties for a selected business. Reports returned through that connection go to the assistant you choose. Its handling of information is governed by that provider’s terms, privacy policy, and your account settings. Review those settings before granting access. Adding another property does not automatically share it with an existing assistant authorization.",
+          "ScoreLead does not use connected Google reporting data for advertising or to train generalized AI models. Its use and transfer of information received from Google APIs will follow the Google API Services User Data Policy, including applicable Limited Use requirements.",
+          "Repeated reports can be served from a cache for five minutes. Expired cache entries and expired authorization records are removed by scheduled cleanup. Google connections and selected-property metadata remain until disconnected. Disconnecting removes the connection, its stored credentials, selected resources, and associated report cache from the active database; protected backups expire through their ordinary lifecycle. Disconnecting ScoreLead does not delete reports already received by an external assistant.",
+          "Assistant authorizations expire after 30 days and can be revoked earlier in Integrations. You can disconnect Google there and also revoke ScoreLead through your Google account’s third-party access controls. Contact hello@scorelead.io for privacy and deletion requests.",
+        ],
+        links: [
+          {
+            label: "Google API Services User Data Policy",
+            href: "https://developers.google.com/terms/api-services-user-data-policy",
+            external: true,
+          },
         ],
       },
       {
