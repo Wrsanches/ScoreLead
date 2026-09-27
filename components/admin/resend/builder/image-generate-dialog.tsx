@@ -13,7 +13,7 @@ import { usePlan } from "@/components/admin/plan-context"
 import { AiMark } from "@/components/admin/resend/ai-mark"
 import { readJson, resendErrorMessage } from "@/components/admin/resend/errors"
 import type { ProductImage } from "@/lib/product-images"
-import { MAX_REFERENCES, type EmailImageFormat } from "@/lib/services/email-image-generator"
+import { MAX_REFERENCES, type EmailImageFormat } from "@/lib/resend/image-formats"
 
 const INPUT =
   "w-full px-3.5 py-2.5 bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-60"

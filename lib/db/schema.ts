@@ -193,6 +193,7 @@ export const discoveryJob = pgTable("discovery_job", {
 ])
 
 export const lead = pgTable("lead", {
+  statusRevision: integer("statusRevision").notNull().default(0),
   id: text("id").primaryKey(),
   jobId: text("jobId")
     .notNull()
@@ -428,6 +429,7 @@ export type WhatsAppConsentSnapshot = {
 }
 
 export const whatsappSequence = pgTable("whatsapp_sequence", {
+  agentExecutionId: text("agentExecutionId"),
   id: text("id").primaryKey(),
   businessId: text("businessId")
     .notNull()
@@ -985,3 +987,53 @@ export const reportingMcpToken = pgTable("reporting_mcp_token", {
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
   usedAt: timestamp("usedAt", { withTimezone: true }),
 }, (t) => [index("reporting_mcp_token_grant_idx").on(t.grantId), index("reporting_mcp_token_expiry_idx").on(t.expiresAt)])
+
+// Durable automation definitions and immutable published revisions.
+export const agentWorkspace = pgTable("agent_workspace", {
+  businessId: text("businessId").primaryKey().references(() => business.id, { onDelete: "cascade" }),
+  draft: jsonb("draft").$type<import("@/lib/agents/model").AgentGraph>().notNull(),
+  version: integer("version").notNull().default(0),
+  publishedRevisionId: text("publishedRevisionId"),
+  paused: boolean("paused").notNull().default(true),
+  pausedAgentIds: jsonb("pausedAgentIds").$type<string[]>().notNull().default([]),
+  enrollmentStarts: jsonb("enrollmentStarts").$type<Record<string, string>>().notNull().default({}),
+  activatedAt: timestamp("activatedAt", { withTimezone: true }),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+})
+export const agentRevision = pgTable("agent_revision", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  graph: jsonb("graph").$type<import("@/lib/agents/model").AgentGraph>().notNull(),
+  actorId: text("actorId").notNull().references(() => user.id),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+})
+export const agentExecution = pgTable("agent_execution", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  revisionId: text("revisionId").notNull().references(() => agentRevision.id),
+  agentId: text("agentId").notNull(),
+  leadId: text("leadId").references(() => lead.id, { onDelete: "cascade" }),
+  dedupe: text("dedupe").notNull(),
+  usageReserved: boolean("usageReserved").notNull().default(false),
+  status: text("status").notNull().default("queued"),
+  result: text("result"),
+  prepared: jsonb("prepared").$type<Record<string, unknown>>(),
+  providerId: text("providerId"),
+  lease: text("lease"),
+  requestStartedAt: timestamp("requestStartedAt", { withTimezone: true }),
+  dueAt: timestamp("dueAt", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, t => [uniqueIndex("agent_execution_dedupe").on(t.businessId,t.agentId,t.dedupe),index("agent_execution_due").on(t.status,t.dueAt),index("agent_execution_business").on(t.businessId,t.createdAt)])
+export const agentEvent = pgTable("agent_event", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, {onDelete:"cascade"}),
+  executionId: text("executionId").references(() => agentExecution.id,{onDelete:"cascade"}),
+  agentId: text("agentId"),
+  kind: text("kind").notNull(),
+  detail: jsonb("detail").$type<Record<string, unknown>>().notNull().default({}),
+  createdAt: timestamp("createdAt", {withTimezone:true}).notNull().defaultNow(),
+},t=>[index("agent_event_business").on(t.businessId,t.createdAt)])
+export const agentWorker = pgTable("agent_worker", {
+  id:text("id").primaryKey(), heartbeatAt:timestamp("heartbeatAt",{withTimezone:true}).notNull().defaultNow(),
+})

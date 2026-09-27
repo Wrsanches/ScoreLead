@@ -41,3 +41,31 @@ Use shared semantic buttons, navigation links, labelled native checkboxes and
 Radix confirmation dialogs. Retain visible focus, status/alert announcements,
 reduced-motion preferences, and readable light/dark color pairs. No new select,
 date, table or token system is introduced by these integration pages.
+
+## Agents automation
+
+Authority: the user-approved “Agents — automação visual de prospecção” plan.
+Runtime policy owners: `lib/agents/model.ts` (graph/filters), `context.ts`
+(business permissions/channel readiness), `store.ts` (versions/enrollment),
+`worker.ts` (execution), existing plan and provider services (quotas/consent).
+Operational rollout and data lifecycle are in `docs/agents.md`.
+
+| Capability | Canonical owner | Agents behavior | Verification |
+| --- | --- | --- | --- |
+| Canvas | React Flow + `agents.css` | Positions saved with explicit draft; mobile starts as list | Browser drag/save/reload and narrow viewport |
+| Forms | Shared Input/Textarea/Select/Switch/Button | Authored Select popups; native time controls intentionally use OS input, as existing WhatsApp settings | Open popup, keyboard, mobile |
+| Configuration | Shared Sheet/Tabs | Close preserves in-memory draft; saving keeps the sheet open | Save, reopen, activity empty state |
+| Navigation | Shared UnsavedNavigationProvider (also reporting) | Confirm unsaved link navigation; beforeunload covers document exit | Browser cancel/discard |
+| Publication | Shared AlertDialog | Audience, channels, windows, limits, sample generation, explicit current-lead inclusion | API conflict and readiness tests |
+| History | Cursor API, 50 items per page | Separate execution vs provider delivery state; prepared content remains business-scoped | Integration tenant checks |
+| Message batch | Shared AlertDialog | Reviewed immutable revision, selected leads or explicit all-matching; stable dedupe | Concurrent/manual batch tests |
+
+Draft edits do not change running work. New nodes remain draft until published;
+paused nodes cannot start new actions. A disabled environment is clearly shown.
+Simulation generates content and consumes an existing AI allowance only for
+contact agents; it does not send. Stage simulation does not alter the lead.
+History cursor and selected panel are transient because they are scoped to the
+current business and may contain recipient data; they are not put into URLs.
+All new copy is maintained in PT/EN/ES. Failures keep the entered graph, expose
+an inline error and offer explicit reload after version conflict. Published
+version selection protects batch review from a simultaneous publication.

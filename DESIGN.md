@@ -118,3 +118,15 @@ assistant catalog cards use the same card owner as WhatsApp and Instagram.
 Property selection uses a subtle emerald border and wash, not a second card
 style. Preserve the existing light/dark utility pairs and Geist typography.
 See `UX-CONTRACT.md` for navigation and behavior.
+
+## Agents workspace
+
+Agents extends the authenticated zinc/Geist surfaces. Railway is a reference for
+spatial organization, not a new theme. `components/agents/agents.css` owns only
+canvas geometry and React Flow overrides; shared global tokens, Button, Sheet,
+Select, Switch, Tabs, AlertDialog, PageHeader and ContentWrapper remain canonical.
+The continuous dotted canvas uses quiet 18px cards and emerald selection/active
+accents. Ordered connectors animate only during processing and stop under
+reduced motion. Agent activation and execution outcomes use separate labels.
+On narrow screens the default is a full-width agent list; the same configuration
+sheet and next-agent selector preserve every graph action without dragging.

@@ -1,0 +1,85 @@
+.agents-workspace {
+  --agent-bg: #fafafa;
+  --agent-dot: #d4d4d8;
+  --agent-edge: #a1a1aa;
+  --agent-text: #71717a;
+}
+.dark .agents-workspace {
+  --agent-bg: #111113;
+  --agent-dot: #303035;
+  --agent-edge: #52525b;
+  --agent-text: #a1a1aa;
+}
+.agent-canvas {
+  background: var(--agent-bg);
+}
+.agent-empty {
+  background-color: var(--agent-bg);
+  background-image: radial-gradient(var(--agent-dot) 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+}
+.agent-card {
+  width: 280px;
+  padding: 20px;
+  border: 1px solid #e4e4e7;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 3px 10px #18181b05;
+  color: #18181b;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
+}
+.dark .agent-card {
+  background: #18181b;
+  border-color: #303035;
+  color: #fafafa;
+}
+.agent-card:hover {
+  border-color: #a1a1aa;
+}
+.agent-card-selected,
+.dark .agent-card-selected {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px #10b98112;
+}
+.agent-canvas .react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: var(--agent-bg);
+  border: 2px solid var(--agent-edge);
+}
+.agent-canvas .react-flow__handle:hover {
+  border-color: #10b981;
+}
+.agent-canvas .react-flow__controls {
+  border: 1px solid var(--agent-dot);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: none;
+}
+.agent-canvas .react-flow__controls-button {
+  background: var(--agent-bg);
+  color: var(--agent-text);
+  border-color: var(--agent-dot);
+  width: 32px;
+  height: 32px;
+}
+.agent-canvas .react-flow__controls-button:hover {
+  background: var(--agent-dot);
+}
+.agent-canvas .react-flow__node:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 4px;
+  border-radius: 18px;
+}
+.agents-workspace > .grid .agent-card {
+  width: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .agents-workspace *,
+  [data-slot="sheet-content"] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

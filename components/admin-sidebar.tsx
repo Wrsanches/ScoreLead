@@ -23,6 +23,7 @@ import {
   CalendarDays,
   Zap,
   Puzzle,
+  Bot,
 } from "lucide-react";
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
@@ -313,6 +314,7 @@ export function AdminSidebar({
             active={isActive("/leads/kanban")}
             collapsed={collapsed}
           />
+          <NavItem icon={Bot} label="Agents" href="/admin/agents" active={isActive("/agents")} collapsed={collapsed} />
           <NavItem
             icon={CalendarDays}
             label={t("contentCalendar")}

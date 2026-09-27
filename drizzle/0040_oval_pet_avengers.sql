@@ -1,0 +1,2 @@
+ALTER TABLE "agent_execution" ADD COLUMN "usageReserved" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "agent_workspace" ADD COLUMN "enrollmentStarts" jsonb DEFAULT '{}'::jsonb NOT NULL;

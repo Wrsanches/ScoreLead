@@ -4,8 +4,8 @@ import { OPENAI_IMAGE_MODEL } from "@/lib/models"
 import { buildKey, getObjectBytes, isManagedUrl, keyFromUrl, putObject } from "@/lib/s3"
 import type { ProductImage } from "@/lib/product-images"
 
-export const EMAIL_IMAGE_FORMATS = ["wide", "square", "portrait"] as const
-export type EmailImageFormat = (typeof EMAIL_IMAGE_FORMATS)[number]
+import { EMAIL_IMAGE_FORMATS, MAX_REFERENCES, type EmailImageFormat } from "@/lib/resend/image-formats"
+export { EMAIL_IMAGE_FORMATS, MAX_REFERENCES, type EmailImageFormat } from "@/lib/resend/image-formats"
 
 /** GPT Image 2.x accepts any WIDTHxHEIGHT divisible by 16; these fit a 600px email column. */
 const FORMAT_SIZE: Record<EmailImageFormat, { size: string; label: string }> = {
@@ -14,7 +14,6 @@ const FORMAT_SIZE: Record<EmailImageFormat, { size: string; label: string }> = {
   portrait: { size: "800x1008", label: "portrait 4:5" },
 }
 
-export const MAX_REFERENCES = 4
 
 export const emailImageRequestSchema = z.object({
   prompt: z.string().trim().min(3).max(600),

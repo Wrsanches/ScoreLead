@@ -1,3 +1,4 @@
+import { reservePlanUsage } from "@/lib/usage-reservation"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { lead, business } from "@/lib/db/schema"
@@ -10,7 +11,7 @@ import {
   type OutreachLead,
   type OutreachSender,
 } from "@/lib/services/outreach-messages"
-import { assertCanUse, recordUsage, PlanLimitError } from "@/lib/plan"
+import { releaseUsage, PlanLimitError } from "@/lib/plan"
 import { getBusinessAccess } from "@/lib/business-access"
 import { getManageableLead } from "@/lib/whatsapp/data"
 
@@ -56,7 +57,7 @@ export async function POST(
 
   // Gate: Free allows 3 AI outreach generations total.
   try {
-    await assertCanUse(billingUserId, "outreachMessage")
+    await reservePlanUsage(billingUserId, "outreachMessage")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -78,6 +79,7 @@ export async function POST(
     .where(eq(business.id, row.businessId))
 
   if (!senderBusiness) {
+    await releaseUsage(billingUserId, "outreachMessage")
     return NextResponse.json(
       { error: "Business profile not found for this lead." },
       { status: 400 },
@@ -119,13 +121,13 @@ export async function POST(
   const messages = await generateOutreachMessages(sender, recipient)
 
   if (messages.length === 0) {
+    await releaseUsage(billingUserId,"outreachMessage")
     return NextResponse.json(
       { error: "Failed to generate messages. Check OpenAI key and try again." },
       { status: 500 },
     )
   }
 
-  await recordUsage(billingUserId, "outreachMessage")
 
   await db
     .update(lead)

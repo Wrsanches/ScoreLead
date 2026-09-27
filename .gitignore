@@ -29,3 +29,7 @@ next-env.d.ts
 public/generated/
 
 .claude/
+
+# Isolated development/build verification
+.next-agents-test/
+.next-agents-build/

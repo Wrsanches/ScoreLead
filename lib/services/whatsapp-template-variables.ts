@@ -11,6 +11,7 @@ type VariableRequest = {
 }
 
 type VariableContext = {
+  instructions?: string
   sender: Record<string, unknown>
   lead: Record<string, unknown>
   steps: VariableRequest[]
@@ -74,6 +75,7 @@ export async function generateWhatsAppTemplateValues(
           sender: context.sender,
           lead: context.lead,
           steps: variableSteps,
+          instructions: context.instructions,
         }),
       },
     ],

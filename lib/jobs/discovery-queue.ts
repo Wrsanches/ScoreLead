@@ -1,3 +1,4 @@
+import { allowedBusinesses } from "@/lib/agents/rollout"
 import { sql, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { business, discoveryJob } from "@/lib/db/schema"
@@ -55,6 +56,11 @@ async function claimNextJob(): Promise<string | null> {
     WHERE id = (
       SELECT j.id FROM discovery_job j
       WHERE j.status = 'queued'
+        AND (NOT EXISTS(SELECT 1 FROM agent_execution ae WHERE ae.id=j.id)
+          OR (${process.env.AGENTS_EXECUTION_ENABLED === 'true'} AND EXISTS(
+            SELECT 1 FROM agent_execution ae JOIN agent_workspace aw ON aw."businessId"=ae."businessId"
+            WHERE ae.id=j.id AND (cardinality(${allowedBusinesses()}::text[])=0 OR ae."businessId"=ANY(${allowedBusinesses()}::text[])) AND ae.status='waiting' AND NOT aw.paused AND NOT(aw."pausedAgentIds" ? ae."agentId")
+          )))
         AND (SELECT count(*) FROM discovery_job r WHERE r.status = 'running') < ${MAX_CONCURRENT_JOBS}
         AND NOT EXISTS (
           SELECT 1 FROM discovery_job r
@@ -90,6 +96,12 @@ async function executeJob(jobId: string) {
         completedAt: new Date(),
       })
       .where(eq(discoveryJob.id, jobId))
+    return
+  }
+
+  const { agentDiscoveryAuthorized } = await import("@/lib/agents/worker")
+  if (!await agentDiscoveryAuthorized(job.id)) {
+    await db.update(discoveryJob).set({status:"failed",errorMessage:"Agent authorization no longer valid",completedAt:new Date()}).where(eq(discoveryJob.id,job.id))
     return
   }
 

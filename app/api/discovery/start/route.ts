@@ -1,3 +1,4 @@
+import { reservePlanUsage } from "@/lib/usage-reservation"
 import { after } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
@@ -9,8 +10,6 @@ import { z } from "zod"
 import { processDiscoveryQueue } from "@/lib/jobs/discovery-queue"
 import { rateLimit } from "@/lib/rate-limit"
 import {
-  assertCanUse,
-  recordUsage,
   getUserPlan,
   leadCap,
   PlanLimitError,
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
 
   // Gate: Free allows 1 discovery job total.
   try {
-    await assertCanUse(billingUserId, "discoveryJob")
+    await reservePlanUsage(billingUserId, "discoveryJob")
   } catch (e) {
     if (e instanceof PlanLimitError) {
       return NextResponse.json(
@@ -127,7 +126,6 @@ export async function POST(request: Request) {
     status: "queued",
   })
 
-  await recordUsage(billingUserId, "discoveryJob")
 
   // The job is queued; the pump claims and runs it subject to the global
   // and per-user concurrency caps (see lib/jobs/discovery-queue.ts).

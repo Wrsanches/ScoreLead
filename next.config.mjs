@@ -23,6 +23,7 @@ if (process.env.AWS_S3_PUBLIC_BASE_URL) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Only externalize the server-only packages that break Turbopack's ESM
   // bundling. Do NOT externalize `better-auth` / `@better-auth/stripe` - their
   // React client subpaths (better-auth/react) must stay bundled, or client
