@@ -17,6 +17,14 @@ During Google's scope review, set `GOOGLE_REPORTING_ALLOWED_EMAILS` to a comma-s
 
 No deployment, production migration, live Google consent or Google verification is performed by the test suite. These require the operator's Google project and accounts.
 
+## Production setup status — September 27, 2026
+
+The Google reporting release and migration 0038 are deployed at `https://app.scorelead.io` through the existing Railway predeploy pipeline. Google Cloud project `scorelead-492919` has the three required APIs enabled and a dedicated **ScoreLead Reporting — Production** web client with the exact callback above. Production credentials and the independent encryption key are stored in Railway. The existing Google sign-in client is unchanged.
+
+Railway's separate `reporting-cleanup` service uses the official `curlimages/curl:8.22.0` image and a reference to the app service's `CRON_SECRET`. It calls only `/api/jobs/reporting/cleanup`, runs daily at 04:00 UTC, and exits after each request. Its manual verification run completed successfully. The main web service remains a continuously running service.
+
+The public OAuth discovery documents and unauthenticated MCP rejection were verified against production. New Google connections remain limited by the preview email allowlist. Google's Analytics data-access verification is still pending a real demonstration video and submission; general customer onboarding must remain restricted until review and live account/client validation are complete.
+
 ## User journey
 
 1. Open **Integrations → Google reporting** and connect a Google account separately for each desired connector.
