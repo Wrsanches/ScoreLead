@@ -15,6 +15,7 @@ import {
   type ReportingIntegration,
 } from "@/lib/google-reporting/paths"
 import { ReportingIcon } from "./reporting-icon"
+import { AssistantIcon } from "./assistant-icon"
 import {
   ReportingNavigationProvider,
   useReportingNavigation,
@@ -386,7 +387,10 @@ function AssistantSettings({
               className="min-w-0 rounded-xl border border-black/[0.08] dark:border-white/[0.10] p-4"
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="font-medium">{command.name}</h3>
+                <h3 className="flex min-w-0 items-center gap-2.5 font-medium">
+                  <AssistantIcon name={command.name} />
+                  {command.name}
+                </h3>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -429,26 +433,29 @@ function AssistantSettings({
                 key={grant.id}
                 className="flex flex-wrap items-center justify-between gap-3 py-4"
               >
-                <div>
-                  <p className="font-medium">{grant.name}</p>
-                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-                    {t("grantDetails", {
-                      count: grant.resourceIds.length,
-                      date: format.dateTime(new Date(grant.expiresAt), {
-                        dateStyle: "medium",
-                      }),
-                    })}
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {grant.lastUsedAt
-                      ? t("lastUsed", {
-                          date: format.dateTime(new Date(grant.lastUsedAt), {
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          }),
-                        })
-                      : t("neverUsed")}
-                  </p>
+                <div className="flex min-w-0 items-start gap-3">
+                  <AssistantIcon name={grant.name} />
+                  <div className="min-w-0">
+                    <p className="break-words font-medium">{grant.name}</p>
+                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+                      {t("grantDetails", {
+                        count: grant.resourceIds.length,
+                        date: format.dateTime(new Date(grant.expiresAt), {
+                          dateStyle: "medium",
+                        }),
+                      })}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {grant.lastUsedAt
+                        ? t("lastUsed", {
+                            date: format.dateTime(new Date(grant.lastUsedAt), {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }),
+                          })
+                        : t("neverUsed")}
+                    </p>
+                  </div>
                 </div>
                 <ConfirmAction
                   label={t("revoke")}

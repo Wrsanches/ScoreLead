@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { BookOpen, Layers, PenLine, CalendarDays, Check } from "lucide-react";
 import { AiOrb, type OrbState } from "@/components/ai-orb";
+import { ContentShowcase } from "./content-showcase";
 
 interface CalendarEmptyStateProps {
   onGenerate: () => void;
@@ -39,7 +40,8 @@ const PHASE_AT: { key: GenStatus; afterSeconds: number }[] = [
 ];
 
 function phaseForElapsed(seconds: number): GenStatus {
-  return (PHASE_AT.find((p) => seconds >= p.afterSeconds) ?? PHASE_AT.at(-1)!).key;
+  return (PHASE_AT.find((p) => seconds >= p.afterSeconds) ?? PHASE_AT.at(-1)!)
+    .key;
 }
 
 export function CalendarEmptyState({
@@ -104,23 +106,25 @@ export function CalendarEmptyState({
         }}
       />
 
-      {/* Subtle concentric orbit rings - replaces the literal 7x5 grid */}
-      <div
-        aria-hidden
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] pointer-events-none"
-      >
-        {[260, 380, 520].map((size, i) => (
-          <div
-            key={size}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-white/[0.08]"
-            style={{
-              width: size,
-              height: size,
-              opacity: 0.5 - i * 0.12,
-            }}
-          />
-        ))}
-      </div>
+      {/* Keep progress decoration separate from the illustrative idle showcase. */}
+      {isGenerating && (
+        <div
+          aria-hidden
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] pointer-events-none"
+        >
+          {[260, 380, 520].map((size, i) => (
+            <div
+              key={size}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-white/[0.08]"
+              style={{
+                width: size,
+                height: size,
+                opacity: 0.5 - i * 0.12,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Top-right faint noise-less corner accent */}
       <div
@@ -128,16 +132,22 @@ export function CalendarEmptyState({
         className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none"
       />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-6 pt-16 pb-14 sm:pt-20 sm:pb-16">
+      {!isGenerating && <ContentShowcase />}
+
+      <div
+        className={`relative z-10 flex flex-col items-center text-center px-6 pb-12 sm:pb-14 ${isGenerating ? "pt-16 sm:pt-20" : "pt-7 sm:pt-8"}`}
+      >
         {/* Orb hero */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-          className="relative mb-8"
-        >
-          <AiOrb state={orbState} size="lg" />
-        </motion.div>
+        {isGenerating && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+            className="relative mb-8"
+          >
+            <AiOrb state={orbState} size="lg" />
+          </motion.div>
+        )}
 
         {/* Title + body */}
         <motion.h2
@@ -248,7 +258,7 @@ export function CalendarEmptyState({
             onClick={locked ? onUpgrade : onGenerate}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-sm rounded-xl shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] transition-colors"
+            className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 font-semibold text-sm rounded-xl shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] transition-colors"
           >
             {locked ? tb("upgradeCta") : t("generateWithAi")}
           </motion.button>
