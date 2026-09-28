@@ -114,6 +114,11 @@ async function executeStep(stepId: string) {
   if (!row || row.step.status !== "sending" || row.sequence.status !== "scheduled") return
 
   const { step, sequence, connection } = row
+  // Historical automation sequences cannot resume after the feature is retired.
+  if (sequence.agentExecutionId) {
+    await blockStep(step.id, sequence.id, "automation_retired")
+    return
+  }
   if (!hasWhatsAppEarlyAccess(row.ownerEmail)) {
     await blockStep(step.id, sequence.id, "feature_not_available")
     return
@@ -163,16 +168,6 @@ async function executeStep(stepId: string) {
     return
   }
 
-  if (sequence.agentExecutionId) {
-    const { agentWhatsAppReady } = await import("@/lib/agents/worker")
-    let ready: boolean;
-    try { ready = await agentWhatsAppReady(sequence.agentExecutionId) }
-    catch { await blockStep(step.id, sequence.id, "agent_no_longer_eligible"); return }
-    if (!ready) {
-      await db.update(whatsappSequenceStep).set({ status: "queued", requestStartedAt: null, retryAt: new Date(Date.now() + 60_000), updatedAt: new Date() }).where(eq(whatsappSequenceStep.id, step.id))
-      return
-    }
-  }
   const now = new Date()
   if (!isWithinSendWindow({
     now,

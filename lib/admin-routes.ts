@@ -1,6 +1,5 @@
 const BUSINESS_SECTION_PREFIXES = [
   "/admin/leads",
-  "/admin/agents",
   "/admin/content-calendar",
   "/admin/profile",
   "/admin/integrations",

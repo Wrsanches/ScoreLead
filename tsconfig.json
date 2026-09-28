@@ -14,9 +14,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "types": [
-      "bun"
-    ],
+    "types": ["bun"],
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
@@ -36,11 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    ".next-agents-test/types/**/*.ts",
-    ".next-agents-test/dev/types/**/*.ts",
-    ".next-agents-build/types/**/*.ts",
-    ".next-agents-build/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

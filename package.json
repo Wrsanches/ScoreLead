@@ -18,10 +18,7 @@
     "stripe:catalog": "bun run scripts/stripe-catalog.ts",
     "blog:images": "bun --env-file=.env.local run scripts/generate-blog-images.ts",
     "test:reporting": "bun test lib/google-reporting/*.test.ts lib/mcp/*.test.ts lib/auth-return-to.test.ts",
-    "test:reporting:integration": "bun test ./lib/google-reporting/reporting.integration.ts",
-    "worker:agents": "bun run scripts/agents-worker.ts",
-    "test:agents": "bun test lib/agents/model.test.ts",
-    "test:agents:integration": "bun test ./lib/agents/agents.integration.ts"
+    "test:reporting:integration": "bun test ./lib/google-reporting/reporting.integration.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1057.0",
@@ -72,7 +69,6 @@
     "@tiptap/react": "^3.31.3",
     "@tiptap/starter-kit": "^3.31.3",
     "@uiw/react-codemirror": "^4.25.11",
-    "@xyflow/react": "^12.12.0",
     "autoprefixer": "^10.5.4",
     "better-auth": "^1.7.1",
     "class-variance-authority": "^0.7.1",

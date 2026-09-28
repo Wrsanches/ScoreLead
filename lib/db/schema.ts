@@ -988,10 +988,11 @@ export const reportingMcpToken = pgTable("reporting_mcp_token", {
   usedAt: timestamp("usedAt", { withTimezone: true }),
 }, (t) => [index("reporting_mcp_token_grant_idx").on(t.grantId), index("reporting_mcp_token_expiry_idx").on(t.expiresAt)])
 
-// Durable automation definitions and immutable published revisions.
+// Retired Agents tables: retain historical records and migration compatibility.
+// No application routes or workers create or process these records.
 export const agentWorkspace = pgTable("agent_workspace", {
   businessId: text("businessId").primaryKey().references(() => business.id, { onDelete: "cascade" }),
-  draft: jsonb("draft").$type<import("@/lib/agents/model").AgentGraph>().notNull(),
+  draft: jsonb("draft").$type<Record<string, unknown>>().notNull(),
   version: integer("version").notNull().default(0),
   publishedRevisionId: text("publishedRevisionId"),
   paused: boolean("paused").notNull().default(true),
@@ -1003,7 +1004,7 @@ export const agentWorkspace = pgTable("agent_workspace", {
 export const agentRevision = pgTable("agent_revision", {
   id: text("id").primaryKey(),
   businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
-  graph: jsonb("graph").$type<import("@/lib/agents/model").AgentGraph>().notNull(),
+  graph: jsonb("graph").$type<Record<string, unknown>>().notNull(),
   actorId: text("actorId").notNull().references(() => user.id),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
 })

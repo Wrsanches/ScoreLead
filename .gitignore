@@ -31,5 +31,4 @@ public/generated/
 .claude/
 
 # Isolated development/build verification
-.next-agents-test/
-.next-agents-build/
+.next-*/
