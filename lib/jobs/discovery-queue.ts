@@ -46,7 +46,7 @@ async function requeueStaleJobs() {
  * per-user concurrency caps. Returns the claimed job id, or null when
  * nothing is claimable.
  */
-async function claimNextJob(): Promise<string | null> {
+export async function claimNextJob(): Promise<string | null> {
   const result = await db.execute<{ id: string }>(sql`
     UPDATE discovery_job SET
       status = 'running',
@@ -59,7 +59,7 @@ async function claimNextJob(): Promise<string | null> {
         AND (NOT EXISTS(SELECT 1 FROM agent_execution ae WHERE ae.id=j.id)
           OR (${process.env.AGENTS_EXECUTION_ENABLED === 'true'} AND EXISTS(
             SELECT 1 FROM agent_execution ae JOIN agent_workspace aw ON aw."businessId"=ae."businessId"
-            WHERE ae.id=j.id AND (cardinality(${allowedBusinesses()}::text[])=0 OR ae."businessId"=ANY(${allowedBusinesses()}::text[])) AND ae.status='waiting' AND NOT aw.paused AND NOT(aw."pausedAgentIds" ? ae."agentId")
+            WHERE ae.id=j.id AND (${allowedBusinesses().length}=0 OR ae."businessId" IN (SELECT jsonb_array_elements_text(${JSON.stringify(allowedBusinesses())}::jsonb))) AND ae.status='waiting' AND NOT aw.paused AND NOT(aw."pausedAgentIds" ? ae."agentId")
           )))
         AND (SELECT count(*) FROM discovery_job r WHERE r.status = 'running') < ${MAX_CONCURRENT_JOBS}
         AND NOT EXISTS (

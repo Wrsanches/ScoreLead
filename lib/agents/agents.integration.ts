@@ -601,3 +601,23 @@ test("a paused destination keeps a forwarded lead queued until resumed", async (
   await worker.pumpAgents();
   expect((await stage()).status).toBe("interested");
 });
+
+test("shared discovery claim handles empty allowlist, disabled execution and restricted businesses", async () => {
+  process.env.OPENAI_API_KEY = "sk_simulated";
+  await pool.query("UPDATE discovery_job SET status='completed'");
+  const a = agent("discovery");
+  const id = await queue(a);
+  await worker.pumpAgents();
+  const { claimNextJob } = await import("@/lib/jobs/discovery-queue");
+  process.env.AGENTS_EXECUTION_ENABLED = "false";
+  expect(await claimNextJob()).toBeNull();
+  process.env.AGENTS_EXECUTION_ENABLED = "true";
+  process.env.AGENTS_ALLOWED_BUSINESS_IDS = foreign;
+  try {
+    expect(await claimNextJob()).toBeNull();
+  } finally {
+    delete process.env.AGENTS_ALLOWED_BUSINESS_IDS;
+  }
+  expect(await claimNextJob()).toBe(id);
+  expect(await claimNextJob()).toBeNull();
+});
