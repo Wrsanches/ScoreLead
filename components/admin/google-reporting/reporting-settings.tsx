@@ -435,29 +435,26 @@ function AssistantSettings({
                 key={grant.id}
                 className="flex flex-wrap items-center justify-between gap-3 py-4"
               >
-                <div className="flex min-w-0 items-start gap-3">
-                  <AssistantIcon name={grant.name} />
-                  <div className="min-w-0">
-                    <p className="break-words font-medium">{grant.name}</p>
-                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-                      {t("grantDetails", {
-                        count: grant.resourceIds.length,
-                        date: format.dateTime(new Date(grant.expiresAt), {
-                          dateStyle: "medium",
-                        }),
-                      })}
-                    </p>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {grant.lastUsedAt
-                        ? t("lastUsed", {
-                            date: format.dateTime(new Date(grant.lastUsedAt), {
-                              dateStyle: "medium",
-                              timeStyle: "short",
-                            }),
-                          })
-                        : t("neverUsed")}
-                    </p>
-                  </div>
+                <div className="min-w-0">
+                  <p className="break-words font-medium">{grant.name}</p>
+                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    {t("grantDetails", {
+                      count: grant.resourceIds.length,
+                      date: format.dateTime(new Date(grant.expiresAt), {
+                        dateStyle: "medium",
+                      }),
+                    })}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {grant.lastUsedAt
+                      ? t("lastUsed", {
+                          date: format.dateTime(new Date(grant.lastUsedAt), {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          }),
+                        })
+                      : t("neverUsed")}
+                  </p>
                 </div>
                 <ConfirmAction
                   label={t("revoke")}
