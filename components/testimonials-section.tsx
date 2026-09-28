@@ -13,7 +13,7 @@ export function TestimonialsSection() {
     <section
       id="customers"
       aria-labelledby="testimonials-heading"
-      className="relative z-20 overflow-hidden bg-white/[0.02] px-6 py-32 sm:py-40"
+      className="relative z-20 overflow-hidden bg-white/[0.02] px-6 marketing-section"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.08]" />
 
@@ -22,7 +22,10 @@ export function TestimonialsSection() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
+          transition={{
+            duration: 0.5,
+            ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
+          }}
         >
           <h2
             id="testimonials-heading"
@@ -36,10 +39,14 @@ export function TestimonialsSection() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5, delay: 0.12, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
-          className="surface-card mt-14 grid overflow-hidden rounded-3xl lg:mt-20 lg:grid-cols-[minmax(0,1fr)_22rem]"
+          transition={{
+            duration: 0.5,
+            delay: 0.12,
+            ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
+          }}
+          className="surface-card mt-8 sm:mt-14 grid overflow-hidden rounded-3xl lg:mt-20 lg:grid-cols-[minmax(0,1fr)_22rem]"
         >
-          <blockquote className="relative flex flex-col justify-between px-8 py-12 lg:min-h-[31rem] lg:px-12 lg:py-16">
+          <blockquote className="relative flex flex-col justify-between px-5 py-8 sm:px-8 sm:py-12 lg:min-h-[31rem] lg:px-12 lg:py-16">
             <Quote
               className="mb-8 h-9 w-9 text-emerald-400"
               strokeWidth={1.5}
@@ -87,7 +94,7 @@ export function TestimonialsSection() {
               <p className="text-xs font-semibold tracking-[0.14em] text-emerald-950/70 uppercase">
                 {t("resultEyebrow")}
               </p>
-              <div className="py-10">
+              <div className="py-6 sm:py-10">
                 <p className="text-7xl leading-none font-semibold tracking-[-0.06em]">
                   {t("resultValue")}
                 </p>
@@ -98,7 +105,7 @@ export function TestimonialsSection() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="glass-pill rounded-xl px-5 py-5">
+              <div className="glass-pill rounded-xl px-3 py-4 sm:px-5 sm:py-5">
                 <p className="text-3xl font-semibold tracking-tight tabular-nums text-zinc-50">
                   {t("metricLeadsValue")}
                 </p>
@@ -106,7 +113,7 @@ export function TestimonialsSection() {
                   {t("metricLeadsLabel")}
                 </p>
               </div>
-              <div className="glass-pill rounded-xl px-5 py-5">
+              <div className="glass-pill rounded-xl px-3 py-4 sm:px-5 sm:py-5">
                 <p className="text-3xl font-semibold tracking-tight tabular-nums text-zinc-50">
                   {t("metricTimeValue")}
                 </p>

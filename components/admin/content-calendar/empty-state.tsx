@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { BookOpen, Layers, PenLine, CalendarDays, Check } from "lucide-react";
 import { AiOrb, type OrbState } from "@/components/ai-orb";
-import { ContentShowcase } from "./content-showcase";
+import { ContentShowcase } from "@/components/content-showcase";
 
 interface CalendarEmptyStateProps {
   onGenerate: () => void;

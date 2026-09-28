@@ -49,7 +49,7 @@ export function AISection() {
   ];
 
   return (
-    <section id="ai" className="relative z-20 py-32 sm:py-40">
+    <section id="ai" className="relative z-20 marketing-section">
       <div
         className="absolute inset-x-0 top-0 pointer-events-none"
         style={{
@@ -92,15 +92,14 @@ export function AISection() {
           className="mt-16 flex justify-center md:mt-20"
         >
           <div
-            className="w-full max-w-[92%] md:max-w-3xl"
+            className="w-full md:max-w-3xl"
             style={{ perspective: "1100px", userSelect: "none", WebkitUserSelect: "none", position: "relative" }}
           >
             <div
-              className="relative scale-95 md:scale-100"
+              className="relative lg:[transform:rotateX(24deg)_scale(1.08)]"
               style={{
                 transformOrigin: "top",
                 willChange: "transform",
-                transform: "rotateX(24deg) scale(1.08)",
               }}
             >
               {/* Specular sheen over the whole sheet */}

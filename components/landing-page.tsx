@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type CSSProperties,
+} from "react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { motion, MotionConfig } from "framer-motion";
@@ -12,10 +18,13 @@ const DashboardPreview = dynamic(
     })),
   { ssr: true },
 );
+import dashboardStyles from "./hero-dashboard.module.css";
 import { Navbar } from "./navbar";
 import { FeatureCardsSection } from "./feature-cards-section";
 import { AISection } from "./ai-section";
 import { PipelineSection } from "./pipeline-section";
+import { ContentSection } from "./content-section";
+import { ReportingSection } from "./reporting-section";
 import { TestimonialsSection } from "./testimonials-section";
 import { WaitlistSection } from "./waitlist-section";
 import { WaitlistFooter } from "./waitlist-footer";
@@ -37,8 +46,28 @@ export function LandingPage() {
   const tb = useTranslations("billing");
   const [yOffset, setYOffset] = useState(0);
   const rafRef = useRef(0);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+    const observer = new ResizeObserver(([entry]) => {
+      preview.style.setProperty(
+        "--preview-scale",
+        String(entry.contentRect.width / 1600),
+      );
+    });
+    observer.observe(preview);
+    return () => observer.disconnect();
+  }, []);
 
   const handleScroll = useCallback(() => {
+    if (
+      !window.matchMedia(
+        "(min-width: 1280px) and (prefers-reduced-motion: no-preference)",
+      ).matches
+    )
+      return;
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       const offset = Math.min(window.scrollY / 300, 1) * -20;
@@ -54,19 +83,11 @@ export function LandingPage() {
     };
   }, [handleScroll]);
 
-  const baseTransform = {
-    translateX: 2,
-    scale: 1.2,
-    rotateX: 47,
-    rotateY: 31,
-    rotateZ: 324,
-  };
-
   return (
     <MotionConfig reducedMotion="user">
       <section
         id="hero"
-        className="relative min-h-screen overflow-hidden"
+        className="marketing-home relative min-h-screen overflow-hidden"
         style={{
           backgroundColor: "#09090B",
           // Ambient light the glass surfaces pick up as the page scrolls.
@@ -93,7 +114,7 @@ export function LandingPage() {
           }}
         />
 
-        <div className="relative z-10 pt-20 sm:pt-28 flex flex-col">
+        <div className="relative z-10 pt-24 sm:pt-28 flex flex-col">
           <div className="w-full flex justify-center px-6 mt-6 sm:mt-16">
             <div className="w-full max-w-4xl">
               <h1 className="text-3xl md:text-5xl lg:text-[56px] font-medium text-white leading-[1.1] text-balance">
@@ -102,7 +123,7 @@ export function LandingPage() {
               <p className="mt-4 sm:mt-6 text-base sm:text-lg text-zinc-300">
                 {t("subtitle")}
               </p>
-              <div className="mt-5 sm:mt-8 flex items-center gap-6 relative z-20">
+              <div className="mt-5 sm:mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 relative z-20">
                 <TrackedLink
                   href="/signup"
                   eventName="signup_start"
@@ -124,38 +145,14 @@ export function LandingPage() {
           </div>
 
           <div
-            className="relative"
-            style={{
-              width: "100vw",
-              marginLeft: "-50vw",
-              marginRight: "-50vw",
-              position: "relative",
-              left: "50%",
-              right: "50%",
-              height: "700px",
-              marginTop: "-60px",
-            }}
+            ref={previewRef}
+            aria-hidden="true"
+            className={dashboardStyles.stage}
           >
+            <div className={dashboardStyles.fade} />
             <div
-              className="absolute bottom-0 left-0 right-0 h-72 z-10 pointer-events-none"
-              style={{
-                background:
-                  "linear-gradient(to top, #09090B 20%, transparent 100%)",
-              }}
-            />
-
-            <div
-              style={{
-                transform: `translateY(${yOffset}px)`,
-                transition: "transform 0.1s ease-out",
-                contain: "strict",
-                perspective: "4000px",
-                perspectiveOrigin: "100% 0",
-                width: "100%",
-                height: "100%",
-                transformStyle: "preserve-3d",
-                position: "relative",
-              }}
+              className={dashboardStyles.scene}
+              style={{ "--preview-y": `${yOffset}px` } as CSSProperties}
             >
               <motion.div
                 initial={skipPreviewEntrance ? false : { opacity: 0 }}
@@ -165,27 +162,7 @@ export function LandingPage() {
                   duration: 1,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="max-sm:mt-45 sm:mt-72"
-                style={{
-                  backgroundColor: "#09090B",
-                  transformOrigin: "0 0",
-                  backfaceVisibility: "hidden",
-                  WebkitBackfaceVisibility: "hidden",
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.09), 0 40px 120px -40px rgba(0,0,0,0.8)",
-                  borderRadius: "28px",
-                  width: "1600px",
-                  height: "900px",
-                  marginInline: "auto",
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  transform: `translate(${baseTransform.translateX}%) scale(${baseTransform.scale}) rotateX(${baseTransform.rotateX}deg) rotateY(${baseTransform.rotateY}deg) rotate(${baseTransform.rotateZ}deg)`,
-                  transformStyle: "preserve-3d",
-                  overflow: "hidden",
-                }}
+                className={dashboardStyles.canvas}
               >
                 <DashboardPreview />
               </motion.div>
@@ -196,6 +173,8 @@ export function LandingPage() {
           <FeatureCardsSection />
           <AISection />
           <PipelineSection />
+          <ContentSection />
+          <ReportingSection />
           <PricingSection />
           <WaitlistSection />
           <WaitlistFooter />

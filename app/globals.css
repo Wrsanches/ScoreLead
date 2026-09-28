@@ -467,3 +467,39 @@ select:-webkit-autofill:focus {
     break-inside: avoid;
   }
 }
+
+/* Public-site responsive layout: generous desktop rhythm, shorter touch pages. */
+@utility marketing-section {
+  padding-block: clamp(4rem, 10vw, 10rem);
+}
+
+:where(.marketing-canvas, .marketing-home) :where(h1, h2, h3, p, dd, a) {
+  overflow-wrap: break-word;
+}
+
+:where(.marketing-canvas, .marketing-home) :where(section[id], header[id], h2[id]) {
+  scroll-margin-top: 6rem;
+}
+
+@media (max-width: 1279px) {
+  :where(.marketing-canvas, .marketing-home) a.press {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Local overflow stays operable even though the legacy page hides its scrollbar. */
+.marketing-nav [id="marketing-mobile-menu"] {
+  scrollbar-width: thin;
+  scrollbar-color: #52525b transparent;
+}
+.marketing-nav [id="marketing-mobile-menu"]::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+.marketing-nav [id="marketing-mobile-menu"]::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 999px;
+}

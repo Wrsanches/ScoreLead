@@ -118,8 +118,17 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
     relatedMarketingPage,
     normalizedLocale,
   );
-  const relatedTools = marketingPages.filter(page => page.group === "tools" && page.relatedBlogSlugs.includes(post.slug) && page.pathname !== post.relatedMarketingPath);
-  const toolLinkLabel = { en: "Put this guide into practice", pt: "Coloque este guia em prática", es: "Pon esta guía en práctica" }[normalizedLocale];
+  const relatedTools = marketingPages.filter(
+    (page) =>
+      page.group === "tools" &&
+      page.relatedBlogSlugs.includes(post.slug) &&
+      page.pathname !== post.relatedMarketingPath,
+  );
+  const toolLinkLabel = {
+    en: "Put this guide into practice",
+    pt: "Coloque este guia em prática",
+    es: "Pon esta guía en práctica",
+  }[normalizedLocale];
   const canonical = getLocalizedUrl(normalizedLocale, `blog/${post.slug}`);
   const image = `${siteConfig.url}${getBlogImage(post.slug)?.og ?? "/images/blog-og.png"}`;
   const related = blogPosts
@@ -271,8 +280,8 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                 >
                   {ui.decisionTable}
                 </h2>
-                <div className="mt-6 overflow-x-auto border-y border-white/[0.08]">
-                  <table className="w-full min-w-155 border-collapse text-left">
+                <div className="mt-6 hidden sm:block border-y border-white/[0.08]">
+                  <table className="w-full table-fixed border-collapse text-left">
                     <thead>
                       <tr className="border-b border-white/[0.08] text-xs uppercase tracking-[0.14em] text-zinc-500">
                         <th scope="col" className="w-2/5 px-4 py-4 font-medium">
@@ -300,6 +309,18 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                     </tbody>
                   </table>
                 </div>
+                <dl className="mt-6 divide-y divide-white/10 border-y border-white/10 sm:hidden">
+                  {translation.sections.map((section) => (
+                    <div key={section.heading} className="py-5">
+                      <dt className="text-sm font-medium text-zinc-100">
+                        {section.heading}
+                      </dt>
+                      <dd className="mt-2 text-sm leading-6 text-zinc-400">
+                        {firstSentence(section.paragraphs[0])}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </section>
 
               <div className="mt-14 space-y-14">
@@ -410,11 +431,20 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
                   <div className="mt-6 border-t border-white/10 pt-5">
                     <p className="text-sm text-zinc-400">{toolLinkLabel}</p>
                     <ul className="mt-3 grid gap-3">
-                      {relatedTools.map(tool => (
+                      {relatedTools.map((tool) => (
                         <li key={tool.id}>
-                          <Link href={`/${tool.pathname}`} className="surface-card group flex min-h-12 items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-medium leading-6 text-zinc-200 transition-colors hover:bg-white/[0.06] hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400">
-                            {getMarketingTranslation(tool, normalizedLocale).title}
-                            <ArrowRight className="size-4 shrink-0 text-zinc-500 transition-colors group-hover:text-emerald-300" aria-hidden="true" />
+                          <Link
+                            href={`/${tool.pathname}`}
+                            className="surface-card group flex min-h-12 items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-medium leading-6 text-zinc-200 transition-colors hover:bg-white/[0.06] hover:text-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                          >
+                            {
+                              getMarketingTranslation(tool, normalizedLocale)
+                                .title
+                            }
+                            <ArrowRight
+                              className="size-4 shrink-0 text-zinc-500 transition-colors group-hover:text-emerald-300"
+                              aria-hidden="true"
+                            />
                           </Link>
                         </li>
                       ))}
@@ -478,7 +508,7 @@ export default async function BlogPostPage({ params }: { params: PageParams }) {
               {ui.relatedTitle}
             </h2>
             <p className="mt-3 text-zinc-500">{ui.relatedDescription}</p>
-            <div className="mt-9 grid gap-6 md:grid-cols-3">
+            <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((relatedPost) => (
                 <BlogCard
                   key={relatedPost.slug}

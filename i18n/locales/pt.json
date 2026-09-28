@@ -1,4 +1,113 @@
 {
+  "reportingSection": {
+    "label": "Google Analytics + Search Console",
+    "heading": "Converse com seus dados.\nEncontre o próximo passo.",
+    "description": "Conecte suas propriedades ao ScoreLead e pergunte ao Codex ou Claude Code sobre tráfego, presença nas buscas e desempenho das páginas via MCP.",
+    "choose": "Experimente uma pergunta",
+    "preview": "Exemplo ilustrativo",
+    "business": "Mora Casa · 1–28 de setembro",
+    "answer": "Exemplo de resposta",
+    "sources": "Fontes dos relatórios",
+    "access": "Acesso somente de leitura às propriedades que você aprovar.",
+    "cta": "Começar com o ScoreLead",
+    "setup": "Conecte o Google, selecione suas propriedades e autorize seu assistente.",
+    "footnote": "Dados de exemplo, não um relatório ao vivo. As respostas dependem das suas propriedades, período e dados disponíveis.",
+    "visuals": {
+      "connection": "Seus dados, conectados ao seu assistente",
+      "connectionDescription": "Google Analytics e Search Console se conectam pelo ScoreLead MCP ao Codex ou Claude Code.",
+      "traffic": "De onde vêm as visitas",
+      "search": "Visibilidade nas buscas",
+      "pages": "Variação por página"
+    },
+    "examples": {
+      "traffic": {
+        "label": "Entenda seu tráfego",
+        "question": "Quais canais trouxeram mais sessões nos últimos 28 dias?",
+        "summary": "A busca orgânica liderou com 4.820 sessões, seguida pelo tráfego direto com 2.140. Compare o engajamento por canal antes de decidir onde investir.",
+        "column": "Canal",
+        "metric": "Sessões",
+        "context": "Participação",
+        "rows": [
+          {
+            "name": "Busca orgânica",
+            "value": "4.820",
+            "detail": "52%"
+          },
+          {
+            "name": "Direto",
+            "value": "2.140",
+            "detail": "23%"
+          },
+          {
+            "name": "Redes sociais orgânicas",
+            "value": "1.390",
+            "detail": "15%"
+          }
+        ],
+        "note": "GA4 · Os 3 principais canais, com 90% das sessões totais."
+      },
+      "search": {
+        "label": "Encontre oportunidades nas buscas",
+        "question": "Quais buscas têm muitas impressões, mas poucos cliques?",
+        "summary": "“Canecas de cerâmica artesanal” apareceu 12.400 vezes, com CTR de 1,5%. Revise a posição e a página de destino antes de testar um novo título ou descrição.",
+        "column": "Busca",
+        "metric": "Impressões",
+        "context": "CTR",
+        "rows": [
+          {
+            "name": "canecas de cerâmica artesanal",
+            "value": "12.400",
+            "detail": "1,5%"
+          },
+          {
+            "name": "jogo de jantar de cerâmica",
+            "value": "8.600",
+            "detail": "1,2%"
+          },
+          {
+            "name": "cerâmica artesanal",
+            "value": "6.200",
+            "detail": "1,8%"
+          }
+        ],
+        "note": "Search Console · Seleção de buscas. O Google omite consultas anônimas."
+      },
+      "pages": {
+        "label": "Compare buscas e visitas ao site",
+        "question": "Quais páginas perderam cliques nas buscas e como mudaram suas sessões orgânicas?",
+        "summary": "/collections/mugs perdeu 18% dos cliques nas buscas, enquanto as sessões orgânicas caíram 12%. Investigue buscas e dispositivos; essa comparação sozinha não explica a causa.",
+        "column": "Página",
+        "metric": "Cliques",
+        "context": "Sessões",
+        "rows": [
+          {
+            "name": "/collections/mugs",
+            "value": "−18%",
+            "detail": "−12%"
+          },
+          {
+            "name": "/collections/plates",
+            "value": "−9%",
+            "detail": "−5%"
+          },
+          {
+            "name": "/journal/care",
+            "value": "−6%",
+            "detail": "+3%"
+          }
+        ],
+        "note": "Variação vs. 4–31 de agosto. Cliques: Search Console; sessões orgânicas: GA4. Métricas e fusos dos relatórios são diferentes."
+      }
+    }
+  },
+  "contentSection": {
+    "label": "Conteúdo para Instagram",
+    "heading": "Um mês de conteúdo.",
+    "headingAccent": "Com a cara da sua marca.",
+    "description": "Transforme o perfil do seu negócio em um calendário de conteúdo com IA. Crie posts e legendas, revise cada detalhe e agende as publicações em um só lugar.",
+    "cta": "Criar meu calendário",
+    "plans": "Ver planos"
+  },
   "billing": {
     "perMonth": "/mês",
     "perYear": "/ano",
@@ -108,6 +217,9 @@
     "description": "Encontre, pontue e converta leads de empresas B2B com IA. Descoberta automatizada de contas, pontuação inteligente e outreach personalizado em escala."
   },
   "nav": {
+    "navigation": "Navegação principal",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
     "results": "Resultados",
     "features": "Recursos",
     "ai": "IA",
@@ -1626,9 +1738,6 @@
     "approve": "Aprovar",
     "markDraft": "Marcar como rascunho",
     "showcase": {
-      "caption": "Marcas fictícias, possibilidades reais. Seu calendário terá a identidade do seu negócio.",
-      "pause": "Pausar exemplos",
-      "play": "Reproduzir exemplos",
       "ideaLabel": "Um novo olhar",
       "idea": "Sua próxima grande ideia.",
       "tipsLabel": "Salve para depois",

@@ -1,0 +1,44 @@
+.adaptive {
+  --nav-foreground: #f4f4f5;
+  --nav-border: rgb(255 255 255 / 0.3);
+  --nav-hover: rgb(255 255 255 / 0.06);
+}
+
+.adaptive[data-nav-contrast="light"] {
+  --nav-foreground: #18181b;
+  --nav-border: rgb(24 24 27 / 0.35);
+  --nav-hover: rgb(0 0 0 / 0.06);
+}
+
+.adaptive:is(a, button):hover {
+  background-color: var(--nav-hover);
+}
+
+.ink,
+.languageSwitcher [data-language-code],
+.languageSwitcher > svg {
+  color: var(--nav-foreground);
+  transition: color 150ms;
+}
+
+.languageSwitcher {
+  border-color: var(--nav-border);
+  background: transparent;
+}
+
+.languageSwitcher:hover {
+  border-color: var(--nav-foreground);
+  background: var(--nav-hover);
+}
+
+.languageSwitcher > svg {
+  opacity: 1;
+}
+
+@media (forced-colors: active) {
+  .ink,
+  .languageSwitcher [data-language-code],
+  .languageSwitcher > svg {
+    color: ButtonText;
+  }
+}

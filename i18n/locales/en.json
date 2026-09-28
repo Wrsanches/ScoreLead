@@ -1,4 +1,113 @@
 {
+  "reportingSection": {
+    "label": "Google Analytics + Search Console",
+    "heading": "Ask your data.\nFind your next move.",
+    "description": "Connect your properties to ScoreLead and ask Codex or Claude Code about traffic, search visibility and page performance through MCP.",
+    "choose": "Try a question",
+    "preview": "Illustrative example",
+    "business": "Mora Casa · September 1–28",
+    "answer": "Example response",
+    "sources": "Report sources",
+    "access": "Read-only access to the properties you approve.",
+    "cta": "Start with ScoreLead",
+    "setup": "Connect Google, select your properties, then authorize your assistant.",
+    "footnote": "Sample data, not a live report. Actual responses depend on your properties, date range and available data.",
+    "visuals": {
+      "connection": "Your data, connected to your assistant",
+      "connectionDescription": "Google Analytics and Search Console connect through ScoreLead MCP to Codex or Claude Code.",
+      "traffic": "Where visits begin",
+      "search": "Search visibility",
+      "pages": "Change by page"
+    },
+    "examples": {
+      "traffic": {
+        "label": "Understand your traffic",
+        "question": "Which channels brought the most sessions in the last 28 days?",
+        "summary": "Organic Search led with 4,820 sessions, followed by Direct with 2,140. Compare engagement by channel before deciding where to invest.",
+        "column": "Channel",
+        "metric": "Sessions",
+        "context": "Share",
+        "rows": [
+          {
+            "name": "Organic Search",
+            "value": "4,820",
+            "detail": "52%"
+          },
+          {
+            "name": "Direct",
+            "value": "2,140",
+            "detail": "23%"
+          },
+          {
+            "name": "Organic Social",
+            "value": "1,390",
+            "detail": "15%"
+          }
+        ],
+        "note": "GA4 · Top 3 channels, 90% of total sessions."
+      },
+      "search": {
+        "label": "Find search opportunities",
+        "question": "Which searches have high impressions but a low click-through rate?",
+        "summary": "“Handmade ceramic mugs” appeared 12,400 times with a 1.5% CTR. Review its ranking and landing page before testing a new title or description.",
+        "column": "Search query",
+        "metric": "Impressions",
+        "context": "CTR",
+        "rows": [
+          {
+            "name": "handmade ceramic mugs",
+            "value": "12,400",
+            "detail": "1.5%"
+          },
+          {
+            "name": "ceramic dinner set",
+            "value": "8,600",
+            "detail": "1.2%"
+          },
+          {
+            "name": "handmade pottery",
+            "value": "6,200",
+            "detail": "1.8%"
+          }
+        ],
+        "note": "Search Console · Selected queries. Google omits anonymized searches."
+      },
+      "pages": {
+        "label": "Connect search and site activity",
+        "question": "Which pages lost search clicks, and how did their organic sessions change?",
+        "summary": "/collections/mugs lost 18% of its search clicks while organic sessions fell 12%. Check query and device trends to investigate; this comparison alone does not establish the cause.",
+        "column": "Page",
+        "metric": "Clicks",
+        "context": "Sessions",
+        "rows": [
+          {
+            "name": "/collections/mugs",
+            "value": "−18%",
+            "detail": "−12%"
+          },
+          {
+            "name": "/collections/plates",
+            "value": "−9%",
+            "detail": "−5%"
+          },
+          {
+            "name": "/journal/care",
+            "value": "−6%",
+            "detail": "+3%"
+          }
+        ],
+        "note": "Change vs. August 4–31. Clicks: Search Console; organic sessions: GA4. Metrics and reporting time zones differ."
+      }
+    }
+  },
+  "contentSection": {
+    "label": "Instagram content",
+    "heading": "A month of content.",
+    "headingAccent": "Made to feel like your brand.",
+    "description": "Turn your business profile into an AI-powered content calendar. Create posts and captions, review every detail and schedule your content in one place.",
+    "cta": "Create my calendar",
+    "plans": "View plans"
+  },
   "billing": {
     "perMonth": "/mo",
     "perYear": "/yr",
@@ -108,6 +217,9 @@
     "description": "Find, score, and convert B2B company leads with AI. Automated account discovery, intelligent scoring, and personalized outreach at scale."
   },
   "nav": {
+    "navigation": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "results": "Results",
     "features": "Features",
     "ai": "AI",
@@ -1626,9 +1738,6 @@
     "approve": "Approve",
     "markDraft": "Mark as draft",
     "showcase": {
-      "caption": "Fictional brands, real possibilities. Your calendar is tailored to your business.",
-      "pause": "Pause examples",
-      "play": "Play examples",
       "ideaLabel": "A fresh perspective",
       "idea": "Your next great idea.",
       "tipsLabel": "Save for later",

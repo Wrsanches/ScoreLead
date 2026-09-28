@@ -77,7 +77,7 @@ export function FeatureCardsSection() {
   const t = useTranslations("features")
 
   return (
-    <section id="features" className="relative z-20 py-40">
+    <section id="features" className="relative z-20 marketing-section">
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{

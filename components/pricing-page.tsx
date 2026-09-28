@@ -23,7 +23,6 @@ import {
   siteConfig,
 } from "@/lib/seo";
 
-
 /* ── Plan card ─────────────────────────────────────────────────────────
    Price, one line of positioning, four bullets, one button. The full
    matrix lives in the comparison table below, so the cards stay short. */
@@ -105,7 +104,9 @@ function PlanCard({
         ))}
       </ul>
 
-      <p className="relative mt-5 text-xs leading-5 text-zinc-600">{footnote}</p>
+      <p className="relative mt-5 text-xs leading-5 text-zinc-600">
+        {footnote}
+      </p>
 
       <div className="relative mt-auto pt-6">
         <TrackedLink
@@ -179,7 +180,7 @@ function CompareCell({
 function ComparisonTable({ pricing }: { pricing: PricingUi }) {
   return (
     <div className="glass-card overflow-hidden rounded-3xl">
-      <div className="overflow-x-auto">
+      <div className="hidden md:block">
         <table className="w-full min-w-[44rem] border-collapse text-left">
           <thead>
             <tr className="border-b border-white/[0.08]">
@@ -240,6 +241,31 @@ function ComparisonTable({ pricing }: { pricing: PricingUi }) {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="divide-y divide-white/10 md:hidden">
+        {pricing.rows.map((row) => (
+          <section key={row.label} className="p-5">
+            <h3 className="text-sm font-medium text-zinc-100">{row.label}</h3>
+            <dl className="mt-4 grid grid-cols-2 gap-4">
+              {pricing.plans.map((plan) => (
+                <div key={plan.id} className="min-w-0">
+                  <dt
+                    className={`mb-2 text-xs ${plan.id === "growth" ? "text-emerald-400" : "text-zinc-400"}`}
+                  >
+                    {plan.name}
+                  </dt>
+                  <dd>
+                    <CompareCell
+                      cell={row.values[plan.id]}
+                      pricing={pricing}
+                      highlighted={plan.id === "growth"}
+                    />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
       </div>
     </div>
   );
@@ -327,7 +353,9 @@ export function PricingPageView({
                 {ui.home}
               </Link>
               <span aria-hidden="true">/</span>
-              <span className="truncate text-zinc-400">{translation.title}</span>
+              <span className="truncate text-zinc-400">
+                {translation.title}
+              </span>
             </nav>
 
             <div className="mt-10">

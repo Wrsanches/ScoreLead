@@ -120,3 +120,68 @@ grid, with a subtle emerald border and wash for selection. Long names and IDs
 wrap inside each card; narrow containers collapse naturally to one column.
 Preserve the existing light/dark utility pairs and Geist typography.
 See `UX-CONTRACT.md` for navigation and behavior.
+
+## Homepage content showcase
+
+The home page introduces the content calendar before pricing. Its heading,
+copy and signup action use the existing marketing type scale, 72rem content
+width and zinc/emerald palette. Match the AI/Pipeline sections with left-aligned
+white headings (weight 538, optical size 28), responsive 18px supporting copy,
+and the hero's white rounded-xl signup action. Color belongs primarily to the
+post artwork; the Instagram label uses the full-color brand logo at 20px,
+matching the Google provider marks in the reporting section.
+`components/content-showcase.tsx` and its CSS
+module own the illustrative Instagram post strip shared with the calendar
+empty state; keep the fictional brands and aligned cards consistent in both
+contexts. The strip runs continuously without a caption, playback control or
+hover pause. Reduced motion stops the strip.
+The five fictional brands use generated marks from `public/images/showcase/`,
+matched to each post's existing palette. Keep the same mark in the 24px circular
+profile avatar and 16px rounded post signature. Assets are pre-sized 128px WebP
+files; their generation prompts and source images live in `output/imagegen/`.
+New copy follows the existing EN/PT/ES locale.
+
+## Homepage reporting examples
+
+`components/reporting-section.tsx` presents the read-only GA4/Search Console
+MCP connection after the content showcase, before pricing. Follow the same
+left-aligned heading, Geist scale, 72rem shell and white signup action. A
+question selector sits beside one glass report preview, stacking on mobile.
+Emerald and a check identify the selected question; preserve visible keyboard
+focus. All examples reserve the same panel geometry. Use the existing Google
+logo assets, explicitly illustrative data, and localized EN/PT/ES questions.
+Sources, period and metric limitations stay with each answer. Search clicks
+and GA4 sessions are distinct; the demo neither requests reports nor claims
+to identify causation or qualified leads.
+`reporting-visuals.tsx` adds a source-to-assistant diagram and question-driven
+SVG charts. Highlight the relevant Google source paths; keep both supported
+assistants visible without implying that either is currently connected.
+Traffic and search bars use a shared zero baseline within each chart. Page
+comparisons use a labeled −20% to +20% scale with separate clicks/sessions
+series. Retain the equivalent semantic table for screen readers. Chart entry
+is a brief fade, disabled for reduced motion; questions never auto-advance.
+
+## Public website on phones and tablets
+
+Keep the same Geist, zinc and emerald identity at every width. The shared
+`Navbar` uses its full link row only from 1280px, in a 72rem container. Below
+that, keep the brand and a 44px menu control in the toolbar; put links
+and account actions underneath inside the same surface. The language switcher
+stays in the toolbar on tablets and moves inside the menu below 768px. Bound the open menu
+to the available dynamic viewport and allow scrolling in landscape. Escape
+returns focus to the trigger; outside clicks and navigation close the menu.
+
+`marketing-section` in `app/globals.css` owns homepage section spacing:
+clamp(4rem, 10vw, 10rem). Anchor headings clear the fixed header. Public CTAs
+have 44px minimum height at touch widths, with natural wrapping and 24px
+page gutters. The homepage reuses the full `DashboardPreview` at every width.
+`hero-dashboard.module.css` reserves a 16:9 frame below 1280px and scales the
+1600px canvas to its measured container width; desktop keeps its original
+perspective treatment. A readable pipeline stage list appears below 1024px.
+Pricing comparisons and article decision tables become labelled stacked
+rows on phones, retaining every value. Footer links use touch-friendly rows,
+and contact inputs stay at 16px on tablets to avoid focus zoom.
+
+Check shared public templates (home, pricing, feature, use case, tool,
+comparison, case study, blog, contact and legal) at 320/390px, 768/1024px and
+1280px. These browser checks are not a claim of physical-device coverage.

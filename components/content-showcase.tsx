@@ -1,108 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   Bookmark,
   Heart,
   MessageCircle,
   MoreHorizontal,
-  Pause,
-  Play,
   Send,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import styles from "./content-showcase.module.css";
 
 const samples = ["idea", "tips", "details", "story", "month"] as const;
 type Sample = (typeof samples)[number];
 
-const brands: Record<Sample, { name: string; handle: string }> = {
-  idea: { name: "Vora Studio", handle: "vora.studio" },
-  tips: { name: "Lume Social", handle: "lume.social" },
-  details: { name: "Mora Casa", handle: "mora.casa" },
-  story: { name: "Nova Forma", handle: "nova.forma" },
-  month: { name: "Dia Papel", handle: "dia.papel" },
+const brands: Record<Sample, { name: string; handle: string; logo: string }> = {
+  idea: {
+    name: "Vora Studio",
+    handle: "vora.studio",
+    logo: "/images/showcase/vora-studio.webp",
+  },
+  tips: {
+    name: "Lume Social",
+    handle: "lume.social",
+    logo: "/images/showcase/lume-social.webp",
+  },
+  details: {
+    name: "Mora Casa",
+    handle: "mora.casa",
+    logo: "/images/showcase/mora-casa.webp",
+  },
+  story: {
+    name: "Nova Forma",
+    handle: "nova.forma",
+    logo: "/images/showcase/nova-forma.webp",
+  },
+  month: {
+    name: "Dia Papel",
+    handle: "dia.papel",
+    logo: "/images/showcase/dia-papel.webp",
+  },
 };
 
 function SampleLogo({ sample }: { sample: Sample }) {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      {sample === "idea" && (
-        <path d="m3 5 9 15 9-15h-5l-4 7-4-7H3Z" fill="currentColor" />
-      )}
-      {sample === "tips" && (
-        <>
-          <path
-            d="M12 3v18M3 12h18M6 6l12 12M6 18 18 6"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <circle cx="12" cy="12" r="4" fill="currentColor" />
-        </>
-      )}
-      {sample === "details" && (
-        <>
-          <path
-            d="M5 18V9a7 7 0 0 1 14 0v9H5Z"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          />
-          <path
-            d="M9 18v-7a3 3 0 0 1 6 0v7M3 21h18"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </>
-      )}
-      {sample === "story" && (
-        <>
-          <path
-            d="M4 19V5l16 14V5"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="square"
-          />
-          <circle cx="12" cy="12" r="3" fill="currentColor" />
-        </>
-      )}
-      {sample === "month" && (
-        <>
-          <path
-            d="M5 3h10l4 4v14H5V3Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M14 3v5h5M9 12h6M9 16h4"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </>
-      )}
-    </svg>
+    <Image
+      src={brands[sample].logo}
+      width={24}
+      height={24}
+      alt=""
+      className={styles.logo}
+      unoptimized
+    />
   );
 }
 
 /** Illustrative posts, separate from the user's actual calendar and generation progress. */
 export function ContentShowcase() {
   const t = useTranslations("contentCalendar.showcase");
-  const [paused, setPaused] = useState(false);
 
   return (
-    <figure className={styles.showcase}>
+    <div className={styles.showcase} aria-hidden="true">
       <div className={styles.viewport} aria-hidden="true">
-        <div className={styles.track} data-paused={paused}>
+        <div className={styles.track}>
           {[0, 1].map((copy) => (
             <div className={styles.group} key={copy}>
               {samples.map((sample) => (
@@ -164,23 +124,6 @@ export function ContentShowcase() {
           ))}
         </div>
       </div>
-      <figcaption className="relative flex items-center justify-center gap-3 px-5 text-xs text-zinc-500 dark:text-zinc-400">
-        <span>{t("caption")}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className={`size-8 shrink-0 rounded-full ${styles.playback}`}
-          aria-label={paused ? t("play") : t("pause")}
-          onClick={() => setPaused((value) => !value)}
-        >
-          {paused ? (
-            <Play className="size-3.5" />
-          ) : (
-            <Pause className="size-3.5" />
-          )}
-        </Button>
-      </figcaption>
-    </figure>
+    </div>
   );
 }

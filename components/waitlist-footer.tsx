@@ -101,7 +101,9 @@ export function WaitlistFooter() {
             <h2 className="text-2xl font-medium tracking-tight text-white sm:text-3xl">
               {t("ctaTitle")}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-400 sm:text-base">{t("ctaBody")}</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-400 sm:text-base">
+              {t("ctaBody")}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-5">
             <TrackedLink
@@ -117,7 +119,11 @@ export function WaitlistFooter() {
               className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-300 transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
             >
               {t("contactUs")}
-              <ArrowRight strokeWidth={1.75} className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              <ArrowRight
+                strokeWidth={1.75}
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </Link>
           </div>
         </div>
@@ -144,7 +150,7 @@ export function WaitlistFooter() {
                   rel="me noopener noreferrer"
                   aria-label={t("twitter")}
                   title={t("twitter")}
-                  className="glass-pill inline-flex size-9 items-center justify-center rounded-full text-zinc-400 hover:brightness-125 transition-[filter,color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                  className="glass-pill inline-flex size-11 items-center justify-center rounded-full text-zinc-400 hover:brightness-125 transition-[filter,color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                 >
                   <SocialIcon platform="x" className="size-4" />
                 </a>
@@ -154,7 +160,7 @@ export function WaitlistFooter() {
                   rel="me noopener noreferrer"
                   aria-label={t("instagram")}
                   title={t("instagram")}
-                  className="glass-pill inline-flex size-9 items-center justify-center rounded-full text-zinc-400 hover:brightness-125 transition-[filter,color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-pink-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                  className="glass-pill inline-flex size-11 items-center justify-center rounded-full text-zinc-400 hover:brightness-125 transition-[filter,color] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-pink-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                 >
                   <SocialIcon platform="instagram" className="size-4" />
                 </a>
@@ -163,19 +169,19 @@ export function WaitlistFooter() {
 
             <nav
               aria-label={t("navigation")}
-              className="grid grid-cols-2 gap-x-10 gap-y-10 sm:grid-cols-3 lg:col-span-9 xl:grid-cols-5 xl:gap-x-12"
+              className="grid grid-cols-1 min-[375px]:grid-cols-2 gap-x-6 sm:gap-x-10 gap-y-10 sm:grid-cols-3 lg:col-span-9 xl:grid-cols-5 xl:gap-x-12"
             >
               {linkGroups.map((group) => (
                 <div key={group.title}>
                   <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-300">
                     {group.title}
                   </h2>
-                  <ul className="mt-5 space-y-3.5">
+                  <ul className="mt-4 space-y-1">
                     {group.links.map((link) => (
                       <li key={link.href}>
                         <Link
                           href={link.href}
-                          className="rounded-sm text-sm text-zinc-500 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                          className="inline-flex min-h-11 items-center rounded-sm text-sm leading-6 text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
                         >
                           {link.label}
                         </Link>

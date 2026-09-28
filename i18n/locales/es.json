@@ -1,4 +1,113 @@
 {
+  "reportingSection": {
+    "label": "Google Analytics + Search Console",
+    "heading": "Habla con tus datos.\nEncuentra el siguiente paso.",
+    "description": "Conecta tus propiedades a ScoreLead y pregunta a Codex o Claude Code sobre tráfico, visibilidad en búsquedas y rendimiento de páginas mediante MCP.",
+    "choose": "Prueba una pregunta",
+    "preview": "Ejemplo ilustrativo",
+    "business": "Mora Casa · 1–28 de septiembre",
+    "answer": "Ejemplo de respuesta",
+    "sources": "Fuentes de los informes",
+    "access": "Acceso de solo lectura a las propiedades que apruebes.",
+    "cta": "Empezar con ScoreLead",
+    "setup": "Conecta Google, selecciona tus propiedades y autoriza a tu asistente.",
+    "footnote": "Datos de ejemplo, no un informe en vivo. Las respuestas dependen de tus propiedades, período y datos disponibles.",
+    "visuals": {
+      "connection": "Tus datos, conectados a tu asistente",
+      "connectionDescription": "Google Analytics y Search Console se conectan mediante ScoreLead MCP a Codex o Claude Code.",
+      "traffic": "De dónde vienen las visitas",
+      "search": "Visibilidad en búsquedas",
+      "pages": "Cambio por página"
+    },
+    "examples": {
+      "traffic": {
+        "label": "Entiende tu tráfico",
+        "question": "¿Qué canales generaron más sesiones en los últimos 28 días?",
+        "summary": "La búsqueda orgánica lideró con 4.820 sesiones, seguida del tráfico directo con 2.140. Compara la interacción por canal antes de decidir dónde invertir.",
+        "column": "Canal",
+        "metric": "Sesiones",
+        "context": "Proporción",
+        "rows": [
+          {
+            "name": "Búsqueda orgánica",
+            "value": "4.820",
+            "detail": "52%"
+          },
+          {
+            "name": "Directo",
+            "value": "2.140",
+            "detail": "23%"
+          },
+          {
+            "name": "Redes sociales orgánicas",
+            "value": "1.390",
+            "detail": "15%"
+          }
+        ],
+        "note": "GA4 · Los 3 canales principales, con el 90% de las sesiones totales."
+      },
+      "search": {
+        "label": "Encuentra oportunidades de búsqueda",
+        "question": "¿Qué búsquedas tienen muchas impresiones pero pocos clics?",
+        "summary": "“Tazas de cerámica artesanal” apareció 12.400 veces, con un CTR del 1,5%. Revisa su posición y página de destino antes de probar un nuevo título o descripción.",
+        "column": "Búsqueda",
+        "metric": "Impresiones",
+        "context": "CTR",
+        "rows": [
+          {
+            "name": "tazas de cerámica artesanal",
+            "value": "12.400",
+            "detail": "1,5%"
+          },
+          {
+            "name": "vajilla de cerámica",
+            "value": "8.600",
+            "detail": "1,2%"
+          },
+          {
+            "name": "cerámica artesanal",
+            "value": "6.200",
+            "detail": "1,8%"
+          }
+        ],
+        "note": "Search Console · Selección de búsquedas. Google omite las consultas anónimas."
+      },
+      "pages": {
+        "label": "Compara búsquedas y visitas al sitio",
+        "question": "¿Qué páginas perdieron clics en búsquedas y cómo cambiaron sus sesiones orgánicas?",
+        "summary": "/collections/mugs perdió el 18% de sus clics en búsquedas y sus sesiones orgánicas cayeron un 12%. Investiga consultas y dispositivos; esta comparación por sí sola no explica la causa.",
+        "column": "Página",
+        "metric": "Clics",
+        "context": "Sesiones",
+        "rows": [
+          {
+            "name": "/collections/mugs",
+            "value": "−18%",
+            "detail": "−12%"
+          },
+          {
+            "name": "/collections/plates",
+            "value": "−9%",
+            "detail": "−5%"
+          },
+          {
+            "name": "/journal/care",
+            "value": "−6%",
+            "detail": "+3%"
+          }
+        ],
+        "note": "Cambio frente al 4–31 de agosto. Clics: Search Console; sesiones orgánicas: GA4. Las métricas y zonas horarias de los informes difieren."
+      }
+    }
+  },
+  "contentSection": {
+    "label": "Contenido para Instagram",
+    "heading": "Un mes de contenido.",
+    "headingAccent": "Con la identidad de tu marca.",
+    "description": "Convierte el perfil de tu negocio en un calendario de contenido con IA. Crea publicaciones y textos, revisa cada detalle y programa tu contenido en un solo lugar.",
+    "cta": "Crear mi calendario",
+    "plans": "Ver planes"
+  },
   "billing": {
     "perMonth": "/mes",
     "perYear": "/año",
@@ -108,6 +217,9 @@
     "description": "Encuentra, puntúa y convierte leads de empresas B2B con IA. Descubrimiento automatizado de cuentas, puntuación inteligente y outreach personalizado a escala."
   },
   "nav": {
+    "navigation": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
     "results": "Resultados",
     "features": "Funciones",
     "ai": "IA",
@@ -1626,9 +1738,6 @@
     "approve": "Aprobar",
     "markDraft": "Marcar como borrador",
     "showcase": {
-      "caption": "Marcas ficticias, posibilidades reales. Tu calendario se adaptará a tu negocio.",
-      "pause": "Pausar ejemplos",
-      "play": "Reproducir ejemplos",
       "ideaLabel": "Una nueva mirada",
       "idea": "Tu próxima gran idea.",
       "tipsLabel": "Guárdalo para después",

@@ -13,7 +13,7 @@ export function PipelineSection() {
   const t = useTranslations("pipeline");
 
   return (
-    <section id="pipeline" className="relative py-40 px-6 md:px-12 lg:px-24">
+    <section id="pipeline" className="relative marketing-section px-6">
       <div
         className="absolute inset-x-0 top-0 pointer-events-none"
         style={{
@@ -47,7 +47,7 @@ export function PipelineSection() {
         </p>
 
         <div
-          className="relative w-full mb-16 overflow-hidden"
+          className="relative mb-16 hidden w-full overflow-hidden lg:block"
           style={{
             perspective: "1200px",
           }}
@@ -206,8 +206,33 @@ export function PipelineSection() {
           </div>
         </div>
 
+        <ol className="my-10 grid gap-3 sm:grid-cols-2 lg:hidden">
+          {[
+            [t("stageDiscovery"), "2,450"],
+            [t("stageEnrichment"), "1,830"],
+            [t("stageScored"), "1,240"],
+            [t("stageOutreach"), "680"],
+            [t("stageConverted"), "180"],
+          ].map(([label, value], index) => (
+            <li
+              key={label}
+              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-4"
+            >
+              <span className="font-mono text-xs text-emerald-400">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="min-w-0 flex-1 text-sm text-zinc-300">
+                {label}
+              </span>
+              <span className="font-mono text-sm tabular-nums text-zinc-100">
+                {value}
+              </span>
+            </li>
+          ))}
+        </ol>
+
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="border-t border-b md:border-r border-white/[0.08] pt-8 px-6 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
+          <div className="border-t border-b md:border-r border-white/[0.08] pt-8 px-0 pb-10 md:pt-10 md:pr-10 md:px-0 md:pb-16">
             <h3 className="text-xl font-medium text-zinc-200 mb-3">
               {t("discoveryTitle")}
             </h3>
@@ -252,7 +277,7 @@ export function PipelineSection() {
             </div>
           </div>
 
-          <div className="border-b md:border-t border-white/[0.08] pt-8 px-6 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
+          <div className="border-b md:border-t border-white/[0.08] pt-8 px-0 pb-10 md:pt-10 md:pl-10 md:px-0 md:pb-16">
             <h3 className="text-xl font-medium text-zinc-200 mb-3">
               {t("deduplicationTitle")}
             </h3>
@@ -268,7 +293,7 @@ export function PipelineSection() {
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                   <span className="text-zinc-500 text-sm">Sunset Yoga SF</span>
-                  <span className="text-zinc-600 text-xs ml-auto">
+                  <span className="min-w-0 break-all text-zinc-500 text-xs ml-auto">
                     sunsetyoga.com
                   </span>
                 </div>
@@ -283,7 +308,7 @@ export function PipelineSection() {
                   <span className="text-zinc-400 text-sm">
                     Sunset Yoga Studio
                   </span>
-                  <span className="text-zinc-600 text-xs ml-auto">
+                  <span className="min-w-0 break-all text-zinc-500 text-xs ml-auto">
                     sunsetyoga.com
                   </span>
                 </div>

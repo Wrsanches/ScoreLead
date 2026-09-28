@@ -14,7 +14,7 @@ import {
 } from "@/lib/validations/contact"
 
 const inputClassName =
-  "w-full rounded-md border border-white/[0.08] bg-white/[0.03] px-3.5 py-3 text-base text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] placeholder:text-zinc-600 hover:border-white/[0.14] focus:border-emerald-500/60 focus:bg-white/[0.03] focus:ring-3 focus:ring-emerald-500/10 aria-invalid:border-red-400/60 aria-invalid:ring-3 aria-invalid:ring-red-500/10 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+  "w-full rounded-md border border-white/[0.08] bg-white/[0.03] px-3.5 py-3 text-base text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] placeholder:text-zinc-600 hover:border-white/[0.14] focus:border-emerald-500/60 focus:bg-white/[0.03] focus:ring-3 focus:ring-emerald-500/10 aria-invalid:border-red-400/60 aria-invalid:ring-3 aria-invalid:ring-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
 
 const MESSAGE_MAX_LENGTH = 5_000
 

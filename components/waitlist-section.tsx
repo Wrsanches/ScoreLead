@@ -38,7 +38,7 @@ export function WaitlistSection() {
   }
 
   return (
-    <section id="waitlist" className="relative py-32 px-6 overflow-hidden">
+    <section id="waitlist" className="relative marketing-section px-6 overflow-hidden">
       <div
         className="absolute pointer-events-none"
         style={{
@@ -111,9 +111,9 @@ export function WaitlistSection() {
                 </div>
               ) : (
                 <>
-                  <form onSubmit={handleSubmit(onSubmit)} className="glass-strong flex items-stretch gap-2 p-1.5 rounded-2xl">
+                  <form noValidate onSubmit={handleSubmit(onSubmit)} className="glass-strong flex flex-col sm:flex-row items-stretch gap-2 p-1.5 rounded-2xl">
                     <label htmlFor="contact-email" className="sr-only">{t("placeholder")}</label>
-                    <div className="relative flex-1">
+                    <div className="relative min-w-0 flex-1">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
                       <input
                         id="contact-email"
@@ -130,13 +130,13 @@ export function WaitlistSection() {
                           },
                           onChange: () => { if (error) setError("") },
                         })}
-                        className="w-full pl-10 pr-4 py-3 bg-transparent text-white text-sm placeholder:text-zinc-500 focus:outline-none"
+                        className="w-full pl-10 pr-4 py-3 bg-transparent text-white text-base placeholder:text-zinc-500 focus:outline-none"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="press px-5 py-3 bg-white hover:bg-zinc-100 text-zinc-900 font-medium rounded-[10px] text-sm shrink-0 disabled:opacity-50 flex items-center gap-2 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)]"
+                      className="press px-5 py-3 bg-white hover:bg-zinc-100 text-zinc-900 font-medium rounded-[10px] text-sm shrink-0 disabled:opacity-50 flex items-center justify-center gap-2 transition-[transform,background-color] ease-[cubic-bezier(0.23,1,0.32,1)]"
                     >
                       {loading ? t("sending") : t("ctaSales")}
                       {!loading && <Send className="w-3.5 h-3.5" />}

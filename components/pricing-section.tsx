@@ -27,7 +27,7 @@ export function PricingSection() {
   const t = useTranslations("billing")
 
   return (
-    <section id="pricing" className="relative z-20 px-6 py-32 sm:py-40">
+    <section id="pricing" className="relative z-20 px-6 marketing-section">
       <div
         className="absolute inset-x-0 top-0 pointer-events-none"
         style={{
