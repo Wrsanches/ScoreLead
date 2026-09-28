@@ -255,11 +255,11 @@ function ConnectionEditor({
                 {t("noProperties")}
               </p>
             ) : (
-              <div className="max-h-80 space-y-1 overflow-y-auto">
+              <div className="grid max-h-80 grid-cols-[repeat(auto-fill,minmax(min(100%,13rem),1fr))] gap-2.5 overflow-y-auto p-1">
                 {options.map((r) => (
                   <label
                     key={r.externalId}
-                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors hover:bg-zinc-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-500 dark:hover:bg-white/[0.04] ${selected.includes(r.externalId) ? "border-emerald-500/25 bg-emerald-500/[0.04]" : "border-transparent"}`}
+                    className={`flex min-w-0 cursor-pointer items-start gap-2.5 rounded-xl border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-500 has-[:disabled]:cursor-wait has-[:disabled]:opacity-60 motion-reduce:transition-none ${selected.includes(r.externalId) ? "border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.09]" : "border-black/[0.08] bg-white hover:bg-zinc-50 dark:border-white/[0.10] dark:bg-white/[0.02] dark:hover:bg-white/[0.05]"}`}
                   >
                     <input
                       type="checkbox"
@@ -276,8 +276,10 @@ function ConnectionEditor({
                       }
                     />
                     <span className="min-w-0 text-sm text-zinc-800 dark:text-zinc-200">
-                      <span className="block break-words">{r.name}</span>
-                      <span className="block break-all text-xs text-zinc-500">
+                      <span className="block font-medium leading-5 [overflow-wrap:anywhere]">
+                        {r.name}
+                      </span>
+                      <span className="mt-1 block break-all text-xs leading-4 text-zinc-500 dark:text-zinc-400">
                         {r.externalId}
                         {unavailable.some(
                           (item) => item.externalId === r.externalId,
