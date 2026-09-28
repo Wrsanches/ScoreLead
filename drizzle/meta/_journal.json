@@ -288,6 +288,13 @@
       "when": 1790551237497,
       "tag": "0040_oval_pet_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1790599621183,
+      "tag": "0041_drop_retired_agents",
+      "breakpoints": true
     }
   ]
 }

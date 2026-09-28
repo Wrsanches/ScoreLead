@@ -1,23 +1,32 @@
 # Agents retirement
 
-Agents has been removed from the application: navigation, UI, API routes,
-translations, React Flow dependency, automation engine and deploy scripts.
-The dedicated Railway agents-worker service is removed from testing and production.
+Agents UI, API, engine and the dedicated Railway worker have been removed.
+Google reporting, discovery, email and WhatsApp remain available. Shared usage
+reservations and email delivery fixes remain in place.
 
-Migrations 0039 and 0040 and their schema definitions are retained to preserve
-existing records and the migration chain. They are archival only. Do not remove
-these migrations or drop the historical tables as part of feature removal.
+The user subsequently requested removal of Agents data from local, testing and
+production. Migration 0041 removes the five agent_* tables, lead.statusRevision,
+its trigger/function and whatsapp_sequence.agentExecutionId. It preserves other
+business, lead, message and integration data. Existing migration files 0039 and
+0040 remain immutable so fresh installs and migration history stay consistent.
 
-The shared discovery queue excludes jobs owned by an archived agent execution.
-The shared WhatsApp queue blocks sequences carrying agentExecutionId. These
-retirement guards prevent old jobs from resuming through regular channel workers.
-Normal discovery, email, WhatsApp and Google reporting remain available.
-Shared usage reservations and email delivery fixes remain in place.
+## Deployment order
+
+1. Verify no active Agents-owned discovery jobs or WhatsApp sequences exist.
+2. Deploy the application without Agents schema columns or queue dependencies to
+   both testing and production, while retaining database tables and columns.
+3. Wait for both compatible deployments to be healthy and the old deployments
+   to stop; then apply 0041 and deploy the migration to both branches.
+4. Verify absence of the retired tables, columns, trigger and function, and
+   verify normal lead/WhatsApp queries and application health.
+
+Do not roll back application code to a version that references the retired
+schema. Restoring that code requires restoring compatible schema first.
 
 ## Verification
 
-83 existing email, WhatsApp and reporting tests pass, alongside TypeScript,
-scoped ESLint and a production Webpack build. The built route manifest contains
-no Agents page or API. A PostgreSQL check using connection-local temporary tables
-confirms that the real discovery claim function selects a manual job and never
-claims an archived automation job, even with the legacy execution flag enabled.
+The migration was first executed and rolled back against the configured local
+database. Exactly five tables disappeared, the trigger was removed, and queries
+using the new lead and WhatsApp ORM schemas succeeded. TypeScript, scoped ESLint
+and 83 existing channel/reporting tests passed. Final environment checks verify
+all five tables, both columns, the trigger and its function are absent.
