@@ -55,8 +55,6 @@ export async function claimNextJob(): Promise<string | null> {
     WHERE id = (
       SELECT j.id FROM discovery_job j
       WHERE j.status = 'queued'
-        -- Retired automations must never resume through the shared discovery queue.
-        AND NOT EXISTS(SELECT 1 FROM agent_execution ae WHERE ae.id=j.id)
         AND (SELECT count(*) FROM discovery_job r WHERE r.status = 'running') < ${MAX_CONCURRENT_JOBS}
         AND NOT EXISTS (
           SELECT 1 FROM discovery_job r

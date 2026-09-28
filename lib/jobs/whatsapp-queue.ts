@@ -114,11 +114,6 @@ async function executeStep(stepId: string) {
   if (!row || row.step.status !== "sending" || row.sequence.status !== "scheduled") return
 
   const { step, sequence, connection } = row
-  // Historical automation sequences cannot resume after the feature is retired.
-  if (sequence.agentExecutionId) {
-    await blockStep(step.id, sequence.id, "automation_retired")
-    return
-  }
   if (!hasWhatsAppEarlyAccess(row.ownerEmail)) {
     await blockStep(step.id, sequence.id, "feature_not_available")
     return
