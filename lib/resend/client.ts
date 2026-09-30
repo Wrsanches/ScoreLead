@@ -77,6 +77,11 @@ export async function ensureResendWebhook(
   client: Resend,
   endpoint: string,
 ): Promise<{ id: string; signingSecret: string } | null> {
+  // Local connections only exist in the local database. Without an explicit
+  // tunnel, the default production URL cannot resolve their connection IDs.
+  if (process.env.NODE_ENV !== "production" && !process.env.RESEND_WEBHOOK_PUBLIC_URL?.trim()) {
+    return null
+  }
   const { data, error } = await client.webhooks.create({
     endpoint,
     events: [...RESEND_WEBHOOK_EVENTS],

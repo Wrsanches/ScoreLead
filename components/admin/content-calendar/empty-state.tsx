@@ -106,26 +106,6 @@ export function CalendarEmptyState({
         }}
       />
 
-      {/* Keep progress decoration separate from the illustrative idle showcase. */}
-      {isGenerating && (
-        <div
-          aria-hidden
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] pointer-events-none"
-        >
-          {[260, 380, 520].map((size, i) => (
-            <div
-              key={size}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200/60 dark:border-white/[0.08]"
-              style={{
-                width: size,
-                height: size,
-                opacity: 0.5 - i * 0.12,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
       {/* Top-right faint noise-less corner accent */}
       <div
         aria-hidden

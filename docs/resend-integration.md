@@ -43,7 +43,7 @@ Capability `emailOutreach` in `lib/plan.ts`: Growth and Pro. No per-send meterin
 2. Connect with a real full-access key; choose From `onboarding@resend.dev`.
 3. Create a template using `{{lead.firstName}}` and `{{unsubscribe_url}}`.
 4. On a lead, send to `delivered@resend.dev`, then `bounced@resend.dev` (Resend test addresses). The second send to the bounced address should be blocked (`RECIPIENT_SUPPRESSED`).
-5. For webhooks, expose the dev server (`cloudflared tunnel --url http://localhost:3000`) and set `RESEND_WEBHOOK_PUBLIC_URL` before connecting.
+5. For webhooks, expose the dev server (`cloudflared tunnel --url http://localhost:3000`) and set `RESEND_WEBHOOK_PUBLIC_URL` before connecting. Outside production, automatic webhook registration is skipped unless this variable is set. A local connection ID is absent from the production database, so pointing a local webhook at `app.scorelead.io` returns `404 Unknown connection`.
 6. Open the unsubscribe link from a sent email; it should record a suppression and show a confirmation page.
 
 Open/click events only fire when tracking is enabled on the domain in Resend.
