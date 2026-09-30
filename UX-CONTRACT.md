@@ -60,7 +60,12 @@ alone never claims a repository is connected: Connect repository explicitly
 saves the choice and synchronizes its README when available. Show a grant-access
 action and refresh for missing repositories, disable archived/read-only choices,
 and preserve the selected repository and form edits after API failure. Manual
-token connections remain compatible and available as an alternative. An absent
+token connections remain compatible under Advanced options. AI instructions
+are optional; code lookup requires only the repository connection. Optional
+reference documents and their sync timestamp live under Advanced options, with
+existing selections retained. Codex workflow setup has a separate optional
+section and identifies its API-key requirement. One form saves all settings;
+invalid fields open their containing disclosure before receiving focus. An absent
 server App configuration disables login with explanatory copy. State returns
 to the initiating locale and validated business; tokens are never URL state.
 

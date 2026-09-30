@@ -88,12 +88,20 @@ token scoped to that repository:
 - **Issues: write** to publish a reviewed task.
 - **Actions: write** only when enabling Codex workflow dispatch.
 
+The GitHub screen centers on the connected account and repository. Code lookup
+is automatic; no document selection or Codex workflow is required for reply
+suggestions. **AI instructions** is an optional disclosure for business rules,
+deployment information and tone. **Advanced options** contains manual-token
+setup and optional reference documents; existing document selections are retained.
+Codex automation has its own optional setup section. All settings are saved
+explicitly, with navigation guarded while edits are pending.
+
 The optional workflow is verified as active when saving. Choose up to ten
 `.md`, `.mdx` or `.txt` files such as `README.md` and `docs/product.md`. They are
 optional; an empty selection uses project notes. Connecting from the picker
 automatically selects the README when it is a supported text file. These optional
 reference documents are saved as a snapshot (100 KB per file, 120 KB combined).
-Save and synchronize refreshes this snapshot and its timestamp. Project notes
+Saving changes refreshes this snapshot and its timestamp. Project notes
 supply current business rules, deployment information and tone.
 
 For every analysis, ScoreLead resolves the repository's current default branch
@@ -146,6 +154,17 @@ Meta media can expire; saved transcripts remain readable. Raw audio is not
 persisted in ScoreLead storage.
 
 ## Reviewed tasks and Codex
+
+The provided GitHub Actions workflow uses an OpenAI API key. It does not use
+the owner's ChatGPT subscription. As of September 30, 2026, OpenAI's
+[Sign in with ChatGPT](https://developers.openai.com/siwc/quickstart)
+supports eligible plan usage, but commercial/remote applications must request
+access through the [partner registration process](https://developers.openai.com/siwc/request-client-id).
+The open-source/local flow cannot simply be substituted for ScoreLead's hosted
+service. The current preview also excludes the
+[transcription API](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations),
+so voice-message transcription still needs a separate supported provider.
+No ChatGPT sign-in button is offered until a supported integration is enabled.
 
 Approve saves the edited title, description, criteria and priority. Reject
 requires a reason, retains the decision and queues a revised customer reply.
