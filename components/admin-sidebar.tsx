@@ -23,6 +23,7 @@ import {
   CalendarDays,
   Zap,
   Puzzle,
+  Inbox,
 } from "lucide-react";
 import Image from "next/image";
 import { ScoreLeadLogo } from "@/components/scorelead-logo";
@@ -320,6 +321,13 @@ export function AdminSidebar({
             active={isActive("/content-calendar")}
             collapsed={collapsed}
           />
+          {whatsappAvailable && <NavItem
+            icon={Inbox}
+            label={t("supportInbox")}
+            href="/admin/inbox"
+            active={isActive("/inbox")}
+            collapsed={collapsed}
+          />}
           <NavItem
             icon={Building2}
             label={t("businessPage")}

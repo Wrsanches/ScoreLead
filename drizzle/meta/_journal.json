@@ -295,6 +295,20 @@
       "when": 1790599621183,
       "tag": "0041_drop_retired_agents",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1790774077685,
+      "tag": "0042_support_inbox_github",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790777268242,
+      "tag": "0043_github_app_connection",
+      "breakpoints": true
     }
   ]
 }

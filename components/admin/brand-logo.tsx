@@ -47,7 +47,7 @@ export function BrandLogo({
     )
   }
 
-  const fill = platform === "whatsapp" ? "#25D366" : getSocialConfig(platform).color
+  const fill = platform === "whatsapp" ? "#25D366" : platform === "github" ? "#18181B" : getSocialConfig(platform).color
   return (
     <svg viewBox="0 0 40 40" className={className} aria-hidden="true" role="img">
       <rect width="40" height="40" rx="11" fill={fill} />

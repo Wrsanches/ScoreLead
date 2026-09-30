@@ -3,8 +3,42 @@ import type {
   WhatsAppTemplateParameter,
 } from "@/lib/db/schema"
 import { metaAppSecretProof } from "@/lib/whatsapp/security"
+import { createHash } from "node:crypto"
+import { readLimitedBody } from "@/lib/integrations/http"
 
 const GRAPH_ORIGIN = "https://graph.facebook.com"
+
+export function isWhatsAppMediaUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === "https:" && !url.username && !url.password && (!url.port || url.port === "443") &&
+      (url.hostname === "lookaside.fbsbx.com" || url.hostname === "lookaside.facebook.com" || url.hostname.endsWith(".fbcdn.net"))
+  } catch { return false }
+}
+
+export async function downloadWhatsAppAudio(input: {
+  mediaId: string; phoneNumberId: string; accessToken: string; expectedSha256?: string | null
+}): Promise<{ bytes: Buffer; mimeType: string }> {
+  if (!/^\d+$/.test(input.mediaId)) throw new Error("AUDIO_UNAVAILABLE")
+  const metadata = await graphRequest<{ url: string; mime_type: string; file_size: number }>(
+    `${input.mediaId}?phone_number_id=${encodeURIComponent(input.phoneNumberId)}`, input.accessToken)
+  if (!isWhatsAppMediaUrl(metadata.url)) throw new Error("AUDIO_UNAVAILABLE")
+  const mimeType = metadata.mime_type.split(";")[0].trim().toLowerCase()
+  if (!mimeType.startsWith("audio/") || Number(metadata.file_size) > 16 * 1024 * 1024) throw new Error("AUDIO_TOO_LARGE")
+  const response = await fetch(metadata.url, {
+    headers: { Authorization: `Bearer ${input.accessToken}` }, redirect: "error", cache: "no-store",
+    signal: AbortSignal.timeout(25_000),
+  })
+  if (!response.ok) { await response.body?.cancel(); throw new Error("AUDIO_UNAVAILABLE") }
+  const bytes = await readLimitedBody(response, 16 * 1024 * 1024)
+  if (input.expectedSha256) {
+    const hash = createHash("sha256").update(bytes)
+    const hexadecimal = /^[a-f\d]{64}$/i.test(input.expectedSha256)
+    const actual = hash.digest(hexadecimal ? "hex" : "base64")
+    if (actual !== (hexadecimal ? input.expectedSha256.toLowerCase() : input.expectedSha256)) throw new Error("AUDIO_HASH_MISMATCH")
+  }
+  return { bytes, mimeType }
+}
 
 function graphVersion(): string {
   return process.env.META_GRAPH_API_VERSION || "v23.0"

@@ -1,7 +1,8 @@
 # ScoreLead integration workflows
 
 This contract covers the integration catalog and Google Analytics, Search Console,
-and AI assistant detail pages. Visual context is in [DESIGN.md](DESIGN.md).
+AI assistant and GitHub detail pages, and the WhatsApp support inbox.
+Visual context is in [DESIGN.md](DESIGN.md).
 
 ## Canonical UI map
 
@@ -41,3 +42,43 @@ Use shared semantic buttons, navigation links, labelled native checkboxes and
 Radix confirmation dialogs. Retain visible focus, status/alert announcements,
 reduced-motion preferences, and readable light/dark color pairs. No new select,
 date, table or token system is introduced by these integration pages.
+
+## Support conversations and GitHub
+
+`/admin/inbox` owns support conversations; `/admin/integrations/github` owns
+the repository connection for the selected business. Legacy business routes
+reuse the same components. Conversation selection, pending/replied/all filter
+and pagination are URL state; switching businesses removes the conversation
+selection. Lists are paginated at 25 and message history at 30 with an explicit
+older-messages action. Polling preserves edited reply, task and transcript
+drafts. The shared navigation guard uses generic unsaved-edits copy for these
+forms and provider-specific copy for Google property selection.
+
+GitHub's primary entry is Connect with GitHub, followed by an authorized
+account/organization and a paginated repository radio list. Login authorization
+alone never claims a repository is connected: Connect repository explicitly
+saves the choice and synchronizes its README when available. Show a grant-access
+action and refresh for missing repositories, disable archived/read-only choices,
+and preserve the selected repository and form edits after API failure. Manual
+token connections remain compatible and available as an alternative. An absent
+server App configuration disables login with explanatory copy. State returns
+to the initiating locale and validated business; tokens are never URL state.
+
+Marking a conversation replied is an explicit manual action against the last
+message the owner saw. A newer inbound message reopens it; stale status/reply
+writes return a recoverable conflict. Copying a draft neither sends it nor
+marks it replied. Support never sends a WhatsApp reply automatically. Audio
+has authenticated playback, automatic transcription and a manual correction
+fallback. Missing or unsupported media is visibly uncertain to both owner and
+model. Transcripts remain available when Meta playback expires.
+
+AI classifies and proposes; owner/admin review approves or rejects tasks.
+Rejection includes a reason and queues a revised reply. GitHub publication and
+Codex dispatch are separate explicit actions after approval. Publish only the
+reviewed requirements, not the raw conversation or phone number. An uncertain
+publication offers issue reconciliation instead of retrying creation; an
+uncertain dispatch links to Actions and blocks duplicate dispatch. A requested
+workflow is never presented as completed implementation. GitHub's token stays
+encrypted on the server and is never returned to the browser. Context sync
+uses only the owner's selected documentation files, with the sync timestamp
+visible beside them. All new states and controls are localized in EN/PT/ES.

@@ -4,9 +4,11 @@ const BUSINESS_SECTION_PREFIXES = [
   "/admin/profile",
   "/admin/integrations",
   "/admin/discovery-jobs",
+  "/admin/inbox",
 ] as const
 
 export function getBusinessSwitchDestination(pathname: string): string {
+  if (pathname.startsWith("/admin/inbox")) return "/admin/inbox"
   if (pathname.startsWith("/admin/integrations/")) {
     return "/admin/integrations"
   }

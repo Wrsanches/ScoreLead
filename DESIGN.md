@@ -185,3 +185,25 @@ and contact inputs stay at 16px on tablets to avoid focus zoom.
 Check shared public templates (home, pricing, feature, use case, tool,
 comparison, case study, blog, contact and legal) at 320/390px, 768/1024px and
 1280px. These browser checks are not a claim of physical-device coverage.
+
+## WhatsApp support inbox and GitHub
+
+The support workspace reuses the admin Geist, zinc/emerald palette,
+`ContentWrapper`, `PageHeader` and `SectionCard`. Desktop pairs a compact
+conversation list with a flexible detail column. Phones show the list or the
+selected conversation with an explicit return action. Preserve wrapping for
+message bodies, repository names and editable task requirements. A violet wash
+distinguishes proposed development tasks from customer reply drafts.
+
+GitHub uses the existing integration detail layout and `IntegrationCard`, with
+the repository settings beside a 20rem setup sidebar. Use the dark GitHub logo
+tile in both themes. Native audio controls belong next to the transcript and
+its correction action. Shared inputs, selects, Sonner feedback and Radix
+confirmations remain the owners; introduce no new token or component system.
+
+GitHub login precedes a compact repository picker inside the settings card.
+Reuse the shared Select for account/organization and labelled native radio rows
+for repositories, with wrapping full names and text for archived/read-only
+states. Private repository locks supplement names. Paginate at 25 instead of
+creating an unbounded menu; loading/error/grant-access states occupy this same
+surface. Save settings explicitly after selection.

@@ -29,10 +29,12 @@ const NavigationContext = createContext<{
 /** One guard shared by provider forms, breadcrumbs, and sidebar links. */
 export function ReportingNavigationProvider({
   children,
+  messageNamespace = "googleReporting",
 }: {
   children: ReactNode
+  messageNamespace?: "googleReporting" | "integrationNavigation"
 }) {
-  const t = useTranslations("googleReporting")
+  const t = useTranslations(messageNamespace)
   const dirty = useRef(new Set<string>())
   const [pending, setPending] = useState<(() => void) | null>(null)
   const setDirty = useCallback((id: string, changed: boolean) => {

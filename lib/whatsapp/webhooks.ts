@@ -4,7 +4,6 @@ import { db } from "@/lib/db"
 import {
   whatsappConnection,
   whatsappConsentEvent,
-  whatsappInboundMessage,
   whatsappSequence,
   whatsappSequenceStep,
   whatsappTemplate,
@@ -17,6 +16,7 @@ import {
   pauseWhatsAppSequencesForReply,
 } from "@/lib/whatsapp/sequences"
 import type { WhatsAppWebhookPayload } from "@/lib/whatsapp/types"
+import { inboundAudio, recordSupportInbound } from "@/lib/support/ingest"
 
 const OPT_OUT_WORDS = new Set([
   "STOP",
@@ -63,7 +63,7 @@ function inboundText(message: Record<string, unknown>): string | null {
   return null
 }
 
-async function handleInbound(connection: typeof whatsappConnection.$inferSelect, message: Record<string, unknown>) {
+async function handleInbound(connection: typeof whatsappConnection.$inferSelect, message: Record<string, unknown>, contactName: string | null) {
   const messageId = typeof message.id === "string" ? message.id : null
   const from = typeof message.from === "string" ? metaPhoneToE164(message.from) : null
   if (!messageId || !from) return
@@ -77,20 +77,18 @@ async function handleInbound(connection: typeof whatsappConnection.$inferSelect,
     ))
     .orderBy(desc(whatsappSequence.createdAt))
     .limit(1)
-  const [inserted] = await db
-    .insert(whatsappInboundMessage)
-    .values({
-      id: randomUUID(),
+  const inserted = await recordSupportInbound({
       connectionId: connection.id,
+      businessId: connection.businessId,
       leadId: recentSequence?.leadId ?? null,
       metaMessageId: messageId,
       fromPhone: from,
       messageType: typeof message.type === "string" ? message.type : "unknown",
       textBody,
       receivedAt: timestamp(message.timestamp),
-    })
-    .onConflictDoNothing({ target: whatsappInboundMessage.metaMessageId })
-    .returning({ id: whatsappInboundMessage.id })
+      contactName,
+      media: inboundAudio(message),
+  })
   if (!inserted) return
 
   const optedOut = isWhatsAppOptOut(textBody)
@@ -190,8 +188,13 @@ async function handleMessages(value: Record<string, unknown>) {
   if (!connection) return
   const messages = Array.isArray(value.messages) ? value.messages : []
   const statuses = Array.isArray(value.statuses) ? value.statuses : []
+  const contacts = Array.isArray(value.contacts) ? value.contacts as { wa_id?: string; profile?: { name?: string } }[] : []
   for (const message of messages) {
-    if (message && typeof message === "object") await handleInbound(connection, message as Record<string, unknown>)
+    if (message && typeof message === "object") {
+      const inbound = message as Record<string, unknown>
+      const name = contacts.find((contact) => contact.wa_id === inbound.from)?.profile?.name
+      await handleInbound(connection, inbound, typeof name === "string" ? name.slice(0, 200) : null)
+    }
   }
   for (const status of statuses) {
     if (status && typeof status === "object") await handleStatus(status as Record<string, unknown>)

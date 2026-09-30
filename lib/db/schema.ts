@@ -494,6 +494,56 @@ export const whatsappSequenceStep = pgTable("whatsapp_sequence_step", {
 ])
 
 /** Minimal reply record for pause-and-handoff; this is intentionally not a full inbox. */
+export type GitHubContextFile = { path: string; sha: string; text: string }
+
+export const githubConnection = pgTable("github_connection", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  owner: text("owner").notNull(),
+  repository: text("repository").notNull(),
+  defaultBranch: text("defaultBranch").notNull(),
+  encryptedToken: text("encryptedToken").notNull(),
+  authType: text("authType").$type<"token" | "github_app">().notNull().default("token"),
+  installationId: text("installationId"),
+  repositoryId: text("repositoryId"),
+  githubLogin: text("githubLogin"),
+  contextPaths: jsonb("contextPaths").$type<string[]>().notNull().default(["README.md"]),
+  contextFiles: jsonb("contextFiles").$type<GitHubContextFile[]>().notNull().default([]),
+  projectNotes: text("projectNotes").notNull().default(""),
+  codexWorkflow: text("codexWorkflow"),
+  contextSyncedAt: timestamp("contextSyncedAt").notNull().defaultNow(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [uniqueIndex("github_connection_business_uidx").on(table.businessId)])
+
+export const supportConversation = pgTable("support_conversation", {
+  id: text("id").primaryKey(),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId").notNull().references(() => whatsappConnection.id, { onDelete: "cascade" }),
+  fromPhone: text("fromPhone").notNull(),
+  contactName: text("contactName"),
+  lastMessageId: text("lastMessageId").notNull(),
+  lastMessageAt: timestamp("lastMessageAt").notNull(),
+  respondedThroughMessageId: text("respondedThroughMessageId"),
+  respondedAt: timestamp("respondedAt"),
+  triageStatus: text("triageStatus").notNull().default("queued"),
+  processingToken: text("processingToken"),
+  processingStartedAt: timestamp("processingStartedAt"),
+  attemptCount: integer("attemptCount").notNull().default(0),
+  retryAt: timestamp("retryAt"),
+  errorCode: text("errorCode"),
+  analyzedThroughMessageId: text("analyzedThroughMessageId"),
+  classification: text("classification"),
+  summary: text("summary"),
+  suggestedReply: text("suggestedReply"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("support_conversation_recipient_uidx").on(table.connectionId, table.fromPhone),
+  index("support_conversation_business_idx").on(table.businessId, table.lastMessageAt, table.id),
+  index("support_conversation_queue_idx").on(table.triageStatus, table.retryAt),
+])
+
 export const whatsappInboundMessage = pgTable("whatsapp_inbound_message", {
   id: text("id").primaryKey(),
   connectionId: text("connectionId")
@@ -504,11 +554,49 @@ export const whatsappInboundMessage = pgTable("whatsapp_inbound_message", {
   fromPhone: text("fromPhone").notNull(),
   messageType: text("messageType").notNull(),
   textBody: text("textBody"),
+  conversationId: text("conversationId").references(() => supportConversation.id, { onDelete: "set null" }),
+  mediaId: text("mediaId"),
+  mediaMimeType: text("mediaMimeType"),
+  mediaSha256: text("mediaSha256"),
+  isVoiceNote: boolean("isVoiceNote").notNull().default(false),
+  transcript: text("transcript"),
+  transcriptionError: text("transcriptionError"),
   receivedAt: timestamp("receivedAt").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("whatsapp_inbound_message_meta_uidx").on(table.metaMessageId),
   index("whatsapp_inbound_message_recipient_idx").on(table.connectionId, table.fromPhone, table.receivedAt),
+  index("whatsapp_inbound_message_conversation_idx").on(table.conversationId, table.receivedAt, table.id),
+])
+
+export type SupportTaskProposal = {
+  title: string
+  description: string
+  acceptanceCriteria: string[]
+  priority: "low" | "medium" | "high"
+  rationale: string
+}
+
+export const supportTask = pgTable("support_task", {
+  id: text("id").primaryKey(),
+  conversationId: text("conversationId").notNull().references(() => supportConversation.id, { onDelete: "cascade" }),
+  sourceMessageId: text("sourceMessageId").notNull().references(() => whatsappInboundMessage.id, { onDelete: "cascade" }),
+  proposal: jsonb("proposal").$type<SupportTaskProposal>().notNull(),
+  status: text("status").notNull().default("proposed"),
+  rejectionReason: text("rejectionReason"),
+  reviewedByUserId: text("reviewedByUserId").references(() => user.id, { onDelete: "set null" }),
+  reviewedAt: timestamp("reviewedAt"),
+  githubRepository: text("githubRepository"),
+  githubIssueNumber: integer("githubIssueNumber"),
+  githubIssueUrl: text("githubIssueUrl"),
+  codexStatus: text("codexStatus"),
+  codexDispatchedAt: timestamp("codexDispatchedAt"),
+  errorCode: text("errorCode"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("support_task_source_uidx").on(table.sourceMessageId),
+  index("support_task_conversation_idx").on(table.conversationId, table.createdAt),
 ])
 
 /** Small idempotency ledger for delivery and template-status webhook changes. */
@@ -551,6 +639,26 @@ export const contentPost = pgTable("content_post", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
+
+/** One-time OAuth state binds GitHub authorization to the current business and actor. */
+export const githubOAuthState = pgTable("github_oauth_state", {
+  hash: text("hash").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  verifierEncrypted: text("verifierEncrypted").notNull(),
+  locale: text("locale").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+})
+
+/** Short-lived identity token used only to choose repositories; automation uses installation tokens. */
+export const githubAuthorization = pgTable("github_authorization", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
+  businessId: text("businessId").notNull().references(() => business.id, { onDelete: "cascade" }),
+  githubLogin: text("githubLogin").notNull(),
+  encryptedToken: text("encryptedToken").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+}, (table) => [uniqueIndex("github_authorization_actor_business_uidx").on(table.userId, table.businessId)])
 
 export const instagramConnection = pgTable("instagram_connection", {
   id: text("id").primaryKey(),

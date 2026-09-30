@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { processWhatsAppQueue } from "@/lib/jobs/whatsapp-queue"
+import { processSupportQueue } from "@/lib/support/queue"
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET
@@ -12,5 +13,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   await processWhatsAppQueue()
+  await processSupportQueue({ maxItems: 1 })
   return NextResponse.json({ ok: true })
 }

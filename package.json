@@ -18,7 +18,9 @@
     "stripe:catalog": "bun run scripts/stripe-catalog.ts",
     "blog:images": "bun --env-file=.env.local run scripts/generate-blog-images.ts",
     "test:reporting": "bun test lib/google-reporting/*.test.ts lib/mcp/*.test.ts lib/auth-return-to.test.ts",
-    "test:reporting:integration": "bun test ./lib/google-reporting/reporting.integration.ts"
+    "test:reporting:integration": "bun test ./lib/google-reporting/reporting.integration.ts",
+    "test:support": "bun test lib/support/support.test.ts lib/github/*.test.ts",
+    "test:support:integration": "bun test ./lib/support/support.integration.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1057.0",

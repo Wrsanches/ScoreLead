@@ -9,6 +9,9 @@
  */
 export const OPENAI_TEXT_MODEL = "gpt-6-astra"
 
+/** WhatsApp voice notes (including OGG/Opus) use the transcription endpoint. */
+export const OPENAI_TRANSCRIPTION_MODEL = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-mini-transcribe"
+
 /**
  * OpenAI GPT Image model used for content-calendar slide generation and
  * image-to-image refinement (both go through the Images API).

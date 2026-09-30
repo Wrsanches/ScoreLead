@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server"
+import { after, NextResponse } from "next/server"
 import { verifyMetaWebhookSignature } from "@/lib/whatsapp/security"
 import { processWhatsAppWebhook } from "@/lib/whatsapp/webhooks"
 import type { WhatsAppWebhookPayload } from "@/lib/whatsapp/types"
+import { processSupportQueue } from "@/lib/support/queue"
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -33,5 +34,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
   await processWhatsAppWebhook(payload)
+  if (payload.entry?.some((entry) => entry.changes?.some((change) => Array.isArray(change.value?.messages) && change.value.messages.length > 0))) {
+    after(async () => {
+      // Briefly collect consecutive customer messages; the durable queue and
+      // cron recover if the host stops this callback.
+      await new Promise((resolve) => setTimeout(resolve, 8500))
+      await processSupportQueue({ maxItems: 1 })
+    })
+  }
   return NextResponse.json({ ok: true })
 }
