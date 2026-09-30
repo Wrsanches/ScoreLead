@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto"
 import { and, desc, eq, sql } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { business, supportConversation, supportTask, user, whatsappConnection, whatsappInboundMessage } from "@/lib/db/schema"
-import { getGitHubConnection } from "@/lib/github/data"
+import { getGitHubConnection, githubToken } from "@/lib/github/data"
+import { RepositoryContext } from "@/lib/github/repository-context"
+import { GitHubError } from "@/lib/github/client"
+import type { RepositoryEvidence } from "@/lib/github/contracts"
 import { can, getUserPlan } from "@/lib/plan"
 import { generateSupportTriage, transcribeSupportAudio } from "@/lib/support/ai"
 import { downloadWhatsAppAudio } from "@/lib/whatsapp/meta"
@@ -72,24 +75,37 @@ async function analyzeConversation(id: string, token: string) {
       }
       await db.update(whatsappInboundMessage).set({ transcript: message.transcript, transcriptionError: message.transcriptionError }).where(eq(whatsappInboundMessage.id, message.id))
     }
+    let repositoryContext: RepositoryContext | undefined
+    let repositoryEvidence: RepositoryEvidence | null = null
+    if (github) {
+      try {
+        repositoryContext = await RepositoryContext.open(await githubToken(github), github.owner, github.repository, github.defaultBranch)
+        repositoryEvidence = repositoryContext.evidence
+      } catch (error) {
+        repositoryEvidence = { repository: `${github.owner}/${github.repository}`, branch: github.defaultBranch, commit: null,
+          status: "unavailable", errorCode: error instanceof GitHubError ? error.code : "GITHUB_CONTEXT_UNAVAILABLE", files: [] }
+      }
+    }
     const triage = await generateSupportTriage({
       businessProfile: { name: profile.name, description: profile.description, services: profile.services,
         persona: profile.persona, language: profile.language, website: profile.website, businessModel: profile.businessModel },
       projectNotes: github?.projectNotes ?? "", repository: github ? `${github.owner}/${github.repository}` : null,
       contextFiles: github?.contextFiles ?? [],
+      contextSyncedAt: github?.contextSyncedAt.toISOString(), repositoryAccess: repositoryEvidence,
       messages: messages.reverse().map((message) => {
         const text = message.transcript ?? message.textBody
         return { type: message.messageType, text: text ? text.length > 6000 ? `${text.slice(0, 6000)}\n[Message truncated; consult full conversation before acting.]` : text : null,
           receivedAt: message.receivedAt.toISOString() }
       }),
       taskDecision: decision ?? null,
-    })
+    }, undefined, repositoryContext)
     await db.transaction(async (tx) => {
       // A new inbound message during inference invalidates this result. It
       // must never overwrite a newer reply or generate an obsolete task.
       const [updated] = await tx.update(supportConversation).set({
         triageStatus: "ready", classification: triage.classification, summary: triage.summary,
         suggestedReply: triage.suggestedReply, analyzedThroughMessageId: conversation.lastMessageId,
+        repositoryEvidence,
         processingToken: null, processingStartedAt: null, errorCode: null, retryAt: null, updatedAt: new Date(),
       }).where(and(ownership, eq(supportConversation.lastMessageId, conversation.lastMessageId))).returning({ id: supportConversation.id })
       if (!updated) {
@@ -113,7 +129,7 @@ async function analyzeConversation(id: string, token: string) {
 export async function processSupportQueue(options: { conversationId?: string; maxItems?: number } = {}) {
   await db.execute(sql`update support_conversation set "triageStatus" = case when "attemptCount" < 3 then 'queued' else 'failed' end,
     "processingToken" = null, "processingStartedAt" = null, "errorCode" = 'TRIAGE_INTERRUPTED'
-    where "triageStatus" = 'processing' and "processingStartedAt" < now() - interval '6 minutes'`)
+    where "triageStatus" = 'processing' and "processingStartedAt" < now() - interval '10 minutes'`)
   const started = Date.now()
   for (let i = 0; i < (options.maxItems ?? 2) && Date.now() - started < 180_000; i++) {
     const claimed = await claimConversation(options.conversationId)

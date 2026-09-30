@@ -167,6 +167,41 @@ test("audio is downloaded, transcribed and used as conversation context", async 
   expect(await db.select().from(schema.supportTask)).toHaveLength(1)
 })
 
+test("queue reads current repository source and saves consulted commit and files with the draft", async () => {
+  const message = await inbound({ textBody: "Como adiciono novos alunos?" })
+  await db.insert(schema.githubConnection).values({ id: randomUUID(), businessId, owner: "acme", repository: "repo", defaultBranch: "main", encryptedToken: encryptGitHubToken("test-github-token", businessId), contextFiles: [{ path: "README.md", sha: "old", text: "Studio app" }] })
+  const row = await conversation(); await queueSupportTriage(row.id)
+  const commit = "a".repeat(40), tree = "b".repeat(40), blob = "c".repeat(40)
+  let inference = 0
+  providerFetch = (async (url: RequestInfo | URL, init?: RequestInit) => {
+    const target = String(url)
+    if (target.includes("api.github.com")) {
+      if (target.endsWith("/repos/acme/repo")) return Response.json({ default_branch: "main" })
+      if (target.includes("/git/ref/")) return Response.json({ object: { sha: commit } })
+      if (target.includes("/git/commits/")) return Response.json({ sha: commit, tree: { sha: tree } })
+      if (target.includes("/git/trees/")) return Response.json({ sha: tree, truncated: false, tree: [{ path: "app/students.tsx", type: "blob", mode: "100644", sha: blob, size: 100 }] })
+      return Response.json({ sha: blob, encoding: "base64", content: Buffer.from('button("Convidar alunos", () => navigate("/invite-students"))').toString("base64"), size: 100 })
+    }
+    const input = JSON.parse(init!.body as string)
+    if (inference++ === 0) {
+      expect(input.tool_choice).toBe("required")
+      return Response.json({ id: "resp_source", object: "response", status: "completed", output: [{ type: "function_call", id: "fc_source", call_id: "read_source", name: "read_repository_file", arguments: JSON.stringify({ path: "app/students.tsx", startLine: 1, endLine: 50 }), status: "completed" }] })
+    }
+    expect(JSON.stringify(input.input)).not.toContain("parsed_arguments")
+    expect(input.input.find((item: { type: string }) => item.type === "function_call_output").output).toContain("Convidar alunos")
+    return Response.json({ id: "resp_draft", object: "response", status: "completed", output: [{ type: "message", role: "assistant", id: "msg_draft", status: "completed", content: [{ type: "output_text", annotations: [], text: JSON.stringify({ classification: "question", summary: "Adicionar alunos por convite", suggestedReply: 'Toque em "Convidar alunos" na tela de alunos.', task: null }) }] }] })
+  }) as unknown as typeof fetch
+  await processSupportQueue({ conversationId: row.id, maxItems: 1 })
+  const updated = await conversation()
+  expect(updated.triageStatus).toBe("ready")
+  expect(updated.analyzedThroughMessageId).toBe(message!.id)
+  expect(updated.suggestedReply).toContain("Convidar alunos")
+  expect(updated.repositoryEvidence?.commit).toBe(commit)
+  expect(updated.repositoryEvidence?.files[0].path).toBe("app/students.tsx")
+  expect((await listSupportConversations(businessId, connectionId, "pending", 0)).conversations[0].repositoryEvidence?.files).toHaveLength(1)
+  expect(await db.select().from(schema.supportTask)).toHaveLength(0)
+})
+
 test("marking replied does not strand queued analysis in a permanent loading state", async () => {
   const message = await inbound()
   const row = await conversation(); await queueSupportTriage(row.id)

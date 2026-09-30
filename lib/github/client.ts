@@ -5,7 +5,7 @@ export class GitHubError extends Error {
   constructor(public code: string, public status: number, public uncertain = false) { super(code) }
 }
 
-export async function githubRequest<T>(token: string, path: string, init: RequestInit = {}): Promise<T> {
+export async function githubRequest<T>(token: string, path: string, init: RequestInit = {}, maxBytes = 1_500_000): Promise<T> {
   const url = new URL(path, "https://api.github.com")
   if (url.origin !== "https://api.github.com") throw new GitHubError("INVALID_GITHUB_URL", 400)
   let response: Response
@@ -29,7 +29,7 @@ export async function githubRequest<T>(token: string, path: string, init: Reques
   }
   if (response.status === 204) return null as T
   try {
-    return JSON.parse((await readLimitedBody(response, 1_500_000)).toString("utf8")) as T
+    return JSON.parse((await readLimitedBody(response, maxBytes)).toString("utf8")) as T
   } catch { throw new GitHubError("GITHUB_INVALID_RESPONSE", 502, init.method === "POST") }
 }
 

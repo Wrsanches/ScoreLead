@@ -12,6 +12,7 @@ export function publicConversation(row: typeof supportConversation.$inferSelect,
     summary: row.summary, suggestedReply: row.suggestedReply,
     analyzedThroughMessageId: row.analyzedThroughMessageId, errorCode: row.errorCode,
     preview, messageType,
+    repositoryEvidence: row.repositoryEvidence,
   }
 }
 

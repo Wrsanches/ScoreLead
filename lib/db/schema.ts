@@ -536,6 +536,7 @@ export const supportConversation = pgTable("support_conversation", {
   classification: text("classification"),
   summary: text("summary"),
   suggestedReply: text("suggestedReply"),
+  repositoryEvidence: jsonb("repositoryEvidence").$type<import("@/lib/github/contracts").RepositoryEvidence>(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 }, (table) => [

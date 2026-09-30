@@ -84,18 +84,36 @@ Existing manual-token connections continue to work. For this alternative,
 enter `owner/repository` or its GitHub URL and a fine-grained personal access
 token scoped to that repository:
 
-- **Contents: read** for selected project documentation.
+- **Contents: read** for repository source and documentation.
 - **Issues: write** to publish a reviewed task.
 - **Actions: write** only when enabling Codex workflow dispatch.
 
 The optional workflow is verified as active when saving. Choose up to ten
 `.md`, `.mdx` or `.txt` files such as `README.md` and `docs/product.md`. They are
 optional; an empty selection uses project notes. Connecting from the picker
-automatically selects the README when it is a supported text file. Only
-these files are fetched (100 KB per file, 120 KB combined), from the current
-default branch. Save and synchronize refreshes this snapshot and its timestamp.
-Project notes supply current business rules and tone. Changes to code or docs
-are not continuously indexed; sync the context before relying on new changes.
+automatically selects the README when it is a supported text file. These optional
+reference documents are saved as a snapshot (100 KB per file, 120 KB combined).
+Save and synchronize refreshes this snapshot and its timestamp. Project notes
+supply current business rules, deployment information and tone.
+
+For every analysis, ScoreLead resolves the repository's current default branch
+to an immutable commit and lets the model find paths, browse directories, search
+within files and read relevant source lines. It can consult screens, navigation,
+business logic and translations anywhere in the connected repository without
+manually selecting source files. A truncated recursive index can still be browsed
+by directory. Code is read through the same scoped connection; no code execution,
+repository writes or additional GitHub permissions are used. There is no global
+cache of private files or continuously running indexing job.
+
+Each analysis is bounded to 24 repository tool operations, 120 KB of retrieved
+excerpts, eight model rounds and 150 seconds of inference. Individual source files
+must be UTF-8 text under 1 MB; reads return up to 250 lines and 24 KB. Binary assets,
+symlinks, dependencies, build output and credential files are excluded. Recognized
+credential values in source are redacted. Consulted paths, line ranges and commit
+are saved with the result and linked in the inbox. Repository access failures or
+incomplete retrieval show a warning instead of silently implying full coverage.
+The worker's recovery lease is ten minutes to cover bounded audio transcription,
+GitHub requests and tool rounds without reclaiming a still-active analysis.
 
 Manual tokens are encrypted with AES-256-GCM and bound to the business ID. Set an
 independent `GITHUB_TOKEN_ENCRYPTION_KEY` (32 bytes, hex or base64), or reuse the
@@ -105,7 +123,8 @@ nor fetched document contents are returned by the settings API. Disconnect
 removes the stored token and documentation snapshot.
 
 The model receives customer messages/transcripts, the business profile and this
-snapshot as untrusted source material, with structured output and `store: false`.
+snapshot and retrieved source as untrusted material, with structured output and
+`store: false`. Stateless tool rounds replay encrypted reasoning and tool outputs.
 It must ask for clarification when the supplied context is insufficient and
 must not promise a release or completion. It cannot approve tasks, execute code
 or send replies. Review the proposed requirements before publishing them.

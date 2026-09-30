@@ -37,4 +37,12 @@ export type PublicGitHubConnection = {
 }
 
 export type GitHubInstallationView = { id: string; login: string }
+export type RepositoryEvidence = {
+  repository: string
+  branch: string
+  commit: string | null
+  status: "ready" | "partial" | "unavailable"
+  errorCode: string | null
+  files: { path: string; sha: string; startLine: number; endLine: number }[]
+}
 export type GitHubRepositoryView = { id: string; fullName: string; private: boolean; description: string | null; writable: boolean; archived: boolean }

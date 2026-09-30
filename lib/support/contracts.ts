@@ -31,6 +31,7 @@ export type SupportConversationView = {
   lastMessageAt: string; pending: boolean; triageStatus: string; classification: string | null
   summary: string | null; suggestedReply: string | null; analyzedThroughMessageId: string | null
   errorCode: string | null; preview: string | null; messageType: string
+  repositoryEvidence?: import("@/lib/github/contracts").RepositoryEvidence | null
 }
 
 /** Resolve only the exact message the operator had on screen. */
