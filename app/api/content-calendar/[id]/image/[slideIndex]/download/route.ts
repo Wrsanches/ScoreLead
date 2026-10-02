@@ -5,11 +5,13 @@ import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { getBusinessAccess } from "@/lib/business-access"
-import { extForMime, getObjectBytes, keyFromUrl } from "@/lib/s3"
+import { getObjectBytes, keyFromUrl } from "@/lib/s3"
+import { normalizeInstagramImage } from "@/lib/instagram/media"
+import { PublishingError } from "@/lib/instagram/validation"
 
 /**
- * Streams one slide image back through our origin with a Content-Disposition
- * header, so the browser saves it instead of opening the S3 URL in a tab.
+ * Downloads a slide using the same metadata-free JPEG export as Instagram
+ * publishing, with a Content-Disposition header so the browser saves it.
  * The `download` attribute is ignored on cross-origin links, which is why
  * the viewer can't link to S3 directly.
  */
@@ -39,6 +41,17 @@ export async function GET(
   const object = await getObjectBytes(key)
   if (!object) return NextResponse.json({ error: "Image not found" }, { status: 404 })
 
+  let jpeg: Buffer
+  try {
+    jpeg = await normalizeInstagramImage(Buffer.from(object.bytes))
+  } catch (error) {
+    if (error instanceof PublishingError) {
+      return NextResponse.json({ error: error.code }, { status: error.status })
+    }
+    console.error("[content-download] image conversion failed:", error)
+    return NextResponse.json({ error: "Image conversion failed" }, { status: 500 })
+  }
+
   const [biz] = await db
     .select({ name: business.name })
     .from(business)
@@ -50,11 +63,11 @@ export async function GET(
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "") || "post"
   const day = new Date(post.scheduledFor).toISOString().slice(0, 10)
-  const filename = `${stem}-${day}-slide-${index + 1}.${extForMime(object.contentType)}`
+  const filename = `${stem}-${day}-slide-${index + 1}.jpg`
 
-  return new NextResponse(Buffer.from(object.bytes), {
+  return new NextResponse(Buffer.from(jpeg), {
     headers: {
-      "Content-Type": object.contentType,
+      "Content-Type": "image/jpeg",
       "Content-Disposition": `attachment; filename="${filename}"`,
       "Cache-Control": "private, no-store",
     },

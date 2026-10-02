@@ -112,7 +112,7 @@ export async function downloadSlide(postId: string, slideIndex: number): Promise
   if (!response.ok) throw new Error("DOWNLOAD_FAILED");
   const disposition = response.headers.get("Content-Disposition") ?? "";
   const filename =
-    /filename="([^"]+)"/.exec(disposition)?.[1] ?? `slide-${slideIndex + 1}.png`;
+    /filename="([^"]+)"/.exec(disposition)?.[1] ?? `slide-${slideIndex + 1}.jpg`;
   const blobUrl = URL.createObjectURL(await response.blob());
   const anchor = document.createElement("a");
   anchor.href = blobUrl;
