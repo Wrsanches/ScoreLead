@@ -1,5 +1,6 @@
 import type { GoogleReportingProvider } from "@/lib/db/schema"
 import { z } from "zod"
+import { integrationKeyring } from "@/lib/security/token-encryption"
 
 const adminAssignmentsSchema = z
   .array(
@@ -71,13 +72,7 @@ export function googleReportingConfig() {
 }
 
 export function reportingEncryptionKey() {
-  const value = process.env.GOOGLE_REPORTING_TOKEN_ENCRYPTION_KEY || ""
-  const key = Buffer.from(
-    value,
-    /^[a-f\d]{64}$/i.test(value) ? "hex" : "base64",
-  )
-  if (key.length !== 32) throw new Error("REPORTING_NOT_CONFIGURED")
-  return key
+  return integrationKeyring("reporting").current.bytes
 }
 
 export function googleReportingEnabled() {

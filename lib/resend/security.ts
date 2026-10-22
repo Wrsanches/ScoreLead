@@ -1,10 +1,8 @@
 import {
-  createCipheriv,
-  createDecipheriv,
   createHmac,
-  randomBytes,
   timingSafeEqual,
 } from "node:crypto"
+import { decryptIntegrationValue, encryptIntegrationValue, integrationKeyring } from "@/lib/security/token-encryption"
 
 /**
  * Per-business secrets for the Resend integration (customer API keys and
@@ -14,44 +12,19 @@ import {
  * radius stays separate.
  */
 function key() {
-  const raw = process.env.RESEND_TOKEN_ENCRYPTION_KEY || ""
-  const decoded = Buffer.from(raw, /^[a-f\d]{64}$/i.test(raw) ? "hex" : "base64")
-  if (decoded.length !== 32) throw new Error("RESEND_INTEGRATION_NOT_CONFIGURED")
-  return decoded
+  return integrationKeyring("resend").current.bytes
 }
 
 export function isResendEncryptionConfigured(): boolean {
-  try {
-    key()
-    return true
-  } catch {
-    return false
-  }
+  try { integrationKeyring("resend"); return true } catch { return false }
 }
 
 export function encryptResendSecret(value: string, businessId: string): string {
-  const iv = randomBytes(12)
-  const cipher = createCipheriv("aes-256-gcm", key(), iv)
-  cipher.setAAD(Buffer.from(businessId))
-  const encrypted = Buffer.concat([cipher.update(value, "utf8"), cipher.final()])
-  return [
-    "v1",
-    iv.toString("base64url"),
-    cipher.getAuthTag().toString("base64url"),
-    encrypted.toString("base64url"),
-  ].join(".")
+  return encryptIntegrationValue("resend", value, businessId)
 }
 
 export function decryptResendSecret(value: string, businessId: string): string {
-  const [version, iv, tag, data] = value.split(".")
-  if (version !== "v1" || !iv || !tag || !data) throw new Error("RESEND_SECRET_INVALID")
-  const decipher = createDecipheriv("aes-256-gcm", key(), Buffer.from(iv, "base64url"))
-  decipher.setAAD(Buffer.from(businessId))
-  decipher.setAuthTag(Buffer.from(tag, "base64url"))
-  return Buffer.concat([
-    decipher.update(Buffer.from(data, "base64url")),
-    decipher.final(),
-  ]).toString("utf8")
+  return decryptIntegrationValue("resend", value, businessId)
 }
 
 /**
@@ -61,6 +34,45 @@ export function decryptResendSecret(value: string, businessId: string): string {
 export function unsubscribeToken(messageId: string): string {
   const mac = createHmac("sha256", key()).update(messageId).digest("base64url")
   return `${Buffer.from(messageId).toString("base64url")}.${mac}`
+}
+
+/** Parse the lookup id without trusting the bearer token yet. */
+export function unsubscribeMessageId(token: string): string | null {
+  const match = /^([A-Za-z0-9_-]{1,342})\.([A-Za-z0-9_-]{43})$/.exec(token)
+  if (!match) return null
+  const id = Buffer.from(match[1], "base64url")
+  const mac = Buffer.from(match[2], "base64url")
+  if (id.toString("base64url") !== match[1] || mac.length !== 32 || mac.toString("base64url") !== match[2]) return null
+  const value = id.toString("utf8")
+  return /^[A-Za-z0-9_-]{1,255}$/.test(value) ? value : null
+}
+
+type EmailSnapshot = { id: string; html: string; text: string | null }
+
+function storedTokens(message: EmailSnapshot) {
+  // renderEmailTemplate guarantees this exact URL is in the saved email body.
+  // It is a random-looking bearer capability, already persisted before sending.
+  const tokens = new Set<string>()
+  for (const body of [message.html, message.text || ""]) {
+    for (const match of body.matchAll(/\/u\/([A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43})(?=$|[\s"'<>])/g)) {
+      if (unsubscribeMessageId(match[1]) === message.id) tokens.add(match[1])
+    }
+  }
+  return [...tokens]
+}
+
+/** Existing delivered links survive key retirement without retaining a compromised key. */
+export function matchesStoredUnsubscribeToken(token: string, message: EmailSnapshot): boolean {
+  if (unsubscribeMessageId(token) !== message.id) return false
+  const actual = Buffer.from(token)
+  return storedTokens(message).some((stored) => {
+    const expected = Buffer.from(stored)
+    return actual.length === expected.length && timingSafeEqual(actual, expected)
+  })
+}
+
+export function hasStoredUnsubscribeLink(message: EmailSnapshot): boolean {
+  return storedTokens(message).length > 0
 }
 
 export function verifyUnsubscribeToken(token: string): string | null {

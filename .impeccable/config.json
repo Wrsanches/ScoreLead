@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "roboto",
+        "files": [
+          "app/u/[token]/route.ts"
+        ],
+        "createdAt": "2026-10-22T00:52:20.540Z",
+        "reason": "Codex: pre-existing unchanged system-font fallback in standalone unsubscribe response; this change only updates token validation."
+      }
+    ]
+  }
+}

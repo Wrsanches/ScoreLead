@@ -3,23 +3,18 @@ import { eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { emailMessage } from "@/lib/db/schema"
 import { addSuppression } from "@/lib/resend/data"
-import { verifyUnsubscribeToken } from "@/lib/resend/security"
+import { matchesStoredUnsubscribeToken, unsubscribeMessageId } from "@/lib/resend/security"
 import { escapeEmailHtml } from "@/lib/resend/render"
 
 /**
- * Public one-click unsubscribe. The token is an HMAC over the message id, so
- * a valid link proves the visitor received that exact email. Idempotent.
+ * Public one-click unsubscribe. Compare the exact bearer link saved in the
+ * delivered email, so retiring an encryption/signing key preserves old links.
  */
 async function unsubscribe(token: string): Promise<{ ok: true; email: string } | { ok: false }> {
-  let messageId: string | null
-  try {
-    messageId = verifyUnsubscribeToken(token)
-  } catch {
-    messageId = null
-  }
+  const messageId = unsubscribeMessageId(token)
   if (!messageId) return { ok: false }
   const [message] = await db.select().from(emailMessage).where(eq(emailMessage.id, messageId)).limit(1)
-  if (!message) return { ok: false }
+  if (!message || !matchesStoredUnsubscribeToken(token, message)) return { ok: false }
   await addSuppression({
     businessId: message.businessId,
     email: message.toEmail,

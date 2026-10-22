@@ -1,51 +1,15 @@
 import {
-  createCipheriv,
-  createDecipheriv,
   createHash,
   createHmac,
-  randomBytes,
   timingSafeEqual,
 } from "node:crypto"
+import { decryptIntegrationValue, encryptIntegrationValue } from "@/lib/security/token-encryption"
 
-function key() {
-  const raw = process.env.INSTAGRAM_TOKEN_ENCRYPTION_KEY || ""
-  const decoded = Buffer.from(
-    raw,
-    /^[a-f\d]{64}$/i.test(raw) ? "hex" : "base64",
-  )
-  if (decoded.length !== 32) throw new Error("INSTAGRAM_NOT_CONFIGURED")
-  return decoded
-}
 export function encryptInstagramToken(token: string, businessId: string) {
-  const iv = randomBytes(12)
-  const cipher = createCipheriv("aes-256-gcm", key(), iv)
-  cipher.setAAD(Buffer.from(businessId))
-  const encrypted = Buffer.concat([
-    cipher.update(token, "utf8"),
-    cipher.final(),
-  ])
-  return [
-    "v1",
-    iv.toString("base64url"),
-    cipher.getAuthTag().toString("base64url"),
-    encrypted.toString("base64url"),
-  ].join(".")
+  return encryptIntegrationValue("instagram", token, businessId)
 }
 export function decryptInstagramToken(value: string, businessId: string) {
-  const [version, iv, tag, data] = value.split(".")
-  if (version !== "v1" || !iv || !tag || !data)
-    throw new Error("INSTAGRAM_TOKEN_INVALID")
-  const decipher = createDecipheriv(
-    "aes-256-gcm",
-    key(),
-    Buffer.from(iv, "base64url"),
-  )
-  decipher.setAAD(Buffer.from(businessId))
-  decipher.setAuthTag(Buffer.from(tag, "base64url"))
-  return Buffer.concat([
-    decipher.update(Buffer.from(data, "base64url")),
-    decipher.final(),
-  ]).toString("utf8")
+  return decryptIntegrationValue("instagram", value, businessId)
 }
 export function stateHash(state: string) {
   return createHash("sha256").update(state).digest("hex")

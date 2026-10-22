@@ -4,6 +4,9 @@ import {
   encryptResendSecret,
   unsubscribeToken,
   verifyUnsubscribeToken,
+  hasStoredUnsubscribeLink,
+  matchesStoredUnsubscribeToken,
+  unsubscribeMessageId,
 } from "./security"
 
 const previous = process.env.RESEND_TOKEN_ENCRYPTION_KEY
@@ -32,4 +35,22 @@ test("unsubscribe tokens verify only when untouched", () => {
   expect(verifyUnsubscribeToken(`${Buffer.from("msg_999").toString("base64url")}.${mac}`)).toBeNull()
   expect(verifyUnsubscribeToken("garbage")).toBeNull()
   expect(verifyUnsubscribeToken(`${id}.${mac}.extra`)).toBeNull()
+})
+
+test("delivered unsubscribe links survive signing-key removal through exact saved snapshots", () => {
+  const token = unsubscribeToken("msg_123")
+  const snapshot = { id: "msg_123", html: `<a href="https://scorelead.com/u/${token}">Unsubscribe</a>`, text: null }
+  const oldKey = process.env.RESEND_TOKEN_ENCRYPTION_KEY
+  try {
+    process.env.RESEND_TOKEN_ENCRYPTION_KEY = Buffer.alloc(32, 10).toString("hex")
+    expect(verifyUnsubscribeToken(token)).toBeNull()
+    expect(hasStoredUnsubscribeLink(snapshot)).toBe(true)
+    expect(matchesStoredUnsubscribeToken(token, snapshot)).toBe(true)
+    expect(matchesStoredUnsubscribeToken(unsubscribeToken("msg_123"), snapshot)).toBe(false)
+    expect(matchesStoredUnsubscribeToken(token, { ...snapshot, id: "msg_999" })).toBe(false)
+    expect(matchesStoredUnsubscribeToken(token, { ...snapshot, html: snapshot.html.replace(token, token + "extra") })).toBe(false)
+    expect(matchesStoredUnsubscribeToken(token, { ...snapshot, html: "", text: `Unsubscribe: https://scorelead.com/u/${token}\n` })).toBe(true)
+  } finally { process.env.RESEND_TOKEN_ENCRYPTION_KEY = oldKey }
+  for (const malformed of ["garbage", token + ".extra", token + "=", `${Buffer.from("../foo").toString("base64url")}.${token.split(".")[1]}`])
+    expect(unsubscribeMessageId(malformed)).toBeNull()
 })
